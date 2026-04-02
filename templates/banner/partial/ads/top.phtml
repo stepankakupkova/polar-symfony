@@ -1,0 +1,79 @@
+<?php
+/**
+ * banner leaderboard 970x210
+ * jen na desktopech
+ */
+
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p1").length && $("#p1").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p1");
+        }
+    }, 2000);'
+);
+
+$view->addHeadStyle(
+    '#ssp-zone-151865-branding {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 auto;
+    }
+    #ssp-zone-151865-branding.adFull {
+        width: 2000px;
+        height: 1400px;
+    }
+    #ssp-zone-151865-branding.adFull ~ #page {
+        position: relative;
+        top: 142px;
+    }'
+);
+
+$rand = random_int(1, 1000);
+?>
+
+<div id="bannerLeaderboardPlace<?= $rand ?>"></div>
+
+<div id="ssp-zone-151865"></div>
+
+<script>
+    var sspScript = document.getElementById('ssp-script');
+    sspScript.addEventListener('load', function() {
+        var elBannerLeaderboard = document.getElementById('bannerLeaderboardPlace<?= $rand ?>');
+        var htmlBannerLeaderboard = "";
+        if (sssp.displaySeznamAds()) {
+            var brandedZones = [];
+            if (window.innerWidth >= 1366) {
+                document.body.insertAdjacentHTML('afterbegin', '<div id="ssp-zone-151865-branding"></div>');
+                brandedZones.push({
+                    "zoneId": 151865,
+                    "width": 2000,
+                    "height": 1400,
+                    "id": "ssp-zone-151865",
+                    "elements": [
+                        {id: "ssp-zone-151865-branding", width: 2000, height: 1400}
+                    ]
+                });
+            }
+            sssp.getAds(brandedZones);
+        } else {
+            if (window.innerWidth > 767) {
+                <?php if (isset($bannerLeaderboard)) { ?>
+                    htmlBannerLeaderboard =
+                        "<div class=\"container\">" +
+                            "<div class=\"row\">" +
+                                "<div class=\"col-md-12\">" +
+                                    "<div id=\"bannerLeaderboard\" data-type=\"leaderboard\" data-id=\"<?= $bannerLeaderboard['id'] ?>\" style=\"margin: 0 auto;\">" +
+                                        "<a onclick=\"bannerCountClick('leaderboard', <?= $bannerLeaderboard['id'] ?>)\" class=\"d-inline-block\" href=\"<?= $bannerLeaderboard['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                            "<img class=\"img-fluid d-block\" src=\"<?= $view->asset($bannerLeaderboard['image']) ?>\" alt=\"Reklama\" />" +
+                                        "</a>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    elBannerLeaderboard.insertAdjacentHTML("beforeend", htmlBannerLeaderboard);
+                <?php } ?>
+            }
+        }
+    });
+</script>

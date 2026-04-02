@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="cs" class="boxed">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><?= $view->getTitle() !== '' ? htmlspecialchars($view->getTitle()) . ' | POLAR' : 'POLAR televize Ostrava' ?></title>
+    <meta name="author" content="POLAR televize Ostrava">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+    <meta name="application-name" content="POLAR televize Ostrava">
+    <meta name="theme-color" content="#0f385a">
+    <meta name="robots" content="<?= $robots ?? 'index, follow' ?>">
+    <meta name="googlebot" content="<?= $robots ?? 'index, follow' ?>">
+    <?php foreach ($view->getMetas() as $meta) { ?>
+        <meta name="<?= htmlspecialchars($meta['name']) ?>" content="<?= htmlspecialchars($meta['content']) ?>">
+    <?php } ?>
+    <?php foreach ($view->getOgMetas() as $og) { ?>
+        <meta property="<?= htmlspecialchars($og['property']) ?>" content="<?= htmlspecialchars($og['content']) ?>">
+    <?php } ?>
+    <meta name="msapplication-config" content="<?= $view->asset('img/web/icon/browserconfig.xml') ?>">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= $view->asset('img/web/icon/apple-touch-icon.png') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= $view->asset('img/web/icon/favicon-32x32.png') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= $view->asset('img/web/icon/favicon-16x16.png') ?>">
+    <link rel="manifest" href="<?= $view->asset('img/web/icon/site.webmanifest') ?>">
+    <link rel="mask-icon" href="<?= $view->asset('img/web/icon/safari-pinned-tab.svg') ?>" color="#0f385a">
+    <link rel="shortcut icon" href="<?= $view->asset('img/web/icon/favicon.ico') ?>">
+
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/font-google/css/font-google.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/bootstrap/css/bootstrap.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/font-awesome/css/all.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/animate/css/animate.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/simple-line-icons/css/simple-line-icons.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/owl-carousel/css/owl-carousel.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/owl-carousel/css/owl-theme.default.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/web/pnotify/css/pnotify.min.css?ver=0.1') ?>">
+    <!-- TODO: vendor/porto-admin/css/theme-admin-extension.min.css (admin rozšíření) -->
+    <!-- TODO: css/admin/skin/theme-admin-extension.min.css -->
+    <link rel="stylesheet" href="<?= $view->asset('vendor/porto/css/theme.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/porto/css/theme-elements.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/porto/css/theme-blog.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('css/web/skin/skin.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('css/web/custom.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('css/web/print.css?ver=0.1') ?>" media="print">
+
+    <script src="<?= $view->asset('vendor/web/jquery/js/jquery.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/modernizr/js/modernizr.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('js/web/custom.min.js?ver=0.1') ?>"></script>
+    <script type="text/javascript" 
+        data-cmp-ab="1" 
+        src="https://cdn.consentmanager.net/delivery/js/semiautomatic.min.js" 
+        data-cmp-cdid="dfc21489221a9" 
+        data-cmp-host="c.delivery.consentmanager.net" 
+        data-cmp-cdn="cdn.consentmanager.net" 
+        data-cmp-codesrc="0">
+    </script>
+    <script id="ssp-script" defer src="https://ssp.imedia.cz/static/js/ssp.js"></script>
+    <script>
+        var sspScript = document.getElementById('ssp-script');
+        sspScript.addEventListener('load', function() {
+            sssp.config({ source: 'media' });
+            sssp.getAdsByTags();
+
+            if (sssp.displaySeznamAds()) {
+                var el = document.createElement('link');
+                el.setAttribute('rel', 'stylesheet');
+                el.setAttribute('type', 'text/css');
+                el.setAttribute('href', '/css/web/seznam.css?ver=1.2');
+                document.getElementsByTagName('head')[0].appendChild(el);
+
+                $('.simple-search.input-group').addClass('custom-slim');
+            }
+        });
+    </script>
+    <?php foreach ($view->getHeadStyles() as $css) { ?>
+        <style><?= $css ?></style>
+    <?php } ?>
+    <?php foreach ($view->getHeadLinks() as $link) { ?>
+        <link rel="<?= htmlspecialchars($link['rel']) ?>" href="<?= htmlspecialchars($link['href']) ?>"<?= $link['media'] ? ' media="' . htmlspecialchars($link['media']) . '"' : '' ?>>
+    <?php } ?>
+</head>
+
+<body>
+    <?= $view->include('banner/partial/ads/top', ['bannerLeaderboard' => $bannerLeaderboard ?? null]) ?>
+    <div class="body border-top-0">
+        <header id="header" class="header-no-border-bottom">
+            <div class="header-body">
+                <div class="header-container container container-md-fluid">
+                    <div class="header-row">
+                        <div class="header-column flex-grow-0 justify-content-center">
+                            <button class="btn header-btn-collapse-nav text-secondary bg-white h-100 ms-0 me-2 collapsed" data-bs-toggle="collapse"
+                                    data-bs-target=".header-nav-main">
+                                <i class="fa fa-bars text-7"></i>
+                            </button>
+                        </div>
+                        <div class="header-column flex-grow-0 align-items-start me-2 me-md-4 py-0">
+                            <div class="header-logo">
+                                <!-- H1 nadpis pro SEO -->
+                                <?php
+                                    // TODO: doplnit routes až budou implementovány: job_list, job_city_list, job_our_detail, job_city_detail,
+                                    //       news_region, news_region_city, news_redactor, app_hd, app_polar2, app_reklama, app_kontakt,
+                                    //       app_hbbtv, app_jak-naladit, election_*, program_*, show_*
+                                    $h1Routes = ['app_home', 'app_search', 'news_list', 'news_pr_list', 'news_triptip_list', 'camera_list', 'camera_detail'];
+                                    $h1Display = in_array($routeName ?? '', $h1Routes, true);
+                                    $h1Title = htmlspecialchars($view->getTitle());
+                                ?>
+                                <?= $h1Display ? '<h1 aria-label="' . $h1Title . '" class="m-0">' : '' ?>
+                                <a href="<?= $view->path('app_home') ?>">
+                                    <img alt="POLAR televize Ostrava" src="<?= $view->asset('img/web/logo.svg') ?>">
+                                </a>
+                                <?= $h1Display ? '</h1>' : '' ?>
+                            </div>
+                        </div>
+
+                        <!-- submenu - horní menu desktop -->
+                        <div class="header-column align-self-center d-none d-lg-block">
+                            <nav class="header-nav-top">
+                                <?= $view->include('navigation/submenu') ?>
+                            </nav>
+                        </div>
+
+                        <!-- Horní hlavička mobily -->
+                        <div class="header-row d-lg-none p-relative d-flex justify-content-end">
+                            <div class="header-column flex-grow-0 align-self-center me-2 me-md-3 z-index-2">
+                                <nav class="header-nav-top">
+                                    <?= $view->include('navigation/submenu', ['mobile' => true]) ?>
+                                </nav>
+                            </div>
+                            <div class="header-column flex-grow-0 align-self-center me-5 me-5-custom pe-2 z-index-2">
+                                <a href="https://www.facebook.com/televize.polar" target="_blank" class="text-secondary hide-xs-2">
+                                    <i class="fab fa-facebook-f text-7"></i>
+                                </a>
+                            </div>
+                            <div class="header-row p-absolute right-0 w-100 justify-content-end align-self-center me-3">
+                                <div class="header-nav-features w-100 ps-2">
+                                    <div class="header-nav-features-search-reveal-container justify-content-end">
+                                        <div class="header-nav-feature header-nav-features-search header-nav-features-search-reveal d-inline-flex w-100">
+                                            <form class="searchForm w-100" role="search" action="<?= $view->path('app_search') ?>" method="get">
+                                                <div class="simple-search input-group bg-white w-100 z-index-3">
+                                                    <input class="form-control search" name="q" type="text" value=""
+                                                           placeholder="Hledat ve zprávách a v pořadech" required minlength="3">
+                                                    <button class="btn" type="submit">
+                                                        <i class="fa fa-search header-nav-top-icon text-6 text-secondary"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            <a href="#" class="header-nav-features-search-show-icon"><i class="fas fa-search header-nav-top-icon text-6 text-secondary"></i></a>
+                                            <a href="#" class="header-nav-features-search-hide-icon"><i class="fas fa-times header-nav-top-icon text-secondary"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END Horní hlavička mobily -->
+
+                        <div class="header-column align-self-center d-none d-lg-block">
+                            <div class="header-nav-features header-nav-features-no-border header-nav-features-md-show-border justify-content-end px-0 mx-0">
+                                <form class="searchForm" action="<?= $view->path('app_search') ?>" method="get">
+                                    <div class="simple-search input-group line-height-1">
+                                        <input class="form-control search" name="q" type="text" value="" placeholder="Hledat ve zprávách a v pořadech" required
+                                               minlength="3">
+                                        <button class="btn btn-rounded" type="submit">
+                                            <i class="fa fa-search header-nav-top-icon"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="header-column align-self-center flex-row justify-content-end d-none d-xl-flex">
+                            <ul class="social-icons">
+                                <li class="social-icons-facebook">
+                                    <a href="https://www.facebook.com/televize.polar" target="_blank" data-placement="bottom" data-tooltip title="Facebook" class="text-secondary text-hover-light">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                </li>
+                                <li class="social-icons-instagram">
+                                    <a href="https://www.instagram.com/televize.polar/" target="_blank" data-placement="bottom" data-tooltip title="Instagram" class="text-secondary text-hover-light">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="social-icons-twitter">
+                                    <a href="https://twitter.com/Televize_Polar" target="_blank" data-placement="bottom" data-tooltip title="Platforma X" class="text-secondary text-hover-light">
+                                        <i class="fab fa-x-twitter"></i>
+                                    </a>
+                                </li>
+                                <li class="social-icons-tiktok">
+                                    <a href="https://www.tiktok.com/@televize.polar" target="_blank" data-placement="bottom" data-tooltip title="TikTok" class="text-secondary text-hover-light">
+                                        <i class="fab fa-tiktok"></i>
+                                    </a>
+                                </li>
+                                <li class="social-icons-youtube">
+                                    <a href="https://www.youtube.com/user/polarostrava" target="_blank" data-placement="bottom" data-tooltip title="YouTube" class="text-secondary text-hover-light">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-container header-nav header-nav-bar p-0 border-bottom border-color-ccc">
+                    <div class="container-fluid gx-0">
+                        <!-- Mobily - Menu regionů v posuvné liště -->
+                        <div class="mobile_menu d-lg-none">
+                            <nav class="d-flex">
+                                <?= $view->include('navigation/menu', ['ulClass' => 'mobile-menu']) ?>
+                            </nav>
+                        </div>
+                        <div class="header-nav-main header-nav-main-effect-1 header-nav-main-sub-effect-1 collapse">
+                            <div class="d-flex">
+                                <!-- Desktop hlavní menu regiony -->
+                                <div class="d-none d-lg-flex">
+                                    <nav>
+                                        <?= $view->include('navigation/menu', ['ulClass' => 'nav nav-pills']) ?>
+                                    </nav>
+                                </div>
+                                <?= $view->include('navigation/mobile-ham-menu') ?>
+                            </div>
+
+                            <!-- Mobily - Přidání sociálních sítí do rozbalovacího menu dolů -->
+                            <ul class="d-lg-none social-mobile-menu d-flex flex-row justify-content-center mb-2">
+                                <li class="border-bottom-0 w-auto mx-1"><a href="https://www.facebook.com/televize.polar" class="d-flex align-self-center text-6 text-decoration-none w-auto" target="_blank"><i class="fab fa-facebook-f text-white"></i></a></li>
+                                <li class="border-bottom-0 w-auto mx-1"><a href="https://www.instagram.com/televize.polar/" class="d-flex align-self-center text-6 text-decoration-none w-auto" target="_blank"><i class="fab fa-instagram text-white"></i></a></li>
+                                <li class="border-bottom-0 w-auto mx-1"><a href="https://twitter.com/Televize_Polar" class="d-flex align-self-center text-6 text-decoration-none w-auto" target="_blank"><i class="fab fa-x-twitter text-white"></i></a></li>
+                                <li class="border-bottom-0 w-auto mx-1"><a href="https://www.tiktok.com/@televize.polar" class="d-flex align-self-center text-6 text-decoration-none w-auto" target="_blank"><i class="fab fa-tiktok text-white"></i></a></li>
+                                <li class="border-bottom-0 w-auto mx-1"><a href="https://www.youtube.com/user/polarostrava" class="d-flex align-self-center text-6 text-decoration-none w-auto" target="_blank"><i class="fab fa-youtube text-white"></i></a></li>
+                                <li class="border-bottom-0 w-auto mx-1"><a href="https://polarmultimedia.cz" class="d-flex align-self-center w-auto" target="_blank"><img alt="POLAR multimedia" src="<?= $view->asset('img/web/POLAR_multimedia_RGB_white.png') ?>"></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div role="main" class="main">
+            <?= $content ?>
+            <?= $view->include('banner/partial/ads/layout-bottom') ?>
+        </div>
+
+        <footer class="bg-secondary pt-4 border-0" id="footer">
+            <div class="container px-3">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h4 class="heading-primary mb-4">Denně nás sleduje <b><?= htmlspecialchars((string) ($footerNumbers['footer_number_1'] ?? '')) ?></b> diváků</h4>
+                        <div class="row mb-4">
+                            <div class="col-11 col-lg-8 text-custom-px ms-2 ms-lg-3">
+                                <div class="row mb-2">
+                                    <div class="col-1 d-lg-flex justify-content-lg-center align-items-lg-center">
+                                        <i class="fas fa-tv font-tyrkys me-1"></i>
+                                    </div>
+                                    <div class="col-7 col-md-10 col-lg-7">
+                                        televizní vysílání
+                                    </div>
+                                    <div class="col-3 col-md-11 col-lg-3 font-weight-bold text-nowrap">
+                                        <?= htmlspecialchars((string) ($footerNumbers['footer_number_2'] ?? '')) ?>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-1 d-lg-flex justify-content-lg-center align-items-lg-center">
+                                        <i class="fas fa-globe-americas font-tyrkys me-1"></i>
+                                    </div>
+                                    <div class="col-7 col-md-10 col-lg-7">
+                                        portál polar.cz
+                                    </div>
+                                    <div class="col-3 col-md-11 col-lg-3 font-weight-bold text-nowrap">
+                                        <?= htmlspecialchars((string) ($footerNumbers['footer_number_3'] ?? '')) ?>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-1 d-lg-flex justify-content-lg-center align-items-lg-center">
+                                        <i class="fab fa-facebook-f font-tyrkys me-1"></i>
+                                    </div>
+                                    <div class="col-7 col-md-10 col-lg-7">
+                                        televize.polar
+                                    </div>
+                                    <div class="col-3 col-md-11 col-lg-3 font-weight-bold text-nowrap">
+                                        <?= htmlspecialchars((string) ($footerNumbers['footer_number_4'] ?? '')) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <img class="img-fluid" src="/img/web/layout/footer/polar_web_paticka.png" alt="Sledovanost">
+                    </div>
+
+                    <div class="col-md-4 mb-4 px-md-4">
+                        <h4 class="heading-primary mb-1">POLAR TELEVIZE</h4>
+                        <div class="text-custom-px mb-3-5">je nejúspěšnější regionální televizní společnost v ČR. Naše štáby denně přinášejí reportáže z měst a obcí Moravskoslezského kraje. Vysíláme je k lidem prostřednictvím televizního vysílání, portálu polar.cz a sociálních sítí.</div>
+                        <h4 class="heading-primary mb-1">POLAR MULTIMEDIA</h4>
+                        <div class="text-custom-px mb-3-5">je divize se specializací na komerční výrobu. Umíme a rádi děláme vše, co se týká multimedií - videa, virtuální realitu, grafiky, weby. Našim klientům to přináší výhodu snadné komunikace s jediným univerzálním a osvědčeným dodavatelem.</div>
+                        <div class="text-custom-px">Obě naše divize těží z více než 30ti let zkušeností (založeno 1993), sdružují více než 50 profesionálů a drží řadu ocenění za profesionalitu a proklientský přístup.</div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <h4 class="heading-primary mb-4">Kontaktujte nás</h4>
+                        <div class="row mb-3">
+                            <div class="col-12 text-custom-px ms-2">
+                                <div class="row mb-2">
+                                    <div class="col-1 d-lg-flex justify-content-lg-center align-items-lg-center">
+                                        <i class="fas fa-phone-alt font-tyrkys me-1"></i>
+                                    </div>
+                                    <div class="col-10 col-lg-11 text-custom-px">
+                                        <span class="font-weight-semi-bold text-nowrap">552 303 303</span>&nbsp;<span>(Nezasílejte SMS, děkujeme)</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-1 d-lg-flex justify-content-lg-center align-items-lg-center">
+                                        <i class="fas fa-envelope font-tyrkys me-1"></i>
+                                    </div>
+                                    <div class="col-10 text-custom-px font-weight-semi-bold">
+                                        <a href="mailto:polar@polar.cz">polar@polar.cz</a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-1 d-lg-flex justify-content-lg-center align-items-lg-center">
+                                        <i class="fas fa-map-marker-alt font-tyrkys me-1"></i>
+                                    </div>
+                                    <div class="col-10 text-custom-px font-weight-semi-bold">
+                                        Adresa:
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-1"></div>
+                                    <div class="col-11">
+                                        <div class="text-custom-px line-height-5 mb-4">Boleslavova&nbsp;710/19<br>Ostrava-Mariánské&nbsp;Hory<br>709&nbsp;00<br>Česká&nbsp;republika</div>
+                                        <div class="social-icons mt-4">
+                                            <ul class="social-icons">
+                                                <li class="social-icons-facebook">
+                                                    <a href="https://www.facebook.com/televize.polar" target="_blank" data-placement="bottom" data-tooltip title="Facebook">
+                                                        <i class="fab fa-facebook-f text-secondary text-hover-light"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="social-icons-instagram">
+                                                    <a href="https://www.instagram.com/televize.polar/" target="_blank" data-placement="bottom" data-tooltip title="Instagram">
+                                                        <i class="fab fa-instagram text-secondary text-hover-light"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="social-icons-twitter">
+                                                    <a href="https://twitter.com/Televize_Polar" target="_blank" data-placement="bottom" data-tooltip title="Platforma X">
+                                                        <i class="fab fa-x-twitter text-secondary text-hover-light"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="social-icons-tiktok">
+                                                    <a href="https://www.tiktok.com/@televize.polar" target="_blank" data-placement="bottom" data-tooltip title="TikTok">
+                                                        <i class="fab fa-tiktok text-secondary text-hover-light"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="social-icons-facebook">
+                                                    <a href="/rss" target="_self" data-placement="bottom" data-tooltip title="RSS">
+                                                        <i class="fas fa-rss text-secondary text-hover-light"></i>
+                                                    </a>
+                                                </li>
+                                                <li class="social-icons-youtube">
+                                                    <a href="https://www.youtube.com/user/polarostrava" target="_blank" data-placement="bottom" data-tooltip title="YouTube">
+                                                        <i class="fab fa-youtube text-secondary text-hover-light"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-copyright bg-secondary border-top border-width-2 border-color-dark-blue py-1">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <p><i class="fa fa-copyright"></i> 1993 - <?= date('Y') ?> POLAR televize Ostrava,&nbsp;s.r.o., orgánem dohledu je Rada pro rozhlasové a&nbsp;televizní vysílání.</p>
+                        </div>
+                        <div class="col-lg-5 d-flex justify-content-end">
+                            <nav id="sub-menu">
+                                <?= $view->include('navigation/footer') ?>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="<?= $view->asset('vendor/web/appear/js/appear.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/easing/js/easing.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/cookie/js/cookie.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/popper/js/popper.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/bootstrap/js/bootstrap.bundle.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/moment/js/moment.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/moment/js/locale/cs.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/validation/js/validation.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/owl-carousel/js/owl-carousel.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/porto/js/theme.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/porto/plugins/js/plugins-custom.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/porto/js/theme.init.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('js/web/custom.config.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/lazysizes/js/lazysizes.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('vendor/web/magnific-popup/js/magnific-popup.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/magnific-popup/locale/cs.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/gmap/js/gmap.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/easy-pie-chart/js/easy-pie-chart.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/validation/locale/cs.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/isotope/js/isotope.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/vivus/js/vivus.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/vide/js/vide.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/pnotify/js/pnotify.min.js?ver=0.1') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/web/jquery/js/jquery.visible.min.js') ?>" defer></script>
+    <script src="<?= $view->asset('vendor/porto-admin/js/theme.admin.extension.min.js?ver=0.1') ?>"></script>
+    <!-- Pokud uživatel vidí banner, uložíme showed + 1 -->
+    <script>
+        window.addEventListener('load', function() {
+            var bannerLeaderboardShowed = false;
+            var bannerRectangleShowed = false;
+            var bannerSquareShowed = false;
+            var bannerMobilestickyShowed = false;
+            var bannerMobilesquare1Showed = false;
+            var bannerMobilesquare2Showed = false;
+            const isInViewportOffset = 0;
+            $('#bannerLeaderboard, #bannerRectangle, #bannerSquare, #bannerMobilesticky, #bannerMobilesquare1, #bannerMobilesquare2').isInViewport(function(status) {
+                if (status === 'entered') {
+                    var type = $(this).attr('data-type');
+                    var id   = $(this).attr('data-id');
+                    if (
+                        (type === 'leaderboard'   && !bannerLeaderboardShowed) ||
+                        (type === 'rectangle'     && !bannerRectangleShowed) ||
+                        (type === 'square'        && !bannerSquareShowed) ||
+                        (type === 'mobilesticky'  && !bannerMobilestickyShowed) ||
+                        (type === 'mobilesquare1' && !bannerMobilesquare1Showed) ||
+                        (type === 'mobilesquare2' && !bannerMobilesquare2Showed)
+                    ) {
+                        $.post('<?= $view->path('banner_set_showed') ?>', { type: type, id: id }, function(json) {
+                            if (json.success === true) {
+                                if (type === 'leaderboard')   bannerLeaderboardShowed   = true;
+                                if (type === 'rectangle')     bannerRectangleShowed     = true;
+                                if (type === 'square')        bannerSquareShowed        = true;
+                                if (type === 'mobilesticky')  bannerMobilestickyShowed  = true;
+                                if (type === 'mobilesquare1') bannerMobilesquare1Showed = true;
+                                if (type === 'mobilesquare2') bannerMobilesquare2Showed = true;
+                            }
+                        }, 'json');
+                    }
+                }
+            }, isInViewportOffset);
+        });
+    </script>
+    <?= $view->include('banner/partial/ads/mobilesticky', ['bannerMobilesticky' => $bannerMobilesticky ?? null]) ?>
+    <!-- TODO: Google Analytics / GTM (gtag.js) — pouze pro production prostředí -->
+    <?php if (($_SERVER['APP_ENV'] ?? 'dev') === 'production') { ?>
+        <!-- Global site tag (gtag.js) - Google Analytics (řízeno consentmanager CMP) -->
+        <script data-cmp-ab="1" async src="https://www.googletagmanager.com/gtag/js?id=<?= htmlspecialchars($GOOGLE_ANALYTICS_ID) ?>"></script>
+        <script data-cmp-ab="1">
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '<?= htmlspecialchars($GOOGLE_ANALYTICS_ID) ?>');
+        </script>
+    <?php } ?>
+    <!-- CMP seznam.cz - možnost upravení souhlasu (zakomentováno jako v polaru) -->
+    <!--<script>
+        document.getElementById('open-cmp-btn').addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            scmp.open();
+        });
+    </script>-->
+    <script>
+        function initStickyMenu() {
+            if ($(window).width() < 992) {
+                $.extend(theme.StickyHeader.defaults, {
+                    stickyEnableOnMobile: true,
+                    stickyStartAtElement: "#header"
+                });
+            } else {
+                $.extend(theme.StickyHeader.defaults, {
+                    stickyStartAtElement: ".header-nav",
+                    stickySetTop: -77
+                });
+            }
+            theme.StickyHeader.initialize();
+        }
+        window.addEventListener("load", function(event) {
+            initStickyMenu();
+        });
+        window.addEventListener("resize", function(event) {
+            initStickyMenu();
+        });
+    </script>
+    <?php foreach ($view->getBodyScripts() as $src) { ?>
+        <script src="<?= $src ?>"></script>
+    <?php } ?>
+    <?php foreach ($view->getInlineScripts() as $script) { ?>
+        <script><?= $script ?></script>
+    <?php } ?>
+</body>
+</html>

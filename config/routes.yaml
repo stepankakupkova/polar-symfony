@@ -1,0 +1,21 @@
+# config/routes.yaml
+news:
+  resource: routes/news.yaml
+
+job:
+  resource: routes/job.yaml
+
+camera:
+  resource: routes/camera.yaml
+
+banner:
+  resource: routes/banner.yaml
+
+app_home:
+  path: /
+  controller: App\Application\Controller\Web\HomeController::index
+
+app_search:
+  path: /hledat
+  controller: App\Application\Controller\Web\SearchController::index
+  methods: [GET]

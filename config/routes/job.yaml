@@ -1,0 +1,15 @@
+job_list:
+  path: /prace
+  controller: App\Job\Controller\Web\JobController::index
+
+job_city_list:
+  path: /prace/{city_url}
+  controller: App\Job\Controller\Web\JobController::index
+
+job_our_detail:
+  path: /prace/nase/{job_id}/{job_url}
+  controller: App\Job\Controller\Web\JobController::detail
+
+job_city_detail:
+  path: /prace/{city_url}/{job_id}/{job_url}
+  controller: App\Job\Controller\Web\JobController::detail

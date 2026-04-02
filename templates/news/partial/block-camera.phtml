@@ -1,0 +1,80 @@
+<?php
+/** @var array|null $blockCamera */
+
+$removeAccent = function (string $text, string $replace = ''): string {
+    $transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
+    $text = $transliterator->transliterate($text);
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
+    }
+    return $text;
+};
+
+?>
+
+<?php if ($blockCamera) { ?>
+    <div class="container-fluid block-news bg-e2e5e9 mb-4-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                        <a class="text-primary" href="<?= $view->path('camera_list') ?>">
+                            Kamery
+                        </a>
+                    </h3>
+                    <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('camera_list') ?>">
+                        více&nbsp;<i class="fas fa-chevron-right text-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <?php for ($i = 0, $iMax = count($blockCamera); $i < $iMax; $i++) { ?>
+                    <?php
+                        $hide_on_mobile = '';
+                        if ($i >= 3) {
+                            $hide_on_mobile = 'd-none d-lg-block';
+                        } else if ($i >= 2) {
+                            $hide_on_mobile = 'd-none d-md-block';
+                        }
+
+                        $thumb = '/data/camera/' . $blockCamera[$i]['id'] . '.jpg';
+                        if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $thumb)) {
+                            $thumb = '/data/camera/nahled-pripravujeme.jpg';
+                        }
+                    ?>
+                    <div class="col-lg-3 col-md-4 col-6 <?= $hide_on_mobile ?>">
+                        <article class="">
+                            <div class="row mb-4">
+                                <div class="col-12 d-flex mb-2-2-3">
+                                    <div class="mb-2">
+                                        <a href="<?= $view->path('camera_detail', ['camera_id' => $blockCamera[$i]['id'], 'camera_url' => $removeAccent($blockCamera[$i]['title'], '-')]) ?>">
+                                            <span class="thumb-info thumb-info-lighten">
+                                                <span class="thumb-info-wrapper">
+                                                    <img src="<?= $thumb ?>" class="img-fluid" alt="<?= $blockCamera[$i]['title'] ?>">
+                                                    <span class="thumb-info-title">
+                                                        <span class="thumb-info-inner">
+                                                            <?= $blockCamera[$i]['title'] ?>
+                                                        </span>
+                                                        <span class="thumb-info-type">
+                                                            <?= $blockCamera[$i]['description'] ?>
+                                                        </span>
+                                                    </span>
+                                                    <span class="thumb-info-action"><span class="thumb-info-action-icon"><i class="fas fa-play"></i></span></span>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } else { ?>
+    <hr class="solid">
+<?php } ?>

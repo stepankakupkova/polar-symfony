@@ -1,0 +1,50 @@
+.vjs-quality-selector .vjs-menu-button {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%
+}
+.vjs-quality-selector .vjs-icon-placeholder {
+    font-family: "VideoJS";
+    font-weight: normal;
+    font-style: normal
+}
+.video-js:not(.vjs-v8) .vjs-quality-selector .vjs-icon-placeholder::before {
+    content: ""
+}
+.vjs-v8 .vjs-quality-selector .vjs-icon-placeholder::before {
+    /*content: ""*/
+    content: "Kvalita \25BC";
+    font-size: 1.2em;
+    font-weight: 400;
+    font-style: normal;
+    font-family: Arial,Helvetica,sans-serif;
+}
+.vjs-quality-changing .vjs-big-play-button {
+    display: none
+}
+.vjs-quality-changing .vjs-control-bar {
+    display: flex;
+    visibility: visible;
+    opacity: 1
+}
+.vjs-quality-selector .vjs-menu li {
+    text-transform: unset !important;
+    padding: .4em 0;
+    outline: none;
+}
+.vjs-quality-selector.vjs-menu-button-popup .vjs-menu {
+    margin-bottom: 39px;
+    width: 11em;
+}
+.vjs-quality-selector .vjs-menu-button.vjs-menu-button-popup.vjs-button:focus-visible {
+    outline: none;
+}
+.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    bottom: 0;
+}
+@media (max-width: 991.98px) {
+    .vjs-v8 .vjs-quality-selector .vjs-icon-placeholder::before {
+        font-weight: bold;
+    }
+}

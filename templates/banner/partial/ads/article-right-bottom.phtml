@@ -1,0 +1,55 @@
+<?php
+/**
+ * seznam.cz SSP - Skyscraper 300x600
+ * nebo vlastní bannerSquare 300x300
+ * jen na desktopech
+ */
+
+$rand = random_int(1, 1000);
+
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p6_' . $rand . '").length && $("#p6_' . $rand . '").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p6_' . $rand . '");
+        }
+    }, 2000);'
+);
+?>
+
+<div id="bannerRightBottomPlace<?= $rand ?>"></div>
+
+<script>
+    if (window.innerWidth > 767) {
+        var sspScript<?= $rand ?> = document.getElementById('ssp-script');
+        sspScript<?= $rand ?>.addEventListener('load', function() {
+            var elBannerRightBottom = document.getElementById('bannerRightBottomPlace<?= $rand ?>');
+            var htmlBannerRightBottom = "";
+            if (sssp.displaySeznamAds()) {
+                htmlBannerRightBottom =
+                    "<div class=\"row\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p6_<?= $rand ?>\" data-szn-ssp-ad='{\"zoneId\": 151875, \"width\": 300, \"height\": 600}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerRightBottom.insertAdjacentHTML("beforeend", htmlBannerRightBottom);
+            } else {
+                <?php if (isset($bannerSquare)) { ?>
+                    htmlBannerRightBottom =
+                        "<div class=\"row\">" +
+                            "<div class=\"col-md-12\">" +
+                                "<div class=\"reklama\">" +
+                                    "Reklama" +
+                                "</div>" +
+                                "<div id=\"bannerSquare\" data-type=\"square\" data-id=\"<?= $bannerSquare['id'] ?>\" style=\"margin: 0 auto;\">" +
+                                    "<a onclick=\"bannerCountClick('square', <?= $bannerSquare['id'] ?>)\" class=\"d-block text-center\" href=\"<?= $bannerSquare['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                        "<img class=\"img-fluid\" src=\"<?= $view->asset($bannerSquare['image']) ?>\" alt=\"Reklama\" />" +
+                                    "</a>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    elBannerRightBottom.insertAdjacentHTML("beforeend", htmlBannerRightBottom);
+                <?php } ?>
+            }
+        });
+    }
+</script>

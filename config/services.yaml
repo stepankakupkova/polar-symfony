@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.HOURS_DELETE_LABELS: 24
+    app.GOOGLE_ANALYTICS_ID: '%env(GOOGLE_ANALYTICS_ID)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+
+    # database
+    App\News\Repository\PlaykitRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    App\Job\Repository\JobRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    App\News\Controller\:
+        resource: '../src/News/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Application\Controller\:
+        resource: '../src/Application/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Camera\Controller\:
+        resource: '../src/Camera/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Job\Controller\:
+        resource: '../src/Job/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Banner\Controller\:
+        resource: '../src/Banner/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\View\PhtmlRenderer:
+        arguments:
+            $templatesDir: '%kernel.project_dir%/templates'
+            $basePath: ''
+            $globals:
+                HOURS_DELETE_LABELS: '%app.HOURS_DELETE_LABELS%'
+
+    App\Application\EventSubscriber\LayoutSubscriber:
+        arguments:
+            $GOOGLE_ANALYTICS_ID: '%app.GOOGLE_ANALYTICS_ID%'
+
+

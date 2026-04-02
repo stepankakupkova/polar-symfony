@@ -1,0 +1,510 @@
+<?php
+/** @var \App\View\ViewHelper $view */
+/** @var array|null $newArticles */
+/** @var array|null $pr */
+/** @var array $regions */
+/** @var array|null $newVideos */
+/** @var array $special */
+/** @var int $newsCount */
+/** @var array|null $bannerRectangle */
+/** @var array|null $bannerSquare */
+/** @var array|null $bannerMobilesquare1 */
+/** @var array|null $bannerMobilesquare2 */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+
+$view->addInlineScript('getTickerData(); interval = startTicker(); getCrawlData();');
+$view->addInlineScript('
+if ($(window).width() > 992) {
+    let playerLiveSDHD = videojs("playerLiveSDHD", {
+        controls: true, autoplay: true, preload: "auto", aspectRatio: "16:9", muted: true, inactivityTimeout: 1000,
+        controlBar: { children: { playToggle: true, LiveDisplay: true, volumePanel: { inline: true }, fullscreenToggle: true } }
+    });
+}
+');
+
+/**
+ * Helper: formátování data a času v češtině
+ */
+function homeFormatDate(string $dateStr): array
+{
+    try {
+        $d = new DateTime($dateStr);
+        $today = new DateTime();
+        $yesterday = (new DateTime())->modify('-1 day');
+        if ($today->format('Y-m-d') === $d->format('Y-m-d')) {
+            $day = 'Dnes';
+        } elseif ($yesterday->format('Y-m-d') === $d->format('Y-m-d')) {
+            $day = 'Včera';
+        } else {
+            $day = $d->format('j. n. Y');
+        }
+        return ['day' => $day, 'time' => $d->format('H:i')];
+    } catch (Exception) {
+        return ['day' => 'NaN', 'time' => 'NaN'];
+    }
+}
+
+$HOURS_DELETE_LABELS = $HOURS_DELETE_LABELS ?? 24;
+$nowMinusX = (new DateTime())->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+
+$k = 0; // PR blok counter
+?>
+
+<?php // Horní blok: live stream + sociální sítě + POLAR multimedia nebo Speciál na HP (povodně, volby, aktuální velká témata) ?>
+<?php if (($special['active'] ?? '') !== '1') { ?>
+    <div class="container d-none d-lg-block pt-4 pb-2">
+        <div class="row">
+            <div class="col-md-4 match-height mb-3">
+                <div id="video-container" class="ratio ratio-16x9">
+                    <video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
+                        <source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
+                        <p class="vjs-no-js">Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.</p>
+                    </video>
+                </div>
+            </div>
+            <div class="col-md-4 match-height mb-3">
+                <div class="container-image ratio ratio-16x9">
+                    <img src="/img/web/hp/social.jpg" class="img-fluid" alt="">
+                    <div class="pattern d-flex flex-column justify-content-start align-items-center p-3">
+                        <span class="title text-center mb-3">Sledujte POLAR na sociálních sítích</span>
+                    </div>
+                    <div class="pattern2 d-flex flex-column justify-content-end align-items-center z-index-4 p-2">
+                        <ul class="social-icons">
+                            <li class="social-icons-facebook"><a href="https://www.facebook.com/televize.polar" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                            <li class="social-icons-instagram"><a href="https://www.instagram.com/televize.polar/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                            <li class="social-icons-twitter"><a href="https://twitter.com/Televize_Polar" target="_blank" title="Platforma X"><i class="fab fa-x-twitter"></i></a></li>
+                            <li class="social-icons-tiktok"><a href="https://www.tiktok.com/@televize.polar" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a></li>
+                            <li class="social-icons-youtube"><a href="https://www.youtube.com/user/polarostrava" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 match-height">
+                <a href="https://multimedia.polar.cz" target="_blank" title="POLAR multimedia">
+                    <div class="container-image ratio ratio-16x9">
+                        <img src="/img/web/hp/mm.jpg" class="img-fluid" alt="">
+                        <div class="pattern pattern-center d-flex flex-column justify-content-center align-items-center p-3">
+                            <span class="title mb-3"><img src="/img/web/POLAR_multimedia_RGB_white.png" class="mm" alt=""></span>
+                            <span class="description line-height-5 text-center">výroba videí, multimediálních prezentací,<br>virtuální reality, grafiky, webů</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php } else { ?>
+    <?php // TODO: special-hp partial (polar news special, volby, povodně apod.) ?>
+<?php } ?>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="crawl" class="mb-2 hide"> <!--crawl-hp-->
+                <div id="crawlIcon">Mimořádná zpráva:</div>
+                <div class="crawl-container"><div>Načítám...</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-7">
+            <div id="ticker" class="<?= ($special['active'] ?? '') === '1' ? 'mb-0 mb-lg-4' : 'mb-4' ?>"> <!-- ticker-hp -->
+                <div id="tickerIcon"></div>
+                <div class="ticker-container">
+                    <ul><div class="ticker-active"><li><span>Načítám...</span></li></div></ul>
+                </div>
+            </div>
+
+            <?php // Speciál na HP MOBILY (povodně, volby, aktuální velká témata) ?>
+            <?php if (($special['active'] ?? '') === '1') { ?>
+                <?php // TODO: special-hp-mobile partial ?>
+            <?php } ?>
+
+            <?php if ($newArticles) { ?>
+                <h2 class="text-primary mt-2 mb-4">
+                    Hlavní zprávy z MS kraje
+                    <small class="d-none d-lg-inline-block text-color-grey ms-2">
+                        <?= number_format($newsCount, 0, ',', ' ') ?> reportáží
+                    </small>
+                    <a class="pull-right text-primary text-2 d-none d-sm-block" href="<?= $view->path('news_list') ?>" title="Více zpráv">
+                        <small>více zpráv <i class="fas fa-chevron-right text-1"></i></small>
+                    </a>
+                </h2>
+
+                <?php // Hlavní články ?>
+                <?php for ($i = 0, $iMax = count($newArticles); $i < $iMax; $i++) { ?>
+                    <?php
+                    $section = $newArticles[$i]['section'] ?? '1';
+                    if ($section === '1') {
+                        $detail_url = $newArticles[$i]['url'];
+                        $region_city_url = ($newArticles[$i]['city_url'] ?? '') === 'cely-ms-kraj'
+                            ? $view->path('news_list')
+                            : $view->path('news_region_city', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url']]);
+                    } elseif ($section === '2') {
+                        $detail_url = $view->path('news_pr_detail', ['article_id' => $newArticles[$i]['article_id'], 'article_url' => $newArticles[$i]['title']]);
+                        $region_city_url = null;
+                    } else {
+                        $detail_url = $view->path('news_triptip_detail', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url'], 'article_id' => $newArticles[$i]['article_id'], 'article_url' => $newArticles[$i]['title']]);
+                        $region_city_url = null;
+                    }
+
+                    $pub = homeFormatDate($newArticles[$i]['public_from'] ?? '');
+                    $upd = homeFormatDate($newArticles[$i]['updated_date'] ?? '');
+                    $day = $pub['day']; $time = $pub['time'];
+                    $dayUpdate = $upd['day']; $timeUpdate = $upd['time'];
+
+                    $hasLabel = ($newArticles[$i]['label'] ?? '') && ($newArticles[$i]['updated_date'] ?? '') > $nowMinusX;
+                    ?>
+
+                    <div class="row mb-4-5">
+                        <?php if ($newArticles[$i]['picture'] ?? '') { ?>
+                            <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                                <a href="<?= $detail_url ?>" title="<?= htmlspecialchars($newArticles[$i]['title']) ?>">
+                                    <span class="thumb-info thumb-info-lighten maxw-310">
+                                        <span class="thumb-info-wrapper">
+                                            <img src="<?= htmlspecialchars($newArticles[$i]['picture']) ?>" class="img-fluid" alt="<?= htmlspecialchars($newArticles[$i]['title']) ?>">
+                                            <?php if (str_contains($newArticles[$i]['picture'], '/videos/')) { ?>
+                                                <span class="thumb-info-action"><span class="thumb-info-action-icon">
+                                                    <i class="fas fa-play"></i>
+                                                    <span class="player_duration"><?= $newArticles[$i]['duration'] ? gmdate('i:s', (int) $newArticles[$i]['duration']) : '' ?></span>
+                                                </span></span>
+                                            <?php } ?>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="col-7 col-lg-6 ps-1 pe-3">
+                                <h2 class="mb-1 mb-md-2">
+                                    <a href="<?= $detail_url ?>" title="<?= htmlspecialchars($newArticles[$i]['title']) ?>"><?= htmlspecialchars($newArticles[$i]['title']) ?></a>
+                                </h2>
+                                <div class="text-1 text-tertiary line-height-7 mb-1">
+                                    <?php if ($hasLabel) { ?>
+                                        <?= htmlspecialchars($newArticles[$i]['label']) ?> <span><?= $dayUpdate ?></span> <span><?= $timeUpdate ?></span>, <span>vydáno <?= strtolower($day) ?></span> <span><?= $time ?></span>&nbsp;|
+                                    <?php } else { ?>
+                                        <span><?= $day ?></span> <span><?= $time ?></span>&nbsp;|
+                                    <?php } ?>
+                                    <?php if ($section === '1') { ?>
+                                        <span><a href="<?= $region_city_url ?>" title="<?= htmlspecialchars($newArticles[$i]['city'] ?? '') ?>"><?= htmlspecialchars($newArticles[$i]['city'] ?? '') ?></a>&nbsp;|</span>
+                                        <span><a href="<?= $view->path('news_redactor', ['redactor_url' => $newArticles[$i]['author_url'] ?? '']) ?>" title="<?= htmlspecialchars($newArticles[$i]['author'] ?? '') ?>"><?= htmlspecialchars($newArticles[$i]['author'] ?? '') ?></a></span>
+                                    <?php } elseif ($section === '2') { ?>
+                                        <span><a href="<?= $view->path('news_pr_list') ?>" title="Komerční sdělení">Komerční sdělení</a></span>
+                                    <?php } else { ?>
+                                        <span><a href="<?= $view->path('news_triptip_list') ?>" title="Kam vyrazit">Kam vyrazit</a></span>
+                                    <?php } ?>
+                                </div>
+                                <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6"><?= htmlspecialchars($newArticles[$i]['anotation'] ?? '') ?></p>
+                            </div>
+                        <?php } else { ?>
+                            <div class="col-12">
+                                <h2 class="mb-1 mb-md-2">
+                                    <a href="<?= $detail_url ?>" title="<?= htmlspecialchars($newArticles[$i]['title']) ?>"><?= htmlspecialchars($newArticles[$i]['title']) ?></a>
+                                </h2>
+                                <div class="text-1 text-tertiary line-height-7 mb-1">
+                                    <?php if ($hasLabel) { ?>
+                                        <?= htmlspecialchars($newArticles[$i]['label']) ?> <span><?= $dayUpdate ?></span> <span><?= $timeUpdate ?></span>, <span>vydáno <?= strtolower($day) ?></span> <span><?= $time ?></span>&nbsp;|
+                                    <?php } else { ?>
+                                        <span><?= $day ?></span> <span><?= $time ?></span>&nbsp;|
+                                    <?php } ?>
+                                    <?php if ($section === '1') { ?>
+                                        <span><a href="<?= $region_city_url ?>" title="<?= htmlspecialchars($newArticles[$i]['city'] ?? '') ?>"><?= htmlspecialchars($newArticles[$i]['city'] ?? '') ?></a>&nbsp;|</span>
+                                        <span><a href="<?= $view->path('news_redactor', ['redactor_url' => $newArticles[$i]['author_url'] ?? '']) ?>" title="<?= htmlspecialchars($newArticles[$i]['author'] ?? '') ?>"><?= htmlspecialchars($newArticles[$i]['author'] ?? '') ?></a></span>
+                                    <?php } elseif ($section === '2') { ?>
+                                        <span><a href="<?= $view->path('news_pr_list') ?>" title="Komerční sdělení">Komerční sdělení</a></span>
+                                    <?php } else { ?>
+                                        <span><a href="<?= $view->path('news_triptip_list') ?>" title="Kam vyrazit">Kam vyrazit</a></span>
+                                    <?php } ?>
+                                </div>
+                                <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6"><?= htmlspecialchars($newArticles[$i]['anotation'] ?? '') ?></p>
+                            </div>
+                        <?php } ?>
+                    </div>
+
+                    <?php if ($i === 4) { ?>
+                        <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
+                        <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+                    <?php } ?>
+                <?php } ?>
+            <?php } ?>
+
+            <?php // TODO: $view->include('ads/article') — interní textová reklama (není zatím implementována) ?>
+        </div>
+
+        <div class="col-12 col-lg-5 p-relative">
+            <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
+                <?php
+                $prBlock = [];
+                if (isset($pr[$k])) { $prBlock[] = $pr[$k]; }
+                if (isset($pr[$k + 1])) { $prBlock[] = $pr[$k + 1]; }
+                if (isset($pr[$k + 2])) { $prBlock[] = $pr[$k + 2]; }
+                ?>
+                <?= $view->include('news/partial/pr-block', ['pr_block' => $prBlock]) ?>
+                <?php $k += 3; ?>
+                <?php // REKLAMA ?>
+                <?php //= $view->include('banner/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+                <?php // REKLAMA ?>
+                <br class="d-none d-lg-inline">
+                <?php // TODO: $view->include('ads/article/right/bottom') — interní reklama vpravo dole ?>
+                <br class="d-none d-lg-inline">
+                <?php // REKLAMA PRO MOBILY (druhá) ?>
+                <?= $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- nejnovější pořady (3x pořad šedá sekce, 3x pořad bílá sekce) -->
+<?php if ($newVideos) { ?>
+    <div class="container-fluid block-news bg-e2e5e9 mb-4-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                        <?php // TODO: route show_list (pořady) — zatím odkaz na homepage ?>
+                        <a class="text-primary" href="/" title="Nejnovější pořady">Nejnovější pořady</a>
+                    </h3>
+                    <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="/">více&nbsp;<i class="fas fa-chevron-right text-1"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <?php // První část videí (3 položky v šedém bloku) ?>
+                <?php for ($i = 0; $i < 3 && isset($newVideos[$i]); $i++) { ?>
+                    <div class="col-md-4 col-6 <?= $i >= 2 ? 'd-none d-md-block' : '' ?>">
+                        <article>
+                            <div class="row mb-4">
+                                <div class="col-12 d-flex mb-2-2-3">
+                                    <div class="img-thumbnail">
+                                        <a href="<?= htmlspecialchars($newVideos[$i]['url']) ?>" title="<?= htmlspecialchars($newVideos[$i]['title']) ?>">
+                                            <span class="thumb-info thumb-info-lighten">
+                                                <span class="thumb-info-wrapper">
+                                                    <img src="<?= htmlspecialchars($newVideos[$i]['image'] ?? '/data/program/show/!default-show.png') ?>" class="img-fluid" alt="<?= htmlspecialchars($newVideos[$i]['title']) ?>">
+                                                    <span class="thumb-info-action"><span class="thumb-info-action-icon">
+                                                        <i class="fas fa-play"></i>
+                                                        <span class="player_duration"><?= $newVideos[$i]['duration'] ? gmdate('i:s', (int) $newVideos[$i]['duration']) : '' ?></span>
+                                                    </span></span>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <h2 class="mb-1"><a href="<?= htmlspecialchars($newVideos[$i]['url']) ?>" title="<?= htmlspecialchars($newVideos[$i]['title']) ?>"><?= htmlspecialchars($newVideos[$i]['title']) ?></a></h2>
+                                    <?php $vd = homeFormatDate($newVideos[$i]['time'] ?? ''); ?>
+                                    <div class="text-1 text-tertiary line-height-7 mb-1"><span><?= $vd['day'] ?>, <?= $vd['time'] ?></span></div>
+                                    <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6"><?= htmlspecialchars($newVideos[$i]['anotation'] ?? '') ?></p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-7">
+                <?php // Druhá část videí (3 články pod sebou) ?>
+                <?php for ($i = 3, $iMax = count($newVideos); $i < $iMax; $i++) { ?>
+                    <div class="row mb-4-5">
+                        <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                            <div class="img-thumbnail">
+                                <a href="<?= htmlspecialchars($newVideos[$i]['url']) ?>" title="<?= htmlspecialchars($newVideos[$i]['title']) ?>">
+                                    <span class="thumb-info thumb-info-lighten maxw-310">
+                                        <span class="thumb-info-wrapper">
+                                            <img src="<?= htmlspecialchars($newVideos[$i]['image'] ?? '/data/program/show/!default-show.png') ?>" class="img-fluid" alt="<?= htmlspecialchars($newVideos[$i]['title']) ?>">
+                                            <span class="thumb-info-action"><span class="thumb-info-action-icon">
+                                                <i class="fas fa-play"></i>
+                                                <span class="player_duration"><?= $newVideos[$i]['duration'] ? gmdate('i:s', (int) $newVideos[$i]['duration']) : '' ?></span>
+                                            </span></span>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-7 col-lg-6 ps-1 pe-3">
+                            <h2 class="mb-1"><a href="<?= htmlspecialchars($newVideos[$i]['url']) ?>" title="<?= htmlspecialchars($newVideos[$i]['title']) ?>"><?= htmlspecialchars($newVideos[$i]['title']) ?></a></h2>
+                            <?php $vd = homeFormatDate($newVideos[$i]['time'] ?? ''); ?>
+                            <div class="text-1 text-tertiary line-height-7 mb-1"><span><?= $vd['day'] ?>, <?= $vd['time'] ?></span></div>
+                            <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6"><?= htmlspecialchars($newVideos[$i]['anotation'] ?? '') ?></p>
+                        </div>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="col-12 col-lg-5 p-relative">
+                <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
+                    <?php
+                    $prBlock = [];
+                    if (isset($pr[$k])) { $prBlock[] = $pr[$k]; }
+                    if (isset($pr[$k + 1])) { $prBlock[] = $pr[$k + 1]; }
+                    ?>
+                    <?= $view->include('news/partial/pr-block', ['pr_block' => $prBlock]) ?>
+                    <?php $k += 2; ?>
+                    <br class="d-none d-lg-inline">
+                </aside>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+
+<!-- Sekce regionů (pro každý region 3x článek šedá sekce, 3x článek bílá sekce) -->
+<?php if ($regions) { ?>
+    <?php foreach ($regions as $region) { ?>
+        <?php if ($region['articles']) { ?>
+            <div class="container-fluid block-news bg-e2e5e9 mb-4-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                                <a class="text-primary" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>" title="<?= htmlspecialchars($region['title']) ?>"><?= htmlspecialchars($region['title']) ?></a>
+                            </h3>
+                            <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>">více&nbsp;<i class="fas fa-chevron-right text-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="row">
+                        <?php // První část článků pro regiony (3 články v šedém bloku) ?>
+                        <?php for ($i = 0; $i < 3 && isset($region['articles'][$i]); $i++) { ?>
+                            <?php
+                            $a = $region['articles'][$i];
+                            $article_url = $view->path('news_detail', ['url' => $a['region_url'], 'city_url' => $a['city_url'], 'article_id' => $a['article_id'], 'article_url' => $a['article_url']]);
+                            $rcUrl = ($a['city_url'] ?? '') === 'cely-ms-kraj'
+                                ? $view->path('news_list')
+                                : $view->path('news_region_city', ['url' => $a['region_url'], 'city_url' => $a['city_url']]);
+                            $pub = homeFormatDate($a['public_from'] ?? '');
+                            $upd = homeFormatDate($a['updated_date'] ?? '');
+                            $hasLabel = ($a['label'] ?? '') && ($a['updated_date'] ?? '') > $nowMinusX;
+                            ?>
+                            <div class="col-md-4 col-6 <?= $i >= 2 ? 'd-none d-md-block' : '' ?>">
+                                <article>
+                                    <div class="row mb-4">
+                                        <?php if ($a['picture'] ?? '') { ?>
+                                            <div class="col-12 d-flex mb-2-2-3">
+                                                <div class="img-thumbnail">
+                                                    <a href="<?= $article_url ?>" title="<?= htmlspecialchars($a['title']) ?>">
+                                                        <span class="thumb-info thumb-info-lighten">
+                                                            <span class="thumb-info-wrapper">
+                                                                <img src="<?= htmlspecialchars($a['picture']) ?>" class="img-fluid" alt="<?= htmlspecialchars($a['title']) ?>">
+                                                                <?php if (str_contains($a['picture'], '/videos/')) { ?>
+                                                                    <span class="thumb-info-action"><span class="thumb-info-action-icon">
+                                                                        <i class="fas fa-play"></i>
+                                                                        <span class="player_duration"><?= $a['duration'] ? gmdate('i:s', (int) $a['duration']) : '' ?></span>
+                                                                    </span></span>
+                                                                <?php } ?>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                        <div class="col-12">
+                                            <h2 class="mb-1"><a href="<?= $article_url ?>" title="<?= htmlspecialchars($a['title']) ?>"><?= htmlspecialchars($a['title']) ?></a></h2>
+                                            <div class="text-1 text-tertiary line-height-7 mb-1">
+                                                <?php if ($hasLabel) { ?>
+                                                    <?= htmlspecialchars($a['label']) ?> <span><?= $upd['day'] ?></span> <span><?= $upd['time'] ?></span>, <span>vydáno <?= strtolower($pub['day']) ?></span> <span><?= $pub['time'] ?></span>&nbsp;|
+                                                <?php } else { ?>
+                                                    <span><?= $pub['day'] ?></span> <span><?= $pub['time'] ?></span>&nbsp;|
+                                                <?php } ?>
+                                                <span><a href="<?= $rcUrl ?>" title="<?= htmlspecialchars($a['city_title'] ?? '') ?>"><?= htmlspecialchars($a['city_title'] ?? '') ?></a>&nbsp;|</span>
+                                                <span><a href="<?= $view->path('news_redactor', ['redactor_url' => $a['author_url'] ?? '']) ?>" title="<?= htmlspecialchars($a['author'] ?? '') ?>"><?= htmlspecialchars($a['author'] ?? '') ?></a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-7">
+                        <?php // Druhá část článků pro regiony (3 články pod sebou) ?>
+                        <?php for ($i = 3, $iMax = count($region['articles']); $i < $iMax; $i++) { ?>
+                            <?php
+                            $a = $region['articles'][$i];
+                            $article_url = $view->path('news_detail', ['url' => $a['region_url'], 'city_url' => $a['city_url'], 'article_id' => $a['article_id'], 'article_url' => $a['article_url']]);
+                            $rcUrl = ($a['city_url'] ?? '') === 'cely-ms-kraj'
+                                ? $view->path('news_list')
+                                : $view->path('news_region_city', ['url' => $a['region_url'], 'city_url' => $a['city_url']]);
+                            $pub = homeFormatDate($a['public_from'] ?? '');
+                            $upd = homeFormatDate($a['updated_date'] ?? '');
+                            $hasLabel = ($a['label'] ?? '') && ($a['updated_date'] ?? '') > $nowMinusX;
+                            ?>
+                            <div class="row mb-4-5">
+                                <?php if ($a['picture'] ?? '') { ?>
+                                    <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                                        <a href="<?= $article_url ?>" title="<?= htmlspecialchars($a['title']) ?>">
+                                            <span class="thumb-info thumb-info-lighten maxw-310">
+                                                <span class="thumb-info-wrapper">
+                                                    <img src="<?= htmlspecialchars(str_replace('715x402', '310x174', $a['picture'])) ?>" class="img-fluid" alt="<?= htmlspecialchars($a['title']) ?>">
+                                                    <?php if (str_contains($a['picture'], '/videos/')) { ?>
+                                                        <span class="thumb-info-action"><span class="thumb-info-action-icon">
+                                                            <i class="fas fa-play"></i>
+                                                            <span class="player_duration"><?= $a['duration'] ? gmdate('i:s', (int) $a['duration']) : '' ?></span>
+                                                        </span></span>
+                                                    <?php } ?>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="col-7 col-lg-6 ps-1 pe-3">
+                                        <h2 class="mb-1"><a href="<?= $article_url ?>" title="<?= htmlspecialchars($a['title']) ?>"><?= htmlspecialchars($a['title']) ?></a></h2>
+                                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                                            <?php if ($hasLabel) { ?>
+                                                <?= htmlspecialchars($a['label']) ?> <span><?= $upd['day'] ?></span> <span><?= $upd['time'] ?></span>, <span>vydáno <?= strtolower($pub['day']) ?></span> <span><?= $pub['time'] ?></span>&nbsp;|
+                                            <?php } else { ?>
+                                                <span><?= $pub['day'] ?></span> <span><?= $pub['time'] ?></span>&nbsp;|
+                                            <?php } ?>
+                                            <span><a href="<?= $rcUrl ?>" title="<?= htmlspecialchars($a['city_title'] ?? '') ?>"><?= htmlspecialchars($a['city_title'] ?? '') ?></a>&nbsp;|</span>
+                                            <span><a href="<?= $view->path('news_redactor', ['redactor_url' => $a['author_url'] ?? '']) ?>" title="<?= htmlspecialchars($a['author'] ?? '') ?>"><?= htmlspecialchars($a['author'] ?? '') ?></a></span>
+                                        </div>
+                                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6"><?= htmlspecialchars($a['anotation'] ?? '') ?></p>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="col-12">
+                                        <h2 class="mb-1"><a href="<?= $article_url ?>" title="<?= htmlspecialchars($a['title']) ?>"><?= htmlspecialchars($a['title']) ?></a></h2>
+                                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                                            <?php if ($hasLabel) { ?>
+                                                <?= htmlspecialchars($a['label']) ?> <span><?= $upd['day'] ?></span> <span><?= $upd['time'] ?></span>, <span>vydáno <?= strtolower($pub['day']) ?></span> <span><?= $pub['time'] ?></span>&nbsp;|
+                                            <?php } else { ?>
+                                                <span><?= $pub['day'] ?></span> <span><?= $pub['time'] ?></span>&nbsp;|
+                                            <?php } ?>
+                                            <span><a href="<?= $rcUrl ?>" title="<?= htmlspecialchars($a['city_title'] ?? '') ?>"><?= htmlspecialchars($a['city_title'] ?? '') ?></a>&nbsp;|</span>
+                                            <span><a href="<?= $view->path('news_redactor', ['redactor_url' => $a['author_url'] ?? '']) ?>" title="<?= htmlspecialchars($a['author'] ?? '') ?>"><?= htmlspecialchars($a['author'] ?? '') ?></a></span>
+                                        </div>
+                                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6"><?= htmlspecialchars($a['anotation'] ?? '') ?></p>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+                    <div class="col-12 col-lg-5 p-relative">
+                        <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
+                            <?php
+                            $prBlock = [];
+                            if (isset($pr[$k])) { $prBlock[] = $pr[$k]; }
+                            if (isset($pr[$k + 1])) { $prBlock[] = $pr[$k + 1]; }
+                            ?>
+                            <?= $view->include('news/partial/pr-block', ['pr_block' => $prBlock]) ?>
+                            <?php $k += 2; ?>
+                            <br class="d-none d-lg-inline">
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+    <?php } ?>
+<?php } ?>
+
+<?php // Zakomentované sekce jako v polaru ?>
+<?php //= $view->include('news/partial/triptip') ?>
+<?php //= $view->include('program/partial/todays-premieres') ?>

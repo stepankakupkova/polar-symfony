@@ -1,0 +1,31 @@
+/*
+ * @project rogr
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/* PRINT *********************************************************/
+@media print {
+    header#header,
+    section.page-header,
+    .container,
+    footer#footer,
+    .show-ad,
+    #AdTrackGenericStickyMobile,
+    #AdTrackAutorefreshStickyMobile {
+        display: none !important;
+    }
+    #printableArea {
+        display: block !important;
+    }
+    div.synchron {
+        line-height: 28px;
+        font-size: 16px;
+        padding: 10px 20px;
+        margin: 0 0 20px;
+        border-left: 5px solid #eee;
+        font-style: italic;
+    }
+}

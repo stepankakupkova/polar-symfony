@@ -1,0 +1,45 @@
+<?php
+/**
+ * seznam.cz SSP — Rectangle 970x310 (desktop) nebo SMR mobil 300x300 (mobile)
+ * Vychází z polar/module/Application/view/partial/ads/bottom.phtml
+ */
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p2").length && $("#p2").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p2");
+        }
+    }, 2000);'
+);
+?>
+<div id="bannerFooterPlace"></div>
+
+<script>
+    var sspScript = document.getElementById('ssp-script');
+    sspScript.addEventListener('load', function() {
+        var elBannerFooter = document.getElementById('bannerFooterPlace');
+        var htmlBannerFooter = "";
+        if (sssp.displaySeznamAds()) {
+            if (window.innerWidth <= 767) {
+                htmlBannerFooter =
+                    "<div class=\"container\">" +
+                        "<div class=\"row mt-5\">" +
+                            "<div class=\"col-md-12\">" +
+                                "<div id=\"p2\" data-szn-ssp-ad='{\"zoneId\": 151900, \"width\": 480, \"height\": 480}' style=\"margin: 0 auto;\"></div>" +
+                            "</div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerFooter.insertAdjacentHTML("beforeend", htmlBannerFooter);
+            } else {
+                htmlBannerFooter =
+                    "<div class=\"container\">" +
+                        "<div class=\"row mt-5\">" +
+                            "<div class=\"col-md-12\">" +
+                                "<div id=\"p2\" data-szn-ssp-ad='{\"zoneId\": 151885, \"width\": 970, \"height\": 310}' style=\"margin: 0 auto;\"></div>" +
+                            "</div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerFooter.insertAdjacentHTML("beforeend", htmlBannerFooter);
+            }
+        }
+    });
+</script>

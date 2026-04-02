@@ -1,0 +1,52 @@
+<?php
+/**
+ * Submenu — horní lišta (desktop) + mobile verze
+ * Obsahuje: Živě Polar 1+2, Pořady, Multimedia, O TV POLAR dropdown (hamburger)
+ *
+ * @param bool $mobile  true = mobilní verze (bez hamburgeru, jen přímé položky)
+ */
+
+$mobile = $mobile ?? false;
+$nav = require dirname(__DIR__, 2) . '/config/navigation.php';
+$items = $nav['submenu'];
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+?>
+<?php foreach ($items as $item) { ?>
+    <?php
+        $isHamburger = isset($item['dropdown']);
+        if ($mobile && $isHamburger) { continue; }
+
+        $active = $item['url'] !== '#' && str_starts_with($currentPath, $item['url']);
+    ?>
+    <?php if ($isHamburger) { ?>
+        <li class="nav-item dropdown d-none d-sm-block">
+            <a id="<?= $item['id'] ?>"
+                class="nav-link dropdown-toggle text-secondary text-hover-primary text-3 text-decoration-none line-height-3 font-weight-500 px-1 px-md-2 p-0"
+                href="#" role="button" data-bs-toggle="dropdown" rel="nofollow">
+                <button class="btn sidenav-1">
+                    <div class="animated-icon2"><span></span><span></span><span></span><span></span></div>
+                </button>
+            </a>
+            <ul class="dropdown-menu">
+                <?php foreach ($item['dropdown'] as $child) { ?>
+                    <li>
+                        <a class="dropdown-item<?= str_starts_with($currentPath, $child['url']) ? ' active' : '' ?>"
+                            href="<?= htmlspecialchars($child['url']) ?>"
+                            title="<?= htmlspecialchars($child['label']) ?>">
+                            <?= htmlspecialchars($child['label']) ?>
+                        </a>
+                    </li>
+                <?php } ?>
+            </ul>
+        </li>
+    <?php } else { ?>
+        <li class="nav-item nav-item-anim-icon">
+            <a id="<?= $item['id'] ?>"
+                class="<?= $item['class'] ?> text-secondary text-hover-primary text-3 nav-link text-decoration-none line-height-3 font-weight-500 px-1 px-md-2<?= $active ? ' active' : '' ?>"
+                href="<?= htmlspecialchars($item['url']) ?>"
+                <?= isset($item['target']) ? 'target="' . $item['target'] . '"' : '' ?>>
+                <?= $item['label'] ?>
+            </a>
+        </li>
+    <?php } ?>
+<?php } ?>

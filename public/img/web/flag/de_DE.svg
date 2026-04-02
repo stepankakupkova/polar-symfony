@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="480" width="640" viewBox="0 0 640 480">
+  <rect id="black_stripe" width="640" height="480" y="0" x="0" fill="#000"/>
+  <rect id="red_stripe" width="640" height="320" y="160" x="0" fill="#D00"/>
+  <rect id="gold_stripe" width="640" height="160" y="320" x="0" fill="#FFCE00"/>
+</svg>

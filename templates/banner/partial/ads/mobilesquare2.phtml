@@ -1,0 +1,38 @@
+<?php
+/**
+ * banner mobile square 2 480x480px
+ * jen na mobilech (HP a výpisy — nezobrazovat, detail — na konci článku)
+ */
+?>
+
+<div id="bannerMobilesquare2Place"></div>
+
+<script>
+    if (window.innerWidth < 768) {
+        var sspScript = document.getElementById('ssp-script');
+        sspScript.addEventListener('load', function() {
+            if (!sssp.displaySeznamAds()) {
+                var elBannerMobilesquare2 = document.getElementById('bannerMobilesquare2Place');
+                var htmlBannerMobilesquare2 = "";
+                <?php if (isset($bannerMobilesquare2)) { ?>
+                    htmlBannerMobilesquare2 =
+                        "<div class=\"container mb-5\">" +
+                            "<div class=\"row\">" +
+                                "<div class=\"col-md-12\">" +
+                                    "<div class=\"reklama\">" +
+                                        "Reklama" +
+                                    "</div>" +
+                                    "<div id=\"bannerMobilesquare2\" data-type=\"mobilesquare2\" data-id=\"<?= $bannerMobilesquare2['id'] ?>\" style=\"margin: 0 auto;\">" +
+                                        "<a onclick=\"bannerCountClick('mobilesquare2', <?= $bannerMobilesquare2['id'] ?>)\" class=\"d-block text-center\" href=\"<?= $bannerMobilesquare2['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                            "<img class=\"img-fluid\" src=\"<?= $view->asset($bannerMobilesquare2['image']) ?>\" alt=\"Reklama\" />" +
+                                        "</a>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    elBannerMobilesquare2.insertAdjacentHTML("beforeend", htmlBannerMobilesquare2);
+                <?php } ?>
+            }
+        });
+    }
+</script>

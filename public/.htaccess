@@ -1,0 +1,16 @@
+# public/.htaccess
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # pokud máš problém s 403/404, zkus odkomentovat:
+    # RewriteBase /
+
+    # nepřepisuj existující soubory/složky
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # všechno ostatní pošli do front controlleru
+    RewriteRule ^ index.php [L]
+</IfModule>

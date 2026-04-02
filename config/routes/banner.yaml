@@ -1,0 +1,4 @@
+banner_set_showed:
+    path: /banner/set-showed
+    controller: App\Banner\Controller\Web\BannerWriteController::setShowed
+    methods: [POST]

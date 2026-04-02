@@ -1,0 +1,21 @@
+<?php
+/** @var array<array{label: string, url?: string}> $breadcrumbs */
+$breadcrumbs = $view->getBreadcrumbs();
+if (!$breadcrumbs) { return; }
+
+$last = array_key_last($breadcrumbs);
+?>
+<ul class="breadcrumb d-inline-block">
+    <li>
+        <a href="<?= $view->path('app_home') ?>" title="Domů">Domů</a>
+    </li>
+    <?php foreach ($breadcrumbs as $i => $crumb) { ?>
+        <li>
+            <?php if ($i === $last) { ?>
+                <span class="text-primary"><?= htmlspecialchars($crumb['label']) ?></span>
+            <?php } else { ?>
+                <a href="<?= htmlspecialchars($crumb['url'] ?? '#') ?>" title="<?= htmlspecialchars($crumb['label']) ?>"><?= htmlspecialchars($crumb['label']) ?></a>
+            <?php } ?>
+        </li>
+    <?php } ?>
+</ul>

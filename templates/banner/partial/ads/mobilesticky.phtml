@@ -1,0 +1,54 @@
+<?php
+/**
+ * banner mobilesticky — vyskakovací reklama v mobilech
+ */
+?>
+
+<div id="bannerMobilestickyPlace"></div>
+
+<script>
+    var elbannerMobilesticky = document.getElementById('bannerMobilestickyPlace');
+    var sspScript = document.getElementById("ssp-script");
+    sspScript.addEventListener("load", function() {
+        var htmlbannerMobilesticky = "";
+        if (sssp.displaySeznamAds()) {
+            const configuration = [
+                {
+                    type: "mobile",
+                    zoneId: 175386,
+                    breakPoint: 480,
+                    fromFeed: true
+                },
+            ];
+            getSznAdPopUp(configuration);
+        } else {
+            <?php if (isset($bannerMobilesticky)) { ?>
+                htmlbannerMobilesticky =
+                    "<div class=\"show-ad\" style=\"display: none;\">" +
+                        "<div id=\"ad7\" class=\"close-ad\">" +
+                            "<a href=\"#\" onclick=\"mobileAd()\">" +
+                                "Zavřít reklamu" +
+                            "</a>" +
+                        "</div>" +
+                        "<div id=\"bannerMobilesticky\" data-type=\"mobilesticky\" data-id=\"<?= $bannerMobilesticky['id'] ?>\" style=\"margin: 0 auto;\">" +
+                            "<a onclick=\"bannerCountClick('mobilesticky', <?= $bannerMobilesticky['id'] ?>)\" class=\"d-block\" href=\"<?= $bannerMobilesticky['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                "<img class=\"img-fluid\" src=\"<?= $view->asset($bannerMobilesticky['image']) ?>\" alt=\"Reklama\" />" +
+                            "</a>" +
+                        "</div>" +
+                    "</div>";
+                elbannerMobilesticky.insertAdjacentHTML("beforeend", htmlbannerMobilesticky);
+                DisplayMobileAd();
+            <?php } ?>
+        }
+    });
+    function mobileAd(){
+        sessionStorage.setItem("MobileAd", "Accepted");
+    }
+    function DisplayMobileAd(){
+        if (sessionStorage.getItem("MobileAd") === "Accepted") {
+            $("#ad7").parent().css("display", "none");
+        } else {
+            $("#ad7").parent().css("display", "block");
+        }
+    }
+</script>

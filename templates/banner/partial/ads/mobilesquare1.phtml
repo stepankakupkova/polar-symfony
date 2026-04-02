@@ -1,0 +1,57 @@
+<?php
+/**
+ * banner mobile square 1 480x480px
+ * jen na mobilech (HP a výpisy — mezi 5. a 6. zprávou)
+ * na desktopu zobrazuje SSP wallpaper
+ */
+?>
+
+<div id="bannerMobilesquare1Place"></div>
+<div id="bannerArticleWalpaper"></div>
+
+<script>
+    if (window.innerWidth < 768) {
+        var sspScript = document.getElementById('ssp-script');
+        sspScript.addEventListener('load', function() {
+            if (!sssp.displaySeznamAds()) {
+                var elBannerMobilesquare1 = document.getElementById('bannerMobilesquare1Place');
+                var htmlBannerMobilesquare1 = "";
+                <?php if (isset($bannerMobilesquare1)) { ?>
+                    htmlBannerMobilesquare1 =
+                        "<div class=\"container mb-5\">" +
+                            "<div class=\"row\">" +
+                                "<div class=\"col-md-12\">" +
+                                    "<div class=\"reklama\">" +
+                                        "Reklama" +
+                                    "</div>" +
+                                    "<div id=\"bannerMobilesquare1\" data-type=\"mobilesquare1\" data-id=\"<?= $bannerMobilesquare1['id'] ?>\" style=\"margin: 0 auto;\">" +
+                                        "<a onclick=\"bannerCountClick('mobilesquare1', <?= $bannerMobilesquare1['id'] ?>)\" class=\"d-block text-center\" href=\"<?= $bannerMobilesquare1['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                            "<img class=\"img-fluid\" src=\"<?= $view->asset($bannerMobilesquare1['image']) ?>\" alt=\"Reklama\" />" +
+                                        "</a>" +
+                                        "<div class=\"banner-pixel\"><?= addslashes($bannerMobilesquare1['code'] ?? '') ?></div>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    elBannerMobilesquare1.insertAdjacentHTML("beforeend", htmlBannerMobilesquare1);
+                <?php } ?>
+            }
+        });
+    }
+    if (window.innerWidth > 767) {
+        var sspScript = document.getElementById('ssp-script');
+        sspScript.addEventListener('load', function() {
+            if (sssp.displaySeznamAds()) {
+                var elBannerArticleWalpaper = document.getElementById('bannerArticleWalpaper');
+                var htmlBannerArticleWalpaper = "";
+                htmlBannerArticleWalpaper =
+                    "<div class=\"row mt-4 mb-4\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p11\" data-szn-ssp-ad='{\"zoneId\": 151870, \"width\": 480, \"height\": 300}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerArticleWalpaper.insertAdjacentHTML("beforeend", htmlBannerArticleWalpaper);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,88 @@
+<?php
+/** @var array $pr_block */
+
+// TODO: inlineScript — deaktivace komerčních článků pro seznam.cz (sspScript load listener)
+
+?>
+
+<div class="removeFromSeznam">
+    <?php if ($pr_block) { ?>
+        <h2 class="text-primary text-4-5 d-none d-lg-block mb-4">
+            <a class="text-primary" href="<?= $view->path('news_pr_list') ?>" title="Komerční sdělení">
+                Komerční sdělení
+            </a>
+            <a class="pull-right text-primary text-2" href="<?= $view->path('news_pr_list') ?>" title="Komerční sdělení">
+                <small>
+                    více
+                    <i class="fas fa-chevron-right text-1"></i>
+                </small>
+            </a>
+        </h2>
+
+        <?php foreach ($pr_block as $pr_item) { ?>
+            <?php if ($pr_item) { ?>
+                <?php $pr_href = '/zpravy/pr/' . $pr_item['article_id'] . '/' . $pr_item['article_url']; ?>
+                <article class="">
+                    <div class="row mb-custom-4-5">
+                        <?php if ($pr_item['picture']) { ?>
+                            <div class="col-5 pe-2 pe-md-3">
+                                <div class="">
+                                    <a class="" href="<?= $pr_href ?>" title="<?= $pr_item['title'] ?>">
+                                        <span class="thumb-info thumb-info-lighten">
+                                            <span class="thumb-info-wrapper">
+                                                <img src="<?= $pr_item['picture'] ?>" class="img-fluid" alt="<?= $pr_item['title'] ?>">
+                                                <?php if (strpos($pr_item['picture'], '/videos/') !== false) { ?>
+                                                    <span class="thumb-info-action">
+                                                        <span class="thumb-info-action-icon">
+                                                            <i class="fas fa-play"></i>
+                                                            <span class="player_duration"><?= $pr_item['duration'] ? gmdate("i:s", $pr_item['duration']) : ''; ?></span>
+                                                        </span>
+                                                    </span>
+                                                <?php } ?>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-7 ps-1 pe-3">
+                                <h2 class="line-height-md-2 mb-1 mb-md-2">
+                                    <a class="text-lg-1" href="<?= $pr_href ?>" title="<?= $pr_item['title'] ?>">
+                                        <?= $pr_item['title'] ?>
+                                    </a>
+                                </h2>
+                                <div class="d-md-none text-1 text-tertiary line-height-7 mb-1">
+                                    <span>
+                                        Komerční sdělení
+                                    </span>
+                                </div>
+                                <div class="d-none d-sm-block">
+                                    <p class="block-truncate block-truncate-2 line-height-6 mb-0">
+                                        <?= $pr_item['anotation']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        <?php } else { ?>
+                            <div class="col-12 pe-2 pe-md-3">
+                                <h2 class="line-height-md-2 mb-1 mb-md-2">
+                                    <a class="text-lg-1" href="<?= $pr_href ?>" title="<?= $pr_item['title'] ?>">
+                                        <?= $pr_item['title'] ?>
+                                    </a>
+                                </h2>
+                                <div class="d-md-none text-1 text-tertiary line-height-7 mb-1">
+                                    <span>
+                                        Komerční sdělení
+                                    </span>
+                                </div>
+                                <div class="d-none d-sm-block">
+                                    <p class="block-truncate block-truncate-2 line-height-6 mb-0">
+                                        <?= $pr_item['anotation']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </article>
+            <?php } ?>
+        <?php } ?>
+    <?php } ?>
+</div>

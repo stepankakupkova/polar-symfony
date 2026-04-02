@@ -1,0 +1,132 @@
+<?php
+/** @var array|null $blockJob */
+/** @var array|null $region */
+
+$locale = Locale::getDefault();
+
+$okresy_url = [
+    0    => 'vse',
+    3801 => 'bruntal',
+    3802 => 'frydek-mistek',
+    3804 => 'novy-jicin',
+    3803 => 'karvina',
+    3806 => 'opava',
+    3807 => 'ostrava',
+];
+
+$okresy_url2 = [
+    'bruntalsko'       => 'bruntal',
+    'frydeckomistecko' => 'frydek-mistek',
+    'novojicinsko'     => 'novy-jicin',
+    'karvinsko'        => 'karvina',
+    'opavsko'          => 'opava',
+    'ostrava'          => 'ostrava',
+];
+
+if (isset($region) && $region && $region['url'] !== 'moravskoslezsky-kraj') {
+    $region_title = ' - ' . $region['region'];
+    $vicezde_url = $view->path('job_city_list', ['city_url' => $okresy_url2[$region['url']]]);
+} else {
+    $region_title = '';
+    $vicezde_url = $view->path('job_list');
+}
+
+$removeAccent = function (string $text, string $replace = ''): string {
+    $transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
+    $text = $transliterator->transliterate($text);
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
+    }
+    return $text;
+};
+
+?>
+
+<?php if ($blockJob) { ?>
+    <div class="container-fluid block-news bg-e2e5e9 mb-4-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                        <a class="text-primary" href="<?= $vicezde_url ?>">
+                            Nabídka práce<?= $region_title ?>
+                        </a>
+                    </h3>
+                    <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $vicezde_url ?>">
+                        více&nbsp;<i class="fas fa-chevron-right text-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <?php for ($i = 0, $iMax = count($blockJob); $i < $iMax; $i++) { ?>
+                    <?php
+                        $hide_on_mobile = '';
+                        if ($i >= 3) {
+                            $hide_on_mobile = 'd-none d-lg-block';
+                        } else if ($i >= 2) {
+                            $hide_on_mobile = 'd-none d-md-block';
+                        }
+
+                        if (!isset($blockJob[$i]['kod'])) {
+                            // Naše nabídky
+                            $href = $view->path('job_our_detail', ['job_id' => $blockJob[$i]['id'], 'job_url' => $removeAccent($blockJob[$i]['profese'], '-')]);
+                            $mzda = $blockJob[$i]['salary'];
+                        } else {
+                            // Ostatní nabídky (MPSV)
+                            $href = $view->path('job_city_detail', ['city_url' => $okresy_url[$blockJob[$i]['kod']] ?? 'vse', 'job_id' => $blockJob[$i]['referencniCislo'], 'job_url' => $removeAccent($blockJob[$i]['profese'], '-')]);
+                            $mzda = '';
+                            if ($blockJob[$i]['mesicniMzdaOd'] > 0) {
+                                $mzda .= 'od ' . number_format($blockJob[$i]['mesicniMzdaOd'], 0, ',', ' ');
+                            }
+                            if ($blockJob[$i]['mesicniMzdaDo'] > 0) {
+                                $mzda .= ' do ' . number_format($blockJob[$i]['mesicniMzdaDo'], 0, ',', ' ');
+                            }
+                            if ($blockJob[$i]['typMzdy']) {
+                                $mzda .= ' ' . $blockJob[$i]['typMzdy'];
+                            }
+                        }
+                    ?>
+                    <div class="col-lg-3 col-md-4 col-6 <?= $hide_on_mobile ?>">
+                        <article class="">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="">
+                                        <h2 class="mb-2">
+                                            <a class="" href="<?= $href ?>">
+                                                <?= $blockJob[$i]['profese'] ?>
+                                            </a>
+                                        </h2>
+                                        <div class="text-2 text-454647 font-weight-semibold">
+                                            <span class="d-block line-height-6">
+                                                <?= $blockJob[$i]['obec'] ?>
+                                            </span>
+                                            <?php
+                                                try {
+                                                    $dateFormatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                                                    $date = $dateFormatter->format(new DateTime($blockJob[$i]['terminZahajeniPracovnihoPomeru']));
+                                                } catch (Exception $e) {
+                                                    $date = 'NaN';
+                                                }
+                                            ?>
+                                            <span class="d-block line-height-6">
+                                                Nástup: od <?= $date ?>
+                                            </span>
+                                            <span class="d-block line-height-6">
+                                                <?= $mzda ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } else { ?>
+    <hr class="solid">
+<?php } ?>

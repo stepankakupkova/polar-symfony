@@ -1,0 +1,47 @@
+<?php
+/**
+ * Hlavní navigace — regiony MS kraje s dropdown městy
+ *
+ * @param string $ulClass  'nav nav-pills' (desktop) nebo 'mobile-menu' (mobile scroll)
+ */
+
+$ulClass = $ulClass ?? 'nav nav-pills';
+$nav = require dirname(__DIR__, 2) . '/config/navigation.php';
+$regions = $nav['regions'];
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+?>
+<ul class="<?= $ulClass ?>" id="mainNav">
+    <li class="d-none d-lg-flex align-self-lg-center ms-0">
+        <a class="d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light" href="<?= $view->path('app_home') ?>">
+            <img src="<?= $view->asset('img/web/layout/header/home.svg') ?>" alt="Domů">
+        </a>
+    </li>
+    <?php foreach ($regions as $region) { ?>
+        <?php
+            $active = $region['id'] === 'region-all'
+                ? $currentPath === '/zpravy'
+                : str_starts_with($currentPath, $region['url']);
+            $hasDropdown = $region['id'] !== 'region-all' && !empty($region['cities']);
+        ?>
+        <li class="<?= $hasDropdown ? 'dropdown' : 'nav-item nav-item-anim-icon' ?>">
+            <a class="dropdown-item dropdown-toggle d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light<?= $active ? ' active' : '' ?>"
+               href="<?= htmlspecialchars($region['url']) ?>"
+               title="<?= htmlspecialchars($region['label']) ?>">
+                <?= htmlspecialchars($region['label']) ?>
+            </a>
+            <?php if ($hasDropdown) { ?>
+                <ul class="dropdown-menu">
+                    <?php foreach ($region['cities'] as $city) { ?>
+                        <li>
+                            <a class="dropdown-item<?= str_starts_with($currentPath, $city['url']) ? ' active' : '' ?>"
+                               href="<?= htmlspecialchars($city['url']) ?>"
+                               title="<?= htmlspecialchars($city['label']) ?>">
+                                <?= htmlspecialchars($city['label']) ?>
+                            </a>
+                        </li>
+                    <?php } ?>
+                </ul>
+            <?php } ?>
+        </li>
+    <?php } ?>
+</ul>

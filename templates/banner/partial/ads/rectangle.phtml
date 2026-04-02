@@ -1,0 +1,40 @@
+<?php
+/**
+ * banner rectangle 480x300px
+ * jen na desktopech
+ */
+
+$rand = random_int(1, 1000);
+?>
+
+<div id="bannerRectanglePlace<?= $rand ?>"></div>
+
+<script>
+    if (window.innerWidth > 767) {
+        var sspScript = document.getElementById('ssp-script');
+        sspScript.addEventListener('load', function() {
+            if (!sssp.displaySeznamAds()) {
+                var elBannerRectangle = document.getElementById('bannerRectanglePlace<?= $rand ?>');
+                var htmlBannerRectangle = "";
+                <?php if (isset($bannerRectangle)) { ?>
+                    htmlBannerRectangle =
+                        "<div class=\"container w-100 mt-4\">" +
+                            "<div class=\"row\">" +
+                                "<div class=\"col-md-12\">" +
+                                    "<div class=\"reklama\">" +
+                                        "Reklama" +
+                                    "</div>" +
+                                    "<div id=\"bannerRectangle\" data-type=\"rectangle\" data-id=\"<?= $bannerRectangle['id'] ?>\" style=\"margin: 0 auto;\">" +
+                                        "<a onclick=\"bannerCountClick('rectangle', <?= $bannerRectangle['id'] ?>)\" class=\"d-block\" href=\"<?= $bannerRectangle['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                            "<img class=\"img-fluid\" src=\"<?= $view->asset($bannerRectangle['image']) ?>\" alt=\"Reklama\" />" +
+                                        "</a>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    elBannerRectangle.insertAdjacentHTML("beforeend", htmlBannerRectangle);
+                <?php } ?>
+            }
+        });
+    }
+</script>

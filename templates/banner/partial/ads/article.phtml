@@ -1,0 +1,37 @@
+<?php
+/**
+ * seznam.cz SSP - SMR mobil článek 720x1280
+ * jen na mobilech
+ */
+
+$rand = random_int(1, 1000);
+
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p3_' . $rand . '").length && $("#p3_' . $rand . '").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p3_' . $rand . '");
+        }
+    }, 2000);'
+);
+?>
+
+<div id="bannerArticlePlace<?= $rand ?>"></div>
+
+<script>
+    var sspScriptArticle<?= $rand ?> = document.getElementById('ssp-script');
+    sspScriptArticle<?= $rand ?>.addEventListener('load', function() {
+        var elBannerArticle = document.getElementById('bannerArticlePlace<?= $rand ?>');
+        var htmlBannerArticle = "";
+        if (sssp.displaySeznamAds()) {
+            if (window.innerWidth <= 767) {
+                htmlBannerArticle =
+                    "<div class=\"row my-3\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p3_<?= $rand ?>\" data-szn-ssp-ad='{\"zoneId\": 151890, \"width\": 720, \"height\": 1280}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerArticle.insertAdjacentHTML("beforeend", htmlBannerArticle);
+            }
+        }
+    });
+</script>

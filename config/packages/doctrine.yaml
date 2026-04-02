@@ -1,0 +1,8 @@
+doctrine:
+    dbal:
+        default_connection: polar
+        connections:
+            polar:
+                url: '%env(resolve:DATABASE_POLAR_URL)%'
+            playkit:
+                url: '%env(resolve:DATABASE_PLAYKIT_URL)%'

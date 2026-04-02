@@ -1,0 +1,56 @@
+<?php
+/**
+ * Hamburger menu (mobily) — položky submenu ve 2 sloupcích
+ * Prvních 5 položek vlevo, zbytek vpravo
+ */
+
+$nav = require dirname(__DIR__, 2) . '/config/navigation.php';
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Sestaví flat seznam: submenu přímé položky + dropdown children jako samostatné položky
+$items = [];
+foreach ($nav['submenu'] as $item) {
+    if (isset($item['dropdown'])) {
+        foreach ($item['dropdown'] as $child) {
+            $items[] = $child;
+        }
+    } else {
+        $items[] = ['label' => $item['label'], 'url' => $item['url'], 'id' => $item['id'], 'target' => $item['target'] ?? null];
+    }
+}
+
+$left  = array_slice($items, 0, 5);
+$right = array_slice($items, 5);
+?>
+<div class="d-lg-none regions">
+    <nav>
+        <ul class="nav nav-pills">
+            <?php foreach ($left as $item) { ?>
+                <li<?= isset($item['id']) ? ' id="' . htmlspecialchars($item['id']) . '"' : '' ?>>
+                    <a class="d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light<?= isset($item['url']) && str_starts_with($currentPath, $item['url']) ? ' active' : '' ?>"
+                       href="<?= htmlspecialchars($item['url'] ?? '#') ?>"
+                       <?= isset($item['target']) ? 'target="' . $item['target'] . '"' : '' ?>>
+                        <?= $item['label'] ?>
+                    </a>
+                </li>
+            <?php } ?>
+        </ul>
+    </nav>
+</div>
+<?php if ($right) { ?>
+<div class="pages-mobile-menu d-lg-none w-50 float-end">
+    <nav>
+        <ul class="nav nav-pills mobile-ham-right">
+            <?php foreach ($right as $item) { ?>
+                <li<?= isset($item['id']) ? ' id="' . htmlspecialchars($item['id']) . '"' : '' ?>>
+                    <a class="d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light<?= isset($item['url']) && str_starts_with($currentPath, $item['url']) ? ' active' : '' ?>"
+                       href="<?= htmlspecialchars($item['url'] ?? '#') ?>"
+                       <?= isset($item['target']) ? 'target="' . $item['target'] . '"' : '' ?>>
+                        <?= $item['label'] ?>
+                    </a>
+                </li>
+            <?php } ?>
+        </ul>
+    </nav>
+</div>
+<?php } ?>

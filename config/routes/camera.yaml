@@ -1,0 +1,7 @@
+camera_list:
+  path: /kamery
+  controller: App\Camera\Controller\Web\CameraController::index
+
+camera_detail:
+  path: /kamery/{camera_id}/{camera_url}
+  controller: App\Camera\Controller\Web\CameraController::detail

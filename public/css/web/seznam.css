@@ -1,0 +1,32 @@
+@media (min-width: 1200px) {
+	html.boxed .body {
+		max-width: 1060px;
+		top: 226px;
+		position: relative;
+	}
+    #header .header-body {
+        max-width: 1060px !important;
+    }
+	.container {
+		width: 1060px;
+	}
+	/*#program {
+		height: 157px;
+	}*/
+	.page-header.page-header-index .row > .col-lg-5 {
+		height: 240px;
+	}
+	#weather #weather_sivs {
+		padding-top: 5px;
+	}
+    .pattern {
+        padding-top: 2rem !important;
+    }
+    .pattern2 {
+        padding-bottom: 2rem !important;
+    }
+    #header .header-nav-main nav > ul > li > a {
+        /*padding: .5rem 1.5rem !important;*/
+        padding: .5rem 1rem !important;  /*zúžení menu kvůli volbám*/
+    }
+}

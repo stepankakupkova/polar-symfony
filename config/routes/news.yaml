@@ -1,0 +1,44 @@
+news_list:
+  path: /zpravy
+  controller: App\News\Controller\Web\NewsController::index
+
+news_ticker:
+  path: /zpravy/json/get-ticker
+  controller: App\News\Controller\Web\NewsController::getTicker
+
+news_crawl:
+  path: /zpravy/json/get-crawl
+  controller: App\News\Controller\Web\NewsController::getCrawl
+
+news_pr_list:
+  path: /zpravy/pr
+  controller: App\News\Controller\Web\PrController::index
+
+news_pr_detail:
+  path: /zpravy/pr/{article_id}/{article_url}
+  controller: App\News\Controller\Web\PrController::detail
+
+news_triptip_list:
+  path: /zpravy/kam-vyrazit
+  controller: App\News\Controller\Web\TriptipController::index
+
+news_triptip_detail:
+  path: /zpravy/kam-vyrazit/{url}/{city_url}/{article_id}/{article_url}
+  controller: App\News\Controller\Web\TriptipController::detail
+
+# news_redactor musí být před news_region_city (obě mají 3 segmenty)
+news_redactor:
+  path: /zpravy/redaktor/{redactor_url}
+  controller: App\News\Controller\Web\RedactorController::index
+
+news_region:
+  path: /zpravy/{url}
+  controller: App\News\Controller\Web\RegionController::index
+
+news_region_city:
+  path: /zpravy/{url}/{city_url}
+  controller: App\News\Controller\Web\RegionController::city
+
+news_detail:
+  path: /zpravy/{url}/{city_url}/{article_id}/{article_url}
+  controller: App\News\Controller\Web\NewsDetailController::index
