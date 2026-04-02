@@ -1,0 +1,32 @@
+* text=auto
+
+*.php text eol=lf
+*.phtml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.less text eol=lf
+*.md text eol=lf
+*.svg text eol=lf
+*.html text eol=lf
+*.htaccess text eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.gz binary
