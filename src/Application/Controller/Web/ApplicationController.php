@@ -6,10 +6,10 @@ use App\Banner\Repository\BannerRepository;
 use App\News\Repository\NewsRepository;
 use App\News\Repository\PlaykitRepository;
 use App\News\Repository\VideoRepository;
-use App\View\PhtmlRenderer;
+use App\Application\View\PhtmlRenderer;
 use Symfony\Component\HttpFoundation\Response;
 
-final class HomeController
+final class ApplicationController
 {
 	public function index(
 		PhtmlRenderer $renderer,
@@ -28,7 +28,7 @@ final class HomeController
 		$regions    = $newsRepository->getAllArticlesForRegions();
 		$newVideos  = $videoRepository->getNewVideosForWeb(6);
 
-		return new Response($renderer->renderWithLayout('application/web/home', [
+		return new Response($renderer->renderWithLayout('application/web/index', [
 			'special'      => $special,
 			'newArticles'  => $newArticles,
 			'newsCount'    => $newsCount,
@@ -40,5 +40,10 @@ final class HomeController
 			'bannerMobilesquare1' => $bannerRepository->getMobilesquare1(),
 			'bannerMobilesquare2' => $bannerRepository->getMobilesquare2(),
 		]));
+	}
+
+	public function search(PhtmlRenderer $renderer): Response
+	{
+		return new Response($renderer->renderWithLayout('application/web/search'));
 	}
 }

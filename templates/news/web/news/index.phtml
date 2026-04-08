@@ -1,0 +1,400 @@
+<?php
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+        if ($(window).width() > 992) {
+            let playerLiveSDHD = videojs("playerLiveSDHD", {
+                controls: true, 
+                autoplay: false, 
+                preload: "none", 
+                aspectRatio: "16:9", 
+                muted: true, 
+                inactivityTimeout: 1000,
+                controlBar: {
+                    children: {
+                        playToggle: true,
+                        LiveDisplay: true,
+                        volumePanel: {
+                            inline: true
+                        },
+                        fullscreenToggle: true
+                    }
+                }
+            });
+        }
+        '
+);
+
+$view->setTitle('Regionální zprávy moravskoslezského kraje');
+$view->addMeta('description', 'Sledujte regionální zpravodajství z moravskoslezského kraje online. Denně Vám přinášíme aktuální zprávy z vašeho regionu a mnoho dalšího.');
+$view->addMeta('keywords', 'regionální zpravodajství, zprávy, reportáže, polar, tv, televize, moravskoslezský kraj');
+$view->addOgMeta('og:title', 'Zprávy | POLAR');
+$view->addOgMeta('og:description', 'Sledujte regionální zpravodajství z moravskoslezského kraje online. Denně Vám přinášíme aktuální zprávy z vašeho regionu a mnoho dalšího.');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', $schemeHost . $view->asset('img/web/layout/microformat.png'));
+$view->addOgMeta('og:image:secure_url', $schemeHost . $view->asset('img/web/layout/microformat.png'));
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+// Přidání prev a next tagů
+if ($page > 1) {
+    $prevPage = $page - 1;
+    $view->addHeadLink('prev', $view->path('news') . ($prevPage > 1 ? '?page=' . $prevPage : ''));
+}
+if ($total > $page * $limit) {
+    $view->addHeadLink('next', $view->path('news') . '?page=' . ($page + 1));
+}
+
+$view->setBreadcrumbs([
+    ['label' => 'Zprávy', 'url' => $view->path('news')],
+]);
+
+$locale = Locale::getDefault();
+
+$dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($locale): string {
+    return (new IntlDateFormatter($locale, $dateType, $timeType))->format($date) ?: '';
+};
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-start align-self-center">
+                <?= $view->include('navigation/breadcrumb') ?>
+                <div class="d-none d-md-block text-color-grey ms-3">
+                    (<?= $newsCount; ?> reportáží)
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="crawl" class="mb-3 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php if ($articles) { ?>
+
+    <?php $i = 1; $k = 0; ?>
+    <?php foreach ($articles as $key => $item) { ?>
+        <?php
+                $region_city_url = $view->path('news');
+            if ($item['region_url'] && $item['city_url']) {
+                $region_city_url = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'];
+                if ($item['city_url'] === 'cely-ms-kraj') {
+                    $region_city_url = $view->path('news');
+                }
+            }
+
+            $article_href = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'] . '/' . $item['article_id'] . '/' . $item['article_url'];
+            $redactor_href = '/zpravy/redaktor/' . $item['author_url'];
+
+            try {
+                $today = new DateTime();
+                $dateUpdate = new DateTime($item['updated_date']);
+                if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                    $dayUpdate = 'Dnes';
+                } else {
+                    $yesterday = new DateTime();
+                    $yesterday->modify('-1 day');
+                    if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                        $dayUpdate = 'Včera';
+                    } else {
+                        $dayUpdate = $dateFormat($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                    }
+                }
+                $timeUpdate = $dateFormat($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
+
+                $today = new DateTime();
+                $date = new DateTime($item['public_from']);
+                if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                    if ($item['label']) {
+                        $day = 'dnes';
+                    } else {
+                        $day = 'Dnes';
+                    }
+                } else {
+                    $yesterday = new DateTime();
+                    $yesterday->modify('-1 day');
+                    if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                        if ($item['label']) {
+                            $day = 'včera';
+                        } else {
+                            $day = 'Včera';
+                        }
+                    } else {
+                        $day = $dateFormat($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                    }
+                }
+                $time = $dateFormat($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
+            } catch (Exception $e) {
+                $day = 'NaN';
+                $time = 'NaN';
+                $dayUpdate = 'NaN';
+                $timeUpdate = 'NaN';
+            }
+        ?>
+
+        <?php // 1., 2., 3. a 4. blok článků  ?>
+        <?php if ($i === 1 || $i === 7 || $i === 13 || $i === 19) { ?>
+            <?php $rand = random_int(1, 1000); ?>
+            <div class="container container<?= $rand ?>">
+                <div class="row">
+                    <div class="col-12 col-lg-7">
+        <?php } ?>
+
+                        <?php // Ticker  ?>
+                        <?php if ($i === 1) { ?>
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="ticker" class="mb-4">
+                                    <div id="tickerIcon" class="">
+                                        <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                                    </div>
+                                    <div class="ticker-container">
+                                        <ul>
+                                            <div class="ticker-active">
+                                                <li>
+                                                    <span>
+                                                        Načítám...
+                                                    </span>
+                                                </li>
+                                            </div>
+                                        </ul>>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+
+                        <div class="row mb-4-5">
+                            <?php if ($item['picture']) { ?>
+                                <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                                    <div class="">
+                                        <a class="" href="<?= $article_href ?>" title="<?= $item['title'] ?>">
+                                            <span class="thumb-info thumb-info-lighten">
+                                                <span class="thumb-info-wrapper">
+                                                    <img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+                                                    <?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+                                                        <span class="thumb-info-action">
+                                                            <span class="thumb-info-action-icon">
+                                                                <i class="fas fa-play"></i>
+                                                                <span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+                                                            </span>
+                                                        </span>
+                                                    <?php } ?>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-7 col-lg-6 ps-1 pe-3">
+                                    <h2 class="mb-1 mb-md-2">
+                                        <a class="" href="<?= $article_href ?>" title="<?= $item['title'] ?>">
+                                            <?= $item['title'] ?>
+                                        </a>
+                                    </h2>
+                                    <div class="text-1 text-tertiary line-height-7 mb-1">
+                                        <?php
+                                            $now_minus_x = new DateTime();
+                                            $now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                            if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+                                                echo $item['label'];
+                                                echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                            } else {
+                                                echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                            }
+                                        ?>
+                                        <span>
+                                            <a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+                                        </span>
+                                        <span>
+                                            <?= '<a class="" href="' . $redactor_href . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+                                        --></span>
+                                    </div>
+                                    <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                        <?= $item['anotation']; ?>
+                                    </p>
+                                </div>
+                            <?php } else { ?>
+                                <div class="col-12">
+                                    <div class="">
+                                        <h2 class="mb-1 mb-md-2">
+                                            <a class="" href="<?= $article_href ?>" title="<?= $item['title'] ?>">
+                                                <?= $item['title'] ?>
+                                            </a>
+                                        </h2>
+                                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                                            <?php
+                                                $now_minus_x = new DateTime();
+                                                $now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                                if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+                                                    echo $item['label'];
+                                                    echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                } else {
+                                                    echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                }
+                                            ?>
+                                            <span>
+                                                <a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+                                            </span>
+                                            <span>
+                                                <?= '<a class="" href="' . $redactor_href . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+                                            --></span>
+                                        </div>
+                                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                            <?= $item['anotation']; ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </div>
+
+            <?php // 1., 2., 3. a 4. blok článků LEVÝ SLOUPEC - uzavření col (nebo pokud jsem na poslední stránce a posledním článku) ?>
+            <?php if ($i === 6 || $i === 12 || $i === 18 || $i === 25 || ($i === count($articles) && $page === (int)ceil($total/$limit))) { ?>
+                    </div>
+            <?php } ?>
+
+
+            <?php // 1., 2., 3. a 4. blok článků PRAVÝ SLOUPEC ?>
+            <?php if ($i === 6 || $i === 12 || $i === 18 || $i === 25) { ?>
+                    <div class="col-12 col-lg-5 p-relative">
+                        <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container<?= $rand ?>', 'padding': {'top': 63}}">
+                            <?php $pr_block = array(); ?>
+                            <!-- 1. blok: Živé vysílání + počasí + 2x PR + banner -->
+                            <?php if ($i === 6) { ?>
+                                <div class="row d-none d-lg-flex mb-4">
+                                    <div class="col-8">
+                                        <div id="video-container" class="ratio ratio-16x9">
+                                            <video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
+                                                <source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
+                                                <p class="vjs-no-js">
+                                                    Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.
+                                                </p>
+                                            </video>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <?php if ($weather) { ?>
+                                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weatherRegion ?></h3>
+                                            <?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
+                                            <?php foreach ($weather as $w) { ?>
+                                                <div class="row text-secondary text-3-4 mb-2">
+                                                    <div class="col-5">
+                                                        <?= $days[$m] ?? '' ?>
+                                                    </div>
+                                                    <div class="col-3 px-2">
+                                                        <img src="/img/web/weather/<?= $w['status'] ?>.png" class="img-fluid" alt="" />
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <?= $w['temperature_day'] ?>°C
+                                                    </div>
+                                                </div>
+                                                <?php $m++; ?>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
+                                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                                <?php $k = $k + 2; ?>
+                                <?php // REKLAMA ?>
+                                <?= $view->include('banner/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+                            <?php } ?>
+
+                            <!-- 2., 3., 4. blok: 3x PR -->
+                            <?php if ($i === 12 || $i === 18 || $i === 25) { ?>
+                                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} if (isset($pr[$k+2])) {$pr_block[] = $pr[$k+2];} ?>
+                                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                                <?php $k = $k + 3; ?>
+                            <?php } ?>
+
+                            <?php if ($i === 12) { ?>
+								<br />
+                                <?php // REKLAMA ?>
+                                <?= $view->include('banner/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+                            <?php } ?>
+                            <br class="d-none d-lg-inline" />
+                        </aside>
+                    </div>
+        <?php } ?>
+
+        <?php // 1., 2., 3. a 4. blok článků PRAVÝ SLOUPEC - uzavření row + container (nebo pokud jsem na poslední stránce a posledním článku) ?>
+        <?php if ($i === 6 || $i === 12 || $i === 18 || $i === 25 || ($i === count($articles) && $page === (int)ceil($total/$limit))) { ?>
+                </div>
+            </div>
+        <?php } ?>
+
+
+        <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
+        <?php if ($i === 5) { ?>
+            <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+        <?php } ?>
+
+        <?php // REKLAMA PRO MOBILY (druhá) ?>
+        <?php if ($i === 12) { ?>
+            <?= $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
+        <?php } ?>
+
+        <?php // Blok Kam vyrazit  ?>
+        <?php if ($i === 6) { ?>
+            <?= $view->include('news/partial/block-triptip', ['blockTriptip' => $blockTriptip, 'region' => $region]) ?>
+        <?php } ?>
+
+        <?php // Blok Nabídka práce  ?>
+        <?php if ($i === 12) { ?>
+            <?= $view->include('news/partial/block-job', ['blockJob' => $blockJob]) ?>
+        <?php } ?>
+
+        <?php // Blok Kamery  ?>
+        <?php if ($i === 18) { ?>
+            <?php // REKLAMA ?>
+            <div class="container">
+                <?= $view->include('banner/partial/ads/article') ?>
+            </div>
+            <?= $view->include('news/partial/block-camera', ['blockCamera' => $blockCamera]) ?>
+        <?php } ?>
+
+        <?php $i++; ?>
+
+    <?php } ?>
+<?php } ?>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <?= $view->include('pagination/paginator', ['route' => 'news', 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+        </div>
+    </div>
+</div>

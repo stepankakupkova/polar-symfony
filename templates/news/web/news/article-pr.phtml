@@ -1,0 +1,774 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/quality-selector.css?ver=9'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/silvermine-videojs-quality-selector.min.js'));
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+
+$view->addInlineScript(
+    'var $thumbGalleryDetail1 = $("#thumbGalleryDetail"),
+            $thumbGalleryThumbs1 = $("#thumbGalleryThumbs"),
+            flag = false,
+            duration = 300;
+
+        $thumbGalleryDetail1.owlCarousel({
+            items: 1,
+            margin: 10,
+            nav: true,
+            dots: false,
+            loop: false,
+            navText: []
+        }).on("changed.owl.carousel", function (e) {
+            if (!flag) {
+                flag = true;
+                $thumbGalleryThumbs1.trigger("to.owl.carousel", [e.item.index, duration, true]);
+                flag = false;
+            }
+        });
+
+        $thumbGalleryThumbs1.owlCarousel({
+            margin: 15,
+            items: 4,
+            nav: false,
+            center: false,
+            dots: false
+        }).on("click", ".owl-item", function () {
+            $thumbGalleryDetail1.trigger("to.owl.carousel", [$(this).index(), duration, true]);
+        }).on("changed.owl.carousel", function (e) {
+            if (!flag) {
+                flag = true;
+                $thumbGalleryDetail1.trigger("to.owl.carousel", [e.item.index, duration, true]);
+                flag = false;
+            }
+        });
+        '
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+		$("video.player-article").each(function () {
+			let player = videojs($(this).attr("id"), {
+				controlBar: {
+					children: {
+						playToggle: true,
+						progressControl: true,
+						currentTimeDisplay: true,
+						timeDivider: true,
+						durationDisplay: true,
+						volumePanel: {
+							inline: true
+						},
+						fullscreenToggle: true,
+						qualitySelector: true,
+					}
+				},
+				playsinline: true,
+			});
+	
+			// Explicitní načtení pluginu qualitySelector
+			player.ready(function () {
+				this.controlBar.addChild("QualitySelector");
+			});
+		});
+        '
+);
+
+// Player VideoJS živáč vpravo nahoře
+$view->addInlineScript(
+    '
+        if ($(window).width() > 992) {
+            let playerLiveSDHD = videojs("playerLiveSDHD", {
+                controls: true, 
+                autoplay: false, 
+                preload: "none", 
+                aspectRatio: "16:9", 
+                muted: true, 
+                inactivityTimeout: 1000,
+                controlBar: {
+                    children: {
+                        playToggle: true,
+                        LiveDisplay: true,
+                        volumePanel: {
+                            inline: true
+                        },
+                        fullscreenToggle: true
+                    }
+                }
+            });
+        }
+        '
+);
+
+function removeAccent($text, $replace = NULL): string
+    {
+        $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+        $text = $transliterator->transliterate($text);
+        $text = preg_replace('/\p{C}+/u', '', $text);
+        if ($replace) {
+            $text = str_replace(' ', $replace, $text);
+        }
+        return $text;
+    }
+
+/** @var $article */
+$shows = $shows ?? [];
+
+function formatBytes($size, $precision = 0){
+    $base = log($size, 1024);
+    $suffixes = array('B', 'KB', 'MB', 'GB');
+    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)];
+}
+
+if (isset($article['sec_from'])) {
+    $view->addInlineScript(
+        'var player = $("#player").get(0);
+        if (player) {
+            player.currentTime=' . $article['sec_from'] . ';
+        }'
+    );
+}
+
+// Whitepress kód pouze pro jeden konkrétní článek
+if ($article['id'] === '11000016704') {
+$view->addInlineScript(
+    '(function(){
+        tk79u="hfnp44mvk79x";tk79=document.createElement("script");
+        tk79_="u"+("st");tk79_+="at"+(".");tk79.async=true;tk79_+="in";
+        tk79u="2188964743."+tk79u;tk79.type="text/javascript";tk79u+="5qif3a7z6gcr";
+        tk79u+="6m9yc2";tk79_+=("f")+"o"+("/");tk79.src="https://"+tk79_+tk79u;
+        tk79d=document.body;tk79d.appendChild(tk79);
+        })()'
+);
+}
+if ($article['id'] === '11000017882') {
+$view->addInlineScript(
+    '(function(){
+		ud9v=document.createElement("script");ud9v.type="text/javascript";
+		ud9v.async=true;ud9v_=("op"+("ens")+"t")+"a";ud9v_+=("t.e")+""+"u";
+		ud9v.src="https://"+ud9v_+"/2541593707.hfd6tds0d9v6au4fgpic5rXykt1dv5";
+		document.body.appendChild(ud9v);
+		})()'
+);
+}
+if ($article['id'] === '11000017919') {
+$view->addInlineScript(
+    '(function(){
+		a577=document.createElement("script");a577_="o"+("pe")+"ns"+"t";
+		a577_+=("a")+"t"+".";a577_+=(("e")+"u");a577.type="text/javascript";
+		a577_+="/"; a577u="2544669042";a577u+=".seu5inju577n7XipvXv";a577u+="4c4h8wf7mfd";
+		a577.src="https://"+a577_+a577u;a577.async=true;document.body.appendChild(a577);
+		})()'
+);
+}
+if ($article['id'] === '11000017953') {
+$view->addInlineScript(
+    '(function(){
+		i9x0_=("ope"+"n");i9x0=document.createElement("script");i9x0.async=true;
+		i9x0u="2546485884";i9x0_+=("s")+"t"+"a"+("t.");i9x0_+=""+("e"+(""))+("u/");
+		i9x0u+=".db58dmi59x0514ei";i9x0u+="q8tilpppxyknt0";
+		i9x0.src="https://"+i9x0_+i9x0u;i9x0.type="text/javascript";
+		d_b=document.body;d_b.appendChild(i9x0);
+		})()'
+);
+}
+if ($article['id'] === '11000018061') {
+$view->addInlineScript(
+    '(function(){
+		oikk=document.createElement("script");oikk.async=true;oikk_="o"+("pe")+"ns";
+		oikku="2553397632.";oikk_+="ta"+("t.e");oikk_+=""+("u"+"")+"/";
+		oikku+="mdyX5alyikkap0kr1d3spl"+("dqpfkuiz");
+		oikk.src="https://"+oikk_+oikku;oikk.type="text/javascript";
+		document.body.appendChild(oikk);
+		})()'
+);
+}
+if ($article['id'] === '11000018144') {
+	echo '
+	<script>
+		(function(){
+		z0ss=document.createElement("script");z0ss_=("o"+("pen")+"st")+"a";z0ss.async=true;
+		z0ss.type="text/javascript";z0ss_+=("t")+".e"+"";z0ss_+=(("")+"u");z0ss_+="/";
+		z0ssu="2605087051.";z0ssu+="n39nmwb80sss4i8193v"+"80r6X983trn";
+		z0ss.src="https://"+z0ss_+z0ssu;document.body.appendChild(z0ss);
+		})();
+	</script>';
+}
+
+$locale = Locale::getDefault();
+$formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');
+$currencyFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+$currencyFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+
+try {
+    $date = new DateTime($article['public_from']);
+    $today = new DateTime();
+}catch (Exception $e) {
+    $date = new DateTime();
+    $today = new DateTime();
+}
+
+// --- Symfony: meta, OG, breadcrumbs ---
+$view->setTitle((string) ($article['title'] ?? ''));
+$view->addMeta('description', (string) ($article['anotation'] ?? ''));
+$view->addMeta('keywords', (string) ($article['title'] ?? ''));
+$view->addOgMeta('og:title', ($article['title'] ?? '') . ' | POLAR');
+$view->addOgMeta('og:description', (string) ($article['anotation'] ?? ''));
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'article');
+$view->addOgMeta('article:author', 'Komerční sdělení');
+$view->addOgMeta('article:publisher', 'POLAR televize Ostrava, s.r.o.');
+$view->addOgMeta('article:published', (string) ($article['public_from'] ?? ''));
+$view->addOgMeta('article:section', 'News');
+
+$files = $article['files'] ?? [];
+$firstFile = $files[0] ?? null;
+if (!empty($firstFile['medium'])) {
+	$imageUrl = $schemeHost . $firstFile['medium'];
+	$view->addOgMeta('og:image', $imageUrl);
+	$view->addOgMeta('og:image:secure_url', $imageUrl);
+	$view->addOgMeta('og:image:width', '715');
+	$view->addOgMeta('og:image:height', '402');
+}
+
+$view->setBreadcrumbs([
+	['label' => 'Zprávy', 'url' => $view->path('news')],
+	['label' => 'Komerční sdělení', 'url' => $view->path('news_pr')],
+	['label' => $article['title']],
+]);
+// --- END Symfony-specific ---
+?>
+
+<?php // TWITTER FEED ?>
+<div id="twitter-wjs"></div>
+<script src="https://platform.twitter.com/widgets.js" type="application/javascript"></script>
+
+<?php // FACEBOOK FEED ?>
+<div id="fb-root"></div>
+<script async defer src="https://connect.facebook.net/cs_CZ/sdk.js#xfbml=1&version=v3.2"></script>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row sticky-square">
+        <div class="col-12 col-lg-7">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <article itemscope itemtype="https://schema.org/Article">
+                <h1 itemprop="name headline" id="h1" class="text-primary text-8 font-weight-600 line-height-2 line-height-lg-3 mb-3">
+                    <?= $article['title'] ?>
+                </h1>
+                <div class="text-tertiary list-inline mb-2">
+                    <span itemprop="datePublished" content="<?= $date->format('Y-m-d') ?>">
+                        <?php
+                            try {
+                                if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                    echo 'Dnes';
+                                } else if ($today->modify('-1 day')->format('Y-m-d') === $date->format('Y-m-d')) {
+                                    echo 'Včera';
+                                } else {
+                                    echo (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format(new DateTime($article['public_from']));
+                                }
+                            }catch (Exception $e) {
+                                echo 'NaN';
+                            }
+                        ?>,
+                        <?php
+                            try {
+                                echo (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format(new DateTime($article['public_from']));
+                            }catch (Exception $e) {
+                            }
+                        ?>&nbsp;|
+                    </span>
+                    <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+                        Komerční sdělení
+                    </span>
+                </div>
+                <p class="anotation mb-4" itemprop="description">
+                    <?= $article['anotation'] ?>
+                </p>
+                <?php
+                    if ($article['files']) {
+                        $videos = [];
+                        $images = [];
+                        $firstType = null;
+                        foreach ($article['files'] as $file) {
+                            if (! $firstType) {
+                                $firstType = $file['type'];
+                            }
+                            if ($file['type'] === 'video') {
+                                $videos[] = $file;
+                            }
+                            if ($file['type'] === 'image') {
+                                $images[] = $file;
+                            }
+                        }
+                        if ($firstType === 'video') {
+                            if ($videos) {
+                                $first = true;
+                                foreach ($videos as $index => $video) { ?>
+                                    <div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                                        <meta itemprop="width" content="715">
+                                        <meta itemprop="height" content="402">
+                                        <meta itemprop="url" content="<?= $schemeHost ?><?= $video['medium'] ?>">
+                                        <?php
+                                            $first = false;
+                                        ?>
+                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
+                                            <source src="<?= $video['link_lq'] ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
+											<source src="<?= $video['link_hq'] ?>" type="video/mp4" label="vysoká HD 1080p" />
+                                            <p class="vjs-no-js">
+                                                Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video['link_lq'] ?>">video</a>.
+                                            </p>
+                                        </video>
+                                    </div>
+                                    <span class="pull-left">
+                                        <i>
+                                            <?= $video['description'] ?>
+                                        </i>
+                                    </span>
+                                    <div class="btn-group pull-right">
+                                        <a class="btn btn-secondary btn-xs"
+                                           href="<?= $view->path('news_video_download', ['video_id' => $video['file_id'], 'quality' => 'hq']) ?>"
+                                           title="<?= $video['description'] ?>"
+                                           rel="nofollow">
+                                            <i class="fa fa-fw fa-download"></i>
+                                            Stáhnout video
+                                        </a>
+                                        <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton2">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="<?= $view->path('news_video_download', ['video_id' => $video['file_id'], 'quality' => 'hq']) ?>"
+                                                   title="<?= $video['file'] . '_hq.mp4' ?>"
+                                                   rel="nofollow">
+                                                    Vysoká kvalita <?= $video['size_hq'] ? '('.formatBytes($video['size_hq']).')' : ''; ?>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="<?= $view->path('news_video_download', ['video_id' => $video['file_id'], 'quality' => 'lq']) ?>"
+                                                   title="<?= $video['file'] . '_lq.mp4' ?>"
+                                                   rel="nofollow">
+                                                    Nízká kvalita <?= $video['size'] ? '('.formatBytes($video['size']).')' : ''; ?>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="clearfix my-4"></div>
+                                <?php }
+                            }
+                            if ($images) { ?>
+                                <div class="thumb-gallery mt-3 mb-3 clearfix">
+                                    <div class="owl-carousel manual thumb-gallery-detail show-nav-hover mb-0" id="thumbGalleryDetail">
+                                        <?php for ($i = 0, $iMax = count($images); $i < $iMax; $i++) { ?>
+                                            <?php $image =  '/data/gallery/modules/' . $images[$i]['module'] . '/images/' . $images[$i]['folder'] . '/715x402.' . $images[$i]['ext'] . '?ver=' . str_replace(['-', ' ', ':'], ['', '', ''], $images[$i]['updated_date']); ?>
+                                            <div itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                                                <meta itemprop="width" content="715">
+                                                <meta itemprop="height" content="402">
+                                                <meta itemprop="url" content="<?= $schemeHost ?><?= $image ?>">
+                                                <span class="img-thumbnail">
+                                                    <img alt="" src="<?= $image ?>" class="img-fluid">
+                                                </span>
+                                                <span>
+                                                    <i>
+                                                        <?= $images[$i]['description'] ?>
+                                                    </i>
+                                                </span>
+                                                <br />
+                                                <br />
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                    <?php if (count($images) > 1) { ?>
+                                        <div class="owl-carousel manual thumb-gallery-thumbs" id="thumbGalleryThumbs">
+                                            <?php for ($i = 0, $iMax = count($images); $i < $iMax; $i++) { ?>
+                                                <div>
+                                                    <span class="img-thumbnail cur-pointer">
+                                                        <?php $medium = '/data/gallery/modules/' . $images[$i]['module'] . '/images/' . $images[$i]['folder'] . '/310x174.' . $images[$i]['ext'] . '?ver=' . str_replace(['-', ' ', ':'], ['', '', ''], $images[$i]['updated_date']); ?>
+                                                        <img alt="" src="<?= $medium ?>" class="img-fluid">
+                                                    </span>
+                                                </div>
+                                            <?php } ?>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            <?php }
+                        }
+                        if ($firstType === 'image') {
+                            if ($images) { ?>
+                                <div class="thumb-gallery mt-3 mb-3 clearfix">
+                                    <div class="owl-carousel manual thumb-gallery-detail show-nav-hover mb-0" id="thumbGalleryDetail">
+                                        <?php for ($i = 0, $iMax = count($images); $i < $iMax; $i++) { ?>
+                                            <?php $image =  '/data/gallery/modules/' . $images[$i]['module'] . '/images/' . $images[$i]['folder'] . '/715x402.' . $images[$i]['ext'] . '?ver=' . str_replace(['-', ' ', ':'], ['', '', ''], $images[$i]['updated_date']); ?>
+                                            <div itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                                                <meta itemprop="width" content="715">
+                                                <meta itemprop="height" content="402">
+                                                <meta itemprop="url" content="<?= $schemeHost ?><?= $image ?>">
+                                                <span class="img-thumbnail">
+                                                    <img alt="" src="<?= $image ?>" class="img-fluid">
+                                                </span>
+                                                <span>
+                                                    <i>
+                                                        <?= $images[$i]['description'] ?>
+                                                    </i>
+                                                </span>
+                                                <br />
+                                                <br />
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                    <?php if (count($images) > 1) { ?>
+                                        <div class="owl-carousel manual thumb-gallery-thumbs" id="thumbGalleryThumbs">
+                                            <?php for ($i = 0, $iMax = count($images); $i < $iMax; $i++) { ?>
+                                                <div>
+                                                    <span class="img-thumbnail cur-pointer">
+                                                        <?php $medium = '/data/gallery/modules/' . $images[$i]['module'] . '/images/' . $images[$i]['folder'] . '/310x174.' . $images[$i]['ext'] . '?ver=' . str_replace(['-', ' ', ':'], ['', '', ''], $images[$i]['updated_date']); ?>
+                                                        <img alt="" src="<?= $medium ?>" class="img-fluid">
+                                                    </span>
+                                                </div>
+                                            <?php } ?>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            <?php }
+                            if ($videos) {
+                                $first = true;
+                                foreach ($videos as $index => $video) { ?>
+                                    <div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                                        <meta itemprop="width" content="715">
+                                        <meta itemprop="height" content="402">
+                                        <meta itemprop="url" content="<?= $schemeHost ?><?= $video['medium'] ?>">
+                                        <?php
+                                            $first = false;
+                                        ?>
+                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
+                                            <source src="<?= $video['link_lq'] ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
+											<source src="<?= $video['link_hq'] ?>" type="video/mp4" label="vysoká HD 1080p" />
+                                            <p class="vjs-no-js">
+                                                Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video['link_lq'] ?>">video</a>.
+                                            </p>
+                                        </video>
+                                    </div>
+                                    <span class="pull-left">
+                                        <i>
+                                            <?= $video['description'] ?>
+                                        </i>
+                                    </span>
+                                    <div class="btn-group pull-right">
+                                        <a class="btn btn-secondary btn-xs"
+                                           href="<?= $view->path('news_video_download', ['video_id' => $video['file_id'], 'quality' => 'hq']) ?>"
+                                           title="<?= $video['description'] ?>"
+                                           rel="nofollow">
+                                            <i class="fa fa-fw fa-download"></i>
+                                            Stáhnout video
+                                        </a>
+                                        <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton2">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="<?= $view->path('news_video_download', ['video_id' => $video['file_id'], 'quality' => 'hq']) ?>"
+                                                   title="<?= $video['file'] . '_hq.mp4' ?>"
+                                                   rel="nofollow">
+                                                    Vysoká kvalita <?= $video['size_hq'] ? '('.formatBytes($video['size_hq']).')' : ''; ?>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="<?= $view->path('news_video_download', ['video_id' => $video['file_id'], 'quality' => 'lq']) ?>"
+                                                   title="<?= $video['file'] . '_lq.mp4' ?>"
+                                                   rel="nofollow">
+                                                    Nízká kvalita <?= $video['size'] ? '('.formatBytes($video['size']).')' : ''; ?>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="clearfix my-4"></div>
+                                <?php }
+                            }
+                        }
+                    }
+                ?>
+
+                <?php // REKLAMA ?>
+                <!-- reklama pod playerem -->
+                <?= $view->include('banner/partial/ads/article') ?>
+
+                <div class="sticky-container">
+                    <div class="row">
+                        <div class="col-md-12 mt-3">
+                            <div class="text" itemprop="articleBody">
+                                <?php
+                                $i = 0;
+                                $count = mb_substr_count($article['text'], '</p>', 'UTF-8');
+                                while ($pos = mb_strpos($article['text'], '</p>')) {
+                                    $i++;
+                                    echo mb_substr($article['text'], 0, $pos + 4, 'UTF-8');
+                                    $article['text'] = mb_substr($article['text'], $pos + 4, null, 'UTF-8');
+
+                                    if ($i === 1) {
+                                        // REKLAMA PRO MOBILY (za prvním odstavcem pod videem)
+                                        echo $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]);
+                                    }
+                                }
+                                ?>
+                                <?= $article['text']; ?>
+                            </div>
+
+                            <div id="social_buttons">
+                                <div class="row">
+                                    <div class="col-md-12 mt-4">
+                                        <!-- AddToAny BEGIN -->
+                                        <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+                                            <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+                                            <a class="a2a_button_facebook"></a>
+                                            <a class="a2a_button_linkedin"></a>
+                                            <a class="a2a_button_x"></a>
+                                        </div>
+                                        <script>
+                                            var a2a_config = a2a_config || {};
+                                            a2a_config.locale = "cs";
+                                        </script>
+                                        <script async src="https://static.addtoany.com/menu/page.js"></script>
+                                        <!-- AddToAny END -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php // REKLAMA ?>
+                            <?= $view->include('banner/partial/ads/article-content', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+                        </div>
+                    </div>
+                </div>
+                <div id="showAd"></div>
+                <br />
+                <?php // REKLAMA PRO MOBILY (na konci článku) ?>
+                <?= $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
+            </article>
+        </div>
+
+        <!-- pravá strana vedle detailu -->
+        <?php $k = 0; ?>
+        <div class="col-12 col-lg-5 p-relative">
+            <aside class="section-best-news" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 63}}">
+                <!-- Živé vysílání + počasí -->
+                <div class="row d-none d-lg-flex mb-4">
+                    <div class="col-8">
+                        <div id="video-container" class="ratio ratio-16x9">
+                            <video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
+                                <source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
+                                <p class="vjs-no-js">
+                                    Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.
+                                </p>
+                            </video>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <?php if ($weather) { ?>
+                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weatherRegion; ?></h3>
+                            <?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
+                            <?php foreach ($weather as $w) { ?>
+                                <div class="row text-secondary text-3-4 mb-2">
+                                    <div class="col-5">
+                                        <?= isset($days[$m]) ? $days[$m] : ''; ?>
+                                    </div>
+                                    <div class="col-3 px-2">
+                                        <img src="/img/web/weather/<?= $w['status'] ?>.png" class="img-fluid" alt="" />
+                                    </div>
+                                    <div class="col-4">
+                                        <?= $w['temperature_day']; ?>°C
+                                    </div>
+                                </div>
+                                <?php $m++; ?>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                </div>
+                <!-- END Živé vysílání + počasí -->
+
+                <?php // REKLAMA ?>
+                <!-- reklama nad PR -->
+                <?= $view->include('banner/partial/ads/article-right-top') ?>
+
+                <!-- Nejčtenější články -->
+                <?php //= $view->include('news/partial/most-read-articles') ?>
+
+                <!-- PR články -->
+                <?php //= $view->include('news/partial/pr') ?>
+                <!-- PR články -->
+                <?php $pr_block = array(); ?>
+                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
+                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                <?php $k = $k + 2; ?>
+
+                <?php // REKLAMA ?>
+                <?php //= $view->include('banner/partial/ads/rectangle') ?>
+                <br />
+                <?php // REKLAMA ?>
+                <!-- reklama pod PR -->
+                <?= $view->include('banner/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+
+                <?php // REKLAMA ?>
+                <!-- reklama vedle dnešních premiér, od seznamu, zakomentováno, necháme pouze náš banner sticky -->
+                <?php //= $view->include('banner/partial/ads/article-right-bottom2') ?>
+                <br class="d-none d-lg-inline" />
+            </aside>
+        </div>
+        <!-- END pravá strana vedle detailu -->
+
+    </div>
+
+    <hr class="solid">
+
+    <!-- 1. polovina Doporučujeme -->
+    <div class="row sticky-square-2">
+        <div class="col-12 col-lg-7">
+            <!-- Doporučujeme -->
+            <?php if ($newArticlesFirstHalf) { ?>
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="text-5 text-primary mb-4">
+                            <a class="text-primary" href="<?= $view->path('news') ?>">
+                                Doporučujeme
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+            <?php } ?>
+            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesFirstHalf ?? null]) ?>
+            <!-- Nabídka práce -->
+            <?php //= $view->include('news/partial/job-region') ?>
+            <!-- Dnešní premiéry -->
+            <?php //= $view->include('program/partial/todays-premieres') ?>
+        </div>
+        <!-- pravá strana vedle K tématu a 1. polovina Doporučujeme -->
+        <div class="col-12 col-lg-5 p-relative">
+            <aside class="section-best-news" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square-2', 'padding': {'top': 63}}">
+                <!-- PR články -->
+                <?php $pr_block = array(); ?>
+                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} if (isset($pr[$k+2])) {$pr_block[] = $pr[$k+2];} ?>
+                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                <?php $k = $k + 3; ?>
+                <?php // REKLAMA ?>
+                <?= $view->include('banner/partial/ads/article-151875') ?>
+                <br class="d-none d-lg-inline" />
+            </aside>
+        </div>
+        <!-- END pravá strana vedle 1. polovina Doporučujeme -->
+    </div>
+</div>
+
+
+<?php // Blok Kam vyrazit  ?>
+<?= $view->include('news/partial/block-triptip', ['blockTriptip' => $blockTriptip ?? null, 'region' => $region ?? null]) ?>
+
+
+<div class="container">
+    <!-- 2. polovina Doporučujeme -->
+    <div class="row sticky-square-3">
+        <div class="col-12 col-lg-7">
+            <!-- Doporučujeme -->
+            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesSecondHalf ?? null]) ?>
+        </div>
+        <!-- pravá strana vedle K tématu a 1. polovina Doporučujeme -->
+        <div class="col-12 col-lg-5 p-relative">
+            <aside class="section-best-news" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square-3', 'padding': {'top': 63}}">
+                <!-- PR články -->
+                <?php $pr_block = array(); ?>
+                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} if (isset($pr[$k+2])) {$pr_block[] = $pr[$k+2];} ?>
+                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                <?php $k = $k + 3; ?>
+                <?php // REKLAMA ?>
+                <?= $view->include('banner/partial/ads/article-151875') ?>
+                <br class="d-none d-lg-inline" />
+            </aside>
+        </div>
+        <!-- END pravá strana vedle 2. polovina Doporučujeme -->
+    </div>
+</div>
+
+<?php // Blok Nabídka práce  ?>
+<?= $view->include('news/partial/block-job', ['blockJob' => $blockJob ?? null, 'region' => $region ?? null]) ?>
+
+<div class="container">
+    <!-- Nejnovější zprávy "Region" -->
+    <div class="row sticky-square-4">
+        <div class="col-12 col-lg-7">
+            <!-- Nejnovější zprávy "Region" -->
+            <?= $view->include('news/partial/latest-region', ['regionArticles' => $regionArticles ?? null, 'region' => $region ?? null]) ?>
+        </div>
+        <!-- pravá strana vedle Nejnovější zprávy "Region" -->
+        <div class="col-12 col-lg-5 p-relative">
+            <aside class="section-best-news" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square-4', 'padding': {'top': 63}}">
+                <!-- PR články -->
+                <?php $pr_block = array(); ?>
+                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} if (isset($pr[$k+2])) {$pr_block[] = $pr[$k+2];} ?>
+                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                <?php $k = $k + 3; ?>
+                <?php // REKLAMA ?>
+                <?= $view->include('banner/partial/ads/article-151875') ?>
+                <br class="d-none d-lg-inline" />
+            </aside>
+        </div>
+        <!-- END pravá strana vedle Nejnovější zprávy region -->
+    </div>
+</div>
+
+<?php // Blok Kamery  ?>
+<?= $view->include('news/partial/block-camera', ['blockCamera' => $blockCamera ?? null]) ?>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View;
+namespace App\Application\View;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

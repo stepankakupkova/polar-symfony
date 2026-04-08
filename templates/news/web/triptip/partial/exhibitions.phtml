@@ -1,0 +1,61 @@
+<?php $locale = Locale::getDefault(); ?>
+
+<?php if ($exhibitions) {?>
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-primary mt-2 mb-4">
+                Výstavy
+                <!--<a class="pull-right link hidden-xs" href="<?php // = $view->path('web-news-pr') ?>" title="">
+                    <small>
+                        Více výstav
+                        <i class="fa fa-angle-double-right"></i>
+                    </small>
+                </a>-->
+            </h2>
+            <?php for ($i = 0, $iMax = count($exhibitions); $i < $iMax; $i++) { ?>
+                <article class="">
+                    <div class="row mb-4">
+                        <?php if ($exhibitions[$i]['image']) { ?>
+                            <div class="col-5 col-sm-5 col-md-6 pe-1 pe-md-2">
+                                <div class="img-thumbnail">
+                                    <a class="" href="<?= $exhibitions[$i]['url'] ?>" title="<?= $exhibitions[$i]['title'] ?>">
+                                        <img src="<?= $exhibitions[$i]['image'] ?>" alt="<?= $exhibitions[$i]['title'] ?>" class="img-fluid img-rounded" />
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-7 col-sm-7 col-md-6 ps-1 pe-3">
+                                <h5 class="mb-2 text-no-uppercase">
+                                    <a href="<?= $exhibitions[$i]['url'] ?>" title="<?= $exhibitions[$i]['title'] ?>">
+                                        <?= $exhibitions[$i]['title'] ?>
+                                    </a>
+                                </h5>
+                                <div class="mb-0">
+                                    <?php $formatter = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, null, null, 'dd. MM. Y');?>
+                                    <span>
+                                        <i class="fa fa-fw fa-calendar text-color-primary"></i>
+                                        <?php $dateFrom = new DateTime($exhibitions[$i]['term_from']);?>
+                                        <span class="text-2 text-tertiary"><?= $formatter->format($dateFrom);?></span>
+                                    </span>
+                                    <span class="text-2 text-tertiary">
+                                        <?php if ($exhibitions[$i]['term_to']) {?>
+                                            <?php $dateTo = new DateTime($exhibitions[$i]['term_to']);?>
+                                            - <?= $formatter->format($dateTo);?>
+                                        <?php }?>
+                                    </span>
+                                    <div>
+                                        <span>
+                                            <i class="fa fa-fw fa-map-pin text-color-primary"></i>
+                                            <a href="<?= $view->path('news_triptip_city', ['url' => $exhibitions[$i]['region_url'], 'city_url' => $exhibitions[$i]['city_url']]) ?>" title="">
+                                                <?= $exhibitions[$i]['city'] ?>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </article>
+            <?php } ?>
+        </div>
+    </div>
+<?php } ?>

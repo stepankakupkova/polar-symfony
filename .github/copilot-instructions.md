@@ -40,10 +40,13 @@ Architektura:
 - service jen pokud je skutečně potřeba
 
 Šablony:
-- zachovej je co nejvíce podobné původním
+- zachovej je co nejvíce podobné původním (ideálně skoro kopie)
 - nepřepisuj zbytečně HTML
 - helpery nahrazuj postupně přes $view->path(), $view->asset(), $view->trans(), $view->include()
 
+Důležité:
+Děláme skoro kopii 1:1, měníme jen věci, které přímo souvisí a přesunem Laminas->Symfony. Nevylepšuj kód, ponechávej ho co nejvíce ve starém znění.
 Pracuj po malých krocích.
 Nejdřív analyzuj související soubory, potom navrhni malý krok a teprve potom upravuj.
 Nikdy nedělej velký refactor bez potvrzení.
+Neodstraňuj komentáře, které mám v kódu, nechci o ně přijít.

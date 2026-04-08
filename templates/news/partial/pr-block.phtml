@@ -1,17 +1,27 @@
 <?php
 /** @var array $pr_block */
 
-// TODO: inlineScript — deaktivace komerčních článků pro seznam.cz (sspScript load listener)
+// Deaktivace komerčních článků pro seznam.cz
+$view->addInlineScript(
+    '
+        var sspScript = document.getElementById("ssp-script");
+        sspScript.addEventListener("load", function() {
+            if (sssp.displaySeznamAds()) {
+                $(".removeFromSeznam").hide();
+            }
+        });
+        '
+);
 
 ?>
 
 <div class="removeFromSeznam">
     <?php if ($pr_block) { ?>
         <h2 class="text-primary text-4-5 d-none d-lg-block mb-4">
-            <a class="text-primary" href="<?= $view->path('news_pr_list') ?>" title="Komerční sdělení">
+            <a class="text-primary" href="<?= $view->path('news_pr') ?>" title="Komerční sdělení">
                 Komerční sdělení
             </a>
-            <a class="pull-right text-primary text-2" href="<?= $view->path('news_pr_list') ?>" title="Komerční sdělení">
+            <a class="pull-right text-primary text-2" href="<?= $view->path('news_pr') ?>" title="Komerční sdělení">
                 <small>
                     více
                     <i class="fas fa-chevron-right text-1"></i>

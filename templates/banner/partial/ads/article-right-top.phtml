@@ -1,0 +1,39 @@
+<?php
+/**
+ * seznam.cz SSP - SMR 300x300 / Čtverec pravá 300x300
+ * jen na desktopech
+ *
+ * Odpovídá starému: ads/article/right/top
+ */
+
+$rand = random_int(1, 1000);
+
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p5_' . $rand . '").length && $("#p5_' . $rand . '").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p5_' . $rand . '");
+        }
+    }, 2000);'
+);
+?>
+
+<div id="bannerRightTopPlace<?= $rand ?>"></div>
+
+<script>
+    var sspScript = document.getElementById('ssp-script');
+    sspScript.addEventListener('load', function() {
+        var elBannerRightTop = document.getElementById('bannerRightTopPlace<?= $rand ?>');
+        var htmlBannerRightTop = "";
+        if (sssp.displaySeznamAds()) {
+            if (window.innerWidth > 767) {
+                htmlBannerRightTop =
+                    "<div class=\"row mt-5 mb-5\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p5_<?= $rand ?>\" data-szn-ssp-ad='{\"zoneId\": 312123, \"width\": 300, \"height\": 300}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerRightTop.insertAdjacentHTML("beforeend", htmlBannerRightTop);
+            }
+        }
+    });
+</script>

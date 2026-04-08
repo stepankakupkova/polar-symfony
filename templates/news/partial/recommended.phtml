@@ -1,0 +1,85 @@
+<?php
+/** @var array|null $recommendedArticles */
+/** @var \App\Application\View\ViewHelper $view */
+
+$locale = Locale::getDefault();
+?>
+
+<?php if ($recommendedArticles) { ?>
+	<?php foreach ($recommendedArticles as $item) { ?>
+		<?php
+		$regionCityUrl = null;
+		$detailUrl = $item['url'] ?? '#';
+		if (($item['section'] ?? null) === '1') {
+			$regionCityUrl = ($item['city_url'] ?? '') === 'cely-ms-kraj'
+				? $view->path('news')
+				: $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+		}
+
+		try {
+			$today = new DateTime();
+			$date = new DateTime($item['public_from']);
+			if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+				$day = !empty($item['label']) ? 'dnes' : 'Dnes';
+			} else {
+				$yesterday = new DateTime();
+				$yesterday->modify('-1 day');
+				if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+					$day = !empty($item['label']) ? 'včera' : 'Včera';
+				} else {
+					$day = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($date) ?: 'NaN';
+				}
+			}
+			$time = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($date) ?: 'NaN';
+		} catch (Exception $e) {
+			$day = 'NaN';
+			$time = 'NaN';
+		}
+		?>
+
+		<div class="row mb-4-5">
+			<?php if (!empty($item['picture'])) { ?>
+				<div class="col-5 col-lg-6 pe-2 pe-md-3">
+					<a href="<?= $detailUrl ?>" title="<?= htmlspecialchars($item['title']) ?>">
+						<span class="thumb-info thumb-info-lighten maxw-310">
+							<span class="thumb-info-wrapper">
+								<img src="<?= htmlspecialchars($item['picture']) ?>" class="img-fluid" alt="<?= htmlspecialchars($item['title']) ?>">
+								<?php if (str_contains((string) $item['picture'], '/videos/')) { ?>
+									<span class="thumb-info-action">
+										<span class="thumb-info-action-icon">
+											<i class="fas fa-play"></i>
+											<span class="player_duration"><?= !empty($item['duration']) ? gmdate('i:s', (int) $item['duration']) : '' ?></span>
+										</span>
+									</span>
+								<?php } ?>
+							</span>
+						</span>
+					</a>
+				</div>
+				<div class="col-7 col-lg-6 ps-1 pe-3">
+			<?php } else { ?>
+				<div class="col-12">
+			<?php } ?>
+				<h2 class="mb-1 mb-md-2">
+					<a href="<?= $detailUrl ?>" title="<?= htmlspecialchars($item['title']) ?>">
+						<?= htmlspecialchars($item['title']) ?>
+					</a>
+				</h2>
+				<div class="text-1 text-tertiary line-height-7 mb-1">
+					<span><?= htmlspecialchars($day) ?></span> <span><?= htmlspecialchars($time) ?></span>&nbsp;|
+					<?php if (($item['section'] ?? null) === '1' && $regionCityUrl) { ?>
+						<span><a href="<?= $regionCityUrl ?>"><?= htmlspecialchars($item['city'] ?? $item['city_title'] ?? '') ?></a>&nbsp;|</span>
+						<span><a href="<?= $view->path('news_redactor', ['redactor_url' => $item['author_url'] ?? '']) ?>"><?= htmlspecialchars($item['author'] ?? '') ?></a></span>
+					<?php } elseif (($item['section'] ?? null) === '2') { ?>
+						<span><a href="<?= $view->path('news_pr') ?>">Komerční sdělení</a></span>
+					<?php } elseif (($item['section'] ?? null) === '3') { ?>
+						<span><a href="<?= $view->path('triptip') ?>">Kam vyrazit</a></span>
+					<?php } ?>
+				</div>
+				<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+					<?= htmlspecialchars($item['anotation'] ?? '') ?>
+				</p>
+			</div>
+		</div>
+	<?php } ?>
+<?php } ?>

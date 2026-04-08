@@ -1,4 +1,4 @@
-news_list:
+news:
   path: /zpravy
   controller: App\News\Controller\Web\NewsController::index
 
@@ -10,35 +10,68 @@ news_crawl:
   path: /zpravy/json/get-crawl
   controller: App\News\Controller\Web\NewsController::getCrawl
 
-news_pr_list:
+news_online_content:
+  path: /zpravy/json/get-content-online-news/{article_id}
+  controller: App\News\Controller\Web\NewsController::getContentOnlineNews
+
+news_guests:
+  path: /hoste
+  controller: App\News\Controller\Web\GuestController::guests
+
+news_guests_guest:
+  path: /hoste/{guest_id}/{guest_url}
+  controller: App\News\Controller\Web\GuestController::guest
+
+news_video_download:
+  path: /zpravy/video-download/{video_id}/{quality}
+  controller: App\News\Controller\Web\NewsController::downloadVideo
+
+news_overwrite_docx:
+  path: /zpravy/overwrite-docx/{article_id}
+  controller: App\News\Controller\Web\NewsController::overwriteDocx
+
+news_pr:
   path: /zpravy/pr
-  controller: App\News\Controller\Web\PrController::index
+  controller: App\News\Controller\Web\NewsController::prnews
 
-news_pr_detail:
+news_pr_article:
   path: /zpravy/pr/{article_id}/{article_url}
-  controller: App\News\Controller\Web\PrController::detail
+  controller: App\News\Controller\Web\NewsController::articlePr
 
-news_triptip_list:
+triptip:
   path: /zpravy/kam-vyrazit
   controller: App\News\Controller\Web\TriptipController::index
 
-news_triptip_detail:
+news_triptip_get_triptip_list:
+  path: /zpravy/kam-vyrazit/json/get-triptip-list
+  controller: App\News\Controller\Web\TriptipController::getTriptipList
+  methods: POST
+
+news_triptip_region:
+  path: /zpravy/kam-vyrazit/{url}
+  controller: App\News\Controller\Web\TriptipController::region
+
+news_triptip_city:
+  path: /zpravy/kam-vyrazit/{url}/{city_url}
+  controller: App\News\Controller\Web\TriptipController::city
+
+triptip_article:
   path: /zpravy/kam-vyrazit/{url}/{city_url}/{article_id}/{article_url}
   controller: App\News\Controller\Web\TriptipController::detail
 
 # news_redactor musí být před news_region_city (obě mají 3 segmenty)
 news_redactor:
   path: /zpravy/redaktor/{redactor_url}
-  controller: App\News\Controller\Web\RedactorController::index
+  controller: App\News\Controller\Web\NewsController::redactor
 
 news_region:
   path: /zpravy/{url}
-  controller: App\News\Controller\Web\RegionController::index
+  controller: App\News\Controller\Web\NewsController::region
 
 news_region_city:
   path: /zpravy/{url}/{city_url}
-  controller: App\News\Controller\Web\RegionController::city
+  controller: App\News\Controller\Web\NewsController::city
 
-news_detail:
+news_region_city_article:
   path: /zpravy/{url}/{city_url}/{article_id}/{article_url}
-  controller: App\News\Controller\Web\NewsDetailController::index
+  controller: App\News\Controller\Web\NewsController::article

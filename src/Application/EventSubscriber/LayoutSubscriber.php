@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\EventSubscriber;
 
 use App\Application\Repository\SettingRepository;
-use App\View\PhtmlRenderer;
+use App\Application\View\PhtmlRenderer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;

@@ -1,0 +1,23 @@
+<?php
+/** @var array|null $regionArticles */
+/** @var array|null $region */
+/** @var \App\Application\View\ViewHelper $view */
+?>
+
+<?php if ($regionArticles) { ?>
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="text-5 text-primary mb-4">
+				<?php if (isset($region) && ($region['url'] ?? '') !== 'moravskoslezsky-kraj') { ?>
+					<a class="text-primary" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>">
+						Nejnovější zprávy - <?= htmlspecialchars($region['region']) ?>
+					</a>
+				<?php } else { ?>
+					<a class="text-primary" href="<?= $view->path('news') ?>">Nejnovější zprávy</a>
+				<?php } ?>
+			</h3>
+		</div>
+	</div>
+
+	<?= $view->include('news/partial/recommended', ['recommendedArticles' => $regionArticles]) ?>
+<?php } ?>

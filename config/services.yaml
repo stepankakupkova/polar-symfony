@@ -53,7 +53,7 @@ services:
         resource: '../src/Banner/Controller/'
         tags: ['controller.service_arguments']
 
-    App\View\PhtmlRenderer:
+    App\Application\View\PhtmlRenderer:
         arguments:
             $templatesDir: '%kernel.project_dir%/templates'
             $basePath: ''

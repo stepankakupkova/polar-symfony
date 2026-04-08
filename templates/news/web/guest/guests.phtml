@@ -1,0 +1,193 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent(string $text, ?string $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    $textTmp = $text;
+    if ($transliterator) {
+        $textTmp = $transliterator->transliterate($text);
+        $textTmp = preg_replace('/[^a-z0-9]+/', '-', $textTmp);
+        $textTmp = strtolower($textTmp);
+        if ($replace) {
+            $textTmp = str_replace(' ', $replace, $textTmp);
+        }
+    }
+
+    return $textTmp;
+}
+
+$locale = Locale::getDefault();
+
+$guests = $this->guests;
+$shows = $this->shows;
+
+// HeadTitle
+$view->setTitle('Hosté ve studiu');
+
+// HeadMeta
+$view->addMeta('description', 'Sledujte rozhovory s hosty ve studiu online.');
+$view->addMeta('keywords', 'hosté ve studiu, host, zprávy, reportáže, polar, tv, televize, moravskoslezský kraj');
+
+// META pro Facebook
+$currentUrl = $this->currentUrl ?? '';
+$ogImage = 'https://' . ($_SERVER['SERVER_NAME'] ?? 'polar.cz') . '/img/web/layout/microformat.png';
+$view->addOgMeta('og:title', 'Hosté ve studiu | POLAR');
+$view->addOgMeta('og:description', 'Sledujte rozhovory s hosty ve studiu online.');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', $ogImage);
+$view->addOgMeta('og:image:secure_url', $ogImage);
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+            <div class="row">
+                <?php if ($guests) { ?>
+                    <?php
+                    foreach ($guests as $item) { ?>
+                        <div class="col-lg-4 mb-4">
+                            <a href="<?= $view->path('news_guests_guest', ['guest_id' => $item['id'], 'guest_url' => removeAccent($item['title'], '-')]) ?>"
+                               class="text-decoration-underline2 d-block mb-2">
+                                <span class="thumb-info thumb-info-lighten">
+                                    <span class="thumb-info-wrapper">
+                                        <?php
+                                        if ($item['picture']) {
+                                            $image = $view->asset($item['picture']);
+                                        } else {
+                                            $image = '/data/program/show/!default-show.png';
+                                        }
+                                        ?>
+                                        <img src="<?= $image ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+                                        <?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+                                            <span class="thumb-info-action">
+                                                <span class="thumb-info-action-icon">
+                                                    <i class="fas fa-play"></i>
+                                                    <span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+                                                </span>
+                                            </span>
+                                        <?php } ?>
+                                    </span>
+                                </span>
+                            </a>
+                            <a href="<?= $view->path('news_guests_guest', ['guest_id' => $item['id'], 'guest_url' => removeAccent($item['title'], '-')]) ?>"
+                               class="text-decoration-underline2">
+                                <h2 class="text-secondary font-weight-regular text-5 line-height-3 mb-1">
+                                    <?= $item['title']; ?>
+                                </h2>
+                            </a>
+                            <h3 class="text-dark font-weight-regular line-height-3">
+                                <?= $item['anotation']; ?>
+                            </h3>
+                            <span class="text-tertiary">
+                                <?php $date = new DateTime($item['public_from']); ?>
+                                <?php $today = new DateTime(); ?>
+                                <?php if ($today->format('Y-m-d') == $date->format('Y-m-d')) { ?>
+                                    Dnes,
+                                <?php } else { ?>
+                                    <?php $today->modify('-1 day'); ?>
+                                    <?php if ($today->format('Y-m-d') == $date->format('Y-m-d')) { ?>
+                                        Včera,
+                                    <?php } else { ?>
+                                        <?php
+                                            $dateFormatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                                            echo $dateFormatter->format($date);
+                                        ?>,
+                                    <?php } ?>
+                                <?php } ?>
+                            </span>
+                            <span>
+                                <?php if (isset($shows[$item['show_id']])) { ?>
+                                    pořad:
+                                    <?php // TODO: odkaz na detail pořadu (route neexistuje) ?>
+                                    <a href="#">
+                                        <?= $shows[$item['show_id']]; ?>
+                                    </a>
+                                <?php } ?>
+                                <?= mb_substr(strip_tags($item['text'], '<p>'), 0, 82, 'UTF-8') . ((mb_strlen(strip_tags($item['text'], '<p>'), 'UTF-8') > 82) ? '...' : ''); ?>
+                                <?php if ($item['text'] != '' && mb_strlen(strip_tags($item['text'], '<p>'), 'UTF-8') > 82) { ?>
+                                    (více)
+                                <?php } ?>
+                            </span>
+                        </div>
+                    <?php } ?>
+                    <div class="row">
+                        <div class="col">
+                            <?= $view->include('pagination/paginator', ['route' => 'news_guests', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+
+                        </div>
+                    </div>
+                <?php } else { ?>
+                    <div class="alert alert-warning alert-lg">
+                        <strong>
+                            <?= $view->trans('No guests found.') ?>
+                        </strong>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>

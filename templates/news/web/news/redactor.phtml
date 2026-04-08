@@ -1,0 +1,255 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+
+    // Ticker + Crawl JS
+    $view->addInlineScript(
+    	    '// Ticker
+            getTickerData();
+            interval = startTicker();
+            // Crawl
+            getCrawlData();'
+    	);
+
+    function removeAccent($text, $replace = NULL): string
+    {
+        $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+        $text = $transliterator->transliterate($text);
+        $text = preg_replace('/\p{C}+/u', '', $text);
+        if ($replace) {
+            $text = str_replace(' ', $replace, $text);
+        }
+        return $text;
+    }
+
+    $locale = Locale::getDefault();
+
+    /** @var array $articles */
+    $shows = $shows ?? [];
+
+$view->setTitle('Zprávy redaktora: ' . $redactor['name'] . ' ' . $redactor['surname']);
+$view->setBreadcrumbs([
+	['label' => 'Zprávy', 'url' => $view->path('news')],
+	['label' => $redactor['name'] . ' ' . $redactor['surname']],
+]);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-between justify-content-lg-start align-self-center">
+                <?= $view->include('navigation/breadcrumb') ?>
+                <div class="text-color-grey ms-3">
+                    (<?= $newsCount; ?> reportáží)
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-7 mb-4 mb-lg-2">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+            <h2 class="mb-4 text-4 font-weight-regular text-secondary">Zprávy redaktora: <b><?= $redactor['name'] . ' ' . $redactor['surname'] ?></b></h2>
+            <?php if ($articles) { ?>
+                <div class="row">
+                    <div class="col-12">
+                        <?php $i = 0; ?>
+                        <?php foreach ($articles as $item) { ?>
+                            <?php
+                                if ($item['region_url'] && $item['city_url']) {
+                                    $region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+                                    if ($item['city_url'] === 'cely-ms-kraj') {
+                                        $region_city_url = $view->path('news');
+                                    }
+                                } else {
+                                    $region_city_url = null;
+                                }
+
+                                try {
+                                    $today = new DateTime();
+                                    $dateUpdate = new DateTime($item['updated_date']);
+                                    if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                        $dayUpdate = 'Dnes';
+                                    } else {
+                                        $yesterday = new DateTime();
+                                        $yesterday->modify('-1 day');
+                                        if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                            $dayUpdate = 'Včera';
+                                        } else {
+                                            $dayUpdate = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($dateUpdate);
+                                        }
+                                    }
+                                    $timeUpdate = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($dateUpdate);
+
+                                    $today = new DateTime();
+                                    $date = new DateTime($item['public_from']);
+                                    if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                        if ($item['label']) {
+                                            $day = 'dnes';
+                                        } else {
+                                            $day = 'Dnes';
+                                        }
+                                    } else {
+                                        $yesterday = new DateTime();
+                                        $yesterday->modify('-1 day');
+                                        if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                            if ($item['label']) {
+                                                $day = 'včera';
+                                            } else {
+                                                $day = 'Včera';
+                                            }
+                                        } else {
+                                            $day = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($date);
+                                        }
+                                    }
+                                    $time = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($date);
+                                } catch (Exception $e) {
+                                    $day = 'NaN';
+                                    $time = 'NaN';
+                                    $dayUpdate = 'NaN';
+                                    $timeUpdate = 'NaN';
+                                }
+                            ?>
+                            <div class="row mb-4-5">
+                                <?php if ($item['picture']) { ?>
+                                    <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                                        <div class="">
+                                            <a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                <span class="thumb-info thumb-info-lighten maxw-310">
+                                                    <span class="thumb-info-wrapper">
+                                                        <img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+                                                        <?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+                                                            <span class="thumb-info-action">
+                                                                <span class="thumb-info-action-icon">
+                                                                    <i class="fas fa-play"></i>
+                                                                    <span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+                                                                </span>
+                                                            </span>
+                                                        <?php } ?>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-7 col-lg-6 ps-1 pe-3">
+                                        <h2 class="mb-1 mb-md-2">
+                                            <a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                <?= $item['title'] ?>
+                                            </a>
+                                        </h2>
+                                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                                            <?php
+                                                $now_minus_x = new DateTime();
+                                                $now_minus_x = $now_minus_x->modify('-24 hours')->format('Y-m-d H:i:s');
+                                                if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+                                                    echo $item['label'];
+                                                    echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                } else {
+                                                    echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                }
+                                            ?>
+                                            <span>
+                                                <a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+                                            </span>
+                                            <span>
+                                                <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+                                            --></span><!--
+                                            --><!--<span>
+                                                <?php //= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $item['show_id']]) . '" title="' . $shows[$item['show_id']] . '">' . $shows[$item['show_id']] . '</a>' : ''; ?>
+                                            </span>-->
+                                        </div>
+                                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                            <?= $item['anotation']; ?>
+                                        </p>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="col-12">
+                                        <div class="">
+                                            <h2 class="mb-1 mb-md-2">
+                                                <a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                    <?= $item['title'] ?>
+                                                </a>
+                                            </h2>
+                                            <div class="text-1 text-tertiary line-height-7 mb-1">
+                                                <?php
+                                                    $now_minus_x = new DateTime();
+                                                    $now_minus_x = $now_minus_x->modify('-24 hours')->format('Y-m-d H:i:s');
+                                                    if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+                                                        echo $item['label'];
+                                                        echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                    } else {
+                                                        echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                    }
+                                                ?>
+                                                <span>
+                                                    <a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+                                                </span>
+                                                <span>
+                                                    <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+                                                --></span><!--
+                                                --><!--<span>
+                                                    <?php //= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $item['show_id']]) . '" title="' . $shows[$item['show_id']] . '">' . $shows[$item['show_id']] . '</a>' : ''; ?>
+                                                </span>-->
+                                            </div>
+                                            <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                                <?= $item['anotation']; ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                <?php } ?>
+                            </div>
+
+                            <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
+                            <?php if ($i === 4) { ?>
+                                <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+                            <?php } ?>
+
+                            <?php $i++; ?>
+                        <?php } ?>
+                        <?= $view->include('pagination/paginator', ['route' => 'news_redactor', 'routeParams' => ['redactor_url' => $redactor['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+
+                        <?php // REKLAMA ?>
+                        <?= $view->include('banner/partial/ads/article') ?>
+
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+        <div class="col-12 col-lg-5">
+            <?php // PR ?>
+            <?= $view->include('news/partial/pr-block', ['pr_block' => $pr]) ?>
+            <?php // REKLAMA ?>
+            <br /><?= $view->include('banner/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+        </div>
+    </div>
+</div>

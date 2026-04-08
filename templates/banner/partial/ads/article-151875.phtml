@@ -1,0 +1,39 @@
+<?php
+/**
+ * seznam.cz SSP - Skyscraper 300x600
+ * jen na desktopech
+ *
+ * Odpovídá starému: ads/article/151875
+ */
+
+$rand = random_int(1, 1000);
+
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p' . $rand . '").length && $("#p' . $rand . '").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p' . $rand . '");
+        }
+    }, 2000);'
+);
+?>
+
+<div id="banner151875Place<?= $rand ?>"></div>
+
+<script>
+    var sspScript = document.getElementById('ssp-script');
+    sspScript.addEventListener('load', function() {
+        var elBannerRightBottom = document.getElementById('banner151875Place<?= $rand ?>');
+        var htmlBannerRightBottom = "";
+        if (sssp.displaySeznamAds()) {
+            if (window.innerWidth > 767) {
+                htmlBannerRightBottom =
+                    "<div class=\"row\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p<?= $rand ?>\" data-szn-ssp-ad='{\"zoneId\": 151875, \"width\": 300, \"height\": 600}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerRightBottom.insertAdjacentHTML("beforeend", htmlBannerRightBottom);
+            }
+        }
+    });
+</script>

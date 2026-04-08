@@ -1,0 +1,208 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+
+// HeadTitle
+$view->setTitle('Kam vyrazit');
+
+// HeadMeta
+$view->addMeta('description', 'Kam vyrazit');
+$view->addMeta('keywords', 'Kam vyrazit');
+
+// META pro Facebook
+$currentUrl = $this->currentUrl ?? '';
+$view->addOgMeta('og:title', 'Kam vyrazit | POLAR');
+$view->addOgMeta('og:description', 'Kam vyrazit');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', 'https://polar.cz/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:secure_url', 'https://polar.cz/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+    $view->addInlineScript(
+    	    'function initData(){
+                $("#calendar ul li a").not(".disabled").click(function(){
+                    var hash = $(this).attr("href").substring(1);
+    	            var today = new Date();
+    	            if ((hash) && hash < today.toISOString().substring(0, 10)) window.location.href = "/kam-vyrazit";
+    	            $.post("' . $view->path('news_triptip_get_triptip_list') . '",
+                        {
+                            date: hash,
+                            region_id: null,
+                            city_id: null,
+                        },
+                        function(json) {
+            				$("#calendar").html(json.calendar);
+            				$("#list").html(json.content);
+    	                    initData();
+                    	    $("#nextEvents").click(function(){
+                                $("section.section-kamvyrazit .row.hide").removeClass("hide");
+            	                $(this).remove();
+                            });
+                        },
+                        "json"
+                    );
+                });
+            }
+    	    var hash = window.location.hash.substring(1);
+    	    var today = new Date();
+    	    if ((hash) && hash < today.toISOString().substring(0, 10)) window.location.href = "/kam-vyrazit";
+    	    $.post("' . $view->path('news_triptip_get_triptip_list') . '",
+                {
+                    date: hash,
+                    region_id: null,
+                    city_id: null,
+                },
+                function(json) {
+    	            $("#calendar").html(json.calendar);
+    				$("#list").html(json.content);
+    	            initData();
+            	    $("#nextEvents").click(function(){
+                        $("section.section-kamvyrazit .row.hide").removeClass("hide");
+    	                $(this).remove();
+                    });
+                },
+                "json"
+            );'
+    	);
+
+    // Ticker + Crawl JS
+    $view->addInlineScript(
+    	    '// Ticker
+            getTickerData();
+            interval = startTicker();
+            // Crawl
+            getCrawlData();'
+    	);
+
+    $locale = Locale::getDefault();
+
+    /** @var $articles */
+    /** @var $exhibitions */
+
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--<div class="container">
+    <div class="featured-box featured-box-secondary featured-box-text-center mt-none">
+        <div class="box-content text-color-secondary">
+            <strong>
+                VZHLEDEM K&nbsp;AKTUÁLNÍ SITUACI OHLEDNĚ KORONAVIRU NEMUSÍ BÝT INFORMACE V&nbsp;RUBRICE "KAM VYRAZIT" AKTUÁLNÍ.<br>KONÁNÍ AKCE PROSÍM VŽDY OVĚŘUJTE U&nbsp;ORGANIZÁTORŮ AKCE.
+            </strong>
+        </div>
+    </div>
+</div>-->
+
+<div class="container mb-3">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div id="ticker" class="">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="sticky-container">
+        <div class="row">
+            <div class="col-12 col-lg-8 mb-5 mb-lg-2 order-1 order-lg-0">
+                <section class="section-kamvyrazit">
+
+                    <h1 class="text-primary font-weight-semibold text-5 mt-0 mb-3">Kam vyrazit</h1>
+
+                    <div id="calendar" class="my-4">
+                    </div>
+
+                    <div id="list">
+                        Čekejte prosím...
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="col-12 col-lg-4 order-0 order-lg-1">
+
+                <section class="section-kamvyrazit">
+                    <div class="featured-box featured-box-primary featured-box-text-left min-height-unset mt-0">
+                        <div class="box-content text-center px-2 py-3">
+                            <strong>
+                                <a class="text-5 text-decoration-none" href="" data-bs-toggle="modal" data-bs-target="#myModal" title="Chci přidat akci">
+                                    <i class="far fa-calendar-plus"></i>&nbsp;&nbsp;<span class="align-middle">CHCI PŘIDAT AKCI</span>
+                                </a>
+                            </strong>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Výstavy -->
+                <?= $view->include('news/web/triptip/partial/exhibitions', ['exhibitions' => $exhibitions]) ?>
+
+                <?php // REKLAMA ?>
+                <br /><?= $view->include('banner/partial/ads/article-right-bottom') ?>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title text-primary" id="myModalLabel">Chybí Vám zde Vaše akce?</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            <div class="modal-body">
+                <p>
+                    Pokud jste pořadatelem akce, více akcí nebo provozovatelem databáze akcí a chcete se propagovat prostřednictvím televize POLAR, kontaktujte nás:
+                </p>
+                <p>
+                    <strong><a href="mailto:obchod@polar.cz">obchod@polar.cz</a></strong>
+                </p>
+                <p>
+                    Pozvánky na vaše akce lze efektivně propagovat pomocí regionálního televizního vysílání POLAR v pořadu Kam vyrazit a na internetovém portálu <strong><a href="https://polar.cz/">polar.cz</a></strong> ve stejnojmenné rubrice <strong><a href="https://polar.cz/kam-vyrazit">Kam vyrazit</a></strong>.
+                </p>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>

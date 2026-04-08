@@ -99,7 +99,7 @@
                                     // TODO: doplnit routes až budou implementovány: job_list, job_city_list, job_our_detail, job_city_detail,
                                     //       news_region, news_region_city, news_redactor, app_hd, app_polar2, app_reklama, app_kontakt,
                                     //       app_hbbtv, app_jak-naladit, election_*, program_*, show_*
-                                    $h1Routes = ['app_home', 'app_search', 'news_list', 'news_pr_list', 'news_triptip_list', 'camera_list', 'camera_detail'];
+                                    $h1Routes = ['app_home', 'app_search', 'news', 'news_pr', 'triptip', 'camera_list', 'camera_detail'];
                                     $h1Display = in_array($routeName ?? '', $h1Routes, true);
                                     $h1Title = htmlspecialchars($view->getTitle());
                                 ?>

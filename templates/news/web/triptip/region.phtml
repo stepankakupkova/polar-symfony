@@ -1,0 +1,253 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+
+$keywords = array(
+    'bruntalsko'           =>  'bruntál, okres bruntál, bruntálsko, rýmařov, krnov, horní benešov, vrbno pod pradědem, zpravodajství, zprávy, reportáže, polar, tv, televize',
+    'frydeckomistecko'     =>  'frýdek-místek, okres frýdek-místek, třinec, jablunkov,frýdlant nad ostravicí, paskov, zpravodajství, zprávy, reportáže, polar, tv, televize',
+    'opavsko'              =>  'opava, opavsko, okres opava, hlučín, kravaře, hradec nad moravicí, vítkov, velké heraltice, budišov nad budišovkou, zpravodajství, zprávy, reportáže, polar, tv, televize',
+    'ostrava'              =>  'ostrava, ostravsko, okres ostrava, dubina, poruba, šenov, ostrava-jih, zábřeh, vratimov, svinov, vítkovice, hrabová, hrabůvka, zpravodajství, zprávy, reportáže, polar, tv, televize',
+    'karvinsko'            =>  'karviná, karvinsko, okres karviná, bohumín, orlová, havířov, český tešín, stonava, petřvald, rychvald, chotěbuz, horní suchá,  zpravodajství, zprávy, reportáže, polar, tv, televize',
+    'novojicinsko'         =>  'nový jičín, novojičínsko, okres nový jičín, studénka, bílovec, fulnek, kunín, příbor, kopřivnice, frenštát pod radhoštěm, štramberk, zpravodajství, zprávy, reportáže, polar, tv, televize',
+    'moravskoslezsky-kraj' =>  'moravskoslezský kraj, ostrava, opava, bruntál, nový jičín, frýdek místek, karviná, moravskoslezsko, zpravodajství, zprávy, reportáže, polar, tv, televize'
+);
+$descriptions = array(
+    'bruntalsko'           =>  'Sledujte akce z Bruntálska online. Denně Vám přinášíme aktuální akce a mnoho dalšího.',
+    'frydeckomistecko'     =>  'Sledujte akce z Frýdeckomístecka online. Denně Vám přinášíme aktuální akce a mnoho dalšího.',
+    'opavsko'              =>  'Sledujte akce z Opavska online. Denně Vám přinášíme aktuální akce a mnoho dalšího.',
+    'ostrava'              =>  'Sledujte akce z Ostravska online. Denně Vám přinášíme aktuální akce a mnoho dalšího.',
+    'karvinsko'            =>  'Sledujte akce z Karvinska online. Denně Vám přinášíme aktuální akce a mnoho dalšího.',
+    'novojicinsko'         =>  'Sledujte akce z Novojičínska online. Denně Vám přinášíme aktuální akce a mnoho dalšího.',
+    'moravskoslezsky-kraj' =>  'Sledujte regionální akce z moravskoslezského kraje online. Denně Vám přinášíme aktuální akce z vašeho regionu a mnoho dalšího.',
+);
+
+$url = $region['url'];
+
+// HeadTitle
+$view->setTitle('Kam vyrazit ' . $region['region']);
+
+// HeadMeta
+$view->addMeta('description', $descriptions[$url] ?? '');
+$view->addMeta('keywords', $keywords[$url] ?? '');
+
+// META pro Facebook
+$currentUrl = $this->currentUrl ?? '';
+$view->addOgMeta('og:title', 'Kam vyrazit ' . $region['region'] . ' | POLAR');
+$view->addOgMeta('og:description', $descriptions[$url] ?? '');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', 'https://polar.cz/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:secure_url', 'https://polar.cz/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+    $view->addInlineScript(
+    	    'function initData(){
+                $("#calendar ul li a").not(".disabled").click(function(){
+                    var hash = $(this).attr("href").substring(1);
+    	            var today = new Date();
+    	            if ((hash) && hash < today.toISOString().substring(0, 10)) window.location.href = "/kam-vyrazit/'.$region['url'].'";
+                    $.post("' . $view->path('news_triptip_get_triptip_list') . '",
+                        {
+                            date: hash,
+                            region_id: '.$region['id'].',
+                            city_id: null,
+                        },
+                        function(json) {
+            				$("#calendar").html(json.calendar);
+            				$("#list").html(json.content);
+    	                    initData();
+                    	    $("#nextEvents").click(function(){
+                                $("section.section-kamvyrazit .row.hide").removeClass("hide");
+            	                $(this).remove();
+                            });
+                        },
+                        "json"
+                    );
+                });
+            }
+    	    var hash = window.location.hash.substring(1);
+    	    var today = new Date();
+    	    if ((hash) && hash < today.toISOString().substring(0, 10)) window.location.href = "/kam-vyrazit/'.$region['url'].'";
+    	    $.post("' . $view->path('news_triptip_get_triptip_list') . '",
+                {
+                    date: hash,
+                    region_id: '.$region['id'].',
+                    city_id: null,
+                },
+                function(json) {
+    				$("#calendar").html(json.calendar);
+    				$("#list").html(json.content);
+    	            initData();
+            	    $("#nextEvents").click(function(){
+                        $("section.section-kamvyrazit .row.hide").removeClass("hide");
+    	                $(this).remove();
+                    });
+                },
+                "json"
+            );
+    	    '
+    	);
+
+    // Ticker + Crawl JS
+    $view->addInlineScript(
+    	    '// Ticker
+            getTickerData();
+            interval = startTicker();
+            // Crawl
+            getCrawlData();'
+    	);
+
+    $locale = Locale::getDefault();
+
+    /** @var $articles */
+    /** @var $exhibitions */
+
+    $dateFormat = function(DateTime $date, int $dateType, int $timeType, string $locale): string {
+        return (new IntlDateFormatter($locale, $dateType, $timeType))->format($date) ?: '';
+    };
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--<div class="container">
+    <div class="featured-box featured-box-secondary featured-box-text-center mt-none">
+        <div class="box-content text-color-secondary">
+            <strong>
+                VZHLEDEM K&nbsp;AKTUÁLNÍ SITUACI OHLEDNĚ KORONAVIRU NEMUSÍ BÝT INFORMACE V&nbsp;RUBRICE "KAM VYRAZIT" AKTUÁLNÍ.<br>KONÁNÍ AKCE PROSÍM VŽDY OVĚŘUJTE U&nbsp;ORGANIZÁTORŮ AKCE.
+            </strong>
+        </div>
+    </div>
+</div>-->
+
+<div class="container mb-5">
+    <div class="sticky-container">
+        <div class="row">
+            <div class="col-12">
+                <div id="crawl" class="mb-2 hide">
+                    <div id="crawlIcon">
+                        Mimořádná zpráva:
+                    </div>
+                    <div class="crawl-container">
+                        <div>
+                            Načítám...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-8 mb-5 mb-lg-2">
+                <div id="ticker" class="mb-4">
+                    <div id="tickerIcon" class="">
+                        <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                    </div>
+                    <div class="ticker-container">
+                        <ul>
+                            <div class="ticker-active">
+                                <li>
+                                    <span>
+                                        Načítám...
+                                    </span>
+                                </li>
+                            </div>
+                        </ul>>
+                    </div>
+                </div>
+                <section class="section-kamvyrazit">
+        			<?php if ($articles) {?>
+        				<div class="featured-box featured-box-primary featured-box-text-start">
+                            <div class="box-content text-start px-2 pt-3 pb-3">
+                                <div class="owl-carousel show-nav-hover mb-0" data-plugin-options='{"responsive": {"0": {"items": 1}, "479": {"items": 2}, "768": {"items": 3}, "979": {"items": 3}, "1199": {"items": 3}}, "margin": 15, "nav": true, "dots": false, "autoplay": true, "autoplayTimeout": 5000, "loop": true}'>
+                                    <?php foreach ($articles as $article) {?>
+                                        <?php if ($article['image']) {?>
+                                            <div class="ps-1 pe-1">
+                                                <div class="img-thumbnail">
+                                                    <a href="<?= $article['url'];?>" title="<?= $article['title'];?>">
+                                                        <img src="<?= $article['image'];?>" class="img-fluid" alt="" />
+                                                    </a>
+                                                </div>
+                                                <h2>
+                                                    <a href="<?= $article['url'];?>" title="<?= $article['title'];?>">
+                                                        <?= $article['title'];?>
+                                                    </a>
+                                                </h2>
+                                                <div class="">
+                                                    <?php $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');?>
+                                                    <span>
+                                                        <i class="fa fa-fw fa-calendar text-color-primary"></i>
+                                                        <?php $dateFrom = new DateTime($article['term_from']);?>
+                                                        <?php $today = new DateTime();?>
+                                                        <?php if ($today->format('Y-m-d') == $dateFrom->format('Y-m-d')) {?>
+                                                            Dnes
+                                                        <?php }else{?>
+                                                            <?php $today->modify('+1 day');?>
+                                                            <?php if ($today->format('Y-m-d') == $dateFrom->format('Y-m-d')) {?>
+                                                                Zítra
+                                                            <?php }else{?>
+                                                                <?= $formatter->format($dateFrom);?>
+                                                            <?php }?>
+                                                        <?php }?>
+                                                    </span>
+                                                    <span>
+                                                        <?= ' '.$dateFormat(new DateTime($article['term_from']), IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);?>
+                                                        <?php if ($article['term_to']) {?>
+                                                            <?php $dateTo = new DateTime($article['term_to']);?>
+                                                            <?php if ($dateFrom->format('Y-m-d') == $dateTo->format('Y-m-d')) {?>
+                                                                - <?= $dateFormat(new DateTime($article['term_to']), IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);?>
+                                                            <?php }else{?>
+                                                                - <?= $formatter->format($dateTo);?>
+                                                                <?= $dateFormat(new DateTime($article['term_to']), IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);?>
+                                                            <?php }?>
+                                                        <?php }?>
+                                                    </span>
+
+                                                    <div class="mt-1">
+                                                        <span>
+                                                            <i class="fa fa-fw fa-map-pin text-primary"></i>
+                                                            <a href="<?= $view->path('news_triptip_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']]);?>" title="">
+                                                                <?= $article['city'];?></a>, <?= $article['place'];?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php }?>
+                                    <?php }?>
+                                </div>
+                            </div>
+                        </div>
+        			<?php }?>
+    			
+        			<div id="calendar" class="my-4">
+
+                    </div>
+
+                    <div id="list">
+                        Čekejte prosím...
+                    </div>
+    			</section>
+    			
+            </div>
+            
+            <div class="col-12 col-lg-4 order-0 order-lg-1">
+
+                <!-- Výstavy -->
+                <?= $view->include('news/web/triptip/partial/exhibitions', ['exhibitions' => $exhibitions]) ?>
+
+                <?php // REKLAMA ?>
+                <br /><?= $view->include('banner/partial/ads/article-right-bottom') ?>
+        			
+            </div>
+            
+        </div>
+    </div>
+</div>

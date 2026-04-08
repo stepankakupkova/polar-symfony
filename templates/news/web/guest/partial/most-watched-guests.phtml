@@ -1,0 +1,68 @@
+<?php
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent(string $text, ?string $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    $textTmp = $text;
+    if ($transliterator) {
+        $textTmp = $transliterator->transliterate($text);
+        $textTmp = preg_replace('/[^a-z0-9]+/', '-', $textTmp);
+        $textTmp = strtolower($textTmp);
+        if ($replace) {
+            $textTmp = str_replace(' ', $replace, $textTmp);
+        }
+    }
+
+    return $textTmp;
+}
+?>
+
+<?php if ($this->mostWatchedGuests) { ?>
+    <h2 class="text-primary mt-2 mb-4">
+        Nejsledovanější hosté
+    </h2>
+    <?php foreach ($this->mostWatchedGuests as $guest) { ?>
+        <article class="">
+            <div class="row mb-3 mb-md-4">
+                <div class="col-5 pe-2 pe-md-3">
+                    <div class="img-thumbnail">
+                        <a class="" href="<?= $view->path('news_guests_guest', ['guest_id' => $guest['id'], 'guest_url' => removeAccent($guest['title'], '-')]) ?>" title="<?= $guest['title'] ?>">
+                            <img src="<?= $guest['picture'] ?>" alt="<?= $guest['title'] ?>" class="img-fluid img-rounded">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-7 ps-1 pe-3">
+                    <h5 class="mb-2 text-no-uppercase">
+                        <a class="text-4 font-weight-500 line-height-2" href="<?= $view->path('news_guests_guest', ['guest_id' => $guest['id'], 'guest_url' => removeAccent($guest['title'], '-')]) ?>">
+                            <?= $guest['title'] ?>
+                        </a>
+                    </h5>
+                    <p class="block-truncate block-truncate-2 line-height-3 mb-1">
+                        <?= $guest['anotation']; ?>
+                    </p>
+                    <div class="text-color-grey text-2">
+                        <?php $date = new DateTime($guest['public_from']);?>
+                        <?php $today = new DateTime();?>
+                        <?php if ($today->format('Y-m-d') == $date->format('Y-m-d')) {?>
+                            Dnes
+                        <?php }else{?>
+                            <?php $today->modify('-1 day');?>
+                            <?php if ($today->format('Y-m-d') == $date->format('Y-m-d')) {?>
+                                Včera
+                            <?php }else{?>
+                                <?php
+                                    $dateFormatter = new IntlDateFormatter(\Locale::getDefault(), IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                                    echo $dateFormatter->format(new DateTime($guest['public_from']));
+                                ?>
+                            <?php }?>
+                        <?php }?>
+                    </div>
+                </div>
+            </div>
+        </article>
+    <?php } ?>
+<?php } ?>

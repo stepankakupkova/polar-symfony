@@ -13,9 +13,14 @@ banner:
 
 app_home:
   path: /
-  controller: App\Application\Controller\Web\HomeController::index
+  controller: App\Application\Controller\Web\ApplicationController::index
 
 app_search:
   path: /hledat
-  controller: App\Application\Controller\Web\SearchController::index
+  controller: App\Application\Controller\Web\ApplicationController::search
   methods: [GET]
+
+app_send_email:
+  path: /json-write/send-email
+  controller: App\Application\Controller\Web\ApplicationWriteController::sendEmail
+  methods: [POST]

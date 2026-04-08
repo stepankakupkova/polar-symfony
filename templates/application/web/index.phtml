@@ -1,0 +1,972 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+/** @var \App\Application\View\ViewHelper $view */
+
+$locale = Locale::getDefault();
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+	if ($(window).width() > 992) {
+		let playerLiveSDHD = videojs("playerLiveSDHD", {
+			controls: true, 
+			autoplay: true, 
+			preload: "auto", 
+			aspectRatio: "16:9", 
+			muted: true, 
+			inactivityTimeout: 1000,
+			controlBar: {
+				children: {
+					playToggle: true,
+					LiveDisplay: true,
+					volumePanel: {
+						inline: true
+					},
+					fullscreenToggle: true
+				}
+			}
+		});
+	}
+    '
+);
+
+// Speciál na HP - ořezání počtu zpráv na danou výšku divu
+$view->addInlineScript(
+    '
+    if ($(window).width() > 992) {
+    	if ($(".box-special-hp").length) {
+			function showFullItems() {
+				const listItems = $(".box-special-hp ul.max-height-custom li");
+				let totalHeight = 0;
+				let maxHeight = 255;
+		
+				listItems.each(function() {
+					totalHeight += $(this).outerHeight(true);
+					if (totalHeight > maxHeight) {
+						$(this).hide(); // Skryjeme přetečené položky
+					} else {
+						$(this).show(); // Zobrazíme položky, které se vejdou
+					}
+				});
+			}
+			showFullItems();
+			$(window).resize(showFullItems);
+		}
+    }
+    '
+);
+
+function removeAccent($text, $replace = NULL): string
+    {
+        $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+        $text = $transliterator->transliterate($text);
+        $text = preg_replace('/\p{C}+/u', '', $text);
+        if ($replace) {
+            $text = str_replace(' ', $replace, $text);
+        }
+        return $text;
+    }
+
+$dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, string $locale, ?string $pattern = null): string {
+    return (new IntlDateFormatter($locale, $dateType, $timeType, null, null, $pattern))->format($date) ?: '';
+};
+
+?>
+
+<?php if ($special['active'] !== '1') { ?>
+	<div class="container d-none d-lg-block pt-4 pb-2">
+		<div class="row">
+			<div class="col-md-4 match-height mb-3">
+				<div id="video-container" class="ratio ratio-16x9">
+					<video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
+						<source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
+						<p class="vjs-no-js">
+							Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.
+						</p>
+					</video>
+				</div>
+			</div>
+			<div class="col-md-4 match-height mb-3">
+				<div class="container-image ratio ratio-16x9">
+					<img src="/img/web/hp/social.jpg" class="img-fluid" alt="">
+					<div class="pattern d-flex flex-column justify-content-start align-items-center p-3">
+						<span class="title text-center mb-3">
+							Sledujte POLAR na sociálních sítích
+						</span>
+					</div>
+					<div class="pattern2 d-flex flex-column justify-content-end align-items-center z-index-4 p-2">
+						<ul class="social-icons">
+							<li class="social-icons-facebook">
+								<a href="https://www.facebook.com/televize.polar" target="_blank" title="Facebook">
+									<i class="fab fa-facebook-f"></i>
+								</a>
+							</li>
+							<li class="social-icons-instagram">
+								<a href="https://www.instagram.com/televize.polar/" target="_blank" title="Instagram">
+									<i class="fab fa-instagram"></i>
+								</a>
+							</li>
+							<li class="social-icons-twitter">
+								<a href="https://twitter.com/Televize_Polar" target="_blank" title="Platforma X">
+									<i class="fab fa-x-twitter"></i>
+								</a>
+							</li>
+							<li class="social-icons-tiktok">
+								<a href="https://www.tiktok.com/@televize.polar" target="_blank" title="TikTok">
+									<i class="fab fa-tiktok"></i>
+								</a>
+							</li>
+							<li class="social-icons-youtube">
+								<a href="https://www.youtube.com/user/polarostrava" target="_blank" title="YouTube">
+									<i class="fab fa-youtube"></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 match-height">
+				<a href="https://multimedia.polar.cz" target="_blank" title="POLAR multimedia">
+					<div class="container-image ratio ratio-16x9">
+						<img src="/img/web/hp/mm.jpg" class="img-fluid" alt="">
+						<div class="pattern pattern-center d-flex flex-column justify-content-center align-items-center p-3">
+							<span class="title mb-3">
+								<img src="/img/web/POLAR_multimedia_RGB_white.png" class="mm" alt="">
+							</span>
+							<span class="description line-height-5 text-center">
+								výroba videí, multimediálních prezentací,<br />
+								virtuální reality, grafiky, webů
+							</span>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+<?php // Speciál na HP (povodně, volby, aktuální velká témata) ?>
+<?php } else { ?>
+	<?= $view->include('news/partial/special-hp') ?>
+<?php } ?>
+
+<?php //= $view->include('application/partial/volby2021') ?>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="crawl" class="mb-2 hide"> <!--crawl-hp  -->
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-7">
+            <div id="ticker" class="<?=($special['active'] === '1') ? 'mb-0 mb-lg-4' : 'mb-4'?>"> <!-- ticker-hp -->
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+			<?php // Speciál na HP MOBILY (povodně, volby, akutální velká témata) ?>
+			<?php if ($special['active'] === '1') { ?>
+				<?= $view->include('news/partial/special-hp-mobile') ?>
+			<?php } ?>
+
+            <?php if ($newArticles) { ?>
+                <?php $k = 0; ?>
+                <h2 class="text-primary mt-2 mb-4">
+                    Hlavní zprávy z MS kraje
+                    <small class="d-none d-lg-inline-block text-color-grey ms-2">
+                        <?= number_format($newsCount, 0, ',', ' ') ?>
+                        reportáží
+                    </small>
+                    <a class="pull-right text-primary text-2 d-none d-sm-block" href="<?= $view->path('news') ?>" title="Více zpráv">
+                        <small>
+                            více zpráv
+                            <i class="fas fa-chevron-right text-1"></i>
+                        </small>
+                    </a>
+                </h2>
+
+                <?php // Hlavní články ?>
+                <?php for ($i = 0, $iMax = count($newArticles); $i < $iMax; $i++) {?>
+
+                    <?php
+                    if ($newArticles[$i]['section'] === '1') {
+                        $region_city_url = $view->path('news_region_city', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url']]);
+                        if ($newArticles[$i]['city_url'] === 'cely-ms-kraj') {
+                            $region_city_url = $view->path('news');
+                        }
+                        $detail_url = $newArticles[$i]['url'];
+                    } else if ($newArticles[$i]['section'] === '2') {
+                        $region_city_url = null;
+                        $detail_url = $view->path('news_pr_article', ['article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
+                    } else if ($newArticles[$i]['section'] === '3') {
+                        $region_city_url = null;
+                        $detail_url = $view->path('triptip_article', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url'], 'article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
+                    }
+
+                    try {
+                        $today = new DateTime();
+                        $dateUpdate = new DateTime($newArticles[$i]['updated_date']);
+                        if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                            $dayUpdate = 'Dnes';
+                        } else {
+                            $yesterday = new DateTime();
+                            $yesterday->modify('-1 day');
+                            if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                $dayUpdate = 'Včera';
+                            } else {
+                                $dayUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                            }
+                        }
+                        $timeUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+                        $today = new DateTime();
+                        $date = new DateTime($newArticles[$i]['public_from']);
+                        if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                            if ($newArticles[$i]['label']) {
+                                $day = 'dnes';
+                            } else {
+                                $day = 'Dnes';
+                            }
+                        } else {
+                            $yesterday = new DateTime();
+                            $yesterday->modify('-1 day');
+                            if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                if ($newArticles[$i]['label']) {
+                                    $day = 'včera';
+                                } else {
+                                    $day = 'Včera';
+                                }
+                            } else {
+                                $day = $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                            }
+                        }
+                        $time = $dateFormatHelper($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+                    } catch (Exception $e) {
+                        $day = 'NaN';
+                        $time = 'NaN';
+                        $dayUpdate = 'NaN';
+                        $timeUpdate = 'NaN';
+                    }
+                    ?>
+
+                    <div class="row mb-4-5">
+                        <?php if ($newArticles[$i]['picture']) { ?>
+                            <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                                <div class="">
+                                    <a class="" href="<?= $detail_url ?>" title="<?= $newArticles[$i]['title'] ?>">
+                                        <span class="thumb-info thumb-info-lighten maxw-310">
+                                            <span class="thumb-info-wrapper">
+                                                <img src="<?= $newArticles[$i]['picture'] ?>" class="img-fluid" alt="<?= $newArticles[$i]['title'] ?>">
+                                                <?php if (strpos($newArticles[$i]['picture'], '/videos/') !== false) { ?>
+                                                    <span class="thumb-info-action">
+                                                        <span class="thumb-info-action-icon">
+                                                            <i class="fas fa-play"></i>
+                                                            <span class="player_duration"><?= $newArticles[$i]['duration'] ? gmdate("i:s", $newArticles[$i]['duration']) : ''; ?></span>
+                                                        </span>
+                                                    </span>
+                                                <?php } ?>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-7 col-lg-6 ps-1 pe-3">
+                                <h2 class="mb-1 mb-md-2">
+                                    <a class="" href="<?= $detail_url ?>" title="<?= $newArticles[$i]['title'] ?>">
+                                        <?= $newArticles[$i]['title'] ?>
+                                    </a>
+                                </h2>
+                                <div class="text-1 text-tertiary line-height-7 mb-1">
+                                    <?php
+                                        $now_minus_x = new DateTime();
+                                        $now_minus_x = $now_minus_x->modify('-' . HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                        if ($newArticles[$i]['label'] && $newArticles[$i]['updated_date'] > $now_minus_x) {
+                                            echo $newArticles[$i]['label'];
+                                            echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                        } else {
+                                            echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                        }
+                                    ?>
+                                    <?php if ($newArticles[$i]['section'] === '1') { ?>
+                                        <span>
+                                            <a href="<?= $region_city_url ?>" title="<?= $newArticles[$i]['city'] ?>"><?= $newArticles[$i]['city'] ?></a>&nbsp;|
+                                        </span>
+                                        <span>
+                                            <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => removeAccent($newArticles[$i]['author'], '-')]) . '" title="' . $newArticles[$i]['author'] . '">' . $newArticles[$i]['author'] . '</a>'; ?><!--
+                                        --></span><!--
+                                        --><!--<span>
+                                            <?php //= $newArticles[$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('news_show', ['show_id' => $newArticles[$i]['show_id']]) . '" title="' . $shows[$newArticles[$i]['show_id']] . '">' . $shows[$newArticles[$i]['show_id']] . '</a>' : ''; ?>
+                                        </span>-->
+                                    <?php } else if ($newArticles[$i]['section'] === '2') { ?>
+                                        <span>
+                                            <a href="<?= $view->path('news_pr') ?>" title="Komerční sdělení">
+                                                Komerční sdělení
+                                            </a>
+                                        </span>
+                                    <?php } else if ($newArticles[$i]['section'] === '3') { ?>
+                                        <span>
+                                            <a href="<?= $view->path('triptip') ?>" title="Kam vyrazit">
+                                                Kam vyrazit
+                                            </a>
+                                        </span>
+                                    <?php } ?>
+                                </div>
+                                <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                    <?= $newArticles[$i]['anotation']; ?>
+                                </p>
+                            </div>
+                        <?php } else { ?>
+                            <div class="col-12">
+                                <div class="">
+                                    <h2 class="mb-1 mb-md-2">
+                                        <a class="" href="<?= $detail_url ?>" title="<?= $newArticles[$i]['title'] ?>">
+                                            <?= $newArticles[$i]['title'] ?>
+                                        </a>
+                                    </h2>
+                                    <div class="text-1 text-tertiary line-height-7 mb-1">
+                                        <?php
+                                            $now_minus_x = new DateTime();
+                                            $now_minus_x = $now_minus_x->modify('-' . HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                            if ($newArticles[$i]['label'] && $newArticles[$i]['updated_date'] > $now_minus_x) {
+                                                echo $newArticles[$i]['label'];
+                                                echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                            } else {
+                                                echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                            }
+                                        ?>
+                                        <?php if ($newArticles[$i]['section'] === '1') { ?>
+                                            <span>
+                                                <a href="<?= $region_city_url ?>" title="<?= $newArticles[$i]['city'] ?>"><?= $newArticles[$i]['city'] ?></a>&nbsp;|
+                                            </span>
+                                            <span>
+                                                <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => removeAccent($newArticles[$i]['author'], '-')]) . '" title="' . $newArticles[$i]['author'] . '">' . $newArticles[$i]['author'] . '</a>'; ?><!--
+                                            --></span><!--
+                                            --><!--<span>
+                                                <?php //= $newArticles[$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('news_show', ['show_id' => $newArticles[$i]['show_id']]) . '" title="' . $shows[$newArticles[$i]['show_id']] . '">' . $shows[$newArticles[$i]['show_id']] . '</a>' : ''; ?>
+                                            </span>-->
+                                        <?php } else if ($newArticles[$i]['section'] === '2') { ?>
+                                            <span>
+                                                <a href="<?= $view->path('news_pr') ?>" title="Komerční sdělení">
+                                                    Komerční sdělení
+                                                </a>
+                                            </span>
+                                        <?php } else if ($newArticles[$i]['section'] === '3') { ?>
+                                            <span>
+                                                <a href="<?= $view->path('triptip') ?>" title="Kam vyrazit">
+                                                    Kam vyrazit
+                                                </a>
+                                            </span>
+                                        <?php } ?>
+                                    </div>
+                                    <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                        <?= $newArticles[$i]['anotation']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+
+                    <?php if ($i === 4) { ?>
+                        <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
+                        <?= $view->include('ads/banner/mobilesquare1') ?>
+                    <?php } ?>
+                <?php } ?>
+            <?php } ?>
+
+            <?php // REKLAMA ?>
+            <?= $view->include('banner/partial/ads/article') ?>
+        </div>
+        <div class="col-12 col-lg-5 p-relative">
+            <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
+                <?php $pr_block = array(); ?>
+                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} if (isset($pr[$k+2])) {$pr_block[] = $pr[$k+2];} ?>
+                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                <?php $k = $k + 3; ?>
+                <?php // REKLAMA ?>
+                <?php //= $view->include('ads/banner/rectangle') ?>
+                <?php // REKLAMA ?>
+                <br class="d-none d-lg-inline" /><?= $view->include('banner/partial/ads/article-right-bottom') ?>
+                <br class="d-none d-lg-inline" />
+                <?php // REKLAMA PRO MOBILY (druhá) ?>
+                <?= $view->include('ads/banner/mobilesquare2') ?>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- nejnovější pořady (3x pořad šedá sekce, 3x pořad bílá sekce) -->
+<?php if ($newVideos) { ?>
+    <div class="container-fluid block-news bg-e2e5e9 mb-4-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                        <a class="text-primary" href="<?= $view->path('show_list') ?>" title="Nejnovější pořady">
+                            Nejnovější pořady
+                        </a>
+                    </h3>
+                    <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('show_list') ?>">
+                        více&nbsp;<i class="fas fa-chevron-right text-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <?php // První část videí (3 položky v šedém bloku) ?>
+                <?php for ($i = 0; $i < 3; $i++) { ?>
+                    <?php
+                        $hide_on_mobile = '';
+                        if ($i >= 2) {
+                            $hide_on_mobile = 'd-none d-md-block';
+                        }
+                    ?>
+                    <div class="col-md-4 col-6 <?= $hide_on_mobile ?>">
+                        <article class="">
+                            <div class="row mb-4">
+                                <div class="col-12 d-flex mb-2-2-3">
+                                    <div class="img-thumbnail">
+                                        <a href="<?= $newVideos[$i]['url'] ?>" title="<?= $newVideos[$i]['title'] ?>">
+                                            <span class="thumb-info thumb-info-lighten">
+                                                <span class="thumb-info-wrapper">
+                                                    <?php $image = $newVideos[$i]['image'] ?? '/data/program/show/!default-show.png'; ?>
+                                                    <img src="<?= $image ?>" class="img-fluid" alt="<?= $newVideos[$i]['title'] ?>">
+                                                    <span class="thumb-info-action">
+                                                        <span class="thumb-info-action-icon">
+                                                            <i class="fas fa-play"></i>
+                                                            <span class="player_duration"><?= $newVideos[$i]['duration'] ? gmdate("i:s", $newVideos[$i]['duration']) : ''; ?></span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <h2 class="mb-1">
+                                        <a href="<?= $newVideos[$i]['url'] ?>" title="<?= $newVideos[$i]['title'] ?>">
+                                            <?= $newVideos[$i]['title'] ?>
+                                        </a>
+                                    </h2>
+                                    <div class="text-1 text-tertiary line-height-7 mb-1">
+                                        <span>
+                                            <?php
+                                                try {
+                                                    $date = new DateTime($newVideos[$i]['time']);
+                                                    $today = new DateTime();
+                                                    if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                        echo 'Dnes,';
+                                                    } else {
+                                                        $yesterday = new DateTime();
+                                                        $yesterday->modify('-1 day');
+                                                        if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                            echo 'Včera,';
+                                                        } else {
+                                                            echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, 'dd. MMMM yyyy,');
+                                                        }
+                                                    }
+                                                    echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, ' HH:mm');
+                                                } catch (Exception $e) {
+                                                    echo 'NaN';
+                                                }
+                                            ?>
+                                        </span>
+                                    </div>
+                                    <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                        <?= $newVideos[$i]['anotation']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-7">
+
+                <?php // Druhá část videí (3 články pod sebou) ?>
+                <?php for ($i = 3, $iMax = count($newVideos); $i < $iMax; $i++) { ?>
+
+                    <div class="row mb-4-5">
+                        <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                            <div class="img-thumbnail">
+                                <a href="<?= $newVideos[$i]['url'] ?>" title="<?= $newVideos[$i]['title'] ?>">
+                                    <span class="thumb-info thumb-info-lighten maxw-310">
+                                        <span class="thumb-info-wrapper">
+                                            <?php $image = $newVideos[$i]['image'] ?? '/data/program/show/!default-show.png'; ?>
+                                            <img src="<?= $image ?>" class="img-fluid" alt="<?= $newVideos[$i]['title'] ?>">
+                                            <span class="thumb-info-action">
+                                                <span class="thumb-info-action-icon">
+                                                    <i class="fas fa-play"></i>
+                                                    <span class="player_duration"><?= $newVideos[$i]['duration'] ? gmdate("i:s", $newVideos[$i]['duration']) : ''; ?></span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-7 col-lg-6 ps-1 pe-3">
+                            <h2 class="mb-1">
+                                <a href="<?= $newVideos[$i]['url'] ?>" title="<?= $newVideos[$i]['title'] ?>">
+                                    <?= $newVideos[$i]['title'] ?>
+                                </a>
+                            </h2>
+                            <div class="text-1 text-tertiary line-height-7 mb-1">
+                                <span>
+                                    <?php
+                                        try {
+                                            $date = new DateTime($newVideos[$i]['time']);
+                                            $today = new DateTime();
+                                            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                echo 'Dnes,';
+                                            } else {
+                                                $yesterday = new DateTime();
+                                                $yesterday->modify('-1 day');
+                                                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                    echo 'Včera,';
+                                                } else {
+                                                    echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, 'dd. MMMM yyyy,');
+                                                }
+                                            }
+                                            echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, ' HH:mm');
+                                        } catch (Exception $e) {
+                                            echo 'NaN';
+                                        }
+                                    ?>
+                                </span>
+                            </div>
+                            <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                <?= $newVideos[$i]['anotation']; ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="col-12 col-lg-5 p-relative">
+                <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
+                    <?php $pr_block = array(); ?>
+                    <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
+                    <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                    <?php $k = $k + 2; ?>
+                    <br class="d-none d-lg-inline" />
+                </aside>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+
+
+<!-- Sekce regionů (pro každý region 3x článek šedá sekce, 3x článek bílá sekce) -->
+<?php if ($regions) { ?>
+    <?php $block = 0;?>
+    <?php foreach ($regions as $region) { ?>
+        <?php if ($region['articles']) { ?>
+            <div class="container-fluid block-news bg-e2e5e9 mb-4-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                                <a class="text-primary" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>" title="<?= $region['title'] ?>">
+                                    <?= $region['title'] ?>
+                                </a>
+                            </h3>
+                            <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>">
+                                více&nbsp;<i class="fas fa-chevron-right text-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <?php // První část článků pro regiony (3 články v šedém bloku) ?>
+                        <?php for ($i = 0; $i < 3; $i++) { ?>
+                            <?php
+                                $hide_on_mobile = '';
+                                if ($i >= 2) {
+                                    $hide_on_mobile = 'd-none d-md-block';
+                                }
+                                if ($region['articles'][$i]['region_url'] && $region['articles'][$i]['city_url']) {
+                                    $region_city_url = $view->path('news_region_city', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url']]);
+                                    if ($region['articles'][$i]['city_url'] === 'cely-ms-kraj') {
+                                        $region_city_url = $view->path('news');
+                                    }
+                                }
+                                try {
+                                    $today = new DateTime();
+                                    $dateUpdate = new DateTime($region['articles'][$i]['updated_date']);
+                                    if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                        $dayUpdate = 'Dnes';
+                                    } else {
+                                        $yesterday = new DateTime();
+                                        $yesterday->modify('-1 day');
+                                        if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                            $dayUpdate = 'Včera';
+                                        } else {
+                                            $dayUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                        }
+                                    }
+                                    $timeUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+                                    $today = new DateTime();
+                                    $date = new DateTime($region['articles'][$i]['public_from']);
+                                    if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                        if ($region['articles'][$i]['label']) {
+                                            $day = 'dnes';
+                                        } else {
+                                            $day = 'Dnes';
+                                        }
+                                    } else {
+                                        $yesterday = new DateTime();
+                                        $yesterday->modify('-1 day');
+                                        if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                            if ($region['articles'][$i]['label']) {
+                                                $day = 'včera';
+                                            } else {
+                                                $day = 'Včera';
+                                            }
+                                        } else {
+                                            $day = $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                        }
+                                    }
+                                    $time = $dateFormatHelper($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+                                } catch (Exception $e) {
+                                    $day = 'NaN';
+                                    $time = 'NaN';
+                                    $dayUpdate = 'NaN';
+                                    $timeUpdate = 'NaN';
+                                }
+                            ?>
+
+                            <div class="col-md-4 col-6 <?= $hide_on_mobile ?>">
+                                <?php if ($region['articles'][$i]['picture']) { ?>
+                                    <article class="">
+                                        <div class="row mb-4">
+                                            <div class="col-12 d-flex mb-2-2-3">
+                                                <div class="img-thumbnail">
+                                                    <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
+                                                        <span class="thumb-info thumb-info-lighten">
+                                                            <span class="thumb-info-wrapper">
+                                                                <img src="<?= $region['articles'][$i]['picture'] ?>" class="img-fluid" alt="<?= $region['articles'][$i]['title'] ?>">
+                                                                <?php if (strpos($region['articles'][$i]['picture'], '/videos/') !== false) { ?>
+                                                                    <span class="thumb-info-action">
+                                                                        <span class="thumb-info-action-icon">
+                                                                            <i class="fas fa-play"></i>
+                                                                            <span class="player_duration"><?= $region['articles'][$i]['duration'] ? gmdate("i:s", $region['articles'][$i]['duration']) : ''; ?></span>
+                                                                        </span>
+                                                                    </span>
+                                                                <?php } ?>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <h2 class="mb-1">
+                                                    <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
+                                                        <?= $region['articles'][$i]['title'] ?>
+                                                    </a>
+                                                </h2>
+                                                <div class="text-1 text-tertiary line-height-7 mb-1">
+                                                    <?php
+                                                        $now_minus_x = new DateTime();
+                                                        $now_minus_x = $now_minus_x->modify('-' . HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                                        if ($region['articles'][$i]['label'] && $region['articles'][$i]['updated_date'] > $now_minus_x) {
+                                                            echo $region['articles'][$i]['label'];
+                                                            echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                        } else {
+                                                            echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                        }
+                                                    ?>
+                                                    <span>
+                                                        <a href="<?= $region_city_url ?>" title="<?= $region['articles'][$i]['city_title'] ?>"><?= $region['articles'][$i]['city_title'] ?></a>&nbsp;|
+                                                    </span>
+                                                    <span>
+                                                        <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $region['articles'][$i]['author_url']]) . '" title="' . $region['articles'][$i]['author'] . '">' . $region['articles'][$i]['author'] . '</a>'; ?><!--
+                                                    --></span><!--
+                                                    --><!--<span>
+                                                        <?php //= $region['articles'][$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('news_show', ['show_id' => $region['articles'][$i]['show_id']]) . '" title="' . $shows[$region['articles'][$i]['show_id']] . '">' . $shows[$region['articles'][$i]['show_id']] . '</a>' : ''; ?>
+                                                    </span>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                <?php } else { ?>
+                                    <article class="">
+                                        <div class="row mb-4">
+                                            <div class="col-12">
+                                                <div class="">
+                                                    <h2 class="mb-1">
+                                                        <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
+                                                            <?= $region['articles'][$i]['title'] ?>
+                                                        </a>
+                                                    </h2>
+                                                    <div class="text-1 text-tertiary line-height-7 mb-1">
+                                                        <?php
+                                                            $now_minus_x = new DateTime();
+                                                            $now_minus_x = $now_minus_x->modify('-' . HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                                            if ($region['articles'][$i]['label'] && $region['articles'][$i]['updated_date'] > $now_minus_x) {
+                                                                echo $region['articles'][$i]['label'];
+                                                                echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                            } else {
+                                                                echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                            }
+                                                        ?>
+                                                        <span>
+                                                            <a href="<?= $region_city_url ?>" title="<?= $region['articles'][$i]['city_title'] ?>"><?= $region['articles'][$i]['city_title'] ?></a>&nbsp;|
+                                                        </span>
+                                                        <span>
+                                                            <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $region['articles'][$i]['author_url']]) . '" title="' . $region['articles'][$i]['author'] . '">' . $region['articles'][$i]['author'] . '</a>'; ?><!--
+                                                        --></span><!--
+                                                        --><!--<span>
+                                                            <?php //= $region['articles'][$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('news_show', ['show_id' => $region['articles'][$i]['show_id']]) . '" title="' . $shows[$region['articles'][$i]['show_id']] . '">' . $shows[$region['articles'][$i]['show_id']] . '</a>' : ''; ?>
+                                                        </span>-->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                <?php } ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-7">
+
+                        <?php // Druhá část článků pro regiony (3 články pod sebou) ?>
+                        <?php for ($i = 3, $iMax = count($region['articles']); $i < $iMax; $i++) { ?>
+
+                            <?php
+                            if ($region['articles'][$i]['region_url'] && $region['articles'][$i]['city_url']) {
+                                $region_city_url = $view->path('news_region_city', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url']]);
+                                if ($region['articles'][$i]['city_url'] === 'cely-ms-kraj') {
+                                    $region_city_url = $view->path('news');
+                                }
+                            }
+                            try {
+                                $today = new DateTime();
+                                $dateUpdate = new DateTime($region['articles'][$i]['updated_date']);
+                                if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                    $dayUpdate = 'Dnes';
+                                } else {
+                                    $yesterday = new DateTime();
+                                    $yesterday->modify('-1 day');
+                                    if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                        $dayUpdate = 'Včera';
+                                    } else {
+                                        $dayUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                    }
+                                }
+                                $timeUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+                                $today = new DateTime();
+                                $date = new DateTime($region['articles'][$i]['public_from']);
+                                if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                    if ($region['articles'][$i]['label']) {
+                                        $day = 'dnes';
+                                    } else {
+                                        $day = 'Dnes';
+                                    }
+                                } else {
+                                    $yesterday = new DateTime();
+                                    $yesterday->modify('-1 day');
+                                    if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                        if ($region['articles'][$i]['label']) {
+                                            $day = 'včera';
+                                        } else {
+                                            $day = 'Včera';
+                                        }
+                                    } else {
+                                        $day = $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                    }
+                                }
+                                $time = $dateFormatHelper($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+                            } catch (Exception $e) {
+                                $day = 'NaN';
+                                $time = 'NaN';
+                                $dayUpdate = 'NaN';
+                                $timeUpdate = 'NaN';
+                            }
+                            ?>
+
+                            <div class="row mb-4-5">
+                                <?php if ($region['articles'][$i]['picture']) { ?>
+                                    <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                                        <div class="">
+                                            <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
+                                                <span class="thumb-info thumb-info-lighten maxw-310">
+                                                    <span class="thumb-info-wrapper">
+														<img src="<?= str_replace('715x402', '310x174', $region['articles'][$i]['picture']) ?>" class="img-fluid" alt="<?= $region['articles'][$i]['title'] ?>">
+														<?php if (strpos($region['articles'][$i]['picture'], '/videos/') !== false) { ?>
+                                                            <span class="thumb-info-action">
+                                                                <span class="thumb-info-action-icon">
+                                                                    <i class="fas fa-play"></i>
+                                                                    <span class="player_duration"><?= $region['articles'][$i]['duration'] ? gmdate("i:s", $region['articles'][$i]['duration']) : ''; ?></span>
+                                                                </span>
+                                                            </span>
+                                                        <?php } ?>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-7 col-lg-6 ps-1 pe-3">
+                                        <h2 class="mb-1">
+                                            <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
+                                                <?= $region['articles'][$i]['title'] ?>
+                                            </a>
+                                        </h2>
+                                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                                            <?php
+                                                $now_minus_x = new DateTime();
+                                                $now_minus_x = $now_minus_x->modify('-' . HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                                if ($region['articles'][$i]['label'] && $region['articles'][$i]['updated_date'] > $now_minus_x) {
+                                                    echo $region['articles'][$i]['label'];
+                                                    echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                } else {
+                                                    echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                }
+                                            ?>
+                                            <span>
+                                                <a href="<?= $region_city_url ?>" title="<?= $region['articles'][$i]['city_title'] ?>"><?= $region['articles'][$i]['city_title'] ?></a>&nbsp;|
+                                            </span>
+                                            <span>
+                                                <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $region['articles'][$i]['author_url']]) . '" title="' . $region['articles'][$i]['author'] . '">' . $region['articles'][$i]['author'] . '</a>'; ?><!--
+                                            --></span><!--
+                                            --><!--<span>
+                                                <?php //= $region['articles'][$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('news_show', ['show_id' => $region['articles'][$i]['show_id']]) . '" title="' . $shows[$region['articles'][$i]['show_id']] . '">' . $shows[$region['articles'][$i]['show_id']] . '</a>' : ''; ?>
+                                            </span>-->
+                                        </div>
+                                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                            <?= $region['articles'][$i]['anotation']; ?>
+                                        </p>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="col-12">
+                                        <div class="">
+                                            <h2 class="mb-1">
+                                                <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
+                                                    <?= $region['articles'][$i]['title'] ?>
+                                                </a>
+                                            </h2>
+                                            <div class="text-1 text-tertiary line-height-7 mb-1">
+                                                <?php
+                                                    $now_minus_x = new DateTime();
+                                                    $now_minus_x = $now_minus_x->modify('-' . HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                                    if ($region['articles'][$i]['label'] && $region['articles'][$i]['updated_date'] > $now_minus_x) {
+                                                        echo $region['articles'][$i]['label'];
+                                                        echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                    } else {
+                                                        echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                                    }
+                                                ?>
+                                                <span>
+                                                    <a href="<?= $region_city_url ?>" title="<?= $region['articles'][$i]['city_title'] ?>"><?= $region['articles'][$i]['city_title'] ?></a>&nbsp;|
+                                                </span>
+                                                <span>
+                                                    <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $region['articles'][$i]['author_url']]) . '" title="' . $region['articles'][$i]['author'] . '">' . $region['articles'][$i]['author'] . '</a>'; ?><!--
+                                                --></span><!--
+                                                --><!--<span>
+                                                    <?php //= $region['articles'][$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('news_show', ['show_id' => $region['articles'][$i]['show_id']]) . '" title="' . $shows[$region['articles'][$i]['show_id']] . '">' . $shows[$region['articles'][$i]['show_id']] . '</a>' : ''; ?>
+                                                </span>-->
+                                            </div>
+                                            <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                                                <?= $region['articles'][$i]['anotation']; ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+                    <div class="col-12 col-lg-5 p-relative">
+                        <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
+                            <?php $pr_block = array(); ?>
+                            <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
+                            <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                            <?php $k = $k + 2; ?>
+                            <br class="d-none d-lg-inline" />
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+    <?php } ?>
+<?php } ?>
+
+
+
+
+
+<!-- Kam vyrazit -->
+<?php //= $view->include('news/partial/triptip') ?>
+<!-- Dnešní premiéry -->
+<?php //= $view->include('program/partial/todays-premieres') ?>
+<?php // Nejčtenější články ?>
+<?php //if ($mostReadArticles) { ?>
+    <!--<div class="featured-box featured-box-primary featured-box-effect-2 my-0">
+        <div class="box-content box-content-border-bottom">
+            <h3 class="font-weight-normal text-5 text-primary mb-4">Nejčtenější články</h3>
+            <ol class="list list-secondary list-ordened list-ordened-style-3 text-start ps-0">
+                <?php //foreach ($mostReadArticles as $article) { ?>
+                    <li class="">
+                        <a href="<?php //= $view->path('news_region_city_article', ['url' => $article['region_url'], 'city_url' => $article['city_url'], 'article_id' => $article['article_id'], 'article_url' => $article['article_url']]) ?>" title="<?php //= $article['title'] ?>">
+                            <?php //= $article['title'] ?>
+                        </a>
+                    </li>
+                <?php //} ?>
+            </ol>
+        </div>
+    </div>-->
+<?php //} ?>
+<?php // Nejsledovanější pořady ?>
+<?php //= $view->include('program/partial/most-watched-shows') ?>

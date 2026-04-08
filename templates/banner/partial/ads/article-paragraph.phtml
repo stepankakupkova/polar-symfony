@@ -1,0 +1,38 @@
+<?php
+/**
+ * Reklama každý 4. odstavec v článku (SSP 480x480, zone 178716, jen mobil)
+ * @var int $i číslo odstavce
+ */
+?>
+<div id="bannerArticlePlace<?= $i ?>">
+
+</div>
+
+<script>
+    var sspScript = document.getElementById('ssp-script');
+    sspScript.addEventListener('load', function() {
+        var elBannerArticle = document.getElementById('bannerArticlePlace<?= $i ?>');
+        var htmlBannerArticle = "";
+        if (sssp.displaySeznamAds()) {
+            if (window.innerWidth <= 767) {
+                htmlBannerArticle =
+                    "<div class=\"row mb-xl\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p3-<?= $i ?>\" data-szn-ssp-ad='{\"zoneId\": 178716, \"width\": 480, \"height\": 480}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerArticle.insertAdjacentHTML("beforeend", htmlBannerArticle);
+            }
+        }
+    });
+
+    $(document).ready(function(){
+        setTimeout(
+            function() {
+                if ($("#p3-<?= $i ?>").length && $("#p3-<?= $i ?>").height() > 0) {
+                    $("<div class=\"reklama\">Reklama</div>").insertBefore("#p3-<?= $i ?>");
+                }
+            }, 2000);
+        });
+
+</script>

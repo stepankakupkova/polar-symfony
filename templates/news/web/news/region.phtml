@@ -12,27 +12,37 @@ $view->addInlineScript(
     getCrawlData();'
 );
 
+// Player VideoJS
 $view->addInlineScript(
-    'if ($(window).width() > 992) {
-        let playerLiveSDHD = videojs("playerLiveSDHD", {
-            controls: true, autoplay: false, preload: "none",
-            aspectRatio: "16:9", muted: true, inactivityTimeout: 1000,
-            controlBar: {
-                children: {
-                    playToggle: true, LiveDisplay: true,
-                    volumePanel: { inline: true },
-                    fullscreenToggle: true
+    '
+        if ($(window).width() > 992) {
+            let playerLiveSDHD = videojs("playerLiveSDHD", {
+                controls: true, 
+                autoplay: false, 
+                preload: "none", 
+                aspectRatio: "16:9", 
+                muted: true, 
+                inactivityTimeout: 1000,
+                controlBar: {
+                    children: {
+                        playToggle: true,
+                        LiveDisplay: true,
+                        volumePanel: {
+                            inline: true
+                        },
+                        fullscreenToggle: true
+                    }
                 }
-            }
-        });
-    }'
+            });
+        }
+        '
 );
 
-$view->setTitle('Regionální zprávy moravskoslezského kraje');
-$view->addMeta('description', 'Sledujte regionální zpravodajství z moravskoslezského kraje online. Denně Vám přinášíme aktuální zprávy z vašeho regionu a mnoho dalšího.');
-$view->addMeta('keywords', 'regionální zpravodajství, zprávy, reportáže, polar, tv, televize, moravskoslezský kraj');
-$view->addOgMeta('og:title', 'Zprávy | POLAR');
-$view->addOgMeta('og:description', 'Sledujte regionální zpravodajství z moravskoslezského kraje online. Denně Vám přinášíme aktuální zprávy z vašeho regionu a mnoho dalšího.');
+$view->setTitle('Zprávy - ' . $region['region']);
+$view->addMeta('description', 'Sledujte regionální zpravodajství z regionu ' . $region['region'] . ' online. Denně Vám přinášíme aktuální zprávy z vašeho regionu a mnoho dalšího.');
+$view->addMeta('keywords', 'regionální zpravodajství, zprávy, reportáže, polar, tv, televize, ' . $region['region']);
+$view->addOgMeta('og:title', 'Zprávy - ' . $region['region'] . ' | POLAR');
+$view->addOgMeta('og:description', 'Sledujte regionální zpravodajství z regionu ' . $region['region'] . ' online. Denně Vám přinášíme aktuální zprávy z vašeho regionu a mnoho dalšího.');
 $view->addOgMeta('og:url', $currentUrl);
 $view->addOgMeta('og:type', 'website');
 $view->addOgMeta('og:image', $schemeHost . $view->asset('img/web/layout/microformat.png'));
@@ -41,19 +51,22 @@ $view->addOgMeta('og:image:width', '1920');
 $view->addOgMeta('og:image:height', '1080');
 
 // Přidání prev a next tagů
+$regionPath = $view->path('news_region', ['url' => $region['url']]);
 if ($page > 1) {
     $prevPage = $page - 1;
-    $view->addHeadLink('prev', $view->path('news_list') . ($prevPage > 1 ? '?page=' . $prevPage : ''));
+    $view->addHeadLink('prev', $regionPath . ($prevPage > 1 ? '?page=' . $prevPage : ''));
 }
 if ($total > $page * $limit) {
-    $view->addHeadLink('next', $view->path('news_list') . '?page=' . ($page + 1));
+    $view->addHeadLink('next', $regionPath . '?page=' . ($page + 1));
 }
 
 $view->setBreadcrumbs([
-    ['label' => 'Zprávy', 'url' => $view->path('news_list')],
+    ['label' => 'Zprávy', 'url' => $view->path('news')],
+    ['label' => $region['region']],
 ]);
 
 $locale = Locale::getDefault();
+
 
 $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($locale): string {
     return (new IntlDateFormatter($locale, $dateType, $timeType))->format($date) ?: '';
@@ -96,11 +109,11 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
     <?php $i = 1; $k = 0; ?>
     <?php foreach ($articles as $key => $item) { ?>
         <?php
-                $region_city_url = $view->path('news_list');
+                $region_city_url = $view->path('news');
             if ($item['region_url'] && $item['city_url']) {
                 $region_city_url = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'];
                 if ($item['city_url'] === 'cely-ms-kraj') {
-                    $region_city_url = $view->path('news_list');
+                    $region_city_url = $view->path('news');
                 }
             }
 
@@ -278,6 +291,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
             <?php if ($i === 6 || $i === 12 || $i === 18 || $i === 25) { ?>
                     <div class="col-12 col-lg-5 p-relative">
                         <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container<?= $rand ?>', 'padding': {'top': 63}}">
+                            <?php $pr_block = array(); ?>
                             <!-- 1. blok: Živé vysílání + počasí + 2x PR + banner -->
                             <?php if ($i === 6) { ?>
                                 <div class="row d-none d-lg-flex mb-4">
@@ -312,15 +326,17 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
                                         <?php } ?>
                                     </div>
                                 </div>
-                                <?php $pr_slice = array_slice($pr, $k, 2); $k += 2; ?>
-                                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_slice]) ?>
+                                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
+                                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                                <?php $k = $k + 2; ?>
                                 <?= $view->include('banner/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
                             <?php } ?>
 
                             <!-- 2., 3., 4. blok: 3x PR -->
                             <?php if ($i === 12 || $i === 18 || $i === 25) { ?>
-                                <?php $pr_slice = array_slice($pr, $k, 3); $k += 3; ?>
-                                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_slice]) ?>
+                                <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} if (isset($pr[$k+2])) {$pr_block[] = $pr[$k+2];} ?>
+                                <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+                                <?php $k = $k + 3; ?>
                             <?php } ?>
 
                             <?php if ($i === 12) { ?>
@@ -338,18 +354,34 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
         <?php } ?>
 
 
-        <?php if ($i === 5) { echo $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]); } ?>
+        <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
+        <?php if ($i === 5) { ?>
+            <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+        <?php } ?>
 
-        <?php if ($i === 12) { echo $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]); } ?>
+        <?php // REKLAMA PRO MOBILY (druhá) ?>
+        <?php if ($i === 12) { ?>
+            <?= $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
+        <?php } ?>
 
-        <?php if ($i === 6) { echo $view->include('news/partial/block-triptip', ['blockTriptip' => $blockTriptip, 'region' => $region]); } ?>
+        <?php // Blok Kam vyrazit  ?>
+        <?php if ($i === 6) { ?>
+            <?= $view->include('news/partial/block-triptip', ['blockTriptip' => $blockTriptip, 'region' => $region]) ?>
+        <?php } ?>
 
-        <?php if ($i === 12) { echo $view->include('news/partial/block-job', ['blockJob' => $blockJob]); } ?>
+        <?php // Blok Nabídka práce  ?>
+        <?php if ($i === 12) { ?>
+            <?= $view->include('news/partial/block-job', ['blockJob' => $blockJob]) ?>
+        <?php } ?>
 
-        <?php if ($i === 18) {
-            echo '<div class="container">' . $view->include('banner/partial/ads/article') . '</div>';
-            echo $view->include('news/partial/block-camera', ['blockCamera' => $blockCamera]);
-        } ?>
+        <?php // Blok Kamery  ?>
+        <?php if ($i === 18) { ?>
+            <?php // REKLAMA ?>
+            <div class="container">
+                <?= $view->include('banner/partial/ads/article') ?>
+            </div>
+            <?= $view->include('news/partial/block-camera', ['blockCamera' => $blockCamera]) ?>
+        <?php } ?>
 
         <?php $i++; ?>
 
@@ -359,7 +391,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <?= $view->include('pagination/paginator', ['route' => 'news_list', 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+            <?= $view->include('pagination/paginator', ['route' => 'news_region', 'routeParams' => ['url' => $region['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
         </div>
     </div>
 </div>

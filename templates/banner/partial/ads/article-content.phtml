@@ -1,0 +1,66 @@
+<?php
+/**
+ * seznam.cz SSP - SMR mobil pouze text 300x300 / 480x300
+ * + bannerRectangle fallback na desktopech
+ *
+ * Odpovídá starému: ads/article/content
+ */
+
+$rand = random_int(1, 1000);
+
+$view->addInlineScript(
+    'setTimeout(function() {
+        if ($("#p4_' . $rand . '").length && $("#p4_' . $rand . '").height() > 0) {
+            $("<div class=\"reklama\">Reklama</div>").insertBefore("#p4_' . $rand . '");
+        }
+    }, 2000);'
+);
+?>
+
+<div id="bannerTextPlace<?= $rand ?>"></div>
+
+<script>
+    var sspScript = document.getElementById('ssp-script');
+    sspScript.addEventListener('load', function() {
+        var elBannerText = document.getElementById('bannerTextPlace<?= $rand ?>');
+        var htmlBannerText = "";
+        if (sssp.displaySeznamAds()) {
+            if (window.innerWidth <= 767) {
+                htmlBannerText =
+                    "<div class=\"row mt-5 mb-3\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p4_<?= $rand ?>\" data-szn-ssp-ad='{\"zoneId\": 151895, \"width\": 480, \"height\": 480}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerText.insertAdjacentHTML("beforeend", htmlBannerText);
+            } else {
+                htmlBannerText =
+                    "<div class=\"row mt-5 mb-3\">" +
+                        "<div class=\"col-md-12\">" +
+                            "<div id=\"p4_<?= $rand ?>\" data-szn-ssp-ad='{\"zoneId\": 151880, \"width\": 480, \"height\": 300}' style=\"margin: 0 auto;\"></div>" +
+                        "</div>" +
+                    "</div>";
+                elBannerText.insertAdjacentHTML("beforeend", htmlBannerText);
+            }
+        } else {
+            if (window.innerWidth > 767) {
+                <?php if (isset($bannerRectangle)) { ?>
+                    htmlBannerText =
+                        "<div class=\"row mt-5 mb-3\">" +
+                            "<div class=\"col-md-12\">" +
+                                "<div class=\"reklama\">" +
+                                    "Reklama" +
+                                "</div>" +
+                                "<div id=\"bannerRectangle\" data-type=\"rectangle\" data-id=\"<?= $bannerRectangle['id'] ?>\" style=\"margin: 0 auto;\">" +
+                                    "<a onclick=\"bannerCountClick('rectangle', <?= $bannerRectangle['id'] ?>)\" class=\"d-block text-center\" href=\"<?= $bannerRectangle['link'] ?>\" title=\"Reklama\" target=\"_blank\">" +
+                                        "<img class=\"img-fluid\" src=\"<?= $view->asset($bannerRectangle['image']) ?>\" alt=\"Reklama\" />" +
+                                    "</a>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>";
+                    elBannerText.insertAdjacentHTML("beforeend", htmlBannerText);
+                <?php } ?>
+            }
+        }
+    });
+</script>
