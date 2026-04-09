@@ -24,3 +24,43 @@ app_send_email:
   path: /json-write/send-email
   controller: App\Application\Controller\Web\ApplicationWriteController::sendEmail
   methods: [POST]
+
+app_hd:
+  path: /hd
+  controller: App\Application\Controller\Web\ApplicationController::hd
+
+app_polar2:
+  path: /polar2
+  controller: App\Application\Controller\Web\ApplicationController::polar2
+
+app_privacy_policy:
+  path: /ochrana-osobnich-udaju
+  controller: App\Application\Controller\Web\ApplicationController::privacyPolicy
+
+app_access_denied:
+  path: /pristup-odepren
+  controller: App\Application\Controller\Web\ApplicationController::accessDenied
+
+app_rss:
+  path: /rss
+  controller: App\Application\Controller\Web\ApplicationController::rss
+
+app_sitemap:
+  path: /mapa-stranek
+  controller: App\Application\Controller\Web\ApplicationController::sitemap
+
+app_sitemap_xml:
+  path: /sitemap.xml
+  controller: App\Application\Controller\Web\ApplicationController::sitemapXml
+
+app_sitemap_default_xml:
+  path: /sitemap-default.xml
+  controller: App\Application\Controller\Web\ApplicationController::sitemapDefaultXml
+
+app_robots_txt:
+  path: /robots.txt
+  controller: App\Application\Controller\Web\ApplicationController::robotsTxt
+
+app_embed_playerjs:
+  path: /embed-playerjs
+  controller: App\Application\Controller\Web\ApplicationController::embedPlayerjs

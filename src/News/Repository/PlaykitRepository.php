@@ -950,4 +950,27 @@ final class PlaykitRepository
 		$result = $qb->executeQuery()->fetchOne();
 		return $result !== false ? $result : null;
 	}
+
+	public function getAllRegionsForRss(): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('region', 'url')
+			->from('polar_news_regions')
+			->orderBy('sort', 'ASC')
+			->fetchAllAssociative();
+
+		return $result ?: null;
+	}
+
+	public function getAllCitiesForRss(): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('city', 'url')
+			->from('polar_news_cities')
+			->where('active = 1')
+			->orderBy('city', 'ASC')
+			->fetchAllAssociative();
+
+		return $result ?: null;
+	}
 }

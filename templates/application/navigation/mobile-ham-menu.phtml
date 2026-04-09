@@ -4,7 +4,7 @@
  * Prvních 5 položek vlevo, zbytek vpravo
  */
 
-$nav = require dirname(__DIR__, 2) . '/config/navigation.php';
+$nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Sestaví flat seznam: submenu přímé položky + dropdown children jako samostatné položky

@@ -1,0 +1,50 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->setTitle('Mapa stránek');
+$view->addMeta('keywords', 'mapa stránek');
+$view->addMeta('description', 'Mapa stránek');
+
+$view->setBreadcrumbs([
+    ['label' => 'Domů', 'url' => $view->path('app_home')],
+    ['label' => 'Mapa stránek'],
+]);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+<br />
+<div class="container py-2">
+    <div class="row justify-content-between">
+        <div class="col-lg-6">
+            <!-- TODO: Navigace sitemap - migrace z Laminas\Navigation -->
+            <ul class="nav nav-list flex-column mb-5">
+                <li><a href="<?= $view->path('app_home') ?>"><?= 'Domů' ?></a></li>
+                <li><a href="<?= $view->path('news') ?>">Zprávy</a></li>
+                <li><a href="<?= $view->path('app_hd') ?>">HD vysílání</a></li>
+                <li><a href="<?= $view->path('app_polar2') ?>">Polar 2</a></li>
+                <li><a href="<?= $view->path('app_rss') ?>">RSS</a></li>
+                <li><a href="<?= $view->path('app_sitemap') ?>">Mapa stránek</a></li>
+                <li><a href="<?= $view->path('app_sitemap_xml') ?>">sitemap.xml</a></li>
+                <li><a href="<?= $view->path('app_robots_txt') ?>">robots.txt</a></li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <h2><?= 'Ostatní' ?></h2>
+            <!-- TODO: Footer navigace - migrace z Laminas\Navigation -->
+        </div>
+    </div>
+</div>

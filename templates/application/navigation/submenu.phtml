@@ -7,7 +7,7 @@
  */
 
 $mobile = $mobile ?? false;
-$nav = require dirname(__DIR__, 2) . '/config/navigation.php';
+$nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $items = $nav['submenu'];
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 ?>

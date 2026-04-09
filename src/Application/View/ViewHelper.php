@@ -3,7 +3,6 @@
 namespace App\Application\View;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ViewHelper
 {
@@ -19,7 +18,6 @@ final class ViewHelper
 	public function __construct(
 		private PhtmlRenderer $renderer,
 		private UrlGeneratorInterface $urlGenerator,
-		private TranslatorInterface $translator,
 		private string $basePath,
 	) {}
 
@@ -31,11 +29,6 @@ final class ViewHelper
 	public function asset(string $path): string
 	{
 		return rtrim($this->basePath, '/') . '/' . ltrim($path, '/');
-	}
-
-	public function trans(string $id, array $params = [], ?string $domain = null, ?string $locale = null): string
-	{
-		return $this->translator->trans($id, $params, $domain, $locale);
 	}
 
 	public function include(string $template, array $params = []): string

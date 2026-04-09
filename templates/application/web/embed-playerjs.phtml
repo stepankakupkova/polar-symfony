@@ -1,0 +1,66 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->setTitle('Živé vysílání');
+$view->addMeta('keywords', 'Živé vysílání');
+$view->addMeta('description', 'Živé vysílání');
+
+$view->setBreadcrumbs([
+    ['label' => 'Domů', 'url' => $view->path('app_home')],
+    ['label' => 'Živé vysílání'],
+]);
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+?>
+
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-2">
+            <h2>Živé internetové vysílání</h2> <!-- Vložení Živého internetového vysílání -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <!--<link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet"/>
+            <link href="https://unpkg.com/@videojs/themes@1/dist/fantasy/index.css" rel="stylesheet"/>-->
+            <video id="player" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{ "controls": true, "autoplay": false, "preload": "auto", "errorDisplay": false, "poster": "https://polar.cz/img/web/poster/besidka.png" }'> <!-- /img/web/poster-hd.jpg -->
+                <source src="https://stream.polar.cz:443/livestream/livestream-1/playlist.m3u8" type="application/x-mpegURL">
+            </video>
+            <!--<script src="https://unpkg.com/video.js/dist/video.min.js"></script>-->
+        </div>
+    </div>
+    <!--
+    <h2 class="mt-xl">Tuto část kódu vložte do stránky</h2>
+    <div class="row">
+        <div class="col-md-12">
+<pre><code>&lt;link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet"&gt;
+&lt;link href="https://unpkg.com/@videojs/themes@1/dist/fantasy/index.css" rel="stylesheet"/&gt;
+&lt;video id="video" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{ "controls": true, "autoplay": false, "preload": "auto", "poster": "<i style="color: #990000;">CESTA K VAŠEMU OBRÁZKU</i>" }'&gt;
+    &lt;source src="https://stream.polar.cz:443/livestream/livestream-1/playlist.m3u8" type="application/x-mpegURL"&gt;
+&lt;/video&gt;
+&lt;script src="https://unpkg.com/video.js/dist/video.min.js"&gt;&lt;/script&gt;
+</code></pre>
+        </div>
+    </div>
+    -->
+</div>

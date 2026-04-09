@@ -11,6 +11,7 @@ use App\Application\View\PhtmlRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class ApplicationController
 {
@@ -125,6 +126,126 @@ final class ApplicationController
 			'bannerSquare'       => $bannerRepository->getSquare(),
 			'bannerMobilesquare1' => $bannerRepository->getMobilesquare1(),
 			'bannerMobilesquare2' => $bannerRepository->getMobilesquare2(),
+		]));
+	}
+
+	public function hd(
+		Request $request,
+		PhtmlRenderer $renderer,
+		BannerRepository $bannerRepository,
+	): Response {
+		$actual_link = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+
+		return new Response($renderer->renderWithLayout('application/web/hd', [
+			'bannerLeaderboard'  => $bannerRepository->getLeaderboard(),
+			'bannerMobilesticky' => $bannerRepository->getMobilesticky(),
+			'og' => [
+				'title' => 'HD vysílání | Televize POLAR',
+				'description' => 'Nepřetržitý proud informací, zpráv a zábavných pořadů z vašeho okolí.',
+				'url' => $actual_link,
+			],
+		]));
+	}
+
+	public function polar2(
+		Request $request,
+		PhtmlRenderer $renderer,
+		BannerRepository $bannerRepository,
+	): Response {
+		$actual_link = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+
+		return new Response($renderer->renderWithLayout('application/web/polar2', [
+			'bannerLeaderboard'  => $bannerRepository->getLeaderboard(),
+			'bannerMobilesticky' => $bannerRepository->getMobilesticky(),
+			'og' => [
+				'title' => 'Polar 2 | Televize POLAR',
+				'description' => 'POLAR - moravskoslezská regionální televize - nepřetržitý proud informací, zpráv a zábavných pořadů z vašeho okolí.',
+				'url' => $actual_link,
+			],
+		]));
+	}
+
+	public function privacyPolicy(
+		PhtmlRenderer $renderer,
+	): Response {
+		return new Response($renderer->renderWithLayout('application/web/privacy-policy', []));
+	}
+
+	public function accessDenied(
+		PhtmlRenderer $renderer,
+	): Response {
+		return new Response($renderer->renderWithLayout('application/web/access-denied', []));
+	}
+
+	public function rss(
+		PhtmlRenderer $renderer,
+		PlaykitRepository $playkitRepository,
+	): Response {
+		return new Response($renderer->renderWithLayout('application/web/rss', [
+			'regions' => $playkitRepository->getAllRegionsForRss(),
+			'cities' => $playkitRepository->getAllCitiesForRss(),
+		]));
+	}
+
+	public function sitemap(
+		PhtmlRenderer $renderer,
+	): Response {
+		return new Response($renderer->renderWithLayout('application/web/sitemap', []));
+	}
+
+	public function sitemapXml(): Response
+	{
+		$file = __DIR__ . '/../../../../public/sitemap.xml';
+		if (!file_exists($file)) {
+			throw new NotFoundHttpException('sitemap.xml not found');
+		}
+
+		$xml = simplexml_load_string(file_get_contents($file));
+		return new Response($xml->asXML(), 200, ['Content-Type' => 'text/xml']);
+	}
+
+	public function sitemapDefaultXml(
+		PhtmlRenderer $renderer,
+	): Response {
+		$content = $renderer->render('application/web/sitemap-default-xml', []);
+		return new Response($content, 200, ['Content-Type' => 'text/xml']);
+	}
+
+	public function robotsTxt(
+		PhtmlRenderer $renderer,
+	): Response {
+		$content = $renderer->render('application/web/robots-txt', []);
+		return new Response($content, 200, ['Content-Type' => 'text/plain']);
+	}
+
+	public function embedPlayerjs(
+		Request $request,
+		PhtmlRenderer $renderer,
+	): Response {
+		$agent = $request->headers->get('User-Agent', '');
+
+		if (strpos($agent, 'Trident') || strpos($agent, 'Edge')) {
+			$autoplay = 'autoplay';
+		} else {
+			$autoplay = '';
+		}
+
+		if (strpos($agent, 'Safari') && !strpos($agent, 'Chrome')) {
+			$dash = false;
+		} else {
+			$dash = true;
+		}
+
+		if (stripos($agent, 'mobile') !== false || stripos($agent, 'android') !== false) {
+			$mobile = true;
+		} else {
+			$mobile = false;
+		}
+
+		return new Response($renderer->renderWithLayout('application/web/embed-playerjs', [
+			'autoplay' => $autoplay,
+			'dash' => $dash,
+			'mobile' => $mobile,
 		]));
 	}
 }

@@ -1,0 +1,53 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->setTitle('Přístup zamítnut');
+$view->addMeta('keywords', 'přístup zamítnut');
+$view->addMeta('description', 'Přístup zamítnut');
+
+$view->setBreadcrumbs([
+    ['label' => 'Domů', 'url' => $view->path('app_home')],
+    ['label' => 'Přístup zamítnut'],
+]);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-2">
+    <div class="row">
+        <div class="col">
+            <div class="featured-box featured-box-primary">
+                <div class="box-content p-5">
+                    <div class="row">
+                        <div class="col">
+                            <i class="icon-featured fa fa-user-secret m-0"></i>
+                            <h2 class="font-weight-normal text-6">
+                                <?= 'Přístup zamítnut' ?>
+                            </h2>
+                            <div class="divider divider-small divider-small-center">
+                                <hr>
+                            </div>
+                            <a href="<?= $view->path('app_home') ?>" class="btn btn-modern btn-primary mr-1">
+                                <?= 'Domů' ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

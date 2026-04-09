@@ -347,7 +347,7 @@ $view->addMeta('description', 'Vyhledávání');
                 <?php } ?>
             </ul>
             <?php if ($paginator) {?>
-                <?= $view->include('pagination/paginator-search', [
+                <?= $view->include('application/pagination/paginator-search', [
                     'page' => $page,
                     'total' => $count,
                     'limit' => $limit,
@@ -450,7 +450,7 @@ $view->addMeta('description', 'Vyhledávání');
                 <?php } ?>
             </ul>
             <?php if ($program_paginator) { ?>
-                <?= $view->include('pagination/paginator-search2', [
+                <?= $view->include('application/pagination/paginator-search2', [
                     'page_porady' => $page_porady,
                     'total' => $program_count,
                     'limit' => $limit,

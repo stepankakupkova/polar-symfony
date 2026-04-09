@@ -3,7 +3,6 @@
 namespace App\Application\View;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PhtmlRenderer
 {
@@ -11,7 +10,6 @@ final class PhtmlRenderer
 		private string $templatesDir,
 		private string $basePath,
 		private UrlGeneratorInterface $urlGenerator,
-		private TranslatorInterface $translator,
 		private array $globals = [],
 	) {}
 
@@ -28,7 +26,7 @@ final class PhtmlRenderer
 			throw new \RuntimeException("Template not found: {$file}");
 		}
 
-		$view = $sharedView ?? new ViewHelper($this, $this->urlGenerator, $this->translator, $this->basePath);
+		$view = $sharedView ?? new ViewHelper($this, $this->urlGenerator, $this->basePath);
 
 		extract($this->globals + $params, EXTR_SKIP);
 
@@ -39,7 +37,7 @@ final class PhtmlRenderer
 
 	public function renderWithLayout(string $template, array $params = [], string $layout = 'layout'): string
 	{
-		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->translator, $this->basePath);
+		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->basePath);
 		$content = $this->render($template, $params, $sharedView);
 		$layoutParams = ['content' => $content];
 		foreach (['bannerLeaderboard', 'bannerMobilesticky', 'robots'] as $key) {

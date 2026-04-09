@@ -183,7 +183,7 @@
 
                             <?php $i++; ?>
                         <?php } ?>
-                        <?= $view->include('pagination/paginator', ['route' => 'news_pr', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+                        <?= $view->include('application/pagination/paginator', ['route' => 'news_pr', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
 
                         <?php // REKLAMA ?>
                         <?= $view->include('banner/partial/ads/article') ?>

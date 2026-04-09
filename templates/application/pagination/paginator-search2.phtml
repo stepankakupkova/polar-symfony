@@ -7,13 +7,13 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-/** @var int $page */
+/** @var int $page_porady */
 /** @var int $total */
 /** @var int $limit */
 /** @var string $query */
 /** @var int|null $region_id */
 /** @var int|null $city_id */
-/** @var int|null $page_porady */
+/** @var int|null $page */
 
 $pageCount = (int) ceil($total / $limit);
 
@@ -21,14 +21,14 @@ if ($pageCount <= 1) {
     return;
 }
 
-$previous     = $page > 1 ? $page - 1 : null;
-$next         = $page < $pageCount ? $page + 1 : null;
-$pagesInRange = range(max(1, $page - 4), min($pageCount, $page + 4));
-$firstItemNumber = ($page - 1) * $limit + 1;
-$lastItemNumber  = min($page * $limit, $total);
+$previous     = $page_porady > 1 ? $page_porady - 1 : null;
+$next         = $page_porady < $pageCount ? $page_porady + 1 : null;
+$pagesInRange = range(max(1, $page_porady - 4), min($pageCount, $page_porady + 4));
+$firstItemNumber = ($page_porady - 1) * $limit + 1;
+$lastItemNumber  = min($page_porady * $limit, $total);
 
-$urlFor = function(int $p) use ($query, $region_id, $city_id, $page_porady): string {
-    return $view->path('app_search') . '?q=' . urlencode($query) . '&r=' . ($region_id ?? '') . '&c=' . ($city_id ?? '') . '&p=' . $p . '&p_porady=' . ($page_porady ?? '');
+$urlFor = function(int $p) use ($view, $query, $region_id, $city_id, $page): string {
+    return $view->path('app_search') . '?q=' . urlencode($query) . '&r=' . ($region_id ?? '') . '&c=' . ($city_id ?? '') . '&p=' . ($page ?? '') . '&p_porady=' . $p;
 };
 ?>
 <ul class="pagination">
@@ -51,7 +51,7 @@ $urlFor = function(int $p) use ($query, $region_id, $city_id, $page_porady): str
         </li>
     <?php } ?>
     <?php foreach ($pagesInRange as $p) { ?>
-        <?php if ($p !== $page) { ?>
+        <?php if ($p !== $page_porady) { ?>
             <li class="page-item">
                 <a class="page-link" href="<?= $urlFor($p) ?>">
                     <?= $p; ?>

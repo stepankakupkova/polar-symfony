@@ -1,0 +1,269 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->setTitle('Polar 2');
+$view->addMeta('keywords', 'polar, tv polar, televize, ostrava, moravskoslezský kraj, televizní vysílání, reklama, výroba pořadů, MSK');
+$view->addMeta('description', 'POLAR - moravskoslezská regionální televize - nepřetržitý proud informací, zpráv a zábavných pořadů z vašeho okolí.');
+
+if (isset($og)) {
+    $view->addOgMeta('og:title', $og['title']);
+    $view->addOgMeta('og:description', $og['description']);
+    $view->addOgMeta('og:url', $og['url']);
+    $view->addOgMeta('og:type', 'website');
+    $view->addOgMeta('og:image', 'https://' . $_SERVER['SERVER_NAME'] . '/img/web/layout/microformat.png');
+    $view->addOgMeta('og:image:secure_url', 'https://' . $_SERVER['SERVER_NAME'] . '/img/web/layout/microformat.png');
+    $view->addOgMeta('og:image:width', '1920');
+    $view->addOgMeta('og:image:height', '1080');
+}
+
+$view->setBreadcrumbs([
+    ['label' => 'Domů', 'url' => $view->path('app_home')],
+    ['label' => 'Polar 2'],
+]);
+
+$view->addBodyScript($view->asset('vendor/web/moment/js/moment.min.js'));
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/nanoscroller/css/nanoscroller.min.css'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+$view->addBodyScript($view->asset('vendor/web/nanoscroller/js/nanoscroller.min.js'));
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    'moment.locale("cs");
+    // Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Program
+$view->addInlineScript(
+    'window.addEventListener("load", function () {
+        getProgram2();
+        function getProgram2() {
+            $.post("' . $view->path('app_get_program2_for_web') . '",
+                {},
+                function(json) {
+                    $("#program2").html(json.content);
+                    $(".nano").nanoScroller({ alwaysVisible: true });
+                    if (json.reload) {
+                        setTimeout(() => {
+                            getProgram2();
+                        }, json.reload * 1000);
+                    }
+                }, 
+                "json"      
+            );
+        }
+        $(".showProgram2").click(function(e){
+            let id = $(this).attr("id");
+            id = id.substr(id.length - 1);
+            $(".showProgram2").removeClass("btn-primary").addClass("btn-default");
+            $(this).addClass("btn-primary");
+            $("#program2 .nano").addClass("hide");
+            $("#program2 #program2-" + id).removeClass("hide");
+            $(".nano").nanoScroller({ alwaysVisible: true });
+        });
+    });'
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+    let player = videojs("player", {
+        controlBar: {
+            children: {
+                playToggle: true,
+                LiveDisplay: true,
+                volumePanel: {
+                    inline: true
+                },
+                fullscreenToggle: true
+            }
+        }
+    });
+    '
+);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8 mb-4 mb-lg-2">
+            <div id="ticker" class="mb-0">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <video id="player" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy mt-4 mt-lg-0" data-setup='{ "controls": true, "autoplay": false, "preload": "auto", "poster": "/img/web/poster-polar2.jpg" }'>
+                <source src="https://stream.polar.cz:443/polar2/polarlive2-1/playlist.m3u8" type="application/x-mpegURL">
+                <p class="vjs-no-js">
+                    Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar2/polarlive2-1/playlist.m3u8">stream</a>.
+                </p>
+            </video>
+        </div>
+        <div id="program2Container" class="col-12 col-lg-4 match-height">
+            <div class="row mt-0 mb-3">
+                <div class="col-6 d-flex align-items-center">
+                    <h2 class="mb-0">
+                        Program POLAR2
+                    </h2>
+                </div>
+                <div class="col-6 d-flex align-items-center justify-content-end">
+                    <button id="program2day1" class="showProgram2 btn btn-primary btn-xs me-2">
+                        Dnes
+                    </button>
+                    <button id="program2day2" class="showProgram2 btn btn-default btn-xs me-2">
+                        Zítra
+                    </button>
+                    <button id="program2day3" class="showProgram2 btn btn-default btn-xs">
+                        Pozítří
+                    </button>
+                </div>
+            </div>
+            <div id="program2">
+
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-4 col-sm-6" style="border-right: 1px solid #cccccc; border-bottom: 1px solid #cccccc;">
+            <div class="row mt-4">
+                <div class="col-3 sol-sm-4">
+                    <img class="img-fluid" src="/img/web/icons/polar2_2x.png" alt="" />
+                </div>
+                <div class="col-9 col-sm-8">
+                    <h4 class="mt-2">
+                        Dvakrát více informací
+                    </h4>
+                </div>
+            </div>
+            <p class="mt-3 mb-3">
+                POLAR2 je druhý program moravskoslezské regionální televite POLAR.
+            </p>
+        </div>
+        <div class="col-md-4 col-sm-6" style="border-right: 1px solid #cccccc; border-bottom: 1px solid #cccccc;">
+            <div class="row mt-4">
+                <div class="col-3 sol-sm-4">
+                    <img class="img-fluid" src="/img/web/icons/polar2_live.png" alt="" />
+                </div>
+                <div class="col-9 col-sm-8">
+                    <h4 class="mt-2">
+                        Přímé přenosy
+                    </h4>
+                </div>
+            </div>
+            <p class="mt-3 mb-3">
+                Vysíláme zde živé přenosy z&nbsp;akcí a&nbsp;významných lokalit Moravkoslezského kraje.
+            </p>
+        </div>
+        <div class="col-md-4 col-sm-6" style="border-bottom: 1px solid #cccccc;">
+            <div class="row mt-4">
+                <div class="col-3 sol-sm-4">
+                    <img class="img-fluid" src="/img/web/icons/polar2_mimo.png" alt="" />
+                </div>
+                <div class="col-9 col-sm-8">
+                    <h4 class="mt-2">
+                        Mimořádné pořady
+                    </h4>
+                </div>
+            </div>
+            <p class="mt-3 mb-3">
+                Na POLAR2 najdete také pořady, které nelze z&nbsp;časových a&nbsp;programových důvodů umístit na hlavní stanici.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-sm-6" style="border-right: 1px solid #cccccc;">
+            <div class="row mt-4">
+                <div class="col-3 sol-sm-4">
+                    <img class="img-fluid" src="/img/web/icons/polar2_tv.png" alt="" />
+                </div>
+                <div class="col-9 col-sm-8">
+                    <h4 class="mt-2">
+                        Sledujte POLAR2 v TV
+                    </h4>
+                </div>
+            </div>
+            <p class="mt-3 mb-3">
+                Díky <a href="https://polar.cz/hbbtv" class="text-color-secondary">Červenému tlačítku POLAR (HbbTV)</a> si můžete náš druhý program pustit přímo ve vašem televizoru.
+            </p>
+        </div>
+        <div class="col-md-4 col-sm-6" style="border-right: 1px solid #cccccc;">
+            <div class="row mt-4">
+                <div class="col-3 sol-sm-4">
+                    <img class="img-fluid" src="/img/web/icons/polar2_pc.png" alt="" />
+                </div>
+                <div class="col-9 col-sm-8">
+                    <h4 class="mt-2">
+                        Sledujte POLAR2 na PC
+                    </h4>
+                </div>
+            </div>
+            <p class="mt-3 mb-3">
+                POLAR2 je vám k dispozici na adrese <a href="https://polar2.cz" target="_blank">polar2.cz</a>. Nezapomeňte si ho uložit do oblíbených záložek.
+            </p>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="row mt-4">
+                <div class="col-3 sol-sm-4">
+                    <img class="img-fluid" src="/img/web/icons/polar2_mobil.png" alt="" />
+                </div>
+                <div class="col-9 col-sm-8">
+                    <h4 class="mt-2">
+                        Sledujte POLAR2 v mobilu
+                    </h4>
+                </div>
+            </div>
+            <p class="mt-3 mb-3">
+                POLAR2 si poradí i&nbsp;s&nbsp;vašim telefonem. Stačí si v&nbsp;mobilním prohlížeči otevřít adresu <a href="https://polar2.cz" target="_blank">polar2.cz</a>.
+            </p>
+        </div>
+    </div>
+</div>

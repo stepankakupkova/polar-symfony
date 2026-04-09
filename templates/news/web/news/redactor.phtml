@@ -37,7 +37,7 @@ $view->setBreadcrumbs([
     <div class="container">
         <div class="row">
             <div class="col-12 d-flex justify-content-between justify-content-lg-start align-self-center">
-                <?= $view->include('navigation/breadcrumb') ?>
+                <?= $view->include('application/navigation/breadcrumb') ?>
                 <div class="text-color-grey ms-3">
                     (<?= $newsCount; ?> reportáží)
                 </div>
@@ -236,7 +236,7 @@ $view->setBreadcrumbs([
 
                             <?php $i++; ?>
                         <?php } ?>
-                        <?= $view->include('pagination/paginator', ['route' => 'news_redactor', 'routeParams' => ['redactor_url' => $redactor['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+                        <?= $view->include('application/pagination/paginator', ['route' => 'news_redactor', 'routeParams' => ['redactor_url' => $redactor['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
 
                         <?php // REKLAMA ?>
                         <?= $view->include('banner/partial/ads/article') ?>

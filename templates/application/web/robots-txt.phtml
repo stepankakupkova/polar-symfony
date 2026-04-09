@@ -1,0 +1,29 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$env = $_SERVER['APP_ENV'] ?? 'production';
+$s = '';
+if (($_SERVER['HTTPS'] ?? '') === 'on') {
+    $s = 's';
+}
+$serverProtocol = strtolower($_SERVER['SERVER_PROTOCOL'] ?? 'http/1.1');
+$protocol = substr($serverProtocol, 0, strpos($serverProtocol, '/')) . $s;
+$port = '';
+if (($_SERVER['SERVER_PORT'] ?? '') === '80') {
+    $port = ':' . $_SERVER['SERVER_PORT'];
+}
+$sitemapUrl = $protocol . '://' . ($_SERVER['SERVER_NAME'] ?? 'localhost') . $port . '/sitemap.xml';
+?>
+    User-agent: *
+<?php if ($env === 'development' || $env === 'dev') { ?>
+    Disallow: /
+<?php } else { ?>
+    Allow: /
+<?php } ?>
+    Sitemap: <?= $sitemapUrl ?>

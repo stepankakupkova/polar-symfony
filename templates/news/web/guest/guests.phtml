@@ -66,7 +66,7 @@ $view->addInlineScript(
     <div class="container">
         <div class="row">
             <div class="col-md-12 align-self-center order-1">
-                <?= $view->include('navigation/breadcrumb') ?>
+                <?= $view->include('application/navigation/breadcrumb') ?>
             </div>
         </div>
     </div>
@@ -176,14 +176,14 @@ $view->addInlineScript(
                     <?php } ?>
                     <div class="row">
                         <div class="col">
-                            <?= $view->include('pagination/paginator', ['route' => 'news_guests', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+                            <?= $view->include('application/pagination/paginator', ['route' => 'news_guests', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
 
                         </div>
                     </div>
                 <?php } else { ?>
                     <div class="alert alert-warning alert-lg">
                         <strong>
-                            <?= $view->trans('No guests found.') ?>
+                            <?= 'Žádný host nebyl nalezen.' ?>
                         </strong>
                     </div>
                 <?php } ?>

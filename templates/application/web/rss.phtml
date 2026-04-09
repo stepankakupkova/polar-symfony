@@ -1,0 +1,91 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->setTitle('RSS');
+$view->addMeta('keywords', 'rss');
+$view->addMeta('description', 'RSS');
+
+$view->setBreadcrumbs([
+    ['label' => 'Domů', 'url' => $view->path('app_home')],
+    ['label' => 'RSS'],
+]);
+
+$regions = $regions;
+$cities = $cities;
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-3">
+            <h2>
+                Vše
+            </h2>
+            <ul class="list-unstyled">
+                <li>
+                    <a href="/rss/global.xml" title="Moravskoslezský kraj" target="_blank">
+                        Moravskoslezský kraj
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h2>
+                Města
+            </h2>
+            <ul class="list-unstyled">
+                <?php foreach ($cities as $city) { ?>
+                    <?php if ($city['url'] !== 'cely-ms-kraj') { ?>
+                        <li>
+                            <a href="/rss/<?= $city['url'] ?>.xml" title="<?= $city['city'] ?>" target="_blank">
+                                <?= $city['city'] ?>
+                            </a>
+                        </li>
+                    <?php } ?>
+                <?php } ?>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h2>
+                Okresy
+            </h2>
+            <ul class="list-unstyled">
+                <?php foreach ($regions as $region) { ?>
+                    <?php if ($region['url'] !== 'moravskoslezsky-kraj') { ?>
+                        <li>
+                            <a href="/rss/<?= $region['url'] ?>.xml" title="<?= $region['region'] ?>" target="_blank">
+                                <?= $region['region'] ?>
+                            </a>
+                        </li>
+                    <?php } ?>
+                <?php } ?>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h2>
+                Seznam.cz
+            </h2>
+            <ul class="list-unstyled">
+                <li>
+                    <a href="/rss/seznam.xml" title="Seznam.cz" target="_blank">
+                        Seznam.cz
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

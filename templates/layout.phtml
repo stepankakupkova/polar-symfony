@@ -114,7 +114,7 @@
                         <!-- submenu - horní menu desktop -->
                         <div class="header-column align-self-center d-none d-lg-block">
                             <nav class="header-nav-top">
-                                <?= $view->include('navigation/submenu') ?>
+                                <?= $view->include('application/navigation/submenu') ?>
                             </nav>
                         </div>
 
@@ -122,7 +122,7 @@
                         <div class="header-row d-lg-none p-relative d-flex justify-content-end">
                             <div class="header-column flex-grow-0 align-self-center me-2 me-md-3 z-index-2">
                                 <nav class="header-nav-top">
-                                    <?= $view->include('navigation/submenu', ['mobile' => true]) ?>
+                                    <?= $view->include('application/navigation/submenu', ['mobile' => true]) ?>
                                 </nav>
                             </div>
                             <div class="header-column flex-grow-0 align-self-center me-5 me-5-custom pe-2 z-index-2">
@@ -202,7 +202,7 @@
                         <!-- Mobily - Menu regionů v posuvné liště -->
                         <div class="mobile_menu d-lg-none">
                             <nav class="d-flex">
-                                <?= $view->include('navigation/menu', ['ulClass' => 'mobile-menu']) ?>
+                                <?= $view->include('application/navigation/menu', ['ulClass' => 'mobile-menu']) ?>
                             </nav>
                         </div>
                         <div class="header-nav-main header-nav-main-effect-1 header-nav-main-sub-effect-1 collapse">
@@ -210,10 +210,10 @@
                                 <!-- Desktop hlavní menu regiony -->
                                 <div class="d-none d-lg-flex">
                                     <nav>
-                                        <?= $view->include('navigation/menu', ['ulClass' => 'nav nav-pills']) ?>
+                                        <?= $view->include('application/navigation/menu', ['ulClass' => 'nav nav-pills']) ?>
                                     </nav>
                                 </div>
-                                <?= $view->include('navigation/mobile-ham-menu') ?>
+                                <?= $view->include('application/navigation/mobile-ham-menu') ?>
                             </div>
 
                             <!-- Mobily - Přidání sociálních sítí do rozbalovacího menu dolů -->
@@ -371,7 +371,7 @@
                         </div>
                         <div class="col-lg-5 d-flex justify-content-end">
                             <nav id="sub-menu">
-                                <?= $view->include('navigation/footer') ?>
+                                <?= $view->include('application/navigation/footer') ?>
                             </nav>
                         </div>
                     </div>

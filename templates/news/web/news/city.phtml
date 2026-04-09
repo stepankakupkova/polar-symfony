@@ -79,7 +79,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
     <div class="container">
         <div class="row">
             <div class="col-12 d-flex justify-content-start align-self-center">
-                <?= $view->include('navigation/breadcrumb') ?>
+                <?= $view->include('application/navigation/breadcrumb') ?>
                 <div class="d-none d-md-block text-color-grey ms-3">
                     (<?= $newsCount; ?> reportáží)
                 </div>
@@ -392,7 +392,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <?= $view->include('pagination/paginator', ['route' => 'news_region_city', 'routeParams' => ['url' => $region['url'], 'city_url' => $city['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+            <?= $view->include('application/pagination/paginator', ['route' => 'news_region_city', 'routeParams' => ['url' => $region['url'], 'city_url' => $city['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
         </div>
     </div>
 </div>
