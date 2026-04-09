@@ -1,0 +1,11 @@
+# Pořady (Show)
+show:
+    path: /porady
+    controller: App\Program\Controller\Web\ShowController::index
+
+show_video:
+    path: /porady/{show_url}/{program_url}
+    controller: App\Program\Controller\Web\ShowController::video
+    requirements:
+        show_url: '[a-zA-Z0-9_-]+'
+        program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'

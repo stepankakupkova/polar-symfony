@@ -1,0 +1,81 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var int $page_porady */
+/** @var int $total */
+/** @var int $limit */
+/** @var string $query */
+/** @var int|null $region_id */
+/** @var int|null $city_id */
+/** @var int|null $page */
+
+$pageCount = (int) ceil($total / $limit);
+
+if ($pageCount <= 1) {
+    return;
+}
+
+$previous     = $page_porady > 1 ? $page_porady - 1 : null;
+$next         = $page_porady < $pageCount ? $page_porady + 1 : null;
+$pagesInRange = range(max(1, $page_porady - 4), min($pageCount, $page_porady + 4));
+$firstItemNumber = ($page_porady - 1) * $limit + 1;
+$lastItemNumber  = min($page_porady * $limit, $total);
+
+$urlFor = function(int $p) use ($query, $region_id, $city_id, $page): string {
+    return $view->path('app_search') . '?q=' . urlencode($query) . '&r=' . ($region_id ?? '') . '&c=' . ($city_id ?? '') . '&p=' . ($page ?? '') . '&p_porady=' . $p;
+};
+?>
+<ul class="pagination">
+    <li>
+        <?= $firstItemNumber ?> - <?= $lastItemNumber ?> ze <?= $total ?>
+    </li>
+</ul>
+<ul class="pagination">
+    <?php if (isset($previous)) { ?>
+        <li class="page-item">
+            <a class="page-link" href="<?= $urlFor($previous) ?>">
+                <i class="fa fa-angle-double-left"></i>
+            </a>
+        </li>
+    <?php } else { ?>
+        <li class="page-item disabled">
+            <a class="page-link" href="#">
+                <i class="fa fa-angle-double-left"></i>
+            </a>
+        </li>
+    <?php } ?>
+    <?php foreach ($pagesInRange as $p) { ?>
+        <?php if ($p !== $page_porady) { ?>
+            <li class="page-item">
+                <a class="page-link" href="<?= $urlFor($p) ?>">
+                    <?= $p; ?>
+                </a>
+            </li>
+        <?php } else { ?>
+            <li class="page-item active">
+                <a class="page-link" href="#">
+                    <?= $p ?>
+                </a>
+            </li>
+        <?php } ?>
+    <?php } ?>
+    <?php if (isset($next)) { ?>
+        <li class="page-item">
+            <a class="page-link" href="<?= $urlFor($next) ?>">
+                <i class="fa fa-angle-double-right"></i>
+            </a>
+        </li>
+    <?php } else { ?>
+        <li class="page-item disabled">
+            <a class="page-link" href="#">
+                <i class="fa fa-angle-double-right"></i>
+            </a>
+        </li>
+    <?php } ?>
+</ul>

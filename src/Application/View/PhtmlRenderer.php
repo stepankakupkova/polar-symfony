@@ -42,7 +42,7 @@ final class PhtmlRenderer
 		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->translator, $this->basePath);
 		$content = $this->render($template, $params, $sharedView);
 		$layoutParams = ['content' => $content];
-		foreach (['bannerLeaderboard', 'bannerMobilesticky'] as $key) {
+		foreach (['bannerLeaderboard', 'bannerMobilesticky', 'robots'] as $key) {
 			if (isset($params[$key])) {
 				$layoutParams[$key] = $params[$key];
 			}

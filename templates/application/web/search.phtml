@@ -1,1 +1,466 @@
-<p>Vyhledávání – zatím stub</p>
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$locale = 'cs_CZ';
+
+$words = $query;
+
+$dateFormatHelper = function (\DateTimeInterface $date, int $dateType, int $timeType, string $locale): string {
+    $formatter = new IntlDateFormatter($locale, $dateType, $timeType);
+    return $formatter->format($date);
+};
+
+/**
+ * @param $content
+ * @param $alternativeContent
+ * @param $words
+ * @return array|string
+ */
+function highlightWords($content, $alternativeContent, $words): array|string
+{
+
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: Lower(); :: NFC;', Transliterator::FORWARD);
+
+    $content = trim(strip_tags($content));
+    $content = preg_replace('/\n/', '- ', $content);
+    $content = str_replace('&nbsp;', ' ', $content);
+
+    $contentUni = $transliterator->transliterate($content);
+    $length = 120;
+
+    $wordUni = $transliterator->transliterate($words);
+    $wordLen = mb_strlen($wordUni, 'UTF-8');
+
+    // zakázat hledání krátkých slov
+    if ($wordLen < 3) {
+        return $content;
+    }
+
+    $keywords = explode(" ", trim($wordUni));
+    $replace = $keywords[0];
+
+    if (mb_strpos($contentUni, $replace, 0, 'UTF-8') !== false) {
+        $pos = mb_strpos($contentUni, $replace, 0, 'UTF-8');
+        if ($pos > 60) {
+            $contentUni = '...' . mb_substr($contentUni, $pos - 60, $length, 'UTF-8');
+            $content = '...' . mb_substr($content, $pos - 60, $length, 'UTF-8');
+        }
+        if (mb_strlen($contentUni, 'UTF-8') > $length) {
+            $contentUni = mb_substr($contentUni, 0, $length - 3, 'UTF-8') . '...';
+            $content = mb_substr($content, 0, $length - 3, 'UTF-8') . '...';
+        }
+    } else if ($alternativeContent) {
+        $content = $alternativeContent;
+        $content = trim(strip_tags($content));
+        $content = preg_replace('/\r|\n/', '', $content);
+        $content = str_replace('&nbsp;', ' ', $content);
+        $content = preg_replace('/{{(.*?)}}/', '', $content);
+        $contentUni = $transliterator->transliterate($content);
+
+        if (mb_strpos($contentUni, $replace, 0, 'UTF-8') !== false) {
+            $pos = mb_strpos($contentUni, $replace, 0, 'UTF-8');
+            if ($pos > 60) {
+                $contentUni = '...' . mb_substr($contentUni, $pos - 60, $length, 'UTF-8');
+                $content = '...' . mb_substr($content, $pos - 60, $length, 'UTF-8');
+            }
+            if (mb_strlen($contentUni, 'UTF-8') > $length) {
+                $contentUni = mb_substr($contentUni, 0, $length - 3, 'UTF-8') . '...';
+                $content = mb_substr($content, 0, $length - 3, 'UTF-8') . '...';
+            }
+        }
+    }
+    if (mb_strlen($contentUni, 'UTF-8') > $length) {
+        $contentUni = mb_substr($contentUni, 0, $length - 3, 'UTF-8') . '...';
+        $content = mb_substr($content, 0, $length - 3, 'UTF-8') . '...';
+    }
+
+    $keywords = explode(" ", trim($wordUni));
+    //var_dump($contentUni);
+    foreach ($keywords as $keyword) {
+        $wordLen = mb_strlen($keyword, 'UTF-8');
+        if ($wordLen > 2) {
+            while (mb_strrpos($contentUni, $keyword, 0, 'UTF-8') !== false) {
+                $pos = mb_strrpos($contentUni, $keyword, 0, 'UTF-8');
+                $contentUni = mb_substr($contentUni, 0, $pos, 'UTF-8') . '<span style="background-color: #f5f553;">' . str_repeat('X', $wordLen) . '</span>' . mb_substr($contentUni, $pos + $wordLen, mb_strlen($contentUni, 'UTF-8'), 'UTF-8');
+                $content = mb_substr($content, 0, $pos, 'UTF-8') . '<span style="background-color: #f5f553;">' . mb_substr($content, $pos, $wordLen, 'UTF-8') . '</span>' . mb_substr($content, $pos + $wordLen, mb_strlen($content, 'UTF-8'), 'UTF-8');
+            }
+        }
+    }
+
+    return $content;
+}
+
+function removeAccent($text, $replace = NULL): string
+    {
+        $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+        $text = $transliterator->transliterate($text);
+        $text = preg_replace('/\p{C}+/u', '', $text);
+        if ($replace) {
+            $text = str_replace(' ', $replace, $text);
+        }
+        return $text;
+    }
+
+$view->setTitle('Vyhledávání');
+$view->addMeta('keywords', 'vyhledávání');
+$view->addMeta('description', 'Vyhledávání');
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <ul class="breadcrumb d-block">
+                    <li><a href="<?= $view->path('app_home') ?>">Úvod</a></li>
+                    <li class="active">Vyhledávání</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-2 mt-4">
+    <div class="row justify-content-center py-0">
+        <div class="col-xl-6">
+            <h2 class="text-primary text-4 text-uppercase font-weight-500 mb-0">Vyhledávání:</h2>
+            <form action="<?= $view->path('app_search') ?>" method="get">
+                <div class="input-group input-group-md">
+                    <input class="form-control h-auto" placeholder="Zadejte a stiskněte Enter..." name="q2" id="q2" type="text" <?= $query ? ('value="' . htmlspecialchars($query) . '"') : '' ?> required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <label id="q-error" class="error" for="q"></label>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col pt-2 mt-1">
+            <hr class="my-2 my-lg-4">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2 d-none d-lg-block">
+            <aside class="sidebar">
+                <h4 class="heading-primary">
+                    Filtrovat hledání
+                </h4>
+                <ul class="nav nav-list mb-4">
+                    <?= $regions ?>
+                </ul>
+            </aside>
+        </div>
+        <div class="col-lg-5 match-height pt-3 mb-5">
+            <h3 class="heading-primary d-inline">
+                <strong>
+                    Zprávy
+                </strong>
+            </h3>
+            <span class="pull-right">
+                <?= number_format($count) ?>
+                výsledků
+            </span>
+            <ul class="simple-post-list">
+                <?php if ($paginator) {?>
+                    <?php foreach ($paginator as $item) {?>
+                        <?php
+                        if ($item['region_url'] && $item['city_url']) {
+                            $region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+                            if ($item['city_url'] === 'cely-ms-kraj') {
+                                $region_city_url = $view->path('news');
+                            }
+                        } else {
+                            $region_city_url = null;
+                        }
+
+                        try {
+                            $today = new DateTime();
+                            $dateUpdate = new DateTime($item['updated_date']);
+                            if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                $dayUpdate = 'Dnes';
+                            } else {
+                                $yesterday = new DateTime();
+                                $yesterday->modify('-1 day');
+                                if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                                    $dayUpdate = 'Včera';
+                                } else {
+                                    $dayUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                }
+                            }
+                            $timeUpdate = $dateFormatHelper($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+                            $today = new DateTime();
+                            $date = new DateTime($item['public_from']);
+                            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                if ($item['label']) {
+                                    $day = 'dnes';
+                                } else {
+                                    $day = 'Dnes';
+                                }
+                            } else {
+                                $yesterday = new DateTime();
+                                $yesterday->modify('-1 day');
+                                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                    if ($item['label']) {
+                                        $day = 'včera';
+                                    } else {
+                                        $day = 'Včera';
+                                    }
+                                } else {
+                                    $day = $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                }
+                            }
+                            $time = $dateFormatHelper($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+                        } catch (Exception $e) {
+                            $day = 'NaN';
+                            $time = 'NaN';
+                            $dayUpdate = 'NaN';
+                            $timeUpdate = 'NaN';
+                        }
+                        ?>
+                        <li class="col-sm-12 col-12">
+                            <?php if ($item['picture']) { ?>
+                                <div class="post-info">
+                                    <div class="row">
+                                        <div class="col-5 col-sm-4 pe-1">
+                                            <?php if ($region_city_url) { ?>
+                                                <a href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                            <?php } else { ?>
+                                                <a href="<?= $view->path('news_pr_article', ['article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                            <?php } ?>
+                                            <?php
+                                                if ($item['picture']) {
+                                                    $image = $item['picture'];
+                                                } else {
+                                                    $image = '/data/news/!default-news.png';
+                                                }
+                                            ?>
+                                                <span class="thumb-info thumb-info-lighten">
+                                                    <span class="thumb-info-wrapper">
+                                                        <img src="<?= $image ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+                                                        <?php if (strpos($image, '/videos/') !== false) { ?>
+                                                            <span class="thumb-info-action">
+                                                                <span class="thumb-info-action-icon">
+                                                                    <i class="fas fa-play"></i>
+                                                                    <span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+                                                                </span>
+                                                            </span>
+                                                        <?php } ?>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
+                                        <div class="col-7 col-sm-8 fix-search-mar">
+                                            <div class="post-content">
+                                                <h2 class="fix-mob mb-1 mb-sm-2">
+                                                    <?php if ($region_city_url) { ?>
+                                                        <a href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                            <?= highlightWords($item['title'], null, $words) ?>
+                                                        </a>
+                                                    <?php } else { ?>
+                                                        <a href="<?= $view->path('news_pr_article', ['article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                            <?= highlightWords($item['title'], null, $words) ?>
+                                                        </a>
+                                                    <?php } ?>
+                                                </h2>
+                                                <div class="post-meta">
+                                                    <?php
+                                                    if ($item['label']) {
+                                                        echo $item['label'];
+                                                        echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>,';
+                                                    } else {
+                                                        echo '<span>' . $day . '</span> <span>' . $time . '</span>,';
+                                                    }
+                                                    ?>
+                                                    <?php if ($region_city_url) { ?>
+                                                        <span>
+                                                            <a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>">
+                                                                <?= $item['city_title'] ?></a>,
+                                                        </span>
+                                                    <?php } ?>
+                                                    <span>
+														<?php if ($region_city_url) { ?>
+															<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?>
+														<?php } else { ?>
+															<?= $item['author']; ?>
+														<?php } ?>
+                                                    </span>
+                                                </div>
+                                                <p class="mb-0 line-height-4 line-height-sm-6">
+                                                    <?= highlightWords($item['anotation'], $item['text'], $words) ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } else { ?>
+                                <div class="post-info">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="post-content">
+                                                <h2 class="mb-1 mb-sm-2">
+                                                    <?php if ($region_city_url) { ?>
+                                                        <a href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                            <?= highlightWords($item['title'], null, $words) ?>
+                                                        </a>
+                                                    <?php } else { ?>
+                                                        <a href="<?= $view->path('news_pr_article', ['article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+                                                            <?= highlightWords($item['title'], null, $words) ?>
+                                                        </a>
+                                                    <?php } ?>
+                                                </h2>
+                                                <div class="post-meta">
+                                                    <?php
+                                                    if ($item['label']) {
+                                                        echo $item['label'];
+                                                        echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>,';
+                                                    } else {
+                                                        echo '<span>' . $day . '</span> <span>' . $time . '</span>,';
+                                                    }
+                                                    ?>
+                                                    <?php if ($region_city_url) { ?>
+                                                        <span>
+                                                            <a href="<?= $region_city_url; ?>" title="<?= $item['city_title'] ?>">
+                                                                <?= $item['city_title'] ?></a>,
+                                                        </span>
+                                                    <?php } ?>
+                                                    <span>
+                                                        <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?>
+                                                    </span>
+                                                </div>
+                                                <p class="mb-0 line-height-4 line-height-sm-6">
+                                                    <?= highlightWords($item['anotation'], $item['text'], $words) ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </li>
+                    <?php } ?>
+                <?php } ?>
+            </ul>
+            <?php if ($paginator) {?>
+                <?= $view->include('pagination/paginator-search', [
+                    'page' => $page,
+                    'total' => $count,
+                    'limit' => $limit,
+                    'query' => $query,
+                    'region_id' => $region_id,
+                    'city_id' => $city_id,
+                    'page_porady' => $page_porady,
+                ]) ?>
+            <?php } ?>
+        </div>
+        <div class="col-lg-5 match-height bg-F5F5F5 pt-3 mb-5">
+            <h3 class="heading-primary d-inline">
+                <strong>
+                    Pořady
+                </strong>
+            </h3>
+            <span class="pull-right">
+                Výsledků:
+                <?php
+                    echo number_format($program_count + $countReprice) . ' (' . number_format($program_count) . ' premiér';
+                    if ($countReprice) {
+                        echo ' a ' . number_format($countReprice) . ' repríz';
+                    }
+                    echo ')';
+                ?>
+            </span>
+            <ul class="simple-post-list">
+                <?php if ($program_paginator) { ?>
+                    <?php foreach ($program_paginator as $item) { ?>
+                        <?php
+                        try {
+                            $today = new DateTime();
+                            $date = new DateTime($item['date']);
+                            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                $day = 'Dnes';
+                            } else {
+                                $yesterday = new DateTime();
+                                $yesterday->modify('-1 day');
+                                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                    $day = 'Včera';
+                                } else {
+                                    $day = $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                }
+                            }
+                            $time = $dateFormatHelper($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+                        } catch (Exception $e) {
+                            $dayUpdate = 'NaN';
+                            $timeUpdate = 'NaN';
+                        }
+                        ?>
+                        <li class="col-sm-12 col-12">
+                            <div class="post-info">
+                                <div class="row">
+                                    <div class="col-5 col-sm-4 pr-sm">
+                                        <a class="" href="<?= $view->path('show_video', ['show_url' => $item['show_url'], 'program_url' => $item['url']]) ?>" title="<?= $item['title'] ?>">
+                                            <?php
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/data/program/thumbs/' . $item['name'] . '.jpg')) {
+                                                    $image = '/data/program/thumbs/' . $item['name'] . '.jpg';
+                                                } else {
+                                                    $image = '/data/program/show/!default-show.png';
+                                                }
+                                            ?>
+                                            <span class="thumb-info thumb-info-lighten">
+                                                <span class="thumb-info-wrapper">
+                                                    <img src="<?= $image ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+                                                    <span class="thumb-info-action">
+                                                        <span class="thumb-info-action-icon">
+                                                            <i class="fas fa-play"></i>
+                                                            <span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="col-7 col-sm-8 pl-xs fix-search-mar">
+                                        <div class="post-content">
+                                            <h2 class="fix-mob mb-1 mb-sm-2">
+                                                <a class="center-block" href="<?= $view->path('show_video', ['show_url' => $item['show_url'], 'program_url' => $item['url']]) ?>" title="<?= $item['title'] ?>">
+                                                    <?= highlightWords($item['title'], null, $words) ?>
+                                                </a>
+                                            </h2>
+                                            <div class="post-meta">
+                                                <span>
+                                                    <?= $day ?>
+                                                </span>
+                                                <span>
+                                                    <?= $time ?>
+                                                </span>
+                                            </div>
+                                            <p class="mb-0 line-height-4 line-height-sm-6">
+                                                <?= highlightWords($item['short_description'], $item['description']." ".$item['overwrite'], $words) ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    <?php } ?>
+                <?php } ?>
+            </ul>
+            <?php if ($program_paginator) { ?>
+                <?= $view->include('pagination/paginator-search2', [
+                    'page_porady' => $page_porady,
+                    'total' => $program_count,
+                    'limit' => $limit,
+                    'query' => $query,
+                    'region_id' => $region_id,
+                    'city_id' => $city_id,
+                    'page' => $page,
+                ]) ?>
+            <?php } ?>
+        </div>
+    </div>
+
+</div>

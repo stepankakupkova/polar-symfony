@@ -1160,4 +1160,26 @@ final class NewsController
 
 		return $text;
 	}
+
+	public function shortlink(string $shortlink, PlaykitRepository $playkitRepository): RedirectResponse
+	{
+		try {
+			if (!$shortlink) {
+				return new RedirectResponse($this->urlGenerator->generate('news'));
+			}
+
+			$article_url = $playkitRepository->getArticleUrlByShortlink($shortlink);
+			//var_dump($article_url);
+
+			if (!$article_url) {
+				return new RedirectResponse($this->urlGenerator->generate('news'));
+			}
+
+			return new RedirectResponse($article_url);
+
+		} catch (\Exception $e) {
+			//var_dump ($e->getMessage());
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+	}
 }

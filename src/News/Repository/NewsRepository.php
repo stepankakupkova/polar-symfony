@@ -55,6 +55,83 @@ final class NewsRepository
 		return (int) ($result['total'] ?? 0);
 	}
 
+	public function searchArticles(string $search, ?int $region, ?int $city, int $page, int $limit): array
+	{
+		$offset = ($page - 1) * $limit;
+		$search2 = mb_strtolower($search, 'UTF-8');
+		$searchAr = explode(' ', $search2);
+		$search2 = '';
+		foreach ($searchAr as $item) {
+			// zakázat hledání krátkých slov
+			if (mb_strlen($item, 'UTF-8') < 3) {
+				continue;
+			}
+			// ošetření znaku '-', aby ho Google nebral jako mínus (vyloučení slova)
+			$item = str_replace('-', ' ', $item);
+			$search2 .= '+' . $item;
+		}
+
+		$qb = $this->connection->createQueryBuilder()
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
+			->from('article')
+			->where('public = 1')
+			->andWhere('public_from <= NOW()')
+			->andWhere('public_to >= NOW()')
+			->groupBy('article_id')
+			->orderBy('public_from', 'DESC')
+			->setFirstResult($offset)
+			->setMaxResults($limit);
+
+		if ($region) {
+			$qb->andWhere('region_id = :region')->setParameter('region', $region);
+		}
+		if ($city) {
+			$qb->andWhere('city_id = :city')->setParameter('city', $city);
+		}
+		if ($search2) {
+			$qb->andWhere('MATCH (title, anotation, text) AGAINST (:search IN BOOLEAN MODE)')
+				->setParameter('search', $search2);
+		}
+
+		return $qb->fetchAllAssociative();
+	}
+
+	public function searchCount(string $search, ?int $region, ?int $city): int
+	{
+		$search2 = mb_strtolower($search, 'UTF-8');
+		$searchAr = explode(' ', $search2);
+		$search2 = '';
+		foreach ($searchAr as $item) {
+			// zakázat hledání krátkých slov
+			if (mb_strlen($item, 'UTF-8') < 3) {
+				continue;
+			}
+			// ošetření znaku '-', aby ho Google nebral jako mínus (vyloučení slova)
+			$item = str_replace('-', ' ', $item);
+			$search2 .= '+' . $item;
+		}
+
+		$qb = $this->connection->createQueryBuilder()
+			->select('COUNT(DISTINCT article_id) AS total')
+			->from('article')
+			->where('public = 1')
+			->andWhere('public_from <= NOW()')
+			->andWhere('public_to >= NOW()');
+
+		if ($region) {
+			$qb->andWhere('region_id = :region')->setParameter('region', $region);
+		}
+		if ($city) {
+			$qb->andWhere('city_id = :city')->setParameter('city', $city);
+		}
+		if ($search2) {
+			$qb->andWhere('MATCH (title, anotation, text) AGAINST (:search IN BOOLEAN MODE)')
+				->setParameter('search', $search2);
+		}
+
+		return (int) $qb->fetchOne();
+	}
+
 	public function getCountFromSettings(): int
 	{
 		$result = $this->connection->createQueryBuilder()
@@ -423,6 +500,24 @@ final class NewsRepository
 			->setParameter('guestId', $guestId)
 			->setParameter('count', 1)
 			->executeStatement();
+	}
+
+	public function getArticlesForSpecialByIDs(?string $ids, int $limit = 5): ?array
+	{
+		if (!$ids) {
+			return null;
+		}
+
+		$qb = $this->connection->createQueryBuilder();
+		$qb->select('article_id', 'article_url', 'title', 'region_url', 'city_url')
+			->from('article')
+			->where('article_id IN (' . $ids . ')')
+			->orderBy('public_from', 'DESC')
+			->groupBy('article_id')
+			->setMaxResults($limit);
+
+		$result = $qb->executeQuery()->fetchAllAssociative();
+		return $result ?: null;
 	}
 
 	private function removeAccent(string $text, string $replace = ''): string

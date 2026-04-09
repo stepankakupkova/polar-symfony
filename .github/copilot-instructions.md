@@ -45,8 +45,8 @@ Architektura:
 - helpery nahrazuj postupně přes $view->path(), $view->asset(), $view->trans(), $view->include()
 
 Důležité:
-Děláme skoro kopii 1:1, měníme jen věci, které přímo souvisí a přesunem Laminas->Symfony. Nevylepšuj kód, ponechávej ho co nejvíce ve starém znění.
-Pracuj po malých krocích.
-Nejdřív analyzuj související soubory, potom navrhni malý krok a teprve potom upravuj.
-Nikdy nedělej velký refactor bez potvrzení.
-Neodstraňuj komentáře, které mám v kódu, nechci o ně přijít.
+- Děláme skoro kopii 1:1, měníme jen věci, které přímo souvisí a přesunem Laminas->Symfony. Nevylepšuj kód, ponechávej ho co nejvíce ve starém znění. Neměň názvy route, parametrů, proměnných, metod, tříd, namespace atd. než je nutné pro samotnou migraci.
+- Pracuj po malých krocích, třeba jedna šablona + jedna funkce v controlleru.
+- Nejdřív analyzuj související soubory, potom navrhni malý krok a teprve potom upravuj.
+- Nikdy nedělej velký refactor bez potvrzení.
+- Neodstraňuj komentáře, které mám v kódu, nechci o ně přijít.

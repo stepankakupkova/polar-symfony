@@ -1,0 +1,74 @@
+<div class="container-fluid d-lg-none gx-0 gy-0 px-0 pb-2 mb-3">
+	<div class="box-special-hp">
+		<div class="row gy-0 gx-0">
+			<div class="col-lg-4">
+				<div class="p-relative">
+					<div class="image-container">
+						<img src="<?= $view->asset('data/special/' . basename($special['image'])); ?>" class="img-fluid" alt="" />
+					</div>
+					<h2 class="special-title text-primary line-height-1">
+						<?= $special['title']; ?>
+					</h2>
+					<?php if ($special['button_1_active'] === '1' || $special['button_2_active'] === '1') { ?>
+						<div class="button">
+							<?php if ($special['button_1_active'] === '1') { ?>
+								<div class="button-1">
+									<a class="btn" href="<?= $special['button_1_link']; ?>" target="_blank">
+										<?= $special['button_1_title']; ?>
+									</a>
+								</div>
+							<?php } ?>
+							<?php if ($special['button_2_active'] === '1') { ?>
+								<div class="button-2">
+									<a class="btn" href="<?= $special['button_2_link']; ?>" target="_blank">
+										<?= $special['button_2_title']; ?>
+									</a>
+								</div>
+							<?php } ?>
+						</div>
+					<?php } ?>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<?php if ($specialArticlesIds !== null) { ?>
+					<ul class="max-height-custom">
+					<?php foreach ($specialArticlesIds as $item) { ?>
+						<li class="">
+							<h3 class="font-weight-normal mb-1 mb-md-2">
+								<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+									<?= $item['title'] ?>
+								</a>
+							</h3>
+						</li>
+					<?php } ?>
+					</ul>
+				<?php } ?>
+			</div>
+			<div class="col-lg-4">
+				<?php if ($specialOnlineArticleId !== null) { ?>
+					<div class="max-height-custom-2">
+						<h2 class="text-primary font-weight-normal">Online reportáž</h2>
+						<div class="special-opacity">
+							<?php foreach ($specialOnlineArticleId as $item) { ?>
+								<div class="row gx-0 gy-0">
+									<div class="col flex-0-0-auto col-custom-2 text-primary font-weight-bold">
+										<?= date('H:i', strtotime($item['datetime'])) ?>
+									</div>
+									<div class="col flex-0-0-auto col-custom-10">
+										<?= $item['content'] ?>
+									</div>
+								</div>
+							<?php } ?>
+						</div>
+						<div class="button-3">
+							<?php $specialOnlineArticleUrlString = $specialOnlineArticleUrl ? $view->path('news_region_city_article', ['url' => $specialOnlineArticleUrl['region_url'], 'city_url' => $specialOnlineArticleUrl['city_url'], 'article_id' => $specialOnlineArticleUrl['article_id'], 'article_url' => $specialOnlineArticleUrl['article_url']]) : '' ?>
+							<a class="btn" href="<?= $specialOnlineArticleUrlString ?>" target="_blank">
+								Zobrazit více
+							</a>
+						</div>
+					</div>
+				<?php } ?>
+			</div>
+		</div>
+	</div>
+</div>

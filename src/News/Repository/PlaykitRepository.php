@@ -874,4 +874,80 @@ final class PlaykitRepository
 		}
 		return $text;
 	}
+
+	public function getAlRegionsForSearch(string $query, ?int $region_id, ?int $city_id): ?string
+	{
+		$regions = $this->connection->createQueryBuilder()
+			->select('id', 'region', 'url', 'sort')
+			->from('polar_news_regions')
+			->orderBy('sort', 'ASC')
+			->fetchAllAssociative();
+
+		if (!$regions) {
+			return null;
+		}
+
+		$menu = '<li' . ((!$region_id && !$city_id) ? ' class="active"' : '') . '>' .
+			'<a' . ((!$region_id && !$city_id) ? ' class="font-weight-extra-bold"' : '') . ' href="/hledat?q=' . $query . '" title="">Vše</a>' .
+			'</li>';
+
+		foreach ($regions as $region) {
+			$cities = $this->connection->createQueryBuilder()
+				->select('id', 'city', 'url')
+				->from('polar_news_cities')
+				->where('region_id = :regionId')
+				->setParameter('regionId', $region['id'])
+				->fetchAllAssociative();
+
+			$menu2 = '';
+			if ($cities) {
+				$menu2 .= '<ul>';
+				foreach ($cities as $city) {
+					$menu2 .= '<li' . ((int)$city['id'] === $city_id ? ' class="active"' : '') . '>' .
+						'<a' . ((int)$city['id'] === $city_id ? ' class="font-weight-extra-bold"' : '') . ' href="/hledat?q=' . $query . '&c=' . $city['id'] . '" title="">' . $city['city'] . '</a>' .
+						'</li>';
+				}
+				$menu2 .= '</ul>';
+			}
+
+			$menu .= '<li' . ((int)$region['id'] === $region_id ? ' class="active"' : '') . '>' .
+				'<a' . ((int)$region['id'] === $region_id ? ' class="font-weight-extra-bold"' : '') . ' href="/hledat?q=' . $query . '&r=' . $region['id'] . '" title="">' . $region['region'] . '</a>' .
+				$menu2 .
+				'</li>';
+		}
+
+		return $menu;
+	}
+
+	public function getOnlineNewsForSpecialByArticleId(int $article_id, int $limit = 5): ?array
+	{
+		$qb = $this->connection->createQueryBuilder();
+		$qb->select('datetime', 'content')
+			->from('polar_news_articles_online')
+			->where('article_id = :article_id')
+			->andWhere('content NOT LIKE :figure')
+			->andWhere('content NOT LIKE :img')
+			->andWhere('content NOT LIKE :widget')
+			->orderBy('datetime', 'DESC')
+			->setMaxResults($limit)
+			->setParameter('article_id', $article_id)
+			->setParameter('figure', '%<figure>%')
+			->setParameter('img', '%<img %')
+			->setParameter('widget', '%<div class="widget">%');
+
+		$result = $qb->executeQuery()->fetchAllAssociative();
+		return $result ?: null;
+	}
+
+	public function getArticleUrlByShortlink(string $shortlink): ?string
+	{
+		$qb = $this->connection->createQueryBuilder();
+		$qb->select('url')
+			->from('polar_news_articles_shortlink')
+			->where('shortlink = :shortlink')
+			->setParameter('shortlink', $shortlink);
+
+		$result = $qb->executeQuery()->fetchOne();
+		return $result !== false ? $result : null;
+	}
 }

@@ -2,6 +2,13 @@ news:
   path: /zpravy
   controller: App\News\Controller\Web\NewsController::index
 
+# shortlink
+news_shortlink:
+  path: /z/{shortlink}
+  controller: App\News\Controller\Web\NewsController::shortlink
+  requirements:
+    shortlink: '[a-zA-Z0-9_-]+'
+
 news_ticker:
   path: /zpravy/json/get-ticker
   controller: App\News\Controller\Web\NewsController::getTicker
