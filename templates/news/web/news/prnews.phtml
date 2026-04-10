@@ -178,7 +178,7 @@
 
                             <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
                             <?php if ($i === 4) { ?>
-                                <?= $view->include('ads/banner/mobilesquare1') ?>
+                                <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
                             <?php } ?>
 
                             <?php $i++; ?>

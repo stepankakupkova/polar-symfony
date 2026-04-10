@@ -1,17 +1,17 @@
 <?php
-/** @var array|null $topicArticles */
+/** @var array|null $newArticlesTopic */
 /** @var \App\Application\View\ViewHelper $view */
 
 $locale = Locale::getDefault();
 ?>
 
-<?php if ($topicArticles) { ?>
+<?php if ($newArticlesTopic) { ?>
 	<div class="row">
 		<div class="col-md-12">
 			<h3 class="text-5 text-primary mb-4">K tématu</h3>
 		</div>
 	</div>
 
-	<?= $view->include('news/partial/recommended', ['recommendedArticles' => $topicArticles]) ?>
+	<?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesTopic]) ?>
 	<hr class="solid">
 <?php } ?>

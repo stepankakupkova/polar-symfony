@@ -213,16 +213,16 @@ if (!empty($cityRank1['city_rank1_url']) && !empty($cityRank1['region_rank1_url'
 	$canonicalUrl = $schemeHost . $view->path('news_region_city_article', [
 		'url' => $cityRank1['region_rank1_url'],
 		'city_url' => $cityRank1['city_rank1_url'],
-		'article_id' => $article['article_id'],
-		'article_url' => $article['article_url'],
+		'article_id' => $article['id'],
+		'article_url' => $article['url'],
 	]);
 	$view->addHeadLink('canonical', $canonicalUrl);
 }
 
 $view->setTitle((string) ($article['title'] ?? ''));
-$view->addMeta('description', trim(($article['anotation'] ?? '') . ' ' . ($city['city'] ?? $article['city_title'] ?? '') . ', ' . ($region['region'] ?? '')));
-$view->addMeta('keywords', trim(($article['title'] ?? '') . ', ' . ($city['city'] ?? $article['city_title'] ?? '') . ', ' . ($region['region'] ?? '')));
-$view->addMeta('news_keywords', trim(($article['title'] ?? '') . ', ' . ($city['city'] ?? $article['city_title'] ?? '') . ', ' . ($region['region'] ?? '')));
+$view->addMeta('description', trim(($article['anotation'] ?? '') . ' ' . ($article['city'] ?? $city['city'] ?? '') . ', ' . ($region['region'] ?? '')));
+$view->addMeta('keywords', trim(($article['title'] ?? '') . ', ' . ($article['city'] ?? $city['city'] ?? '') . ', ' . ($region['region'] ?? '')));
+$view->addMeta('news_keywords', trim(($article['title'] ?? '') . ', ' . ($article['city'] ?? $city['city'] ?? '') . ', ' . ($region['region'] ?? '')));
 if (($article['city_url'] ?? '') !== 'cely-ms-kraj') {
 	$view->addMeta('szn:very_local_content', 'true');
 }
@@ -230,7 +230,7 @@ $view->addOgMeta('og:title', ($article['title'] ?? '') . ' | POLAR');
 $view->addOgMeta('og:description', (string) ($article['anotation'] ?? ''));
 $view->addOgMeta('og:url', $currentUrl);
 $view->addOgMeta('og:type', 'article');
-$view->addOgMeta('article:author', !empty(trim((string) ($article['author'] ?? ''))) ? (string) $article['author'] : 'Komerční sdělení');
+$view->addOgMeta('article:author', !isset($article['surname']) ? 'Komerční sdělení' : $article['name'] . ' ' . $article['surname']);
 $view->addOgMeta('article:publisher', 'POLAR televize Ostrava, s.r.o.');
 $view->addOgMeta('article:published', (string) ($article['public_from'] ?? ''));
 $view->addOgMeta('article:section', 'News');
@@ -252,9 +252,9 @@ if (!empty($firstFile['medium'])) {
 $breadcrumbs = [
 	['label' => 'Zprávy', 'url' => $view->path('news')],
 ];
-if (!empty($city['city']) || !empty($article['city_title'])) {
+if (!empty($article['city']) || !empty($city['city'])) {
 	$breadcrumbs[] = [
-		'label' => $city['city'] ?? $article['city_title'],
+		'label' => $article['city'] ?? $city['city'],
 		'url' => $article['city_url'] === 'cely-ms-kraj'
 			? $view->path('news')
 			: $view->path('news_region_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']]),
@@ -269,7 +269,7 @@ $breadcrumbItems = [
 ];
 if (($article['city_url'] ?? '') !== 'cely-ms-kraj' && !empty($region['region']) && !empty($region['url'])) {
 	$breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => $region['region'], 'item' => $schemeHost . $view->path('news_region', ['url' => $region['url']])];
-	$breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 4, 'name' => $city['city'] ?? $article['city_title'] ?? '', 'item' => $schemeHost . $view->path('news_region_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']])];
+	$breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 4, 'name' => $article['city'] ?? $city['city'] ?? '', 'item' => $schemeHost . $view->path('news_region_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']])];
 	$breadcrumbPosition = 5;
 } else {
 	$breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 3, 'name' => 'MS kraj', 'item' => $schemeHost . $view->path('news')];
@@ -291,7 +291,7 @@ if ($hasOnlineNewsWidget) {
 
 		function getContentOnlineNews() {
 			$.post(
-				' . json_encode($view->path('news_online_content', ['article_id' => $article['article_id']])) . ',
+				' . json_encode($view->path('news_online_content', ['article_id' => $article['id']])) . ',
 				{
 					page: page
 				},
@@ -410,7 +410,7 @@ if ($hasOnlineNewsWidget) {
         },
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "<?= $schemeHost ?>/zpravy/<?= $region['url'] . '/' . ($city['url'] ?? $article['city_url']) . '/' . $article['article_id'] ?>/clanek"
+            "@id": "<?= $schemeHost ?>/zpravy/<?= $region['url'] . '/' . ($city['url'] ?? $article['city_url']) . '/' . $article['id'] ?>/clanek"
         },
 		<?php if ($videos && isset($videos[0]['medium'], $videos[0]['link_hq'])) { ?>
 			"video": {
@@ -623,7 +623,7 @@ if ($hasOnlineNewsWidget) {
                                     </span>
                                     <div class="btn-group pull-right">
 										<a class="btn btn-secondary btn-xs me-1"
-										   href="<?= $view->path('news_overwrite_docx', ['article_id' => $article['article_id']]) ?>"
+										   href="<?= $view->path('news_overwrite_docx', ['article_id' => $article['id']]) ?>"
 										   title="Stáhnout přepis"
 										   rel="nofollow">
 											<i class="fa fa-fw fa-file-word"></i>
@@ -1050,7 +1050,7 @@ if ($hasOnlineNewsWidget) {
     <div class="row sticky-square-2">
         <div class="col-12 col-lg-7">
             <!-- K tématu -->
-            <?= $view->include('news/partial/topic-articles', ['topicArticles' => $topicArticles ?? null]) ?>
+            <?= $view->include('news/partial/topic-articles', ['newArticlesTopic' => $newArticlesTopic ?? null]) ?>
             <!-- Doporučujeme -->
             <?php if ($newArticlesFirstHalf) { ?>
                 <div class="row">

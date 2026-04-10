@@ -27,299 +27,42 @@ final class NewsController
 {
 	public function __construct(
 		private NewsRepository $newsRepository,
-		private JobRepository $jobRepository,
-		private CameraRepository $cameraRepository,
 		private PlaykitRepository $playkitRepository,
-		private BannerRepository $bannerRepository,
 		private TickerRepository $tickerRepository,
 		private CrawlRepository $crawlRepository,
+		private JobRepository $jobRepository,
+		// TODO: private ShowRepository $showRepository,
+		private CameraRepository $cameraRepository,
+		private BannerRepository $bannerRepository,
 		private UrlGeneratorInterface $urlGenerator,
+		private string $PUBLIC_PATH,
 	) {}
 
 	public function index(Request $request, PhtmlRenderer $renderer): Response
 	{
-		$page = max(1, (int) $request->query->get('page', 1));
-		$limit = 25;
+		$articles = null;
+		try {
+			$page = (int) $request->query->get('strana', 1);
+			$articles = $this->newsRepository->getPaginator($page, 25);
+		} catch (\Exception $e) {
+			//var_dump ($e->getMessage());
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
 
-		$articles = $this->newsRepository->getPaginator($page, $limit);
+		// Pořady
+		// TODO: $shows = $this->showRepository->fetchAllForNews();
+
+		// Celkový počet článků
 		$newsCount = $this->newsRepository->getCountFromSettings();
-		$total = $this->newsRepository->getCount();
-		$pr = $this->newsRepository->getPrArticles(11);
-		$blockTriptip = $this->newsRepository->getTriptipArticles(4, null, true);
-		$blockJob = $this->jobRepository->getRandForWeb(132, 4);
-		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
-		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
-		$weatherRegion = 'Ostrava';
-
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-		$bannerRectangle = $this->bannerRepository->getRectangle();
-		$bannerSquare = $this->bannerRepository->getSquare();
-		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
-		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
-
-		return new Response($renderer->renderWithLayout('news/web/news/index', [
-			'articles'          => $articles,
-			'newsCount'         => $newsCount,
-			'page'              => $page,
-			'total'             => $total,
-			'limit'             => $limit,
-			'pr'                => $pr,
-			'blockTriptip'      => $blockTriptip,
-			'blockJob'          => $blockJob,
-			'blockCamera'       => $blockCamera,
-			'weather'           => $weather,
-			'weatherRegion'     => $weatherRegion,
-			'currentUrl'        => $request->getUri(),
-			'schemeHost'        => $request->getSchemeAndHttpHost(),
-			'region'            => null,
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky'=> $bannerMobilesticky,
-			'bannerRectangle'    => $bannerRectangle,
-			'bannerSquare'       => $bannerSquare,
-			'bannerMobilesquare1' => $bannerMobilesquare1,
-			'bannerMobilesquare2' => $bannerMobilesquare2,
-		]));
-	}
-
-	public function region(Request $request, PhtmlRenderer $renderer): Response
-	{
-		$url = (string) $request->attributes->get('url', '');
-		if ($url === '') {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
-		}
-
-		$region = $this->playkitRepository->getRegionByUrl($url);
-		if (!$region) {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
-		}
-
-		$page = max(1, (int) $request->query->get('page', 1));
-		$limit = 25;
-
-		$articles = $this->newsRepository->getPaginatorByRegion((int) $region['id'], $page, $limit);
-		$total = $this->newsRepository->getCount((int) $region['id']);
-		$newsCount = $total;
-		$pr = $this->newsRepository->getPrArticles(11);
-		$blockTriptip = $this->newsRepository->getTriptipArticles(4, (int) $region['id'], true);
-		$blockJob = $this->jobRepository->getRandForWeb((int) ($region['city_code'] ?? 132), 4);
-		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
-		$weather = $this->playkitRepository->getWeatherForNews($region['region'] ?? 'Ostrava');
-		$weatherRegion = $region['region'] ?? 'Ostrava';
-
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-		$bannerRectangle = $this->bannerRepository->getRectangle();
-		$bannerSquare = $this->bannerRepository->getSquare();
-		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
-		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
-
-		return new Response($renderer->renderWithLayout('news/web/news/region', [
-			'articles'          => $articles,
-			'newsCount'         => $newsCount,
-			'page'              => $page,
-			'total'             => $total,
-			'limit'             => $limit,
-			'pr'                => $pr,
-			'region'            => $region,
-			'blockTriptip'      => $blockTriptip,
-			'blockJob'          => $blockJob,
-			'blockCamera'       => $blockCamera,
-			'weather'           => $weather,
-			'weatherRegion'     => $weatherRegion,
-			'currentUrl'        => $request->getUri(),
-			'schemeHost'        => $request->getSchemeAndHttpHost(),
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky'=> $bannerMobilesticky,
-			'bannerRectangle'   => $bannerRectangle,
-			'bannerSquare'      => $bannerSquare,
-			'bannerMobilesquare1' => $bannerMobilesquare1,
-			'bannerMobilesquare2' => $bannerMobilesquare2,
-		]));
-	}
-
-	public function city(Request $request, PhtmlRenderer $renderer): Response
-	{
-		$url = (string) $request->attributes->get('url', '');
-		$cityUrl = (string) $request->attributes->get('city_url', '');
-		if ($url === '' || $cityUrl === '') {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
-		}
-
-		$region = $this->playkitRepository->getRegionByUrl($url);
-		if (!$region) {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
-		}
-
-		$city = $this->playkitRepository->getCityByUrl($cityUrl);
-		if (!$city) {
-			return new RedirectResponse($this->urlGenerator->generate('news_region', ['url' => $url]));
-		}
-
-		$page = max(1, (int) $request->query->get('page', 1));
-		$limit = 25;
-
-		$articles = $this->newsRepository->getPaginatorByCity((int) $city['id'], $page, $limit);
-		$total = $this->newsRepository->getCount(null, (int) $city['id']);
-		$newsCount = $total;
-		$pr = $this->newsRepository->getPrArticles(11);
-		$blockTriptip = $this->newsRepository->getTriptipArticles(4, (int) $region['id'], true);
-		$blockJob = $this->jobRepository->getRandForWeb((int) ($region['city_code'] ?? 132), 4);
-		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
-		$weather = $this->playkitRepository->getWeatherForNews($region['region'] ?? 'Ostrava');
-		$weatherRegion = $region['region'] ?? 'Ostrava';
-
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-		$bannerRectangle = $this->bannerRepository->getRectangle();
-		$bannerSquare = $this->bannerRepository->getSquare();
-		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
-		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
-
-		return new Response($renderer->renderWithLayout('news/web/news/city', [
-			'articles'          => $articles,
-			'newsCount'         => $newsCount,
-			'page'              => $page,
-			'total'             => $total,
-			'limit'             => $limit,
-			'pr'                => $pr,
-			'region'            => $region,
-			'city'              => $city,
-			'blockTriptip'      => $blockTriptip,
-			'blockJob'          => $blockJob,
-			'blockCamera'       => $blockCamera,
-			'weather'           => $weather,
-			'weatherRegion'     => $weatherRegion,
-			'currentUrl'        => $request->getUri(),
-			'schemeHost'        => $request->getSchemeAndHttpHost(),
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky'=> $bannerMobilesticky,
-			'bannerRectangle'   => $bannerRectangle,
-			'bannerSquare'      => $bannerSquare,
-			'bannerMobilesquare1' => $bannerMobilesquare1,
-			'bannerMobilesquare2' => $bannerMobilesquare2,
-		]));
-	}
-
-	public function redactor(Request $request, PhtmlRenderer $renderer): Response
-	{
-		$redactorUrl = (string) $request->attributes->get('redactor_url', '');
-		if ($redactorUrl === '') {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
-		}
-
-		$redactor = $this->playkitRepository->getRedactorByUrl($redactorUrl);
-		if (!$redactor) {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
-		}
-
-		$page = max(1, (int) $request->query->get('page', 1));
-		$limit = 10;
-
-		$articles = $this->newsRepository->getPaginatorByRedactor($redactorUrl, $page, $limit);
-		$total = $this->newsRepository->getCount(null, null, $redactorUrl);
-		$newsCount = $total;
-		$pr = $this->newsRepository->getPrArticles(9);
-
-		$bannerRectangle = $this->bannerRepository->getRectangle();
-		$bannerSquare = $this->bannerRepository->getSquare();
-		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
-
-		return new Response($renderer->renderWithLayout('news/web/news/redactor', [
-			'articles'           => $articles,
-			'redactor'           => $redactor,
-			'newsCount'          => $newsCount,
-			'page'               => $page,
-			'total'              => $total,
-			'limit'              => $limit,
-			'pr'                 => $pr,
-			'currentUrl'         => $request->getUri(),
-			'schemeHost'         => $request->getSchemeAndHttpHost(),
-			'bannerRectangle'    => $bannerRectangle,
-			'bannerSquare'       => $bannerSquare,
-			'bannerMobilesquare1' => $bannerMobilesquare1,
-		]));
-	}
-
-	public function prnews(Request $request, PhtmlRenderer $renderer): Response
-	{
-		$page = max(1, $request->query->getInt('strana', 1));
-		$limit = 10;
-
-		$articles = $this->playkitRepository->getPaginatorByPR($page, $limit);
-		$total = $this->playkitRepository->getCountPR();
-
-		// PR články
-		$pr = $this->newsRepository->getPrArticles(7);
-
-		// Bannery
-		$banners = $this->bannerRepository->getBannersForLayout();
-
-		return new Response($renderer->renderWithLayout('news/web/news/prnews', [
-			'articles' => $articles,
-			'page' => $page,
-			'total' => $total,
-			'limit' => $limit,
-			'newsCount' => $total,
-			'pr' => $pr,
-			'bannerRectangle' => $banners['rectangle'] ?? null,
-			'bannerMobilesquare1' => $banners['mobilesquare1'] ?? null,
-			'bannerLeaderboard' => $banners['leaderboard'] ?? null,
-			'bannerMobilesticky' => $banners['mobilesticky'] ?? null,
-		]));
-	}
-
-	public function articlePr(Request $request, PhtmlRenderer $renderer): Response
-	{
-		$articleId = (int) $request->attributes->get('article_id', 0);
-		if ($articleId <= 0) {
-			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
-		}
-
-		$article = $this->playkitRepository->getArticlePr($articleId);
-		if (!$article) {
-			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
-		}
-
-		// Počítání zobrazení článků
-		$this->newsRepository->setImpressionsCountPr($articleId);
-
-		// Text článku k tisku, bez widgetů
-		$printableText = (string) ($article['text'] ?? '');
-
-		$hasTwitterWidgets = !empty($article['text']) && str_contains($article['text'], '{{twitter-feed-');
-		$hasFacebookWidgets = !empty($article['text']) && str_contains($article['text'], '{{facebook-feed-');
-		$hasFacebookLiveWidgets = !empty($article['text']) && str_contains($article['text'], '{{facebook-live-feed-');
-		$hasYoutubeWidgets = !empty($article['text']) && str_contains($article['text'], '{{youtube-video-');
-
-		// Widgety v textu
-		if (!empty($article['text'])) {
-			$article['text'] = $this->insertRelativeArticle($article['text']);
-			$article['text'] = $this->insertRelativePrArticle($article['text']);
-			$article['text'] = $this->insertRelativeTriptipArticle($article['text']);
-			$article['text'] = $this->insertTwitter($article['text']);
-			$article['text'] = $this->insertFacebook($article['text']);
-			$article['text'] = $this->insertFacebookLive($article['text']);
-			$article['text'] = $this->insertYoutube($article['text'], $request->getSchemeAndHttpHost());
-		}
 
 		// PR články
 		$pr = $this->newsRepository->getPrArticles(11);
-
-		// Doporučujeme - hlavní články z HP
-		$recommendedArticles = $this->playkitRepository->getAllHomepage([$articleId]);
-		$recommendedArticles = $this->prepareRecommendedArticles($recommendedArticles);
-		$newArticlesFirstHalf = $recommendedArticles ? array_slice($recommendedArticles, 0, 5) : null;
-		$newArticlesSecondHalf = $recommendedArticles ? array_slice($recommendedArticles, 5) : null;
-
-		// Nejnovější zprávy pro MSK
-		$regionArticles = $this->prepareRegionArticles($this->newsRepository->getArticlesByRegionId(7, 6, $articleId));
 
 		// Blok Kam vyrazit
-		$blockTriptip = $this->newsRepository->getTriptipArticles(4, null, true);
+		$blockTriptip = $this->newsRepository->getTriptipArticles(4, false, true);
 
 		// Blok Nabídky práce
-		$blockJob = $this->jobRepository->getRandForWebByCityCode(132, 4);
+		$blockJob = $this->jobRepository->getRandForWeb(132, 4);
 
 		// Blok kamery
 		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
@@ -327,32 +70,288 @@ final class NewsController
 		// Počasí
 		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
 
-		// Bannery
+		// Banner leaderboard a Mobilesticky pro layout
+		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
+		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+
+		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner square
 		$bannerSquare = $this->bannerRepository->getSquare();
+
+		// Banner mobile square 1
 		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		return new Response($renderer->renderWithLayout('news/web/news/article-pr', [
-			'article' => $article,
-			'printableText' => $printableText,
+		return new Response($renderer->renderWithLayout('news/web/news/index', [
+			'newsCount' => $newsCount,
 			'pr' => $pr,
-			'newArticlesFirstHalf' => $newArticlesFirstHalf,
-			'newArticlesSecondHalf' => $newArticlesSecondHalf,
-			'regionArticles' => $regionArticles,
 			'blockTriptip' => $blockTriptip,
 			'blockJob' => $blockJob,
 			'blockCamera' => $blockCamera,
+			'articles' => $articles,
+			//'shows' => $shows,
 			'weather' => $weather,
-			'weatherRegion' => 'Ostrava',
+			'weather_region' => 'Ostrava',
+			'bannerLeaderboard' => $bannerLeaderboard,
+			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
 			'bannerMobilesquare2' => $bannerMobilesquare2,
-			'hasTwitterWidgets' => $hasTwitterWidgets,
-			'hasFacebookWidgets' => $hasFacebookWidgets,
-			'hasFacebookLiveWidgets' => $hasFacebookLiveWidgets,
-			'hasYoutubeWidgets' => $hasYoutubeWidgets,
+			// Extra pro šablonu (HeadMeta, paginator)
+			'region' => null,
+			'page' => $page,
+			'total' => $this->newsRepository->getCount(),
+			'limit' => 25,
+			'currentUrl' => $request->getUri(),
+			'schemeHost' => $request->getSchemeAndHttpHost(),
+		]));
+	}
+
+	public function region(Request $request, PhtmlRenderer $renderer): Response
+	{
+		$url = (string) $request->attributes->get('url', 0);
+		if (!$url) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		try {
+			$region = $this->playkitRepository->getRegionByUrl($url);
+		} catch (\Exception $ex) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		if (!$region) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		$articles = null;
+		try {
+			$page = (int) $request->query->get('strana', 1);
+			if ($region['url'] === 'moravskoslezsky-kraj') {
+				$articles = $this->newsRepository->getPaginator($page, 25);
+			} else {
+				$articles = $this->newsRepository->getPaginatorByRegion((int) $region['id'], $page, 25);
+			}
+		} catch (\Exception $e) {
+			//var_dump ($e->getMessage());
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		// Pořady
+		// TODO: $shows = $this->showRepository->fetchAllForNews();
+
+		// Celkový počet článků
+		$newsCount = $this->newsRepository->getCount($region['id']);
+
+		// PR články
+		$pr = $this->newsRepository->getPrArticles(11);
+
+		// Blok Kam vyrazit
+		$blockTriptip = $this->newsRepository->getTriptipArticles(4, $region['id'], true);
+
+		// Blok Nabídky práce
+		$blockJob = $this->jobRepository->getRandForWebByCityCode($this->getJobOkresCode($url), 4);
+
+		// Blok kamery
+		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
+
+		// Počasí
+		$weather_region = $this->getRegionForWeather($region['url']);
+		$weather = $this->playkitRepository->getWeatherForNews($weather_region);
+
+		// Banner leaderboard a Mobilesticky pro layout
+		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
+		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+
+		// Banner rectangle
+		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner square
+		$bannerSquare = $this->bannerRepository->getSquare();
+
+		// Banner mobile square 1
+		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		// Banner mobile square 2
+		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
+
+		return new Response($renderer->renderWithLayout('news/web/news/region', [
+			'newsCount' => $newsCount,
+			'region' => $region,
+			'pr' => $pr,
+			'blockTriptip' => $blockTriptip,
+			'blockJob' => $blockJob,
+			'blockCamera' => $blockCamera,
+			'articles' => $articles,
+			//'shows' => $shows,
+			'weather' => $weather,
+			'weather_region' => $weather_region,
+			'bannerLeaderboard' => $bannerLeaderboard,
+			'bannerMobilesticky' => $bannerMobilesticky,
+			'bannerRectangle' => $bannerRectangle,
+			'bannerSquare' => $bannerSquare,
+			'bannerMobilesquare1' => $bannerMobilesquare1,
+			'bannerMobilesquare2' => $bannerMobilesquare2,
+			// Extra pro šablonu (HeadMeta, paginator)
+			'page' => $page,
+			'total' => $newsCount,
+			'limit' => 25,
+			'currentUrl' => $request->getUri(),
+			'schemeHost' => $request->getSchemeAndHttpHost(),
+		]));
+	}
+
+	public function city(Request $request, PhtmlRenderer $renderer): Response
+	{
+		$url = (string) $request->attributes->get('url', 0);
+		$city_url = (string) $request->attributes->get('city_url', 0);
+		if (!$url || !$city_url) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		try {
+			$region = $this->playkitRepository->getRegionByUrl($url);
+			$city = $this->playkitRepository->getCityByUrl($city_url);
+		} catch (\Exception $ex) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		if (!$city || !$region) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		$articles = null;
+		try {
+			$page = (int) $request->query->get('strana', 1);
+			$articles = $this->newsRepository->getPaginatorByCity((int) $city['id'], $page, 25);
+		} catch (\Exception $e) {
+			//var_dump ($e->getMessage());
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		// Pořady
+		// TODO: $shows = $this->showRepository->fetchAllForNews();
+
+		// Celkový počet článků
+		$newsCount = $this->newsRepository->getCount(null, $city['id']);
+
+		// PR články
+		$pr = $this->newsRepository->getPrArticles(11);
+
+		// Blok Kam vyrazit
+		$blockTriptip = $this->newsRepository->getTriptipArticles(4, $region['id'], true);
+
+		// Blok Nabídky práce
+		$blockJob = $this->jobRepository->getRandForWebByCityCode($this->getJobOkresCode($url), 4);
+
+		// Blok kamery
+		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
+
+		// Počasí
+		$weather_region = $this->getRegionForWeather($region['url']);
+		$weather = $this->playkitRepository->getWeatherForNews($weather_region);
+
+		// Banner leaderboard a Mobilesticky pro layout
+		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
+		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+
+		// Banner rectangle
+		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner square
+		$bannerSquare = $this->bannerRepository->getSquare();
+
+		// Banner mobile square 1
+		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		// Banner mobile square 2
+		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
+
+		return new Response($renderer->renderWithLayout('news/web/news/city', [
+			'newsCount' => $newsCount,
+			'pr' => $pr,
+			'blockTriptip' => $blockTriptip,
+			'blockJob' => $blockJob,
+			'blockCamera' => $blockCamera,
+			'articles' => $articles,
+			'region' => $region,
+			'city' => $city,
+			//'shows' => $shows,
+			'weather' => $weather,
+			'weather_region' => $weather_region,
+			'bannerLeaderboard' => $bannerLeaderboard,
+			'bannerMobilesticky' => $bannerMobilesticky,
+			'bannerRectangle' => $bannerRectangle,
+			'bannerSquare' => $bannerSquare,
+			'bannerMobilesquare1' => $bannerMobilesquare1,
+			'bannerMobilesquare2' => $bannerMobilesquare2,
+			// Extra pro šablonu (HeadMeta, paginator)
+			'page' => $page,
+			'total' => $newsCount,
+			'limit' => 25,
+			'currentUrl' => $request->getUri(),
+			'schemeHost' => $request->getSchemeAndHttpHost(),
+		]));
+	}
+
+	public function redactor(Request $request, PhtmlRenderer $renderer): Response
+	{
+		$redactor_url = (string) $request->attributes->get('redactor_url', null);
+		if (!$redactor_url) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		try {
+			$redactor = $this->playkitRepository->getRedactorByUrl($redactor_url);
+		} catch (\Exception $ex) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		if (!$redactor) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		$articles = null;
+		try {
+			$page = (int) $request->query->get('strana', 1);
+			$articles = $this->newsRepository->getPaginatorByRedactor($redactor['url'], $page, 10);
+		} catch (\Exception $e) {
+			//var_dump($e->getMessage());
+			return new RedirectResponse($this->urlGenerator->generate('news'));
+		}
+
+		// Pořady
+		// TODO: $shows = $this->showRepository->fetchAllForNews();
+
+		// Celkový počet článků
+		$newsCount = $this->newsRepository->getCount(null, null, $redactor['url']);
+
+		// PR články
+		$pr = $this->newsRepository->getPrArticles(9);
+
+		// Banner rectangle
+		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner mobile square 1
+		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		return new Response($renderer->renderWithLayout('news/web/news/redactor', [
+			'newsCount' => $newsCount,
+			'redactor' => $redactor,
+			'pr' => $pr,
+			'articles' => $articles,
+			//'shows' => $shows,
+			'bannerRectangle' => $bannerRectangle,
+			'bannerMobilesquare1' => $bannerMobilesquare1,
+			// Extra pro šablonu (paginator)
+			'page' => $page,
+			'total' => $newsCount,
+			'limit' => 10,
 			'currentUrl' => $request->getUri(),
 			'schemeHost' => $request->getSchemeAndHttpHost(),
 		]));
@@ -360,815 +359,541 @@ final class NewsController
 
 	public function article(Request $request, PhtmlRenderer $renderer): Response
 	{
-		$url = (string) $request->attributes->get('url', '');
-		$cityUrl = (string) $request->attributes->get('city_url', '');
-		$articleId = (int) $request->attributes->get('article_id', 0);
-		$articleUrl = (string) $request->attributes->get('article_url', '');
+		$url = $request->attributes->get('url', 0);
+		$city_url = $request->attributes->get('city_url', 0);
+		$article_id = (int) $request->attributes->get('article_id', 0);
+		$printableText = '';
 
-		if ($url === '' || $cityUrl === '' || $articleId <= 0) {
-			return $this->redirectToNewsList();
+		if (!$url || !$city_url || !$article_id) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
-		$region = $this->playkitRepository->getRegionByUrl($url);
-		$city = $this->playkitRepository->getCityByUrl($cityUrl);
-		$playkitArticle = $city ? $this->playkitRepository->getArticle($articleId, (int) $city['id']) : null;
-		$webArticle = $this->newsRepository->getArticle($articleId);
+		try {
+			$region = $this->playkitRepository->getRegionByUrl($url);
+			$city = $this->playkitRepository->getCityByUrl($city_url);
+			$article = $this->playkitRepository->getArticle($article_id, $city['id']);
+			$city_rank_number_1 = $this->playkitRepository->getCityRank1ByArticleId($article_id);
 
-		if (!$region || !$city || !$playkitArticle || !$webArticle) {
-			return $this->redirectToNewsList();
+			// V proměnné $article jsou data z playkitu. Kvůli autosave dochází ke zveřejnění článků, které jsou rozepsané. Vezmene základní údaje z tabulky "article" v db webu Polaru.
+			$article_data = $this->newsRepository->getArticle($article_id);
+			if ($article_data && $article_data['title'] && $article_data['anotation'] && $article_data['text']) {
+				$article['title'] = $article_data['title'];
+				$article['anotation'] = $article_data['anotation'];
+				$article['text'] = $article_data['text'];
+			}
+
+			if ($article['public'] === 0) {
+				return new RedirectResponse($this->urlGenerator->generate('news'));
+			}
+
+			if (!$region || !$city || !$article) {
+				return new RedirectResponse($this->urlGenerator->generate('news'));
+			}
+			if (!$article['region'] || !$article['city']) {
+				return new RedirectResponse($this->urlGenerator->generate('news'));
+			}
+
+			// Text článku k tisku, bez widgetů
+			$printableText = $article['text'];
+
+			// Počítání zobrazení článků
+			$this->newsRepository->setImpressionsCount($article_id);
+
+			// Souvísající články
+			if ($article['text']) {
+				$article['text'] = $this->insertRelativeArticle($article['text']);
+			}
+
+			// Souvísající PR články
+			if ($article['text']) {
+				$article['text'] = $this->insertRelativePrArticle($article['text']);
+			}
+
+			// Souvísající KAM VYRAZIT články
+			if ($article['text']) {
+				$article['text'] = $this->insertRelativeTriptipArticle($article['text']);
+			}
+
+			// Online reportáž
+			if ($article['text']) {
+				$article['text'] = $this->insertOnlineNews($article['text'], (int)$article['id']);
+			}
+
+			// Twitter feed
+			if ($article['text']) {
+				$article['text'] = $this->insertTwitter($article['text']);
+			}
+
+			// Facebook feed
+			if ($article['text']) {
+				$article['text'] = $this->insertFacebook($article['text']);
+			}
+
+			// Facebook LIVE feed
+			if ($article['text']) {
+				$article['text'] = $this->insertFacebookLive($article['text']);
+			}
+
+			// Youtube video
+			if ($article['text']) {
+				$article['text'] = $this->insertYoutube($article['text'], $request->getSchemeAndHttpHost());
+			}
+		} catch (\Exception $ex) {
+			//var_dump($ex->getMessage().$ex->getFile().$ex->getLine());
+			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
-		$article = $playkitArticle;
-		if (($webArticle['title'] ?? null) && ($webArticle['anotation'] ?? null) && ($webArticle['text'] ?? null)) {
-			$article['title'] = $webArticle['title'];
-			$article['anotation'] = $webArticle['anotation'];
-			$article['text'] = $webArticle['text'];
-		}
-		$article['article_id'] = $webArticle['article_id'];
-		$article['article_url'] = $webArticle['article_url'];
-		$article['city_title'] = $webArticle['city_title'] ?? $city['city'];
-		$article['city_url'] = $webArticle['city_url'] ?? $city['url'];
-		$article['region_url'] = $webArticle['region_url'] ?? $region['url'];
-		$article['author'] = trim((string) (($playkitArticle['name'] ?? '') . ' ' . ($playkitArticle['surname'] ?? '')));
-		$article['author_url'] = $playkitArticle['redactor_url'] ?? null;
-
-		if ((int) ($playkitArticle['public'] ?? 0) === 0 || empty($playkitArticle['region']) || empty($playkitArticle['city'])) {
-			return $this->redirectToNewsList();
+		// Zakázání zobrazení PR článku při prvním příchodu ze stránek seznam.cz
+		$seznam = $request->query->get('utm_source');
+		if ($seznam !== 'www.seznam.cz') {
+			// PR články
+			$pr = $this->newsRepository->getPrArticles(11);
+		} else {
+			$pr = null;
 		}
 
-		$hasTwitterWidgets = !empty($article['text']) && str_contains($article['text'], '{{twitter-feed-');
-		$hasFacebookWidgets = !empty($article['text']) && str_contains($article['text'], '{{facebook-feed-');
-		$hasFacebookLiveWidgets = !empty($article['text']) && str_contains($article['text'], '{{facebook-live-feed-');
-		$hasYoutubeWidgets = !empty($article['text']) && str_contains($article['text'], '{{youtube-video-');
-		$hasOnlineNewsWidget = !empty($article['text']) && str_contains($article['text'], '{{online-reportaz}}');
+		// Nabídky práce
+		/*switch ($url) {
+			case 'ostrava':
+				$joboffer_city_url = 'ostrava';
+				$okres_code = 3807;
+				break;
+			case 'karvinsko':
+				$joboffer_city_url = 'karvina';
+				$okres_code = 3803;
+				break;
+			case 'frydeckomistecko':
+				$joboffer_city_url = 'frydek-mistek';
+				$okres_code = 3802;
+				break;
+			case 'opavsko':
+				$joboffer_city_url = 'opava';
+				$okres_code = 3806;
+				break;
+			case 'novojicinsko':
+				$joboffer_city_url = 'novy-jicin';
+				$okres_code = 3804;
+				break;
+			case 'bruntalsko':
+				$joboffer_city_url = 'bruntal';
+				$okres_code = 3801;
+				break;
+			default:
+				$joboffer_city_url = '';
+				$okres_code = null;
+				break;
+		}
+		$joboffersArticles = $this->jobRepository->getRandForWebByCityCode($okres_code, 3);*/
 
-		if ($hasOnlineNewsWidget) {
-			$hasTwitterWidgets = true;
-			$hasFacebookWidgets = true;
-			$hasFacebookLiveWidgets = true;
-			$hasYoutubeWidgets = true;
+		// Dnešní premiéry
+		//$todayPremieres = $this->showRepository->getTodayPremieresForWeb();
+
+		// Nejčtenější články
+		//$ids = $this->newsRepository->getMostReadArticlesForWeb(3);
+		//$mostReadArticles = $this->newsRepository->getArticlesByIDs($ids, 3);
+
+		// Doporučujeme - hlavní články z HP
+		$newArticles = $this->playkitRepository->getAllHomepage([$article_id]);   // Dříve název "$this->getHomepageTable()->getAll()"
+		if ($newArticles) {
+			foreach ($newArticles as $i => $iValue) {
+				if ($iValue['section'] === '1' || $iValue['section'] === '2') {
+					$newArticles[$i]['url'] = '/zpravy/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
+				}
+				if ($iValue['section'] === '3') {
+					$newArticles[$i]['url'] = '/kam-vyrazit/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
+				}
+			}
+		}
+		// Rozdělíme $newArticles na 2 poloviny. První podpole (prvních 5 položek). Druhé podpole (zbytek).
+		$dividedArray = array_chunk($newArticles ?: [], 5);
+		$newArticlesFirstHalf = isset($dividedArray[0]) ? $dividedArray[0] : null;
+		$newArticlesSecondHalf = isset($dividedArray[1]) ? $dividedArray[1] : null;
+
+		// Nejnovější zprávy pro region
+		$regionArticles = $this->newsRepository->getArticlesByRegionId((int)$region['id'], 6, $article_id);
+		if ($regionArticles) {
+			foreach ($regionArticles as $id => $item) {
+				$date = new \DateTime($item['public_from']);
+				$today = new \DateTime();
+				if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+					$regionArticles[$id]['date'] = 'Dnes';
+				} else if ($today->modify('-1 day')->format('Y-m-d') === $date->format('Y-m-d')) {
+					$regionArticles[$id]['date'] = 'Včera';
+				} else {
+					$regionArticles[$id]['date'] =  $date->format('d.m.');
+				}
+				$regionArticles[$id]['time'] =  $date->format('H:i');
+				$regionArticles[$id]['url'] = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'] . '/' . $item['article_id'] . '/' . $this->removeAccent($item['title'], '-');
+			}
 		}
 
-		if (!empty($article['text'])) {
-			$article['text'] = $this->insertRelativeArticle($article['text']);
-			$article['text'] = $this->insertRelativePrArticle($article['text']);
-			$article['text'] = $this->insertRelativeTriptipArticle($article['text']);
-			$article['text'] = $this->insertOnlineNews($article['text'], $articleId);
-			$article['text'] = $this->insertTwitter($article['text']);
-			$article['text'] = $this->insertFacebook($article['text']);
-			$article['text'] = $this->insertFacebookLive($article['text']);
-			$article['text'] = $this->insertYoutube($article['text'], $request->getSchemeAndHttpHost());
-		}
+		// Pořady
+		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
-		if (
-			($article['region_url'] ?? '') !== $url
-			|| ($article['city_url'] ?? '') !== $cityUrl
-			|| ($article['article_url'] ?? '') !== $articleUrl
-		) {
-			return new RedirectResponse($this->urlGenerator->generate('news_region_city_article', [
-				'url' => $article['region_url'],
-				'city_url' => $article['city_url'],
-				'article_id' => $article['article_id'],
-				'article_url' => $article['article_url'],
-			]));
-		}
+		// Blok Kam vyrazit
+		$blockTriptip = $this->newsRepository->getTriptipArticles(4, $region['id'], true);
 
-		$this->newsRepository->setImpressionsCount($articleId);
-		$cityRank1 = $this->playkitRepository->getCityRank1ByArticleId($articleId);
-		$pr = $this->newsRepository->getPrArticles(11);
-		$recommendedArticles = $this->playkitRepository->getAllHomepage([$articleId]);
-		$recommendedArticles = $this->prepareRecommendedArticles($recommendedArticles);
-		$newArticlesFirstHalf = $recommendedArticles ? array_slice($recommendedArticles, 0, 5) : null;
-		$newArticlesSecondHalf = $recommendedArticles ? array_slice($recommendedArticles, 5) : null;
-		$regionArticles = isset($region['id']) ? $this->prepareRegionArticles($this->newsRepository->getArticlesByRegionId((int) $region['id'], 6, $articleId)) : null;
-		$blockTriptip = $this->newsRepository->getTriptipArticles(4, (int) ($region['id'] ?? 0), true);
-		$blockJob = $this->jobRepository->getRandForWebByCityCode($this->getJobOkresCode($region['url'] ?? null), 4);
+		// Blok Nabídky práce
+		$blockJob = $this->jobRepository->getRandForWebByCityCode($this->getJobOkresCode($url), 4);
+
+		// Blok kamery
 		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
-		$weatherRegion = $this->getRegionForWeather($region['url'] ?? null);
-		$weather = $this->playkitRepository->getWeatherForNews($weatherRegion);
-		$topicArticles = $this->getTopicArticles($article);
-		$printableText = $this->preparePrintableText((string) ($article['text'] ?? ''));
+
+		// Počasí
+		$weather_region = $this->getRegionForWeather($region['url']);
+		$weather = $this->playkitRepository->getWeatherForNews($weather_region);
+
+		//
+		// Články k tématu
+		// Položky vybrat podle: 1) počtu stejných témat (tagů) se zobrazeným článkem, 2) pokud bude stejný počet témat, tak podle počtu shlédnutí (tab. numbers_of_impressions), 3) nezobrazíme článek, který je starší než xy měsíců
+		//
+		if ($article['topics']) {
+			$topic_ids = $data = $final = [];
+			// vezmeme IDčka tagů, ktré jsou u aktuálního článku
+			foreach ($article['topics'] as $topic) {
+				$topic_ids[] = $topic['tag_id'];
+			}
+			// prohledáme všechny články na tyto tagy. V poli vzniknou duplicity, protože některé články mají více, než 1 tag stejný
+			$articles_ids[] = $this->playkitRepository->getArticlesByTopicsAndDate($topic_ids, $article['id']);
+			// sečteme tyto duplicity - potřebujeme články, které mají nejvíce stejných tagů, jako aktuální článek
+			$articles_ids_sort = array_count_values($articles_ids[0]);
+			// seřadíme pole podle počtu stejných tagů DESC
+			arsort($articles_ids_sort, SORT_NUMERIC);
+			// ořežeme na prvních x položek (podle toho, kolik článků bude ve výpise "K tématu")
+			$slice = array_slice($articles_ids_sort, 0, 3, true);
+			// finální IDčka článků projedeme postupně a vyhledáme počet kliknutí (numbers_of_impressions) a vytvoříme pole $data se všemi potřebnými údajji
+			$i = 0;
+			foreach ($slice as $article_id => $count) {
+				$data[$i]['article_id'] = $article_id;
+				$data[$i]['count'] = $count;
+				$data[$i]['impressions'] = $this->newsRepository->getCountForByArticleId($article_id);
+				$i++;
+			}
+			// nakonec toto pole seřadíme podle počtu stejných tagů DESC, numbers_of_impressions DESC
+			if ($data) {
+				foreach ($data as $key => $row) {
+					$count_tags[$key]  = $row['count'];
+					$impressions[$key] = $row['impressions'];
+				}
+				array_multisort($count_tags, SORT_DESC, $impressions, SORT_DESC, $data);
+				// finální pole už bude obsahovat jen IDčka článků seřazené podle všech kritérií
+				foreach ($data as $val) {
+					$final[] = $val['article_id'];
+				}
+				// pro všechny IDčka článků vyhledáme dané články ke zobrazení
+				$newArticlesTopic = $this->newsRepository->getNewArticlesTopic($final);
+				//Debug::dump($newArticlesTopic);
+			} else {
+				$newArticlesTopic = null;
+			}
+
+		} else {
+			$newArticlesTopic = null;
+		}
+		// END Články k tématu
+
+		// Banner leaderboard a Mobilesticky pro layout
+		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
+		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+
+		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner square
 		$bannerSquare = $this->bannerRepository->getSquare();
+
+		// Banner mobile square 1
 		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		// TODO: doladit zbyvajici jemne rozdily proti produkci po vizualnim porovnani na konkretnich URL.
 		return new Response($renderer->renderWithLayout('news/web/news/article', [
 			'article' => $article,
+			'printableText' => $printableText,
 			'region' => $region,
 			'city' => $city,
-			'cityRank1' => $cityRank1,
-			'pr' => $pr,
 			'newArticlesFirstHalf' => $newArticlesFirstHalf,
 			'newArticlesSecondHalf' => $newArticlesSecondHalf,
-			'topicArticles' => $topicArticles,
+			'newArticlesTopic' => $newArticlesTopic,
 			'regionArticles' => $regionArticles,
+			//'joboffersArticles' => $joboffersArticles,
+			//'joboffer_city_url' => $joboffer_city_url,
+			//'todayPremieres' => $todayPremieres,
+			//'mostReadArticles' => $mostReadArticles,
+			'pr' => $pr,
+			//'shows' => $shows,
 			'blockTriptip' => $blockTriptip,
 			'blockJob' => $blockJob,
 			'blockCamera' => $blockCamera,
 			'weather' => $weather,
-			'weatherRegion' => $weatherRegion,
-			'printableText' => $printableText,
+			'weather_region' => $weather_region,
+			'bannerLeaderboard' => $bannerLeaderboard,
+			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
 			'bannerMobilesquare2' => $bannerMobilesquare2,
-			'hasTwitterWidgets' => $hasTwitterWidgets,
-			'hasFacebookWidgets' => $hasFacebookWidgets,
-			'hasFacebookLiveWidgets' => $hasFacebookLiveWidgets,
-			'hasYoutubeWidgets' => $hasYoutubeWidgets,
-			'hasOnlineNewsWidget' => $hasOnlineNewsWidget,
+			// Extra pro šablonu (widgety, meta)
+			'cityRank1' => $city_rank_number_1,
+			'hasTwitterWidgets' => !empty($printableText) && str_contains($printableText, '{{twitter-feed-'),
+			'hasFacebookWidgets' => !empty($printableText) && str_contains($printableText, '{{facebook-feed-'),
+			'hasFacebookLiveWidgets' => !empty($printableText) && str_contains($printableText, '{{facebook-live-feed-'),
+			'hasYoutubeWidgets' => !empty($printableText) && str_contains($printableText, '{{youtube-video-'),
+			'hasOnlineNewsWidget' => !empty($printableText) && str_contains($printableText, '{{online-reportaz}}'),
 			'recaptchaSiteKey' => getenv('GOOGLE_RECAPTCHA_SITE_KEY') ?: null,
 			'currentUrl' => $request->getUri(),
 			'schemeHost' => $request->getSchemeAndHttpHost(),
 		]));
 	}
 
-	public function downloadVideo(Request $request): Response
+	public function articlePr(Request $request, PhtmlRenderer $renderer): Response
 	{
-		$videoId = (int) $request->attributes->get('video_id', 0);
-		$quality = (string) $request->attributes->get('quality', 'hq');
-
-		if ($videoId <= 0 || !in_array($quality, ['hq', 'lq'], true)) {
-			return $this->redirectToNewsList();
+		$article_id = (int) $request->attributes->get('article_id', 0);
+		if (! $article_id) {
+			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 		}
-
-		$video = $this->playkitRepository->getVideoById($videoId);
-		if (!$video || empty($video['folder_light']) || empty($video['file'])) {
-			return $this->redirectToNewsList();
-		}
-
-		$fileUrl = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $video['folder_light'] . '/' . $video['file'] . '_' . $quality . '.mp4';
-		$stream = @fopen($fileUrl, 'rb');
-		if ($stream === false) {
-			return new RedirectResponse($fileUrl);
-		}
-
-		$response = new StreamedResponse(static function () use ($stream): void {
-			fpassthru($stream);
-			fclose($stream);
-		});
-		$response->headers->set('Content-Type', 'application/octet-stream');
-		$response->headers->set('Content-Disposition', 'attachment; filename="' . $video['file'] . '_' . $quality . '.mp4"');
-
-		return $response;
-	}
-
-	public function overwriteDocx(Request $request): Response
-	{
-		$articleId = (int) $request->attributes->get('article_id', 0);
-		$article = $this->newsRepository->getArticle($articleId);
-
-		if (!$article) {
-			return $this->redirectToNewsList();
-		}
-
-		$html = $this->prepareArticleHtmlForDocx((string) ($article['text'] ?? ''));
-		$phpWord = new PhpWord();
-		$phpWord->getSettings()->setThemeFontLang(new Language('cs-CZ'));
-		$phpWord->setDefaultParagraphStyle([
-			'spaceAfter' => 240,
-			'lineHeight' => 1.4,
-		]);
-		$section = $phpWord->addSection();
-
-		$publicFrom = new \DateTime((string) $article['public_from']);
-		$articleUrl = $this->urlGenerator->generate('news_region_city_article', [
-			'url' => $article['region_url'],
-			'city_url' => $article['city_url'],
-			'article_id' => $article['article_id'],
-			'article_url' => $article['article_url'],
-		], UrlGeneratorInterface::ABSOLUTE_URL);
-
-		$table = $section->addTable([
-			'width' => 5000,
-			'unit' => TblWidth::PERCENT,
-			'borderSize' => 0,
-			'borderColor' => 'FFFFFF',
-			'cellMarginTop' => 0,
-			'cellMarginLeft' => 0,
-			'cellMarginRight' => 200,
-			'cellMarginBottom' => 0,
-		]);
-		$table->addRow();
-
-		$logoPath = $this->getProjectDir() . '/public/img/web/logo-email.png';
-		$cellLeft = $table->addCell(6500, ['valign' => 'top']);
-		if (is_file($logoPath)) {
-			$cellLeft->addImage($logoPath, ['height' => 40]);
-		}
-
-		$cellRight = $table->addCell(2500, ['valign' => 'top']);
-		$cellRight->addText('Datum vydání:', ['size' => 9, 'bold' => true], ['alignment' => Jc::END, 'spaceAfter' => 0]);
-		$cellRight->addText($publicFrom->format('j.n.Y, H:i'), ['size' => 9, 'bold' => true], ['alignment' => Jc::END, 'spaceAfter' => 80]);
-		$cellRight->addLink($articleUrl, 'Otevřít článek na polar.cz', ['color' => '0563C1', 'underline' => 'single', 'size' => 10], ['alignment' => Jc::END, 'spaceAfter' => 0]);
-
-		$section->addTextBreak(1);
-		$section->addText((string) $article['title'], ['bold' => true, 'size' => 14], ['spaceAfter' => 160]);
+		$printableText = '';
 
 		try {
-			Html::addHtml($section, $html, false, false);
-		} catch (\Throwable) {
-			$section->addText('Přepis se nepodařilo převést do DOCX.');
+			$article = $this->playkitRepository->getArticlePr($article_id);
+			if (! $article) {
+				return new RedirectResponse($this->urlGenerator->generate('news_pr'));
+			}
+
+			// Text článku k tisku, bez widgetů
+			$printableText = $article['text'];
+
+			// Počítání zobrazení článků
+			$this->newsRepository->setImpressionsCountPr($article_id);
+
+			// Související články
+			if ($article['text']) {
+				$article['text'] = $this->insertRelativeArticle($article['text']);
+			}
+
+			// Související PR články
+			if ($article['text']) {
+				$article['text'] = $this->insertRelativePrArticle($article['text']);
+			}
+
+			// Související KAM VYRAZIT články
+			if ($article['text']) {
+				$article['text'] = $this->insertRelativeTriptipArticle($article['text']);
+			}
+
+			// Twitter feed
+			if ($article['text']) {
+				$article['text'] = $this->insertTwitter($article['text']);
+			}
+
+			// Facebook feed
+			if ($article['text']) {
+				$article['text'] = $this->insertFacebook($article['text']);
+			}
+
+			// Facebook LIVE feed
+			if ($article['text']) {
+				$article['text'] = $this->insertFacebookLive($article['text']);
+			}
+
+			// Youtube video
+			if ($article['text']) {
+				$article['text'] = $this->insertYoutube($article['text'], $request->getSchemeAndHttpHost());
+			}
+		} catch (\Exception $ex) {
+			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 		}
 
-		$baseName = pathinfo((string) $article['article_url'], PATHINFO_FILENAME);
-		$baseName = mb_substr($baseName, 0, 40);
-		$filename = 'polar-prepis-' . $baseName . '-' . $publicFrom->format('Y-m-d') . '.docx';
-
-		$tmp = tempnam(sys_get_temp_dir(), 'docx_');
-		$writer = IOFactory::createWriter($phpWord, 'Word2007');
-		$writer->save($tmp);
-
-		$response = new Response((string) file_get_contents($tmp));
-		$response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-		$response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-		$response->headers->set('Content-Length', (string) filesize($tmp));
-
-		@unlink($tmp);
-
-		return $response;
-	}
-
-	public function getContentOnlineNews(Request $request): JsonResponse
-	{
-		$articleId = (int) $request->attributes->get('article_id', 0);
-		$page = max(1, (int) $request->request->get('page', 1));
-		$limit = 10;
-		$count = 0;
-		$html = '';
-		$refreshDate = '1970/01/01 00:00:00';
-
-		try {
-			$items = $this->playkitRepository->getOnlineNewsByArticleId($articleId, $page, $limit);
-			$count = $this->playkitRepository->getCountOnlineNewsByArticleId($articleId);
-
-			$lastItem = $this->playkitRepository->getOnlineNewsByArticleId($articleId, 1, 1);
-			if (isset($lastItem[0]['datetime'])) {
-				$refreshDate = (new \DateTime((string) $lastItem[0]['datetime']))->format('Y/m/d H:i');
-			}
-
-			if ($items) {
-				$html .= '<h3 class="mb-3">Online reportáž <span class="btnRefreshOnlineNews cur-pointer float-end text-0">aktualizovat&nbsp;<i class="fa fa-fw fa-refresh text-primary"></i></span></h3>';
-				$html .= '<div class="container-fluid ps-3">';
-
-				foreach ($items as $item) {
-					$day = 'NaN';
-					$time = 'NaN';
-
-					try {
-						$datetime = new \DateTime((string) $item['datetime']);
-						$today = new \DateTime();
-						$time = $datetime->format('H:i');
-
-						if ($today->format('Y-m-d') === $datetime->format('Y-m-d')) {
-							$day = 'dnes';
-						} elseif ($today->modify('-1 day')->format('Y-m-d') === $datetime->format('Y-m-d')) {
-							$day = 'včera';
-						} else {
-							$day = $datetime->format('j.n.');
-						}
-					} catch (\Exception) {
-					}
-
-					$content = (string) ($item['content'] ?? '');
-					$content = $this->insertRelativeArticle($content);
-					$content = $this->insertRelativePrArticle($content);
-					$content = $this->insertRelativeTriptipArticle($content);
-					$content = $this->insertTwitter($content);
-					$content = $this->insertFacebook($content);
-					$content = $this->insertYoutube($content, $request->getSchemeAndHttpHost());
-					$content = $this->insertFacebookLive($content);
-
-					$html .= '<div class="row mt-2">';
-					$html .= '<div class="col-md-2 font-weight-bold text-primary text-4-5 text-start line-height-2 ps-0">';
-					$html .= $time . '<br><span class="text-1 font-weight-normal">' . $day . '</span>';
-					$html .= '</div>';
-					$html .= '<div class="col-md-10 content">' . $content . '</div>';
-					$html .= '</div>';
-				}
-
-				$html .= '</div>';
-
-				if ($count > $limit) {
-					$pages = (int) ceil($count / $limit);
-					$html .= '<ul class="pagination">';
-					for ($i = 1; $i <= $pages; $i++) {
-						$class = 'page-item';
-						if ($page === $i) {
-							$class .= ' active';
-						} else {
-							$class .= ' btnPaginator';
-						}
-						$html .= '<li class="' . $class . '" data-page="' . $i . '"><a class="page-link text-decoration-none" href="#">' . $i . '</a></li>';
-					}
-					$html .= '</ul>';
-				}
-			}
-
-			return new JsonResponse([
-				'success' => true,
-				'article_id' => $articleId,
-				'page' => $page,
-				'limit' => $limit,
-				'count' => $count,
-				'refreshDate' => $refreshDate,
-				'html' => $html,
-			]);
-		} catch (\Exception $e) {
-			return new JsonResponse([
-				'success' => false,
-				'article_id' => $articleId,
-				'page' => $page,
-				'limit' => $limit,
-				'count' => $count,
-				'refreshDate' => $refreshDate,
-				'html' => $html,
-				'message' => $e->getMessage(),
-			]);
-		}
-	}
-
-	public function getTicker(): JsonResponse
-	{
-		$content = null;
-		try {
-			$items = $this->tickerRepository->getItems();
-			if ($items) {
-				$content = '<ul>';
-				foreach ($items as $item) {
-					$content .= '<div><li><span>' . $item . '</span></li></div>';
-				}
-				$content .= '</ul>';
-			}
-			return new JsonResponse(['content' => $content, 'success' => true, 'message' => null]);
-		} catch (\Exception $e) {
-			return new JsonResponse(['content' => null, 'success' => false, 'message' => $e->getMessage()]);
-		}
-	}
-
-	public function getCrawl(): JsonResponse
-	{
-		try {
-			$crawl = $this->crawlRepository->getCrawl(1);
-			$items = $this->crawlRepository->getItems(1);
-
-			$start = $crawl['auto_delete_start'] ?? null;
-			$stop  = $crawl['auto_delete_stop'] ?? null;
-			$separator = str_replace(' ', '&nbsp;', $crawl['separator'] ?? '');
-
-			$content = '<div>';
-			if ($crawl['text_before']) {
-				$content .= $crawl['text_before'] . ' ';
-				if ($separator) { $content .= $separator . ' '; }
-			}
-			foreach ($items as $i => $val) {
-				if ($val !== '') {
-					$content .= str_replace(' ', '&nbsp;', $val);
-					if ($separator && ($i + 1) < count($items)) {
-						$content .= ' ' . $separator . ' ';
-					}
-				}
-			}
-			if ($crawl['text_after']) {
-				$content .= ' ';
-				if ($separator) { $content .= $separator . ' '; }
-				$content .= $crawl['text_after'];
-			}
-			$content .= '</div>';
-
-			return new JsonResponse(['content' => $content, 'success' => true, 'message' => null, 'start' => $start, 'stop' => $stop]);
-		} catch (\Exception $e) {
-			return new JsonResponse(['content' => null, 'success' => false, 'message' => $e->getMessage(), 'start' => null, 'stop' => null]);
-		}
-	}
-
-	private function redirectToNewsList(): RedirectResponse
-	{
-		return new RedirectResponse($this->urlGenerator->generate('news'));
-	}
-
-	private function insertRelativeArticle(string $text): string
-	{
-		while (($posStart = mb_strpos($text, '{{souvisejici-clanek', 0, 'UTF-8')) !== false) {
-			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
-			if ($posEnd === false) {
-				break;
-			}
-
-			$placeholder = mb_substr($text, $posStart, $posEnd - $posStart + 2);
-			$relatedArticleId = mb_substr($placeholder, 22, -3);
-			if (!is_numeric($relatedArticleId)) {
-				$text = str_replace($placeholder, '', $text);
-				continue;
-			}
-
-			$relatedArticle = $this->playkitRepository->getArticle((int) $relatedArticleId);
-			if (!$relatedArticle) {
-				$text = str_replace($placeholder, '', $text);
-				continue;
-			}
-
-			$html  = '<div class="widget">';
-			$html .= '<div class="header">Sledujte také</div>';
-			$html .= '<div class="relative-article">';
-			$html .= '<h3>';
-			$html .= '<a href="' . $this->urlGenerator->generate('news_region_city_article', [
-				'url' => $relatedArticle['region_url'],
-				'city_url' => $relatedArticle['city_url'],
-				'article_id' => $relatedArticle['id'],
-				'article_url' => $relatedArticle['url'],
-			]) . '">' . htmlspecialchars((string) $relatedArticle['title'], ENT_QUOTES, 'UTF-8') . '</a>';
-			$html .= '</h3>';
-			$html .= '</div>';
-			$html .= '</div>';
-
-			$text = str_replace($placeholder, $html, $text);
-		}
-
-		return $text;
-	}
-
-	private function insertRelativePrArticle(string $text): string
-	{
-		while (($posStart = mb_strpos($text, '{{souvisejici-pr-clanek', 0, 'UTF-8')) !== false) {
-			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
-			if ($posEnd === false) {
-				break;
-			}
-
-			$placeholder = mb_substr($text, $posStart, $posEnd - $posStart + 2);
-			$relatedArticleId = mb_substr($placeholder, 25, -3);
-			if (!is_numeric($relatedArticleId)) {
-				$text = str_replace($placeholder, '', $text);
-				continue;
-			}
-
-			$relatedArticle = $this->playkitRepository->getArticlePr((int) $relatedArticleId);
-			if (!$relatedArticle) {
-				$text = str_replace($placeholder, '', $text);
-				continue;
-			}
-
-			$html  = '<div class="widget">';
-			$html .= '<div class="header">Sledujte také</div>';
-			$html .= '<div class="relative-pr-article">';
-			$html .= '<h3>';
-			$html .= '<a href="' . $this->urlGenerator->generate('news_pr_article', [
-				'article_id' => $relatedArticle['id'],
-				'article_url' => $relatedArticle['url'],
-			]) . '">' . htmlspecialchars((string) $relatedArticle['title'], ENT_QUOTES, 'UTF-8') . '</a>';
-			$html .= '</h3>';
-			$html .= '</div>';
-			$html .= '</div>';
-
-			$text = str_replace($placeholder, $html, $text);
-		}
-
-		return $text;
-	}
-
-	private function insertRelativeTriptipArticle(string $text): string
-	{
-		while (($posStart = mb_strpos($text, '{{souvisejici-kam-vyrazit-clanek', 0, 'UTF-8')) !== false) {
-			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
-			if ($posEnd === false) {
-				break;
-			}
-
-			$placeholder = mb_substr($text, $posStart, $posEnd - $posStart + 2);
-			$relatedArticleId = mb_substr($placeholder, 34, -3);
-			if (!is_numeric($relatedArticleId)) {
-				$text = str_replace($placeholder, '', $text);
-				continue;
-			}
-
-			$relatedArticle = $this->playkitRepository->getTriptip((int) $relatedArticleId);
-			if (!$relatedArticle || empty($relatedArticle['region_url']) || empty($relatedArticle['city_url'])) {
-				$text = str_replace($placeholder, '', $text);
-				continue;
-			}
-
-			$html  = '<div class="widget">';
-			$html .= '<div class="header">Sledujte také</div>';
-			$html .= '<div class="relative-triptip-article">';
-			$html .= '<h3>';
-			$html .= '<a href="' . $this->urlGenerator->generate('triptip_article', [
-				'url' => $relatedArticle['region_url'],
-				'city_url' => $relatedArticle['city_url'],
-				'article_id' => $relatedArticle['id'],
-				'article_url' => $relatedArticle['url'],
-			]) . '">' . htmlspecialchars((string) $relatedArticle['title'], ENT_QUOTES, 'UTF-8') . '</a>';
-			$html .= '</h3>';
-			$html .= '</div>';
-			$html .= '</div>';
-
-			$text = str_replace($placeholder, $html, $text);
-		}
-
-		return $text;
-	}
-
-	private function insertOnlineNews(string $text, int $articleId): string
-	{
-		return str_replace(
-			'{{online-reportaz}}',
-			'<div class="onlineNews" data-article-id="' . $articleId . '">Online reportáž</div>',
-			$text
-		);
-	}
-
-	private function insertTwitter(string $text): string
-	{
-		$index = 0;
-
-		return (string) preg_replace_callback('/\{\{twitter-feed-([0-9]+)\}\}/u', static function (array $matches) use (&$index): string {
-			$index++;
-
-			return '<div class="twitter-feed" id="twitter-feed-' . $index . '"></div>'
-				. '<script>'
-				. 'twttr.ready(function (twttr) {'
-				. 'twttr.widgets.createTweet(' . json_encode($matches[1]) . ', document.getElementById(' . json_encode('twitter-feed-' . $index) . '), {theme: "light", align: "center", lang: "cs"});'
-				. '});'
-				. '</script>';
-		}, $text);
-	}
-
-	private function insertFacebook(string $text): string
-	{
-		$index = 0;
-
-		return (string) preg_replace_callback('/\{\{facebook-feed-([^}]+)\}\}/u', static function (array $matches) use (&$index): string {
-			$ids = str_replace('"', '', trim($matches[1]));
-			if (!str_contains($ids, '-')) {
-				return '';
-			}
-
-			[$pageId, $postId] = explode('-', $ids, 2);
-			if ($pageId === '' || $postId === '') {
-				return '';
-			}
-
-			$index++;
-
-			return '<div class="fb-post" data-href="https://www.facebook.com/' . htmlspecialchars($pageId, ENT_QUOTES, 'UTF-8') . '/posts/' . htmlspecialchars($postId, ENT_QUOTES, 'UTF-8') . '/" id="facebook-feed-' . $index . '"></div>';
-		}, $text);
-	}
-
-	private function insertFacebookLive(string $text): string
-	{
-		$index = 0;
-
-		return (string) preg_replace_callback('/\{\{facebook-live-feed-([^}]+)\}\}/u', static function (array $matches) use (&$index): string {
-			$ids = str_replace('"', '', trim($matches[1]));
-			if (!str_contains($ids, '-')) {
-				return '';
-			}
-
-			[$pageId, $videoId] = explode('-', $ids, 2);
-			if ($pageId === '' || $videoId === '') {
-				return '';
-			}
-
-			$index++;
-
-			return '<div class="fb-video" data-href="https://www.facebook.com/' . htmlspecialchars($pageId, ENT_QUOTES, 'UTF-8') . '/videos/' . htmlspecialchars($videoId, ENT_QUOTES, 'UTF-8') . '/" id="facebook-live-feed-' . $index . '"></div>';
-		}, $text);
-	}
-
-	private function insertYoutube(string $text, string $schemeHost): string
-	{
-		$index = 0;
-
-		return (string) preg_replace_callback('/\{\{youtube-video-([^}]+)\}\}/u', static function (array $matches) use (&$index, $schemeHost): string {
-			$youtubeId = trim(str_replace('"', '', $matches[1]));
-			if ($youtubeId === '') {
-				return '';
-			}
-
-			$index++;
-
-			return '<div class="responsive_player"><iframe id="youtube-player-' . $index . '" type="text/html" width="640" height="360" src="https://www.youtube.com/embed/' . htmlspecialchars($youtubeId, ENT_QUOTES, 'UTF-8') . '?enablejsapi=1&origin=' . rawurlencode($schemeHost) . '" frameborder="0" allowfullscreen></iframe></div>';
-		}, $text);
-	}
-
-	private function prepareArticleHtmlForDocx(string $html): string
-	{
-		$html = preg_replace('~<script\b[^>]*>.*?</script>~is', '', $html) ?? $html;
-		// 1) &nbsp; rozbiji XML uvnitr DOCX
-		$html = str_replace('&nbsp;', ' ', $html);
-		// 2) PhpWord (loadXML) potrebuje XML-friendly <br/>
-		$html = preg_replace('~</br\s*>~i', '<br/>', $html) ?? $html;
-		$html = preg_replace('~<br\s*>~i', '<br/>', $html) ?? $html;
-		// 3) odstranit prazdne odstavce typu <p><br></p>
-		$html = preg_replace('~<p\b[^>]*>\s*(<br\s*/?>|&nbsp;|\s)*\s*</p>~i', '', $html) ?? $html;
-
-		// 4) prevod <div class="synchron"...> na <p>
-		$dom = new \DOMDocument('1.0', 'UTF-8');
-		libxml_use_internal_errors(true);
-		$dom->loadHTML('<?xml encoding="utf-8" ?><div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-		libxml_clear_errors();
-
-		$xpath = new \DOMXPath($dom);
-		foreach ($xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " synchron ")]') as $node) {
-			$p = $dom->createElement('p');
-			while ($node->firstChild) {
-				$p->appendChild($node->firstChild);
-			}
-			$node->parentNode?->replaceChild($p, $node);
-		}
-
-		$html = '';
-		foreach ($dom->documentElement->childNodes as $child) {
-			$html .= $dom->saveHTML($child);
-		}
-		// END 4)
-
-		// 5) odstranit prazdne seznamy
-		$html = preg_replace('~<ul\b[^>]*>\s*</ul>~i', '', $html) ?? $html;
-		$html = preg_replace('~<ol\b[^>]*>\s*</ol>~i', '', $html) ?? $html;
-		// 6) odstranit prazdne em odstavce
-		$html = preg_replace('~<p\b[^>]*>\s*<em>\s*(<br\s*/?>|&nbsp;|\s|-)*\s*</em>\s*</p>~i', '', $html) ?? $html;
-		// 7) odstranit <br>
-		$html = preg_replace('~<br\s*/?>~i', ' ', $html) ?? $html;
-
-		return $html;
-	}
-
-	private function getProjectDir(): string
-	{
-		return dirname(__DIR__, 4);
-	}
-
-	private function prepareRecommendedArticles(?array $articles): ?array
-	{
-		if (!$articles) {
-			return null;
-		}
-
-		foreach ($articles as &$item) {
-			$section = (string) ($item['section'] ?? '');
-			if ($section === '1' || $section === '2') {
-				$item['url'] = $this->urlGenerator->generate('news_region_city_article', [
-					'url' => $item['region_url'],
-					'city_url' => $item['city_url'],
-					'article_id' => $item['article_id'],
-					'article_url' => $this->removeAccent((string) $item['title'], '-'),
-				]);
-			}
-			if ($section === '3') {
-				$item['url'] = $this->urlGenerator->generate('triptip_article', [
-					'url' => $item['region_url'],
-					'city_url' => $item['city_url'],
-					'article_id' => $item['article_id'],
-					'article_url' => $this->removeAccent((string) $item['title'], '-'),
-				]);
-			}
-		}
-		unset($item);
-
-		return $articles;
-	}
-
-	private function prepareRegionArticles(?array $articles): ?array
-	{
-		if (!$articles) {
-			return null;
-		}
-
-		foreach ($articles as &$item) {
-			try {
-				$date = new \DateTime((string) $item['public_from']);
+		// Celkový počet článků
+		$newsCount = $this->playkitRepository->getCountPR();
+
+		// PR články
+		$pr = $this->newsRepository->getPrArticles(11);
+
+		// Mohlo by Vás zajímat
+		/*$newArticles = $this->newsRepository->getNewArticles(3);
+		if ($newArticles) {
+			foreach ($newArticles as $id => $item) {
+				$date = new \DateTime($item['public_from']);
 				$today = new \DateTime();
 				if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
-					$item['date'] = 'Dnes';
-				} elseif ($today->modify('-1 day')->format('Y-m-d') === $date->format('Y-m-d')) {
-					$item['date'] = 'Včera';
+					$newArticles[$id]['date'] = 'Dnes';
+				} else if ($today->modify('-1 day')->format('Y-m-d') === $date->format('Y-m-d')) {
+					$newArticles[$id]['date'] = 'Včera';
 				} else {
-					$item['date'] = $date->format('d.m.');
+					$newArticles[$id]['date'] =  $date->format('d.m.');
 				}
-				$item['time'] = $date->format('H:i');
-			} catch (\Exception) {
-				$item['date'] = 'NaN';
-				$item['time'] = 'NaN';
+				$newArticles[$id]['time'] =  $date->format('H:i');
+			}
+		}*/
+
+		// Dnešní premiéry
+		//$todayPremieres = $this->showRepository->getTodayPremieresForWeb();
+
+		// Nejčtenější články
+		//$ids = $this->newsRepository->getMostReadArticlesForWeb(3);
+		//$mostReadArticles = $this->newsRepository->getArticlesByIDs($ids, 3);
+
+		// Nabídky práce
+		//$joboffersArticles = $this->jobRepository->getRandForWeb(132, 3);
+
+		// Doporučujeme - hlavní články z HP
+		$newArticles = $this->playkitRepository->getAllHomepage([$article_id]);   // Dříve název "$this->getHomepageTable()->getAll()"
+		if ($newArticles) {
+			foreach ($newArticles as $i => $iValue) {
+				if ($iValue['section'] === '1' || $iValue['section'] === '2') {
+					$newArticles[$i]['url'] = '/zpravy/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
+				}
+				if ($iValue['section'] === '3') {
+					$newArticles[$i]['url'] = '/kam-vyrazit/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
+				}
 			}
 		}
-		unset($item);
+		// Rozdělíme $newArticles na 2 poloviny. První podpole (prvních 5 položek). Druhé podpole (zbytek).
+		$dividedArray = array_chunk($newArticles ?: [], 5);
+		$newArticlesFirstHalf = isset($dividedArray[0]) ? $dividedArray[0] : null;
+		$newArticlesSecondHalf = isset($dividedArray[1]) ? $dividedArray[1] : null;
 
-		return $articles;
-	}
-
-	private function getTopicArticles(array $article): ?array
-	{
-		if (empty($article['topics']) || !is_array($article['topics'])) {
-			return null;
-		}
-
-		$topicIds = [];
-		foreach ($article['topics'] as $topic) {
-			if (isset($topic['tag_id'])) {
-				$topicIds[] = (int) $topic['tag_id'];
+		// Nejnovější zprávy pro MSK
+		$regionArticles = $this->newsRepository->getArticlesByRegionId(7, 6, $article_id);
+		if ($regionArticles) {
+			foreach ($regionArticles as $id => $item) {
+				$date = new \DateTime($item['public_from']);
+				$today = new \DateTime();
+				if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+					$regionArticles[$id]['date'] = 'Dnes';
+				} else if ($today->modify('-1 day')->format('Y-m-d') === $date->format('Y-m-d')) {
+					$regionArticles[$id]['date'] = 'Včera';
+				} else {
+					$regionArticles[$id]['date'] =  $date->format('d.m.');
+				}
+				$regionArticles[$id]['time'] =  $date->format('H:i');
+				$regionArticles[$id]['url'] = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'] . '/' . $item['article_id'] . '/' . $this->removeAccent($item['title'], '-');
 			}
 		}
 
-		$topicIds = array_values(array_unique(array_filter($topicIds)));
-		if ($topicIds === []) {
-			return null;
-		}
+		// Pořady
+		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
-		$articlesIds = $this->playkitRepository->getArticlesByTopicsAndDate($topicIds, (int) $article['id']);
-		if (!$articlesIds) {
-			return null;
-		}
+		// Blok Kam vyrazit
+		$blockTriptip = $this->newsRepository->getTriptipArticles(4, false, true);
 
-		$articlesIdsSort = array_count_values($articlesIds);
-		arsort($articlesIdsSort, SORT_NUMERIC);
-		$slice = array_slice($articlesIdsSort, 0, 3, true);
-		$data = [];
-		foreach ($slice as $articleId => $count) {
-			$data[] = [
-				'article_id' => (int) $articleId,
-				'count' => $count,
-				'impressions' => $this->newsRepository->getCountForByArticleId((int) $articleId),
-			];
-		}
+		// Blok Nabídky práce
+		$blockJob = $this->jobRepository->getRandForWeb(132, 4);
 
-		if ($data === []) {
-			return null;
-		}
+		// Blok kamery
+		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
 
-		$countTags = array_column($data, 'count');
-		$impressions = array_column($data, 'impressions');
-		array_multisort($countTags, SORT_DESC, $impressions, SORT_DESC, $data);
+		// Počasí
+		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
 
-		$final = [];
-		foreach ($data as $value) {
-			$final[] = $value['article_id'];
-		}
+		// Bannery stare
+		/*$bannerArticle = $bannerText = $bannerRight = null;
+		$bannerArticle = $this->getBannersArticleTable()->getBannerForLayout();
+		$bannerText = $this->getBannersTextTable()->getBannerForLayout();
+		$bannerRight = $this->getBannersRightTable()->getBannerForLayout();*/
 
-		return $this->newsRepository->getNewArticlesTopic($final);
+		// Banner leaderboard a Mobilesticky pro layout
+		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
+		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+
+		// Banner rectangle
+		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner square
+		$bannerSquare = $this->bannerRepository->getSquare();
+
+		// Banner mobile square 1
+		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		// Banner mobile square 2
+		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
+
+		return new Response($renderer->renderWithLayout('news/web/news/article-pr', [
+			'newsCount' => $newsCount,
+			'pr' => $pr,
+			'article' => $article,
+			'printableText' => $printableText,
+			//'newArticles' => $newArticles,
+			//'todayPremieres' => $todayPremieres,
+			//'mostReadArticles' => $mostReadArticles,
+			//'joboffersArticles'  => $joboffersArticles,
+			'newArticlesFirstHalf' => $newArticlesFirstHalf,
+			'newArticlesSecondHalf' => $newArticlesSecondHalf,
+			'regionArticles' => $regionArticles,
+			//'shows' => $shows,
+			'blockTriptip' => $blockTriptip,
+			'blockJob' => $blockJob,
+			'blockCamera' => $blockCamera,
+			'weather' => $weather,
+			'weather_region' => 'Ostrava',
+			'bannerLeaderboard' => $bannerLeaderboard,
+			'bannerMobilesticky' => $bannerMobilesticky,
+			'bannerRectangle' => $bannerRectangle,
+			'bannerSquare' => $bannerSquare,
+			'bannerMobilesquare1' => $bannerMobilesquare1,
+			'bannerMobilesquare2' => $bannerMobilesquare2,
+			// Extra pro šablonu (widgety, meta)
+			'hasTwitterWidgets' => !empty($printableText) && str_contains($printableText, '{{twitter-feed-'),
+			'hasFacebookWidgets' => !empty($printableText) && str_contains($printableText, '{{facebook-feed-'),
+			'hasFacebookLiveWidgets' => !empty($printableText) && str_contains($printableText, '{{facebook-live-feed-'),
+			'hasYoutubeWidgets' => !empty($printableText) && str_contains($printableText, '{{youtube-video-'),
+			'currentUrl' => $request->getUri(),
+			'schemeHost' => $request->getSchemeAndHttpHost(),
+		]));
 	}
 
-	private function preparePrintableText(string $text): string
+	public function prnews(Request $request, PhtmlRenderer $renderer): Response
 	{
-		$text = preg_replace('/<div class="widget">.*?<\/div>/s', '', $text) ?? $text;
-		$text = preg_replace('/<div class="relative-article">.*?<\/div>/s', '', $text) ?? $text;
-		$text = preg_replace('/<div class="relative-pr-article">.*?<\/div>/s', '', $text) ?? $text;
-		$text = preg_replace('/<div class="relative-triptip-article">.*?<\/div>/s', '', $text) ?? $text;
-		$text = preg_replace('/<div class="onlineNews".*?<\/div>/s', '', $text) ?? $text;
-
-		return $text;
-	}
-
-	private function getJobOkresCode(?string $url): ?int
-	{
-		return match ($url) {
-			'ostrava' => 3807,
-			'karvinsko' => 3803,
-			'frydeckomistecko' => 3802,
-			'opavsko' => 3806,
-			'novojicinsko' => 3804,
-			'bruntalsko' => 3801,
-			default => null,
-		};
-	}
-
-	private function getRegionForWeather(?string $regionUrl): ?string
-	{
-		return match ($regionUrl) {
-			'ostrava' => 'Ostrava',
-			'karvinsko' => 'Karviná',
-			'frydeckomistecko' => 'Frýdek-Místek',
-			'opavsko' => 'Opava',
-			'novojicinsko' => 'Nový Jičín',
-			'bruntalsko' => 'Bruntál',
-			default => 'Ostrava',
-		};
-	}
-
-	private function removeAccent(string $text, string $replace = ''): string
-	{
-		$transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
-		if ($transliterator) {
-			$text = $transliterator->transliterate($text);
-		}
-		$text = preg_replace('/\p{C}+/u', '', $text) ?? $text;
-		if ($replace) {
-			$text = str_replace(' ', $replace, $text);
+		$articles = null;
+		try {
+			$page = (int) $request->query->get('strana', 1);
+			$articles = $this->playkitRepository->getPaginatorByPR($page, 10);
+		} catch (\Exception $e) {
+			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
-		return $text;
+		// Celkový počet článků
+		$newsCount = $this->playkitRepository->getCountPR();
+
+		// PR články
+		$pr = $this->newsRepository->getPrArticles(7);
+
+		// Banner leaderboard a Mobilesticky pro layout
+		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
+		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+
+		// Banner rectangle
+		$bannerRectangle = $this->bannerRepository->getRectangle();
+
+		// Banner mobile square 1
+		$bannerMobilesquare1 = $this->bannerRepository->getMobilesquare1();
+
+		return new Response($renderer->renderWithLayout('news/web/news/prnews', [
+			'articles' => $articles,
+			'page' => $page,
+			'newsCount' =>  $newsCount,
+			'pr' => $pr,
+			'bannerLeaderboard' => $bannerLeaderboard,
+			'bannerMobilesticky' => $bannerMobilesticky,
+			'bannerRectangle' => $bannerRectangle,
+			'bannerMobilesquare1' => $bannerMobilesquare1,
+			// Extra pro šablonu
+			'currentUrl' => $request->getUri(),
+		]));
 	}
 
-	public function shortlink(string $shortlink, PlaykitRepository $playkitRepository): RedirectResponse
+	public function shortlink(Request $request): RedirectResponse
 	{
 		try {
+			$shortlink = $request->attributes->get('shortlink');
+			//var_dump($shortlink);
 			if (!$shortlink) {
 				return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 
-			$article_url = $playkitRepository->getArticleUrlByShortlink($shortlink);
+			$article_url = $this->playkitRepository->getArticleUrlByShortlink($shortlink);
 			//var_dump($article_url);
 
 			if (!$article_url) {
@@ -1182,4 +907,777 @@ final class NewsController
 			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 	}
+
+	public function downloadVideo(Request $request): Response
+	{
+		$video_id = $request->attributes->get('video_id', 0);
+		$quality = $request->attributes->get('quality', 'hq');
+
+		$video = $this->playkitRepository->getVideoById($video_id);
+
+		$fileUrl = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $video['folder_light'] . '/' . $video['file'] . '_' . $quality . '.mp4';
+
+		$response = new StreamedResponse(static function () use ($fileUrl): void {
+			readfile($fileUrl);
+		});
+		$response->headers->set('Content-Description', 'File Transfer');
+		$response->headers->set('Content-Disposition', 'attachment; filename="' . $video['file'] . '_' . $quality . '.mp4"');
+		$response->headers->set('Content-Type', 'application/force-download');
+
+		return $response;
+	}
+
+	public function getTicker(): JsonResponse
+	{
+		$success = true;
+		$message = null;
+		$content = null;
+
+		try {
+			$ticker = $this->tickerRepository->getItems();
+
+			if ($ticker) {
+				$content = '<ul>';
+				foreach ($ticker as $item) {
+					$content .= '<div><li><span>' . $item . '</span></li></div>';
+				}
+				$content .= '</ul>';
+			}
+		} catch (\Exception $e) {
+			$success = false;
+			$message = $e->getMessage();
+		}
+
+		return new JsonResponse([
+			'content' => $content,
+			'success' => $success,
+			'message' => $message,
+		]);
+	}
+
+	public function getCrawl(): JsonResponse
+	{
+		$success = true;
+		$message = null;
+		$content = null;
+		$start = null;
+		$stop = null;
+
+		try {
+			$crawl = $this->crawlRepository->getCrawl(1);
+
+			if ($crawl['auto_delete_start']) {
+				$start = $crawl['auto_delete_start'];
+			}
+			if ($crawl['auto_delete_stop']) {
+				$stop = $crawl['auto_delete_stop'];
+			}
+
+			$content .= '<div>';
+
+			$items = $this->crawlRepository->getItems(1);
+
+			$separator = str_replace(' ', '&nbsp;', $crawl['separator']);
+
+			if ($crawl['text_before']) {
+				$content .= $crawl['text_before'];
+				$content .= ' ';
+				if ($crawl['separator']) {
+					$content .= $separator . ' ';
+				}
+			}
+
+			if ($items) {
+				foreach ($items as $i => $iValue) {
+					if ($iValue !== '') {
+						$content .= str_replace(' ', '&nbsp;', $iValue);
+						if ($crawl['separator'] && (($i + 1) < count($items))) {
+							$content .= ' ' . $separator . ' ';
+						}
+					}
+				}
+			}
+
+			if ($crawl['text_after']) {
+				$content .= ' ';
+				if ($crawl['separator']) {
+					$content .= $separator . ' ';
+				}
+				$content .= $crawl['text_after'];
+			}
+
+			$content .= '</div>';
+		} catch (\Exception $e) {
+			$success = false;
+			$message = $e->getMessage();
+		}
+
+		return new JsonResponse([
+			'content' => $content,
+			'success' => $success,
+			'message' => $message,
+			'start' => $start,
+			'stop' => $stop,
+		]);
+	}
+
+	/**
+	 * stáhne přepis videa jako DOCX soubor
+	 * @return Response
+	 */
+	public function overwriteDocx(Request $request): Response
+	{
+		$article_id = (int) $request->attributes->get('article_id', 0);
+
+		$article = $this->newsRepository->getArticle($article_id);
+
+		if ($article) {
+
+			$html = (string) $article['text'];
+			$html = preg_replace('~<script\b[^>]*>.*?</script>~is', '', $html);
+
+			// 1) &nbsp; rozbíjí XML uvnitř DOCX
+			$html = str_replace('&nbsp;', ' ', $html);
+
+			// 2) PhpWord (loadXML) potřebuje XML-friendly <br/>
+			$html = preg_replace('~</br\s*>~i', '<br/>', $html);
+			$html = preg_replace('~<br\s*>~i', '<br/>', $html);
+
+			// 3) odstranit prázdné odstavce typu <p><br></p>
+			$html = preg_replace('~<p\b[^>]*>\s*(<br\s*/?>|&nbsp;|\s)*\s*</p>~i', '', $html);
+
+			// 4) převod <div class="synchron"...> na <p>
+			$dom = new \DOMDocument('1.0', 'UTF-8');
+
+			libxml_use_internal_errors(true);
+			$dom->loadHTML('<?xml encoding="utf-8" ?><div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			libxml_clear_errors();
+
+			$xpath = new \DOMXPath($dom);
+
+			foreach ($xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " synchron ")]') as $node) {
+				$p = $dom->createElement('p');
+
+				while ($node->firstChild) {
+					$p->appendChild($node->firstChild);
+				}
+
+				$node->parentNode->replaceChild($p, $node);
+			}
+
+			$html = '';
+			foreach ($dom->documentElement->childNodes as $child) {
+				$html .= $dom->saveHTML($child);
+			}
+			// END 4)
+
+			// 5) odstranit prázdné seznamy
+			$html = preg_replace('~<ul\b[^>]*>\s*</ul>~i', '', $html);
+			$html = preg_replace('~<ol\b[^>]*>\s*</ol>~i', '', $html);
+
+			// 6) odstranit prázdné em odstavce
+			$html = preg_replace('~<p\b[^>]*>\s*<em>\s*(<br\s*/?>|&nbsp;|\s|-)*\s*</em>\s*</p>~i', '', $html);
+
+			// 7) odstranit <br>
+			$html = preg_replace('~<br\s*/?>~i', ' ', $html);
+
+			$phpWord = new PhpWord();
+			$phpWord->getSettings()->setThemeFontLang(new Language('cs-CZ'));
+			$phpWord->setDefaultParagraphStyle([
+				'spaceAfter' => 240,
+				'lineHeight' => 1.4,
+			]);
+			$section = $phpWord->addSection();
+
+			// datum
+			$publicFrom = new \DateTime($article['public_from']);
+
+			// odkaz
+			$articleUrl = $this->urlGenerator->generate('news_region_city_article', [
+				'url' => $article['region_url'],
+				'city_url' => $article['city_url'],
+				'article_id' => $article['article_id'],
+				'article_url' => $article['article_url'],
+			], UrlGeneratorInterface::ABSOLUTE_URL);
+
+			// hlavička (logo vlevo, datum + odkaz vpravo)
+			$table = $section->addTable([
+				'width' => 5000,
+				'unit' => TblWidth::PERCENT,
+				'borderSize' => 0,
+				'borderColor' => 'FFFFFF',
+				'cellMarginTop' => 0,
+				'cellMarginLeft' => 0,
+				'cellMarginRight' => 200,
+				'cellMarginBottom' => 0,
+			]);
+
+			$table->addRow();
+
+			// logo
+			$logoPath = $this->PUBLIC_PATH . '/img/web/logo-email.png';
+			$cellLeft = $table->addCell(6500, ['valign' => 'top']);
+			if (is_file($logoPath)) {
+				$cellLeft->addImage($logoPath, ['height' => 40]);
+			}
+
+			// datum + odkaz
+			$cellRight = $table->addCell(2500, ['valign' => 'top']);
+
+			$cellRight->addText(
+				'Datum vydání:',
+				[
+					'size' => 9,
+					'bold' => true,
+				],
+				[
+					'alignment' => Jc::END,
+					'spaceAfter' => 0,
+				]
+			);
+
+			$cellRight->addText(
+				$publicFrom->format('j.n.Y, H:i'),
+				[
+					'size' => 9,
+					'bold' => true,
+				],
+				[
+					'alignment' => Jc::END,
+					'spaceAfter' => 80,
+				]
+			);
+
+			$cellRight->addLink(
+				$articleUrl,
+				'Otevřít článek na polar.cz',
+				[
+					'color' => '0563C1',
+					'underline' => 'single',
+					'size' => 10,
+				],
+				[
+					'alignment' => Jc::END,
+					'spaceAfter' => 0,
+				]
+			);
+
+			// mezera
+			$section->addTextBreak(1);
+
+			// nadpis - název pořadu
+			$section->addText(
+				(string) $article['title'],
+				[
+					'bold' => true,
+					'size' => 14,
+				],
+				[
+					'spaceAfter' => 160,
+				]
+			);
+
+			// try/catch z toho důvodu, aby při složitém HTML nezůstala zobrazená chybová stránka 500
+			try {
+				Html::addHtml($section, $html, false, false);
+			} catch (\Throwable $e) {
+
+				/* Případné uložení problematického HTML
+				 * file_put_contents(
+					PUBLIC_PATH . '/docx-debug-' . time() . '.txt',
+					print_r([
+						'error' => $e->getMessage(),
+						'html' => $html,
+						'json' => json_encode($html, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+					], true)
+				);*/
+
+				$section->addText('Přepis se nepodařilo převést do DOCX.');
+			}
+
+			$baseName = pathinfo($article['article_url'], PATHINFO_FILENAME);
+			$baseName = mb_substr($baseName, 0, 40);
+			$filename = 'polar-prepis-' . $baseName . '-' . $publicFrom->format('Y-m-d') . '.docx';
+
+			$tmp = tempnam(sys_get_temp_dir(), 'docx_');
+			$writer = IOFactory::createWriter($phpWord, 'Word2007');
+			$writer->save($tmp);
+
+			$response = new Response((string) file_get_contents($tmp));
+			$response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+			$response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+			$response->headers->set('Content-Length', (string) filesize($tmp));
+
+			@unlink($tmp);
+
+			return $response;
+		}
+
+		return new Response();
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertRelativeArticle(string $text): string
+	{
+		RELATIVEARTICLE:
+		if (mb_strpos($text, '{{souvisejici-clanek', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{souvisejici-clanek',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$relative_article_id = mb_substr($id, 22, -3);
+			if (is_numeric($relative_article_id)) {
+				$relatedArticle = $this->playkitRepository->getArticle($relative_article_id);
+				if ($relatedArticle) {
+
+					$html  = '<div class="header">Sledujte také</div>';
+					$html .= '<div class="relative-article">';
+					$html .= '<h3>';
+					$html .= '<a href="' . $this->urlGenerator->generate('news_region_city_article', ['url' => $relatedArticle['region_url'], 'city_url' => $relatedArticle['city_url'], 'article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '</h3>';
+					$html .= '</div>';
+
+					$text = str_replace($id, $html, $text);
+				} else {
+					$text = str_replace($id, '', $text);
+				}
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			GOTO RELATIVEARTICLE;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertRelativePrArticle(string $text): string
+	{
+		RELATIVEARTICLE:
+		if (mb_strpos($text, '{{souvisejici-pr-clanek', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{souvisejici-pr-clanek',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$relative_article_id = mb_substr($id, 25, -3);
+			if (is_numeric($relative_article_id)) {
+				$relatedArticle = $this->playkitRepository->getArticlePr($relative_article_id);
+				if ($relatedArticle) {
+
+					$html  = '<div class="header">Sledujte také</div>';
+					$html .= '<div class="relative-pr-article">';
+					$html .= '<h3>';
+					$html .= '<a href="' . $this->urlGenerator->generate('news_pr_article', ['article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '</h3>';
+					$html .= '</div>';
+
+					$text = str_replace($id, $html, $text);
+				} else {
+					$text = str_replace($id, '', $text);
+				}
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			GOTO RELATIVEARTICLE;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertRelativeTriptipArticle(string $text): string
+	{
+		RELATIVEARTICLE:
+		if (mb_strpos($text, '{{souvisejici-kam-vyrazit-clanek', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{souvisejici-kam-vyrazit-clanek',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$relative_article_id = mb_substr($id, 34, -3);
+			if (is_numeric($relative_article_id)) {
+				$relatedArticle = $this->playkitRepository->getTriptip($relative_article_id); // Dříve "$this->getCoverageTable()->getArticleSection($relative_article_id, 2);"
+				if ($relatedArticle) {
+
+					$html  = '<div class="header">Sledujte také</div>';
+					$html .= '<div class="relative-triptip-article">';
+					$html .= '<h3>';
+					$html .= '<a href="' . $this->urlGenerator->generate('triptip_region_city_article', ['url' => $relatedArticle['region_url'], 'city_url' => $relatedArticle['city_url'], 'article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '</h3>';
+					$html .= '</div>';
+
+					$text = str_replace($id, $html, $text);
+				} else {
+					$text = str_replace($id, '', $text);
+				}
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			GOTO RELATIVEARTICLE;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @param int $article_id
+	 * @return string
+	 */
+	private function insertOnlineNews(string $text, int $article_id): string
+	{
+		if (mb_strpos($text, '{{online-reportaz}}', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{online-reportaz}}',0, 'UTF-8');
+			$posEnd = $posStart + 19;
+			$id = mb_substr($text, $posStart, $posEnd - $posStart);
+
+			$html  = '<div class="onlineNews">Online reportáž</div>';
+
+			$text = str_replace($id, $html, $text);
+
+			// Inline JS pro AJAX načítání online reportáže se řeší v šabloně
+		}
+		return $text;
+	}
+
+	/**
+	 * @return JsonResponse
+	 */
+	public function getContentOnlineNews(Request $request): JsonResponse
+	{
+		$article_id = (int) $request->attributes->get('article_id', 0);
+		$page = (int) $request->request->get('page', 1);
+		$limit = 10;
+		$count = 0;
+		$html = '';
+		$refreshDate = '1970/01/01 00:00:00';
+		$success = true;
+
+		try {
+			$items = $this->playkitRepository->getOnlineNewsByArticleId($article_id, $page, $limit);
+			$count = $this->playkitRepository->getCountOnlineNewsByArticleId($article_id);
+
+			// Poslední příspěvěk
+			try {
+				$item = $this->playkitRepository->getOnlineNewsByArticleId($article_id, 1, 1);
+				if (isset($item[0])) {
+					$datetime = new \DateTime($item[0]['datetime']);
+					$refreshDate = $datetime->format('Y/m/d H:i');
+				}
+			} catch (\Exception $e) {
+				$refreshDate = '1970/01/01 00:00:00';
+			}
+
+			if ($items) {
+				$html .=
+					'<h3 class="mb-3">Online reportáž <span class="btnRefreshOnlineNews cur-pointer pull-right text-0">aktualizovat&nbsp;<i class="fa fa-fw fa-refresh text-primary"></i></span></h3>' .
+					'<div class="container-fluid ps-3">';
+				foreach ($items as $item) {
+
+					try {
+						$datetime = new \DateTime($item['datetime']);
+						$today = new \DateTime();
+
+						if ($today->format('Y-m-d') === $datetime->format('Y-m-d')) {
+							$day = 'dnes';
+						} else if ($today->modify('-1 day')->format('Y-m-d') === $datetime->format('Y-m-d')) {
+							$day = 'včera';
+						} else {
+							$day = $datetime->format('j.n.');
+						}
+					} catch (\Exception $e) {
+						$day = 'NaN';
+					}
+
+					try {
+						$datetime = new \DateTime($item['datetime']);
+						$datetime = $datetime->format('H:i');
+					} catch (\Exception $e) {
+						$datetime = 'NaN';
+					}
+					$html .=
+						'<div class="row mt-2">' .
+							'<div class="col-md-2 font-weight-bold text-primary text-4-5 text-start line-height-2 ps-0">' .
+								$datetime .
+								'<br /><span class="text-1 font-weight-normal">' . $day . '</span>' .
+							'</div>' .
+							'<div class="col-md-10 content">' .
+								$item['content'] .
+							'</div>' .
+						'</div>';
+				}
+				$html .=
+					'</div>';
+
+				// Paginator
+				if ($count > $limit) {
+					$pages = (int)($count / $limit);
+					if (($count % $limit) !== 0) {
+						$pages++;
+					}
+					$html .=
+						'<ul class="pagination">';
+					for ($i = 1; $i <= $pages; $i++) {
+						$class = 'page-item';
+						if ($page === $i) {
+							$class .= ' active';
+						} else {
+							$class .= ' btnPaginator';
+						}
+						$html .=
+							'<li class="' . $class . '" data-page="' . $i . '">' .
+								'<a class="page-link text-decoration-none" href="#" title="">' .
+									$i .
+								'</a>' .
+							'</li>';
+					}
+					$html .=
+						'</ul>';
+				}
+
+				// Doplnění widgetů
+				$html = $this->insertRelativeArticle($html);
+				$html = $this->insertFacebook($html);
+				$html = $this->insertTwitter($html);
+				$html = $this->insertYoutube($html, $request->getSchemeAndHttpHost());
+				$html = $this->insertFacebookLive($html);
+			}
+		} catch (\Exception $e) {
+			$success = $e->getMessage();
+		}
+
+		return new JsonResponse([
+			'success' => $success,
+			'article_id' => $article_id,
+			'page' => $page,
+			'limit' => $limit,
+			'count' => $count,
+			'refreshDate' => $refreshDate,
+			'html' => $html,
+		]);
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertTwitter(string $text): string
+	{
+		$i = 1;
+		TWITTERFEED:
+		if (mb_strpos($text, '{{twitter-feed-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{twitter-feed-',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$twitter_id = mb_substr($id, 16, -3);
+			if (is_numeric($twitter_id)) {
+				$html = '<div class="twitter-feed" id="twitter-feed-' . $i . '">';
+				$html .= '</div>';
+				$html .= '<script>
+								twttr.ready(function (twttr) {
+									twttr.widgets.createTweet(
+										"' . $twitter_id . '",
+										document.getElementById("twitter-feed-' . $i . '"),
+										{
+											theme: "light",
+											align: "center",
+											lang: "cs"
+										}
+									);
+								});
+							</script>';
+
+				$text = str_replace($id, $html, $text);
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			$i++;
+			GOTO TWITTERFEED;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertFacebook(string $text): string
+	{
+		$i = 1;
+		FACEBOOKFEED:
+		if (mb_strpos($text, '{{facebook-feed-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{facebook-feed-',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$code = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$both_ids = mb_substr($code, 16, -2);
+			$both_ids = str_replace('"', '', $both_ids);
+			if (mb_strpos($both_ids, '-', 0, 'UTF-8')) {
+				$two_ids = explode("-", $both_ids);
+				if (isset($two_ids[0]) && isset($two_ids[1])) {
+					$id_page = $two_ids[0];
+					$id_post = $two_ids[1];
+				}
+			}
+			if (isset($id_page) && isset($id_post)) {
+				$html = '<div class="fb-post" data-href="https://www.facebook.com/'.$id_page.'/posts/'.$id_post.'/" id="facebook-feed-' . $i . '"></div>';
+				$text = str_replace($code, $html, $text);
+			} else {
+				$text = str_replace($code, '', $text);
+			}
+			$i++;
+			GOTO FACEBOOKFEED;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertFacebookLive(string $text): string
+	{
+		$i = 1;
+		FACEBOOKLIVEFEED:
+		if (mb_strpos($text, '{{facebook-live-feed-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{facebook-live-feed-', 0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$code = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$both_ids = mb_substr($code, 21, -2);
+			$both_ids = str_replace('"', '', $both_ids);
+			if (mb_strpos($both_ids, '-', 0, 'UTF-8')) {
+				$two_ids = explode("-", $both_ids);
+				if (isset($two_ids[0]) && isset($two_ids[1])) {
+					$id_page = $two_ids[0];
+					$id_post = $two_ids[1];
+				}
+			}
+			if (isset($id_page) && isset($id_post)) {
+				$html = '<div class="fb-video" data-href="https://www.facebook.com/'.$id_page.'/videos/'.$id_post.'/" id="facebook-live-feed-' . $i . '"></div>';
+				$text = str_replace($code, $html, $text);
+			} else {
+				$text = str_replace($code, '', $text);
+			}
+			$i++;
+			GOTO FACEBOOKLIVEFEED;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertYoutube(string $text, string $schemeHost): string
+	{
+		$i = 1;
+		YOUTUBEVIDEO:
+		if (mb_strpos($text, '{{youtube-video-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{youtube-video-',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$youtube_id = mb_substr($id, 17, -3);
+			if ($youtube_id) {
+				$html = '<div class="responsive_player"><iframe id="youtube-player-'.$i.'" type="text/html" width="640" height="360" src="https://www.youtube.com/embed/'.$youtube_id.'?enablejsapi=1&origin='.$schemeHost.'" frameborder="0" allowfullscreen></iframe></div>';
+				$text = str_replace($id, $html, $text);
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			$i++;
+			GOTO YOUTUBEVIDEO;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string|null $url
+	 * @return int|null
+	 */
+	private function getJobOkresCode(?string $url): ?int
+	{
+		switch ($url) {
+			case 'ostrava':
+				$okres_code = 3807;
+				break;
+			case 'karvinsko':
+				$okres_code = 3803;
+				break;
+			case 'frydeckomistecko':
+				$okres_code = 3802;
+				break;
+			case 'opavsko':
+				$okres_code = 3806;
+				break;
+			case 'novojicinsko':
+				$okres_code = 3804;
+				break;
+			case 'bruntalsko':
+				$okres_code = 3801;
+				break;
+			default:
+				$okres_code = null;
+				break;
+		}
+		return $okres_code;
+	}
+
+	/**
+	 * @param string|null $region_url
+	 * @return string|null
+	 */
+	private function getRegionForWeather(?string $region_url): ?string
+	{
+		$weather_region = match ($region_url) {
+			'ostrava' => 'Ostrava',
+			'karvinsko' => 'Karviná',
+			'frydeckomistecko' => 'Frýdek-Místek',
+			'opavsko' => 'Opava',
+			'novojicinsko' => 'Nový Jičín',
+			'bruntalsko' => 'Bruntál',
+			default => 'Ostrava',
+		};
+		return $weather_region;
+	}
+
+	/**
+	 * Funkce pro úpravu odkazu
+	 * @param string $url
+	 * @param string $pageParam
+	 * @param int $newPageValue
+	 * @return string
+	 */
+	private function updatePageParam($url, $pageParam, $newPageValue) {
+		// Parsing URL
+		$parsedUrl = parse_url($url);
+		if (isset($parsedUrl['query'])) {
+			parse_str($parsedUrl['query'], $queryParams);
+		}
+
+		// Update the page parameter
+		$queryParams[$pageParam] = $newPageValue;
+
+		// Rebuild the query and URL
+		$newQuery = http_build_query($queryParams);
+		return $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'] . '?' . $newQuery;
+	}
+
+	/**
+	 * @param $text
+	 * @param null $replace
+	 * @return string
+	 */
+	private function removeAccent($text, $replace = null): string
+	{
+		$transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
+		if ($transliterator) {
+			$text = $transliterator->transliterate($text);
+		}
+		$text = preg_replace('/\p{C}+/u', '', $text);
+		if ($replace) {
+			$text = str_replace(' ', $replace, $text);
+		}
+		return $text;
+	}
+
 }
