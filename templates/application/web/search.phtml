@@ -97,15 +97,15 @@ function highlightWords($content, $alternativeContent, $words): array|string
 }
 
 function removeAccent($text, $replace = NULL): string
-    {
-        $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
-        $text = $transliterator->transliterate($text);
-        $text = preg_replace('/\p{C}+/u', '', $text);
-        if ($replace) {
-            $text = str_replace(' ', $replace, $text);
-        }
-        return $text;
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    $text = $transliterator->transliterate($text);
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
     }
+    return $text;
+}
 
 $view->setTitle('Vyhledávání');
 $view->addMeta('keywords', 'vyhledávání');

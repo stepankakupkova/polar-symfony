@@ -114,15 +114,15 @@ $view->addInlineScript(
 );
 
 function removeAccent($text, $replace = NULL): string
-    {
-        $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
-        $text = $transliterator->transliterate($text);
-        $text = preg_replace('/\p{C}+/u', '', $text);
-        if ($replace) {
-            $text = str_replace(' ', $replace, $text);
-        }
-        return $text;
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    $text = $transliterator->transliterate($text);
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
     }
+    return $text;
+}
 
 /** @var $article */
 $shows = $shows ?? [];
@@ -621,7 +621,7 @@ $view->setBreadcrumbs([
                     </div>
                     <div class="col-4">
                         <?php if ($weather) { ?>
-                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weatherRegion; ?></h3>
+                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weather_region; ?></h3>
                             <?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
                             <?php foreach ($weather as $w) { ?>
                                 <div class="row text-secondary text-3-4 mb-2">
@@ -691,7 +691,7 @@ $view->setBreadcrumbs([
                     </div>
                 </div>
             <?php } ?>
-            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesFirstHalf ?? null]) ?>
+            <?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesFirstHalf ?? null]) ?>
             <!-- Nabídka práce -->
             <?php //= $view->include('news/partial/job-region') ?>
             <!-- Dnešní premiéry -->
@@ -724,7 +724,7 @@ $view->setBreadcrumbs([
     <div class="row sticky-square-3">
         <div class="col-12 col-lg-7">
             <!-- Doporučujeme -->
-            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesSecondHalf ?? null]) ?>
+            <?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesSecondHalf ?? null]) ?>
         </div>
         <!-- pravá strana vedle K tématu a 1. polovina Doporučujeme -->
         <div class="col-12 col-lg-5 p-relative">

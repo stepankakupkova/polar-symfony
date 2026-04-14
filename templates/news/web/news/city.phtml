@@ -66,9 +66,6 @@ $view->setBreadcrumbs([
     ['label' => $city['city'] ?? ''],
 ]);
 
-$locale = Locale::getDefault();
-
-
 $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($locale): string {
     return (new IntlDateFormatter($locale, $dateType, $timeType))->format($date) ?: '';
 };
@@ -308,7 +305,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
                                     </div>
                                     <div class="col-4">
                                         <?php if ($weather) { ?>
-                                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weatherRegion ?></h3>
+                                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weather_region ?></h3>
                                             <?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
                                             <?php foreach ($weather as $w) { ?>
                                                 <div class="row text-secondary text-3-4 mb-2">

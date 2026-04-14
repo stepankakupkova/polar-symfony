@@ -67,4 +67,8 @@ services:
         arguments:
             $GOOGLE_ANALYTICS_ID: '%app.GOOGLE_ANALYTICS_ID%'
 
+    App\Banner\EventListener\BannerGlobalListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
 

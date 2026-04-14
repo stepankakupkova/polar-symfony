@@ -70,10 +70,6 @@ final class NewsController
 		// Počasí
 		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
 
-		// Banner leaderboard a Mobilesticky pro layout
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
 
@@ -96,8 +92,6 @@ final class NewsController
 			//'shows' => $shows,
 			'weather' => $weather,
 			'weather_region' => 'Ostrava',
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
@@ -164,10 +158,6 @@ final class NewsController
 		$weather_region = $this->getRegionForWeather($region['url']);
 		$weather = $this->playkitRepository->getWeatherForNews($weather_region);
 
-		// Banner leaderboard a Mobilesticky pro layout
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
 
@@ -191,8 +181,6 @@ final class NewsController
 			//'shows' => $shows,
 			'weather' => $weather,
 			'weather_region' => $weather_region,
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
@@ -256,10 +244,6 @@ final class NewsController
 		$weather_region = $this->getRegionForWeather($region['url']);
 		$weather = $this->playkitRepository->getWeatherForNews($weather_region);
 
-		// Banner leaderboard a Mobilesticky pro layout
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
 
@@ -284,8 +268,6 @@ final class NewsController
 			//'shows' => $shows,
 			'weather' => $weather,
 			'weather_region' => $weather_region,
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
@@ -592,10 +574,6 @@ final class NewsController
 		}
 		// END Články k tématu
 
-		// Banner leaderboard a Mobilesticky pro layout
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
 
@@ -628,8 +606,6 @@ final class NewsController
 			'blockCamera' => $blockCamera,
 			'weather' => $weather,
 			'weather_region' => $weather_region,
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
@@ -650,13 +626,16 @@ final class NewsController
 	public function articlePr(Request $request, PhtmlRenderer $renderer): Response
 	{
 		$article_id = (int) $request->attributes->get('article_id', 0);
+		error_log("=== articlePr START, id=$article_id ===");
 		if (! $article_id) {
 			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 		}
 		$printableText = '';
 
 		try {
+			error_log('articlePr: getArticlePr...');
 			$article = $this->playkitRepository->getArticlePr($article_id);
+			error_log('articlePr: getArticlePr OK');
 			if (! $article) {
 				return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 			}
@@ -705,11 +684,15 @@ final class NewsController
 			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 		}
 
+		error_log('articlePr: getCountPR...');
 		// Celkový počet článků
 		$newsCount = $this->playkitRepository->getCountPR();
+		error_log('articlePr: getCountPR OK');
 
 		// PR články
+		error_log('articlePr: getPrArticles...');
 		$pr = $this->newsRepository->getPrArticles(11);
+		error_log('articlePr: getPrArticles OK');
 
 		// Mohlo by Vás zajímat
 		/*$newArticles = $this->newsRepository->getNewArticles(3);
@@ -755,8 +738,10 @@ final class NewsController
 		$newArticlesFirstHalf = isset($dividedArray[0]) ? $dividedArray[0] : null;
 		$newArticlesSecondHalf = isset($dividedArray[1]) ? $dividedArray[1] : null;
 
+		error_log('articlePr: getArticlesByRegionId...');
 		// Nejnovější zprávy pro MSK
 		$regionArticles = $this->newsRepository->getArticlesByRegionId(7, 6, $article_id);
+		error_log('articlePr: getArticlesByRegionId OK');
 		if ($regionArticles) {
 			foreach ($regionArticles as $id => $item) {
 				$date = new \DateTime($item['public_from']);
@@ -776,27 +761,22 @@ final class NewsController
 		// Pořady
 		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
+		error_log('articlePr: blockTriptip...');
 		// Blok Kam vyrazit
 		$blockTriptip = $this->newsRepository->getTriptipArticles(4, false, true);
 
+		error_log('articlePr: blockJob...');
 		// Blok Nabídky práce
 		$blockJob = $this->jobRepository->getRandForWeb(132, 4);
 
+		error_log('articlePr: blockCamera...');
 		// Blok kamery
 		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
 
+		error_log('articlePr: weather...');
 		// Počasí
 		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
-
-		// Bannery stare
-		/*$bannerArticle = $bannerText = $bannerRight = null;
-		$bannerArticle = $this->getBannersArticleTable()->getBannerForLayout();
-		$bannerText = $this->getBannersTextTable()->getBannerForLayout();
-		$bannerRight = $this->getBannersRightTable()->getBannerForLayout();*/
-
-		// Banner leaderboard a Mobilesticky pro layout
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
+		error_log('articlePr: weather OK, rendering...');
 
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
@@ -810,6 +790,7 @@ final class NewsController
 		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
+		error_log('articlePr: rendering template...');
 		return new Response($renderer->renderWithLayout('news/web/news/article-pr', [
 			'newsCount' => $newsCount,
 			'pr' => $pr,
@@ -828,8 +809,6 @@ final class NewsController
 			'blockCamera' => $blockCamera,
 			'weather' => $weather,
 			'weather_region' => 'Ostrava',
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerSquare' => $bannerSquare,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
@@ -860,10 +839,6 @@ final class NewsController
 		// PR články
 		$pr = $this->newsRepository->getPrArticles(7);
 
-		// Banner leaderboard a Mobilesticky pro layout
-		$bannerLeaderboard = $this->bannerRepository->getLeaderboard();
-		$bannerMobilesticky = $this->bannerRepository->getMobilesticky();
-
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
 
@@ -875,11 +850,12 @@ final class NewsController
 			'page' => $page,
 			'newsCount' =>  $newsCount,
 			'pr' => $pr,
-			'bannerLeaderboard' => $bannerLeaderboard,
-			'bannerMobilesticky' => $bannerMobilesticky,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
 			// Extra pro šablonu
+			'page' => $page,
+			'total' => $newsCount,
+			'limit' => 25,
 			'currentUrl' => $request->getUri(),
 		]));
 	}

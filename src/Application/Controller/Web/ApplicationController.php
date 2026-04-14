@@ -137,8 +137,6 @@ final class ApplicationController
 		$actual_link = $request->getSchemeAndHttpHost() . $request->getRequestUri();
 
 		return new Response($renderer->renderWithLayout('application/web/hd', [
-			'bannerLeaderboard'  => $bannerRepository->getLeaderboard(),
-			'bannerMobilesticky' => $bannerRepository->getMobilesticky(),
 			'og' => [
 				'title' => 'HD vysílání | Televize POLAR',
 				'description' => 'Nepřetržitý proud informací, zpráv a zábavných pořadů z vašeho okolí.',
@@ -155,8 +153,6 @@ final class ApplicationController
 		$actual_link = $request->getSchemeAndHttpHost() . $request->getRequestUri();
 
 		return new Response($renderer->renderWithLayout('application/web/polar2', [
-			'bannerLeaderboard'  => $bannerRepository->getLeaderboard(),
-			'bannerMobilesticky' => $bannerRepository->getMobilesticky(),
 			'og' => [
 				'title' => 'Polar 2 | Televize POLAR',
 				'description' => 'POLAR - moravskoslezská regionální televize - nepřetržitý proud informací, zpráv a zábavných pořadů z vašeho okolí.',
