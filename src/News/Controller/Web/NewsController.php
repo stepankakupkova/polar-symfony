@@ -347,7 +347,7 @@ final class NewsController
 		$printableText = '';
 
 		if (!$url || !$city_url || !$article_id) {
-			return new RedirectResponse($this->urlGenerator->generate('news'));
+			//return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
 		try {
@@ -365,14 +365,14 @@ final class NewsController
 			}
 
 			if ($article['public'] === 0) {
-				return new RedirectResponse($this->urlGenerator->generate('news'));
+				//return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 
 			if (!$region || !$city || !$article) {
-				return new RedirectResponse($this->urlGenerator->generate('news'));
+				//return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 			if (!$article['region'] || !$article['city']) {
-				return new RedirectResponse($this->urlGenerator->generate('news'));
+				//return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 
 			// Text článku k tisku, bez widgetů
@@ -478,10 +478,10 @@ final class NewsController
 		$newArticles = $this->playkitRepository->getAllHomepage([$article_id]);   // Dříve název "$this->getHomepageTable()->getAll()"
 		if ($newArticles) {
 			foreach ($newArticles as $i => $iValue) {
-				if ($iValue['section'] === '1' || $iValue['section'] === '2') {
+				if ($iValue['section'] === 1 || $iValue['section'] === 2) {
 					$newArticles[$i]['url'] = '/zpravy/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
 				}
-				if ($iValue['section'] === '3') {
+				if ($iValue['section'] === 3) {
 					$newArticles[$i]['url'] = '/kam-vyrazit/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
 				}
 			}
@@ -491,7 +491,7 @@ final class NewsController
 		$newArticlesFirstHalf = isset($dividedArray[0]) ? $dividedArray[0] : null;
 		$newArticlesSecondHalf = isset($dividedArray[1]) ? $dividedArray[1] : null;
 
-		// Nejnovější zprávy pro region
+		// Nejnovější zprávy pro MSK
 		$regionArticles = $this->newsRepository->getArticlesByRegionId((int)$region['id'], 6, $article_id);
 		if ($regionArticles) {
 			foreach ($regionArticles as $id => $item) {

@@ -54,14 +54,13 @@ $view->addOgMeta('og:image:height', '1080');
 $cityPath = $view->path('news_region_city', ['url' => $region['url'], 'city_url' => $city['url']]);
 if ($page > 1) {
     $prevPage = $page - 1;
-    $view->addHeadLink('prev', $cityPath . ($prevPage > 1 ? '?page=' . $prevPage : ''));
+    $view->addHeadLink('prev', $cityPath . ($prevPage > 1 ? '?strana=' . $prevPage : ''));
 }
 if ($total > $page * $limit) {
-    $view->addHeadLink('next', $cityPath . '?page=' . ($page + 1));
+    $view->addHeadLink('next', $cityPath . '?strana=' . ($page + 1));
 }
 
 $view->setBreadcrumbs([
-    ['label' => 'Zprávy', 'url' => $view->path('news')],
     ['label' => $region['region'], 'url' => $view->path('news_region', ['url' => $region['url']])],
     ['label' => $city['city'] ?? ''],
 ]);

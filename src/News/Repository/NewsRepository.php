@@ -7,7 +7,10 @@ use Doctrine\DBAL\ParameterType;
 
 final class NewsRepository
 {
-	public function __construct(private Connection $connection) {}
+	public function __construct(
+		private Connection $connection,
+		private int $hoursDeleteLabels = 24,
+	) {}
 
 	public function getPaginator(int $page, int $limit): array
 	{
@@ -367,6 +370,15 @@ final class NewsRepository
 
 		if (!$rows) {
 			return null;
+		}
+
+		$now_minus_x = new \DateTime();
+		$now_minus_x = $now_minus_x->modify('-' . $this->hoursDeleteLabels . ' hours')->format('Y-m-d H:i:s');
+
+		foreach ($rows as $i => $iValue) {
+			if ($iValue['updated_date'] < $now_minus_x) {
+				$rows[$i]['label'] = '';
+			}
 		}
 
 		$indexed = [];

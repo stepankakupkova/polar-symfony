@@ -10,12 +10,14 @@ $last = array_key_last($breadcrumbs);
         <a href="<?= $view->path('app_home') ?>" title="Domů">Domů</a>
     </li>
     <?php foreach ($breadcrumbs as $i => $crumb) { ?>
-        <li>
-            <?php if ($i === $last) { ?>
-                <span class="text-primary"><?= htmlspecialchars($crumb['label']) ?></span>
-            <?php } else { ?>
+        <?php if ($i === $last) { ?>
+            <li class="active">
+                <?= htmlspecialchars($crumb['label']) ?>
+            </li>
+        <?php } else { ?>
+            <li>
                 <a href="<?= htmlspecialchars($crumb['url'] ?? '#') ?>" title="<?= htmlspecialchars($crumb['label']) ?>"><?= htmlspecialchars($crumb['label']) ?></a>
-            <?php } ?>
-        </li>
+            </li>
+        <?php } ?>
     <?php } ?>
 </ul>

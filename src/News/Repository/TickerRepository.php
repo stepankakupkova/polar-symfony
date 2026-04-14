@@ -13,7 +13,7 @@ final class TickerRepository
 		return $this->connection->createQueryBuilder()
 			->select('content')
 			->from('polar_ticker_content')
-			->orderBy('order', 'ASC')
+			->orderBy('`order`', 'ASC')
 			->executeQuery()
 			->fetchFirstColumn();
 	}

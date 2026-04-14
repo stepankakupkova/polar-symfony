@@ -26,8 +26,21 @@ services:
     App\News\Repository\PlaykitRepository:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
+            $hoursDeleteLabels: '%app.HOURS_DELETE_LABELS%'
+
+    App\News\Repository\NewsRepository:
+        arguments:
+            $hoursDeleteLabels: '%app.HOURS_DELETE_LABELS%'
 
     App\Job\Repository\JobRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    App\News\Repository\CrawlRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    App\News\Repository\TickerRepository:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
 

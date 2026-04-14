@@ -16,7 +16,7 @@ $previous     = $page > 1 ? $page - 1 : null;
 $next         = $page < $pageCount ? $page + 1 : null;
 $pagesInRange = range(max(1, $page - 4), min($pageCount, $page + 4));
 
-$urlFor = fn(int $p): string => $view->path($route, $routeParams) . '?page=' . $p;
+$urlFor = fn(int $p): string => $view->path($route, $routeParams + ['strana' => $p]);
 
 ?>
 <ul class="pagination">

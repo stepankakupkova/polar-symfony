@@ -16,7 +16,7 @@ Tykej mi a piš o sobě v mužském rodě.
 
 Instrukce pro tento projekt:
 
-Pracuju na migraci z Laminas do Symfony.
+Pracuju na migraci z Laminas do Symfony. Web předělávej jako kopii 1:1, budou se lišit jen frameworkem Laminas/Symfony.
 
 Projekty:
 - polar = starý Laminas, pouze reference, nikdy neupravuj

@@ -74,7 +74,7 @@ return [
         ],
         [
             'id'     => 'menuFooterSitemap',
-            'label'  => 'Sitemap',
+            'label'  => 'Mapa stránek',
             'url'    => '/sitemap',
             'class'  => null,
             'target' => null,

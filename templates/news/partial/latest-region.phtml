@@ -1,23 +1,161 @@
-<?php
-/** @var array|null $regionArticles */
-/** @var array|null $region */
-/** @var \App\Application\View\ViewHelper $view */
-?>
-
 <?php if ($regionArticles) { ?>
-	<div class="row">
-		<div class="col-md-12">
-			<h3 class="text-5 text-primary mb-4">
-				<?php if (isset($region) && ($region['url'] ?? '') !== 'moravskoslezsky-kraj') { ?>
-					<a class="text-primary" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>">
-						Nejnovější zprávy - <?= htmlspecialchars($region['region']) ?>
-					</a>
-				<?php } else { ?>
-					<a class="text-primary" href="<?= $view->path('news') ?>">Nejnovější zprávy</a>
-				<?php } ?>
-			</h3>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="text-5 text-primary mb-4">
+                <?php if (isset($region) && $region['url'] !== 'moravskoslezsky-kraj') { ?>
+                    <a class="text-primary" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>">
+                        Nejnovější zprávy - <?= $region['region'] ?>
+                    </a>
+                <?php } else { ?>
+                    <a class="text-primary" href="<?= $view->path('news') ?>">
+                        Nejnovější zprávy
+                    </a>
+                <?php } ?>
+            </h3>
+        </div>
+    </div>
 
-	<?= $view->include('news/partial/recommended', ['recommendedArticles' => $regionArticles]) ?>
+    <?php foreach ($regionArticles as $article) { ?>
+
+        <?php
+        $region_city_url = $view->path('news_region_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']]);
+        if ($article['city_url'] === 'cely-ms-kraj') {
+            $region_city_url = $view->path('news');
+        }
+
+        try {
+            $today = new DateTime();
+            $dateUpdate = new DateTime($article['updated_date']);
+            if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                $dayUpdate = 'Dnes';
+            } else {
+                $yesterday = new DateTime();
+                $yesterday->modify('-1 day');
+                if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                    $dayUpdate = 'Včera';
+                } else {
+                    $dayUpdate = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($dateUpdate);
+                }
+            }
+            $timeUpdate = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($dateUpdate);
+
+            $today = new DateTime();
+            $date = new DateTime($article['public_from']);
+            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                if ($article['label']) {
+                    $day = 'dnes';
+                } else {
+                    $day = 'Dnes';
+                }
+            } else {
+                $yesterday = new DateTime();
+                $yesterday->modify('-1 day');
+                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                    if ($article['label']) {
+                        $day = 'včera';
+                    } else {
+                        $day = 'Včera';
+                    }
+                } else {
+                    $day = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($date);
+                }
+            }
+            $time = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($date);
+        } catch (Exception $e) {
+            $day = 'NaN';
+            $time = 'NaN';
+            $dayUpdate = 'NaN';
+            $timeUpdate = 'NaN';
+        }
+        ?>
+
+        <div class="row mb-4-5">
+            <?php if ($article['picture']) { ?>
+                <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                    <div class="">
+                        <a class="" href="<?= $view->path('news_region_city_article', ['url' => $article['region_url'], 'city_url' => $article['city_url'], 'article_id' => $article['article_id'], 'article_url' => $article['article_url']]) ?>" title="<?= $article['title'] ?>">
+                            <span class="thumb-info thumb-info-lighten maxw-310">
+                                <span class="thumb-info-wrapper">
+                                    <img src="<?= str_replace('715x402', '310x174', $article['picture']) ?>" class="img-fluid" alt="<?= $article['title'] ?>">
+                                    <?php if (strpos($article['picture'], '/videos/') !== false) { ?>
+                                        <span class="thumb-info-action">
+                                            <span class="thumb-info-action-icon">
+                                                <i class="fas fa-play"></i>
+                                                <span class="player_duration"><?= $article['duration'] ? gmdate("i:s", $article['duration']) : ''; ?></span>
+                                            </span>
+                                        </span>
+                                    <?php } ?>
+                                </span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-7 col-lg-6 ps-1 pe-3">
+                    <h2 class="mb-1 mb-md-2">
+                        <a class="" href="<?= $view->path('news_region_city_article', ['url' => $article['region_url'], 'city_url' => $article['city_url'], 'article_id' => $article['article_id'], 'article_url' => $article['article_url']]) ?>" title="<?= $article['title'] ?>">
+                            <?= $article['title'] ?>
+                        </a>
+                    </h2>
+                    <div class="text-1 text-tertiary line-height-7 mb-1">
+                        <?php
+                            $now_minus_x = new DateTime();
+                            $now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                            if ($article['label'] && $article['updated_date'] > $now_minus_x) {
+                                echo $article['label'];
+                                echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                            } else {
+                                echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                            }
+                        ?>
+                        <span>
+                            <a href="<?= $region_city_url ?>" title="<?= $article['city_title'] ?>"><?= $article['city_title'] ?></a>&nbsp;|
+                        </span>
+                        <span>
+                            <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $article['author_url']]) . '" title="' . $article['author'] . '">' . $article['author'] . '</a>'; ?><!--
+                        --></span><!--
+                        --><!--<span>
+                            <?php //= $article['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $article['show_id']]) . '" title="' . $shows[$article['show_id']] . '">' . $shows[$article['show_id']] . '</a>' : ''; ?>
+                        </span>-->
+                    </div>
+                    <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                        <?= $article['anotation']; ?>
+                    </p>
+                </div>
+            <?php } else { ?>
+                <div class="col-12">
+                    <div class="">
+                        <h2 class="mb-1 mb-md-2">
+                            <a class="" href="<?= $view->path('news_region_city_article', ['url' => $article['region_url'], 'city_url' => $article['city_url'], 'article_id' => $article['article_id'], 'article_url' => $article['article_url']]) ?>" title="<?= $article['title'] ?>">
+                                <?= $article['title'] ?>
+                            </a>
+                        </h2>
+                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                            <?php
+                                $now_minus_x = new DateTime();
+                                $now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                if ($article['label'] && $article['updated_date'] > $now_minus_x) {
+                                    echo $article['label'];
+                                    echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                } else {
+                                    echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                }
+                            ?>
+                            <span>
+                                <a href="<?= $region_city_url ?>" title="<?= $article['city_title'] ?>"><?= $article['city_title'] ?></a>&nbsp;|
+                            </span>
+                            <span>
+                                <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $article['author_url']]) . '" title="' . $article['author'] . '">' . $article['author'] . '</a>'; ?><!--
+                            --></span><!--
+                            --><!--<span>
+                                <?php //= $article['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $article['show_id']]) . '" title="' . $shows[$article['show_id']] . '">' . $shows[$article['show_id']] . '</a>' : ''; ?>
+                            </span>-->
+                        </div>
+                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                            <?= $article['anotation']; ?>
+                        </p>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+    <?php } ?>
 <?php } ?>

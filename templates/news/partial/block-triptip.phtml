@@ -2,8 +2,6 @@
 /** @var array|null $blockTriptip */
 /** @var array|null $region */
 
-$locale = Locale::getDefault();
-
 $timeFormat = function (DateTime $date) use ($locale): string {
     return (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($date) ?: '';
 };
@@ -28,6 +26,8 @@ $region_title = (isset($region) && $region && $region['url'] !== 'moravskoslezsk
                 </div>
             </div>
         </div>
+        <!-- Pokud dojde k obnově carouselu (nefunguje pak sticky na pravé bloky), tak oddělat container>row>col níže, nechat jen carousel>article -->
+        <!--<div class="container owl-carousel owl-theme stage-margin nav-style-1 d-flex" data-plugin-options="{'items': 4, 'margin': 30, 'loop': false, 'nav': true, 'dots': false, 'stagePadding': 40}">-->
         <div class="container">
             <div class="row">
                 <?php for ($i = 0, $iMax = count($blockTriptip); $i < $iMax; $i++) { ?>

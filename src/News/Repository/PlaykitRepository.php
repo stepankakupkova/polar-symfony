@@ -7,7 +7,10 @@ use Doctrine\DBAL\ParameterType;
 
 final class PlaykitRepository
 {
-	public function __construct(private Connection $connection) {}
+	public function __construct(
+		private Connection $connection,
+		private int $hoursDeleteLabels = 24,
+	) {}
 
 	public function getWeatherForNews(?string $region): ?array
 	{
@@ -41,7 +44,20 @@ final class PlaykitRepository
 		}
 
 		$result = $qb->fetchAllAssociative();
-		return $result ?: null;
+		if (!$result) {
+			return null;
+		}
+
+		$now_minus_x = new \DateTime();
+		$now_minus_x = $now_minus_x->modify('-' . $this->hoursDeleteLabels . ' hours')->format('Y-m-d H:i:s');
+
+		foreach ($result as $i => $iValue) {
+			if ($iValue['updated_date'] < $now_minus_x) {
+				$result[$i]['label'] = '';
+			}
+		}
+
+		return $result;
 	}
 
 	public function getRegionByUrl(string $url): ?array

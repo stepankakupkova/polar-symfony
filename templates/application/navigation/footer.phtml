@@ -4,22 +4,17 @@ $items = $nav['footer'];
 $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 ?>
 <ul class="">
-    <?php foreach ($items as $item) { ?>
-        <?php
-        $active = ($item['url'] !== '?cmpscreen' && rtrim($currentUri, '/') === rtrim($item['url'], '/'));
-        $class = trim(($item['class'] ?? '') . ' ml-1 text-decoration-none' . ($active ? ' active' : ''));
-        $idAttr = $item['id'] ? ' id="' . htmlspecialchars($item['id']) . '"' : '';
-        $targetAttr = $item['target'] ? ' target="' . htmlspecialchars($item['target']) . '"' : '';
-        ?>
-        <li>
-            <?php if ($item['icon']) { ?>
-                <i class="<?= htmlspecialchars($item['icon']) ?> mr-1" aria-hidden="true"></i>&nbsp;
-            <?php } ?>
-            <a class="<?= htmlspecialchars($class) ?>"
-               href="<?= htmlspecialchars($item['url']) ?>"
-               <?= $idAttr ?>
-               title="<?= htmlspecialchars($item['label']) ?>"
-               <?= $targetAttr ?>><?= htmlspecialchars($item['label']) ?></a>
-        </li>
-    <?php } ?>
+<?php foreach ($items as $item) {
+    $active = ($item['url'] !== '?cmpscreen' && rtrim($currentUri, '/') === rtrim($item['url'], '/'));
+    $class = trim(($item['class'] ?? '') . ' ml-1 text-decoration-none' . ($active ? ' active' : ''));
+    $idAttr = $item['id'] ? ' id="' . htmlspecialchars($item['id']) . '"' : '';
+    $targetAttr = $item['target'] ? ' target="' . htmlspecialchars($item['target']) . '"' : '';
+    echo '<li>';
+    if ($item['icon']) {
+        echo '<i class="' . htmlspecialchars($item['icon']) . ' mr-1" aria-hidden="true"></i>&nbsp;';
+    }
+    echo '<a class="' . htmlspecialchars($class) . '" href="' . htmlspecialchars($item['url']) . '"' . $idAttr . ' title="' . htmlspecialchars($item['label']) . '"' . $targetAttr . '>' . htmlspecialchars($item['label']) . '</a>';
+    echo '</li>';
+}
+?>
 </ul>

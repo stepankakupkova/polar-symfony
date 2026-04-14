@@ -1,17 +1,154 @@
-<?php
-/** @var array|null $newArticlesTopic */
-/** @var \App\Application\View\ViewHelper $view */
-
-$locale = Locale::getDefault();
-?>
-
 <?php if ($newArticlesTopic) { ?>
-	<div class="row">
-		<div class="col-md-12">
-			<h3 class="text-5 text-primary mb-4">K tématu</h3>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="text-5 text-primary mb-4">
+                K tématu
+            </h3>
+        </div>
+    </div>
 
-	<?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesTopic]) ?>
-	<hr class="solid">
+    <?php for ($i = 0, $iMax = count($newArticlesTopic); $i < $iMax; $i++) { ?>
+
+        <?php
+        $region_city_url = $view->path('news_region_city', ['url' => $newArticlesTopic[$i]['region_url'], 'city_url' => $newArticlesTopic[$i]['city_url']]);
+        if ($newArticlesTopic[$i]['city_url'] === 'cely-ms-kraj') {
+            $region_city_url = $view->path('news');
+        }
+
+        try {
+            $today = new DateTime();
+            $dateUpdate = new DateTime($newArticlesTopic[$i]['updated_date']);
+            if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                $dayUpdate = 'Dnes';
+            } else {
+                $yesterday = new DateTime();
+                $yesterday->modify('-1 day');
+                if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+                    $dayUpdate = 'Včera';
+                } else {
+                    $dayUpdate = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($dateUpdate);
+                }
+            }
+            $timeUpdate = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($dateUpdate);
+
+            $today = new DateTime();
+            $date = new DateTime($newArticlesTopic[$i]['public_from']);
+            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                if ($newArticlesTopic[$i]['label']) {
+                    $day = 'dnes';
+                } else {
+                    $day = 'Dnes';
+                }
+            } else {
+                $yesterday = new DateTime();
+                $yesterday->modify('-1 day');
+                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                    if ($newArticlesTopic[$i]['label']) {
+                        $day = 'včera';
+                    } else {
+                        $day = 'Včera';
+                    }
+                } else {
+                    $day = (new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE))->format($date);
+                }
+            }
+            $time = (new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT))->format($date);
+        } catch (Exception $e) {
+            $day = 'NaN';
+            $time = 'NaN';
+            $dayUpdate = 'NaN';
+            $timeUpdate = 'NaN';
+        }
+        ?>
+
+        <div class="row mb-4-5">
+            <?php if ($newArticlesTopic[$i]['picture']) { ?>
+                <div class="col-5 col-lg-6 pe-2 pe-md-3">
+                    <div class="">
+                        <a class="" href="<?= $view->path('news_region_city_article', ['url' => $newArticlesTopic[$i]['region_url'], 'city_url' => $newArticlesTopic[$i]['city_url'], 'article_id' => $newArticlesTopic[$i]['article_id'], 'article_url' => $newArticlesTopic[$i]['article_url']]) ?>" title="<?= $newArticlesTopic[$i]['title'] ?>">
+                            <span class="thumb-info thumb-info-lighten maxw-310">
+                                <span class="thumb-info-wrapper">
+                                    <img src="<?= $newArticlesTopic[$i]['picture'] ?>" class="img-fluid" alt="<?= $newArticlesTopic[$i]['title'] ?>">
+                                    <?php if (strpos($newArticlesTopic[$i]['picture'], '/videos/') !== false) { ?>
+                                        <span class="thumb-info-action">
+                                            <span class="thumb-info-action-icon">
+                                                <i class="fas fa-play"></i>
+                                                <span class="player_duration"><?= $newArticlesTopic[$i]['duration'] ? gmdate("i:s", $newArticlesTopic[$i]['duration']) : ''; ?></span>
+                                            </span>
+                                        </span>
+                                    <?php } ?>
+                                </span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-7 col-lg-6 ps-1 pe-3">
+                    <h2 class="mb-1 mb-md-2">
+                        <a class="" href="<?= $view->path('news_region_city_article', ['url' => $newArticlesTopic[$i]['region_url'], 'city_url' => $newArticlesTopic[$i]['city_url'], 'article_id' => $newArticlesTopic[$i]['article_id'], 'article_url' => $newArticlesTopic[$i]['article_url']]) ?>" title="<?= $newArticlesTopic[$i]['title'] ?>">
+                            <?= $newArticlesTopic[$i]['title'] ?>
+                        </a>
+                    </h2>
+                    <div class="text-1 text-tertiary line-height-7 mb-1">
+                        <?php
+                            $now_minus_x = new DateTime();
+                            $now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                            if ($newArticlesTopic[$i]['label'] && $newArticlesTopic[$i]['updated_date'] > $now_minus_x) {
+                                echo $newArticlesTopic[$i]['label'];
+                                echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                            } else {
+                                echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                            }
+                        ?>
+                        <span>
+                            <a href="<?= $region_city_url ?>" title="<?= $newArticlesTopic[$i]['city_title'] ?>"><?= $newArticlesTopic[$i]['city_title'] ?></a>&nbsp;|
+                        </span>
+                        <span>
+                            <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $newArticlesTopic[$i]['author_url']]) . '" title="' . $newArticlesTopic[$i]['author'] . '">' . $newArticlesTopic[$i]['author'] . '</a>'; ?><!--
+                        --></span><!--
+                        --><!--<span>
+                            <?php //= $newArticlesTopic[$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $newArticlesTopic[$i]['show_id']]) . '" title="' . $shows[$newArticlesTopic[$i]['show_id']] . '">' . $shows[$newArticlesTopic[$i]['show_id']] . '</a>' : ''; ?>
+                        </span>-->
+                    </div>
+                    <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                        <?= $newArticlesTopic[$i]['anotation']; ?>
+                    </p>
+                </div>
+            <?php } else { ?>
+                <div class="col-12">
+                    <div class="">
+                        <h2 class="mb-1 mb-md-2">
+                            <a class="" href="<?= $view->path('news_region_city_article', ['url' => $newArticlesTopic[$i]['region_url'], 'city_url' => $newArticlesTopic[$i]['city_url'], 'article_id' => $newArticlesTopic[$i]['article_id'], 'article_url' => $newArticlesTopic[$i]['article_url']]) ?>" title="<?= $newArticlesTopic[$i]['title'] ?>">
+                                <?= $newArticlesTopic[$i]['title'] ?>
+                            </a>
+                        </h2>
+                        <div class="text-1 text-tertiary line-height-7 mb-1">
+                            <?php
+                                $now_minus_x = new DateTime();
+                                $now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+                                if ($newArticlesTopic[$i]['label'] && $newArticlesTopic[$i]['updated_date'] > $now_minus_x) {
+                                    echo $newArticlesTopic[$i]['label'];
+                                    echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                } else {
+                                    echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+                                }
+                            ?>
+                            <span>
+                                <a href="<?= $region_city_url ?>" title="<?= $newArticlesTopic[$i]['city_title'] ?>"><?= $newArticlesTopic[$i]['city_title'] ?></a>&nbsp;|
+                            </span>
+                            <span>
+                                <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $newArticlesTopic[$i]['author_url']]) . '" title="' . $newArticlesTopic[$i]['author'] . '">' . $newArticlesTopic[$i]['author'] . '</a>'; ?><!--
+                            --></span><!--
+                            --><!--<span>
+                                <?php //= $newArticlesTopic[$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $newArticlesTopic[$i]['show_id']]) . '" title="' . $shows[$newArticlesTopic[$i]['show_id']] . '">' . $shows[$newArticlesTopic[$i]['show_id']] . '</a>' : ''; ?>
+                            </span>-->
+                        </div>
+                        <p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+                            <?= $newArticlesTopic[$i]['anotation']; ?>
+                        </p>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+    <?php } ?>
+    <hr class="solid">
 <?php } ?>

@@ -193,7 +193,6 @@ if (isset($article['sec_from'])) {
     );
 }
 
-$locale = Locale::getDefault();
 $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');
 $currencyFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 $currencyFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
@@ -249,18 +248,24 @@ if (!empty($firstFile['medium'])) {
 	$view->addOgMeta('og:image:secure_url', $imageUrl);
 }
 
-$breadcrumbs = [
-	['label' => 'Zprávy', 'url' => $view->path('news')],
-];
-if (!empty($article['city']) || !empty($city['city'])) {
-	$breadcrumbs[] = [
-		'label' => $article['city'] ?? $city['city'],
-		'url' => $article['city_url'] === 'cely-ms-kraj'
-			? $view->path('news')
-			: $view->path('news_region_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']]),
-	];
+$breadcrumbs = [];
+if ($article['city_url'] === 'cely-ms-kraj') {
+	$breadcrumbs[] = ['label' => 'MS kraj', 'url' => $view->path('news')];
+} else {
+	if (!empty($region['region'])) {
+		$breadcrumbs[] = [
+			'label' => $region['region'],
+			'url' => $view->path('news_region', ['url' => $region['url']]),
+		];
+	}
+	if (!empty($article['city']) || !empty($city['city'])) {
+		$breadcrumbs[] = [
+			'label' => $article['city'] ?? $city['city'],
+			'url' => $view->path('news_region_city', ['url' => $article['region_url'], 'city_url' => $article['city_url']]),
+		];
+	}
 }
-$breadcrumbs[] = ['label' => $article['title']];
+$breadcrumbs[] = ['label' => mb_substr($article['title'], 0, 30) . (mb_strlen($article['title']) > 30 ? '…' : '')];
 $view->setBreadcrumbs($breadcrumbs);
 
 $breadcrumbItems = [
@@ -499,7 +504,7 @@ if ($hasOnlineNewsWidget) {
             <article itemscope itemtype="https://schema.org/Article">
                 <h1 itemprop="name headline" id="h1" class="text-primary text-8 font-weight-600 line-height-2 line-height-lg-3 mb-3">
                     <?php
-                    if ($article['guest'] === '1') {
+                    if ($article['guest'] === 1) {
                         echo 'Hosté ve studiu: ' . $article['title'] . ', ' . $article['anotation'];
                     } else {
                         echo $article['title'];
@@ -566,7 +571,11 @@ if ($hasOnlineNewsWidget) {
                         --></a>&nbsp;|
                     </span>
                     <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-                        <a class="" href="<?= $view->path('news_redactor', ['redactor_url' => $article['redactor_url']]) ?>" title="<?= $article['name'] . ' ' . $article['surname'] ?>"><?= $article['name'] . ' ' . $article['surname'] ?></a><!--
+                        <?php if (!empty($article['redactor_url'])) { ?>
+                            <a class="" href="<?= $view->path('news_redactor', ['redactor_url' => $article['redactor_url']]) ?>" title="<?= $article['name'] . ' ' . $article['surname'] ?>"><?= $article['name'] . ' ' . $article['surname'] ?></a><!--
+                        <?php } else { ?>
+                            <?= $article['name'] . ' ' . $article['surname'] ?><!--
+                        <?php } ?>
                     --></span><!--
                     --><!--<span>
                     <?php //= $article['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $article['show_id']]) . '" title="' . $shows[$article['show_id']] . '">' . $shows[$article['show_id']] . '</a>' : ''; ?>
@@ -574,7 +583,7 @@ if ($hasOnlineNewsWidget) {
                 </div>
                 <p class="anotation mb-4" itemprop="description">
                     <?php
-                    if ($article['guest'] === '1') {
+                    if ($article['guest'] === 1) {
                         echo strip_tags($article['text']);
                     } else {
                         echo $article['anotation'];
@@ -1063,7 +1072,7 @@ if ($hasOnlineNewsWidget) {
                     </div>
                 </div>
             <?php } ?>
-            <?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesFirstHalf ?? null]) ?>
+            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesFirstHalf ?? null]) ?>
             <!-- Nabídka práce -->
             <?php //= $view->include('news/partial/job-region') ?>
             <!-- Dnešní premiéry -->
@@ -1095,7 +1104,7 @@ if ($hasOnlineNewsWidget) {
     <div class="row sticky-square-3">
         <div class="col-12 col-lg-7">
             <!-- Doporučujeme -->
-            <?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesSecondHalf ?? null]) ?>
+            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesSecondHalf ?? null]) ?>
         </div>
         <!-- pravá strana vedle K tématu a 1. polovina Doporučujeme -->
         <div class="col-12 col-lg-5 p-relative">

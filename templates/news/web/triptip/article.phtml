@@ -192,8 +192,6 @@ function formatBytes($size, $precision = 0){
     return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)];
 }
 
-
-$locale = Locale::getDefault();
 $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');
 $currencyFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 $currencyFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);

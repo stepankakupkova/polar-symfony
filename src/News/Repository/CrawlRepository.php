@@ -11,7 +11,7 @@ final class CrawlRepository
 	public function getCrawl(int $id = 1): ?array
 	{
 		return $this->connection->createQueryBuilder()
-			->select('separator', 'text_before', 'text_after', 'auto_delete_start', 'auto_delete_stop')
+			->select('`separator`', 'text_before', 'text_after', 'auto_delete_start', 'auto_delete_stop')
 			->from('polar_crawl_settings_crawls')
 			->where('id = :id')
 			->setParameter('id', $id)
@@ -26,7 +26,7 @@ final class CrawlRepository
 			->from('polar_crawl_content')
 			->where('crawl_id = :crawl_id')
 			->setParameter('crawl_id', $crawlId)
-			->orderBy('order', 'ASC')
+			->orderBy('`order`', 'ASC')
 			->executeQuery()
 			->fetchFirstColumn();
 

@@ -208,7 +208,6 @@ if ($article['id'] === '11000018144') {
 	</script>';
 }
 
-$locale = Locale::getDefault();
 $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');
 $currencyFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 $currencyFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
@@ -691,7 +690,7 @@ $view->setBreadcrumbs([
                     </div>
                 </div>
             <?php } ?>
-            <?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesFirstHalf ?? null]) ?>
+            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesFirstHalf ?? null]) ?>
             <!-- Nabídka práce -->
             <?php //= $view->include('news/partial/job-region') ?>
             <!-- Dnešní premiéry -->
@@ -724,7 +723,7 @@ $view->setBreadcrumbs([
     <div class="row sticky-square-3">
         <div class="col-12 col-lg-7">
             <!-- Doporučujeme -->
-            <?= $view->include('news/partial/recommended', ['recommendedArticles' => $newArticlesSecondHalf ?? null]) ?>
+            <?= $view->include('news/partial/recommended', ['newArticles' => $newArticlesSecondHalf ?? null]) ?>
         </div>
         <!-- pravá strana vedle K tématu a 1. polovina Doporučujeme -->
         <div class="col-12 col-lg-5 p-relative">

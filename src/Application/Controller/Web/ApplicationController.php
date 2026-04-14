@@ -40,6 +40,16 @@ final class ApplicationController
 
 		// Hlavní články HP (section 1 = zprávy, 2 = PR, 3 = Triptip)
 		$newArticles = $playkitRepository->getAllHomepage();
+		if ($newArticles) {
+			foreach ($newArticles as $i => $iValue) {
+				if ($iValue['section'] === 1 || $iValue['section'] === 2) {
+					$newArticles[$i]['url'] = '/zpravy/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
+				}
+				if ($iValue['section'] === 3) {
+					$newArticles[$i]['url'] = '/kam-vyrazit/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
+				}
+			}
+		}
 
 		$newsCount  = $newsRepository->getCountFromSettings();
 		$pr         = $newsRepository->getPrArticles(19);
@@ -243,5 +253,18 @@ final class ApplicationController
 			'dash' => $dash,
 			'mobile' => $mobile,
 		]));
+	}
+
+	private function removeAccent($text, $replace = null): string
+	{
+		$transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
+		if ($transliterator) {
+			$text = $transliterator->transliterate($text);
+		}
+		$text = preg_replace('/\p{C}+/u', '', $text);
+		if ($replace) {
+			$text = str_replace(' ', $replace, $text);
+		}
+		return $text;
 	}
 }

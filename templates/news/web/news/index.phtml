@@ -56,14 +56,14 @@ $view->addOgMeta('og:image:height', '1080');
 // Přidání prev a next tagů
 if ($page > 1) {
     $prevPage = $page - 1;
-    $view->addHeadLink('prev', $view->path('news') . ($prevPage > 1 ? '?page=' . $prevPage : ''));
+    $view->addHeadLink('prev', $view->path('news') . ($prevPage > 1 ? '?strana=' . $prevPage : ''));
 }
 if ($total > $page * $limit) {
-    $view->addHeadLink('next', $view->path('news') . '?page=' . ($page + 1));
+    $view->addHeadLink('next', $view->path('news') . '?strana=' . ($page + 1));
 }
 
 $view->setBreadcrumbs([
-    ['label' => 'Zprávy', 'url' => $view->path('news')],
+    ['label' => 'MS kraj', 'url' => $view->path('news')],
 ]);
 
 $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($locale): string {
