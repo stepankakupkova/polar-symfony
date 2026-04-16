@@ -16,7 +16,7 @@ app_home:
   controller: App\Application\Controller\Web\ApplicationController::index
 
 app_search:
-  path: /hledat
+  path: /hledani
   controller: App\Application\Controller\Web\ApplicationController::search
   methods: [GET]
 

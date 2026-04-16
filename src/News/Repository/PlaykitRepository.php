@@ -9,56 +9,8 @@ final class PlaykitRepository
 {
 	public function __construct(
 		private Connection $connection,
-		private int $hoursDeleteLabels = 24,
+		private int $HOURS_DELETE_LABELS,
 	) {}
-
-	public function getWeatherForNews(?string $region): ?array
-	{
-		$qb = $this->connection->createQueryBuilder()
-			->select('pwd.date', 'pwd.day', 'pwd.status', 'pwd.temperature_day')
-			->from('polar_weather_days', 'pwd')
-			->leftJoin('pwd', 'polar_weather_cities', 'pwc', 'pwc.id = pwd.city_id')
-			->orderBy('pwd.date', 'ASC')
-			->setMaxResults(3);
-
-		if ($region) {
-			$qb->where('pwc.title = :region')
-				->setParameter('region', $region);
-		}
-
-		$result = $qb->fetchAllAssociative();
-		return $result ?: null;
-	}
-
-	public function getAllHomepage(?array $withoutIds = null): ?array
-	{
-		$qb = $this->connection->createQueryBuilder()
-			->select('pnh.*', 'pna.show_id', 'pna.updated_date')
-			->from('polar_news_homepage', 'pnh')
-			->leftJoin('pnh', 'polar_news_articles', 'pna', 'pna.id = pnh.article_id')
-			->orderBy('pnh.id', 'ASC');
-
-		if ($withoutIds) {
-			$qb->where('pnh.article_id NOT IN (:ids)')
-				->setParameter('ids', $withoutIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
-		}
-
-		$result = $qb->fetchAllAssociative();
-		if (!$result) {
-			return null;
-		}
-
-		$now_minus_x = new \DateTime();
-		$now_minus_x = $now_minus_x->modify('-' . $this->hoursDeleteLabels . ' hours')->format('Y-m-d H:i:s');
-
-		foreach ($result as $i => $iValue) {
-			if ($iValue['updated_date'] < $now_minus_x) {
-				$result[$i]['label'] = '';
-			}
-		}
-
-		return $result;
-	}
 
 	public function getRegionByUrl(string $url): ?array
 	{
@@ -77,6 +29,18 @@ final class PlaykitRepository
 		$result = $this->connection->createQueryBuilder()
 			->select('*')
 			->from('polar_news_cities')
+			->where('url = :url')
+			->setParameter('url', $url)
+			->fetchAssociative();
+
+		return $result ?: null;
+	}
+
+	public function getRedactorByUrl(string $url): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('*')
+			->from('polar_news_redaction')
 			->where('url = :url')
 			->setParameter('url', $url)
 			->fetchAssociative();
@@ -116,33 +80,72 @@ final class PlaykitRepository
 			$qb->setParameter('cityId', $cityId, ParameterType::INTEGER);
 		}
 
-		$result = $qb->fetchAssociative();
-		if (!$result) {
+		$resultSet = $qb->fetchAssociative();
+		if (!$resultSet) {
 			return null;
 		}
 
-		$result['url'] = $this->removeAccent((string) ($result['title'] ?? ''), '-');
-		$result['label'] = $this->getArticleLabels($articleId, (string) ($result['updated_date'] ?? ''));
-		$result['topics'] = $this->getArticleTopics($articleId);
-		$result['files'] = $this->getArticleFiles($articleId, (string) ($result['public_from'] ?? ''));
+		$resultSet['url'] = $this->removeAccent((string) ($resultSet['title'] ?? ''), '-');
 
-		return $result;
-	}
+		// Label
+		$now_minus_x = new \DateTime();
+		$now_minus_x = $now_minus_x->modify('-' . $this->HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
 
-	public function getCityRank1ByArticleId(int $articleId): ?array
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('pnc.url AS city_rank1_url', 'pnr.url AS region_rank1_url')
-			->from('polar_news_articles2cities', 'pnac')
-			->leftJoin('pnac', 'polar_news_cities', 'pnc', 'pnc.id = pnac.city_id')
-			->leftJoin('pnc', 'polar_news_regions', 'pnr', 'pnr.id = pnc.region_id')
-			->where('pnac.article_id = :articleId')
-			->andWhere('pnac.rank = 1')
-			->setParameter('articleId', $articleId)
-			->setMaxResults(1)
-			->fetchAssociative();
+		if ($resultSet['updated_date'] > $now_minus_x) {
+			$labels = $this->connection->createQueryBuilder()
+				->select('pnl.title', 'pnl.color', 'pnl.icon')
+				->from('polar_news_label', 'pnl')
+				->leftJoin('pnl', 'polar_news_articles2label', 'pna2l', 'pna2l.label_id = pnl.id')
+				->where('pna2l.article_id = :articleId')
+				->setParameter('articleId', $resultSet['id'], ParameterType::INTEGER)
+				->fetchAllAssociative();
+			$resultSet['label'] = $labels ?: null;
+		} else {
+			$resultSet['label'] = null;
+		}
 
-		return $result ?: null;
+		// Topics
+		$topics = $this->connection->createQueryBuilder()
+			->select('pnt.id AS tag_id', 'pnt.tag', 'pnt.url')
+			->from('polar_news_tags', 'pnt')
+			->leftJoin('pnt', 'polar_news_articles2tags', 'pna2t', 'pna2t.tag_id = pnt.id')
+			->where('pna2t.article_id = :articleId')
+			->setParameter('articleId', $resultSet['id'], ParameterType::INTEGER)
+			->fetchAllAssociative();
+		$resultSet['topics'] = $topics ?: null;
+
+		// Všechny soubory z galerie
+		$files = $this->connection->createQueryBuilder()
+			->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.size_hq', 'gf.ext', 'gf.duration', 'gf.description', 'gf.updated_date', 'pna2gf.file_id', 'pna2gf.rank')
+			->from('gallery_files', 'gf')
+			->leftJoin('gf', 'polar_news_articles2gallery_files', 'pna2gf', 'pna2gf.file_id = gf.id')
+			->where('pna2gf.article_id = :articleId')
+			->andWhere('pna2gf.checked = 1')
+			->orderBy('pna2gf.rank', 'ASC')
+			->setParameter('articleId', $resultSet['id'])
+			->fetchAllAssociative();
+
+		if ($files) {
+			foreach ($files as &$file) {
+				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
+				if ($file['type'] === 'video') {
+					$file['medium'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/715x402.jpg?ver=' . $version;
+					if ($resultSet['public_from'] >= '2015-12-10') {
+						$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_lq.mp4';
+						$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+					} else {
+						$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+						$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+					}
+				}
+			}
+			unset($file);
+			$resultSet['files'] = $files;
+		} else {
+			$resultSet['files'] = null;
+		}
+
+		return $resultSet;
 	}
 
 	public function getArticlePr(int $articleId): ?array
@@ -184,9 +187,6 @@ final class PlaykitRepository
 						$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
 						$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
 					}
-				}
-				if ($file['type'] === 'image') {
-					$file['medium'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/715x402.' . $file['ext'] . '?ver=' . $version;
 				}
 			}
 			unset($file);
@@ -284,6 +284,147 @@ final class PlaykitRepository
 		}
 
 		return $result;
+	}
+
+	public function getOnlineNewsByArticleId(int $articleId, int $page, int $limit = 10): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('*')
+			->from('polar_news_articles_online')
+			->where('article_id = :articleId')
+			->andWhere('datetime <= NOW()')
+			->orderBy('datetime', 'DESC')
+			->setFirstResult(($page - 1) * $limit)
+			->setMaxResults($limit)
+			->setParameter('articleId', $articleId, ParameterType::INTEGER)
+			->fetchAllAssociative();
+
+		return $result ?: null;
+	}
+
+	public function getCountOnlineNewsByArticleId(int $articleId): int
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('COUNT(*) AS count')
+			->from('polar_news_articles_online')
+			->where('article_id = :articleId')
+			->andWhere('datetime <= NOW()')
+			->setParameter('articleId', $articleId, ParameterType::INTEGER)
+			->fetchAssociative();
+
+		return (int) ($result['count'] ?? 0);
+	}
+
+	public function getAllHomepage(?array $withoutIds = null): ?array
+	{
+		$qb = $this->connection->createQueryBuilder()
+			->select('pnh.*', 'pna.show_id', 'pna.updated_date')
+			->from('polar_news_homepage', 'pnh')
+			->leftJoin('pnh', 'polar_news_articles', 'pna', 'pna.id = pnh.article_id')
+			->orderBy('pnh.id', 'ASC');
+
+		if ($withoutIds) {
+			$qb->where('pnh.article_id NOT IN (:ids)')
+				->setParameter('ids', $withoutIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+		}
+
+		$result = $qb->fetchAllAssociative();
+		if (!$result) {
+			return null;
+		}
+
+		$now_minus_x = new \DateTime();
+		$now_minus_x = $now_minus_x->modify('-' . $this->HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+
+		foreach ($result as $i => $iValue) {
+			if ($iValue['updated_date'] < $now_minus_x) {
+				$result[$i]['label'] = '';
+			}
+		}
+
+		return $result;
+	}
+
+	public function getArticlesByTopicsAndDate(array $tagsId, int $withoutArticleId): ?array
+	{
+		if ($tagsId === []) {
+			return null;
+		}
+
+		$now = (new \DateTimeImmutable())->modify('-1 year')->format('Y-m-d H:i:s');
+		$result = $this->connection->createQueryBuilder()
+			->select('pna2t.article_id')
+			->from('polar_news_articles2tags', 'pna2t')
+			->leftJoin('pna2t', 'polar_news_articles', 'pna', 'pna.id = pna2t.article_id')
+			->where('pna2t.tag_id IN (:tagsId)')
+			->andWhere('pna.public_from >= :now')
+			->andWhere('pna.id != :withoutArticleId')
+			->andWhere('pna.public = 1')
+			->andWhere('pna.public_from <= NOW()')
+			->andWhere('pna.public_to >= NOW()')
+			->setParameter('tagsId', $tagsId, \Doctrine\DBAL\ArrayParameterType::INTEGER)
+			->setParameter('now', $now)
+			->setParameter('withoutArticleId', $withoutArticleId, ParameterType::INTEGER)
+			->fetchFirstColumn();
+
+		return $result ?: null;
+	}
+
+	public function getPaginatorByPR(int $page, int $limit): array
+	{
+		$offset = ($page - 1) * $limit;
+
+		$rows = $this->connection->createQueryBuilder()
+			->select('pnp.id', 'pnp.title', 'pnp.anotation', 'pnp.public_from')
+			->from('polar_news_pr', 'pnp')
+			->where('pnp.public_from <= NOW()')
+			->andWhere('pnp.public_to >= NOW()')
+			->groupBy('pnp.id')
+			->orderBy('pnp.public_from', 'DESC')
+			->setFirstResult($offset)
+			->setMaxResults($limit)
+			->fetchAllAssociative();
+
+		foreach ($rows as $i => $row) {
+			$file = $this->connection->createQueryBuilder()
+				->select('gf.folder', 'gf.type', 'gf.module', 'gf.ext', 'gf.duration', 'gf.updated_date')
+				->from('gallery_files', 'gf')
+				->leftJoin('gf', 'polar_news_pr2gallery_files', 'pnp2gf', 'pnp2gf.file_id = gf.id')
+				->where('pnp2gf.pr_id = :prId')
+				->andWhere('pnp2gf.checked = 1')
+				->orderBy('pnp2gf.rank', 'ASC')
+				->setMaxResults(1)
+				->setParameter('prId', $row['id'], ParameterType::INTEGER)
+				->fetchAssociative();
+
+			if ($file) {
+				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
+				if ($file['type'] === 'video') {
+					$rows[$i]['picture'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/310x174.jpg?ver=' . $version;
+				}
+				if ($file['type'] === 'image') {
+					$rows[$i]['picture'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/310x174.' . $file['ext'] . '?ver=' . $version;
+				}
+				$rows[$i]['duration'] = $file['duration'];
+			} else {
+				$rows[$i]['picture'] = null;
+				$rows[$i]['duration'] = null;
+			}
+		}
+
+		return $rows;
+	}
+
+	public function getCountPR(): int
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('COUNT(DISTINCT pnp.id) AS total')
+			->from('polar_news_pr', 'pnp')
+			->where('pnp.public_from <= NOW()')
+			->andWhere('pnp.public_to >= NOW()')
+			->fetchAssociative();
+
+		return (int) ($result['total'] ?? 0);
 	}
 
 	public function getTriptips(int $limit, int $important = 1, ?string $fromDate = null, int $show = 0): ?array
@@ -422,231 +563,71 @@ final class PlaykitRepository
 		return $data;
 	}
 
-	public function getOnlineNewsByArticleId(int $articleId, int $page, int $limit = 10): ?array
+	public function getAllRegionsForRss(): ?array
 	{
 		$result = $this->connection->createQueryBuilder()
-			->select('*')
-			->from('polar_news_articles_online')
-			->where('article_id = :articleId')
-			->andWhere('datetime <= NOW()')
-			->orderBy('datetime', 'DESC')
-			->setFirstResult(($page - 1) * $limit)
-			->setMaxResults($limit)
-			->setParameter('articleId', $articleId, ParameterType::INTEGER)
+			->select('region', 'url')
+			->from('polar_news_regions')
+			->orderBy('sort', 'ASC')
 			->fetchAllAssociative();
 
 		return $result ?: null;
 	}
 
-	public function getCountOnlineNewsByArticleId(int $articleId): int
+	public function getAllCitiesForRss(): ?array
 	{
 		$result = $this->connection->createQueryBuilder()
-			->select('COUNT(*) AS count')
-			->from('polar_news_articles_online')
-			->where('article_id = :articleId')
-			->andWhere('datetime <= NOW()')
-			->setParameter('articleId', $articleId, ParameterType::INTEGER)
-			->fetchAssociative();
+			->select('city', 'url')
+			->from('polar_news_cities')
+			->where('active = 1')
+			->orderBy('city', 'ASC')
+			->fetchAllAssociative();
 
-		return (int) ($result['count'] ?? 0);
+		return $result ?: null;
 	}
 
-	public function getArticlesByTopicsAndDate(array $tagsId, int $withoutArticleId): ?array
+	public function getAlRegionsForSearch(string $query, ?int $region_id, ?int $city_id): ?string
 	{
-		if ($tagsId === []) {
+		$regions = $this->connection->createQueryBuilder()
+			->select('id', 'region', 'url', 'sort')
+			->from('polar_news_regions')
+			->orderBy('sort', 'ASC')
+			->fetchAllAssociative();
+
+		if (!$regions) {
 			return null;
 		}
 
-		$now = (new \DateTimeImmutable())->modify('-1 year')->format('Y-m-d H:i:s');
-		$result = $this->connection->createQueryBuilder()
-			->select('pna2t.article_id')
-			->from('polar_news_articles2tags', 'pna2t')
-			->leftJoin('pna2t', 'polar_news_articles', 'pna', 'pna.id = pna2t.article_id')
-			->where('pna2t.tag_id IN (:tagsId)')
-			->andWhere('pna.public_from >= :now')
-			->andWhere('pna.id != :withoutArticleId')
-			->andWhere('pna.public = 1')
-			->andWhere('pna.public_from <= NOW()')
-			->andWhere('pna.public_to >= NOW()')
-			->setParameter('tagsId', $tagsId, \Doctrine\DBAL\ArrayParameterType::INTEGER)
-			->setParameter('now', $now)
-			->setParameter('withoutArticleId', $withoutArticleId, ParameterType::INTEGER)
-			->fetchFirstColumn();
+		$menu = '<li' . ((!$region_id && !$city_id) ? ' class="active"' : '') . '>' .
+			'<a' . ((!$region_id && !$city_id) ? ' class="font-weight-extra-bold"' : '') . ' href="/hledani?q=' . $query . '" title="">Vše</a>' .
+			'</li>';
 
-		return $result ?: null;
-	}
+		foreach ($regions as $region) {
+			$cities = $this->connection->createQueryBuilder()
+				->select('id', 'city', 'url')
+				->from('polar_news_cities')
+				->where('region_id = :regionId')
+				->setParameter('regionId', $region['id'])
+				->fetchAllAssociative();
 
-	public function getVideoById(int $id): ?array
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('gf.*')
-			->from('gallery_files', 'gf')
-			->where('gf.id = :id')
-			->andWhere('gf.type = :type')
-			->setParameter('id', $id, ParameterType::INTEGER)
-			->setParameter('type', 'video')
-			->setMaxResults(1)
-			->fetchAssociative();
-
-		return $result ?: null;
-	}
-
-	public function getSpecial(): array
-	{
-		$rows = $this->connection->createQueryBuilder()
-			->select('label', 'value')
-			->from('polar_news_settings')
-			->where('flag = :flag')
-			->setParameter('flag', 'special')
-			->fetchAllAssociative();
-
-		$result = [];
-		foreach ($rows as $row) {
-			$result[$row['label']] = $row['value'];
-		}
-		return $result;
-	}
-
-	public function getRedactorByUrl(string $url): ?array
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('*')
-			->from('polar_news_redaction')
-			->where('url = :url')
-			->setParameter('url', $url)
-			->fetchAssociative();
-
-		return $result ?: null;
-	}
-
-	private function getArticleFiles(int $articleId, string $publicFrom): ?array
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.size_hq', 'gf.ext', 'gf.duration', 'gf.description', 'gf.updated_date', 'pna2gf.file_id', 'pna2gf.rank')
-			->from('gallery_files', 'gf')
-			->leftJoin('gf', 'polar_news_articles2gallery_files', 'pna2gf', 'pna2gf.file_id = gf.id')
-			->where('pna2gf.article_id = :articleId')
-			->andWhere('pna2gf.checked = 1')
-			->orderBy('pna2gf.rank', 'ASC')
-			->setParameter('articleId', $articleId)
-			->fetchAllAssociative();
-
-		if (!$result) {
-			return null;
-		}
-
-		foreach ($result as &$file) {
-			$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
-
-			if ($file['type'] === 'video') {
-				$file['medium'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/715x402.jpg?ver=' . $version;
-				$file['seznam_image'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/seznam.jpg';
-				if ($publicFrom >= '2015-12-10') {
-					$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_lq.mp4';
-					$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
-				} else {
-					$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
-					$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+			$menu2 = '';
+			if ($cities) {
+				$menu2 .= '<ul>';
+				foreach ($cities as $city) {
+					$menu2 .= '<li' . ((int)$city['id'] === $city_id ? ' class="active"' : '') . '>' .
+						'<a' . ((int)$city['id'] === $city_id ? ' class="font-weight-extra-bold"' : '') . ' href="/hledani?q=' . $query . '&c=' . $city['id'] . '" title="">' . $city['city'] . '</a>' .
+						'</li>';
 				}
+				$menu2 .= '</ul>';
 			}
 
-			if ($file['type'] === 'image') {
-				$file['medium'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/715x402.' . $file['ext'] . '?ver=' . $version;
-				$file['thumb'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/310x174.' . $file['ext'] . '?ver=' . $version;
-				$file['full'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/origin.' . $file['ext'] . '?ver=' . $version;
-			}
-		}
-		unset($file);
-
-		return $result;
-	}
-
-	private function getArticleTopics(int $articleId): ?array
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('pnt.id AS tag_id', 'pnt.tag', 'pnt.url')
-			->from('polar_news_tags', 'pnt')
-			->leftJoin('pnt', 'polar_news_articles2tags', 'pna2t', 'pna2t.tag_id = pnt.id')
-			->where('pna2t.article_id = :articleId')
-			->setParameter('articleId', $articleId, ParameterType::INTEGER)
-			->fetchAllAssociative();
-
-		return $result ?: null;
-	}
-
-	private function getArticleLabels(int $articleId, string $updatedDate): ?array
-	{
-		$cutoff = (new \DateTimeImmutable())->modify('-24 hours')->format('Y-m-d H:i:s');
-		if ($updatedDate !== '' && $updatedDate < $cutoff) {
-			return null;
+			$menu .= '<li' . ((int)$region['id'] === $region_id ? ' class="active"' : '') . '>' .
+				'<a' . ((int)$region['id'] === $region_id ? ' class="font-weight-extra-bold"' : '') . ' href="/hledani?q=' . $query . '&r=' . $region['id'] . '" title="">' . $region['region'] . '</a>' .
+				$menu2 .
+				'</li>';
 		}
 
-		$result = $this->connection->createQueryBuilder()
-			->select('pnl.title', 'pnl.color', 'pnl.icon')
-			->from('polar_news_label', 'pnl')
-			->leftJoin('pnl', 'polar_news_articles2label', 'pna2l', 'pna2l.label_id = pnl.id')
-			->where('pna2l.article_id = :articleId')
-			->setParameter('articleId', $articleId, ParameterType::INTEGER)
-			->fetchAllAssociative();
-
-		return $result ?: null;
-	}
-
-	public function getPaginatorByPR(int $page, int $limit): array
-	{
-		$offset = ($page - 1) * $limit;
-
-		$rows = $this->connection->createQueryBuilder()
-			->select('pnp.id', 'pnp.title', 'pnp.anotation', 'pnp.public_from')
-			->from('polar_news_pr', 'pnp')
-			->where('pnp.public_from <= NOW()')
-			->andWhere('pnp.public_to >= NOW()')
-			->groupBy('pnp.id')
-			->orderBy('pnp.public_from', 'DESC')
-			->setFirstResult($offset)
-			->setMaxResults($limit)
-			->fetchAllAssociative();
-
-		foreach ($rows as $i => $row) {
-			$file = $this->connection->createQueryBuilder()
-				->select('gf.folder', 'gf.type', 'gf.module', 'gf.ext', 'gf.duration', 'gf.updated_date')
-				->from('gallery_files', 'gf')
-				->leftJoin('gf', 'polar_news_pr2gallery_files', 'pnp2gf', 'pnp2gf.file_id = gf.id')
-				->where('pnp2gf.pr_id = :prId')
-				->andWhere('pnp2gf.checked = 1')
-				->orderBy('pnp2gf.rank', 'ASC')
-				->setMaxResults(1)
-				->setParameter('prId', $row['id'], ParameterType::INTEGER)
-				->fetchAssociative();
-
-			if ($file) {
-				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
-				if ($file['type'] === 'video') {
-					$rows[$i]['picture'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/310x174.jpg?ver=' . $version;
-				}
-				if ($file['type'] === 'image') {
-					$rows[$i]['picture'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/310x174.' . $file['ext'] . '?ver=' . $version;
-				}
-				$rows[$i]['duration'] = $file['duration'];
-			} else {
-				$rows[$i]['picture'] = null;
-				$rows[$i]['duration'] = null;
-			}
-		}
-
-		return $rows;
-	}
-
-	public function getCountPR(): int
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('COUNT(DISTINCT pnp.id) AS total')
-			->from('polar_news_pr', 'pnp')
-			->where('pnp.public_from <= NOW()')
-			->andWhere('pnp.public_to >= NOW()')
-			->fetchAssociative();
-
-		return (int) ($result['total'] ?? 0);
+		return $menu;
 	}
 
 	/**
@@ -831,59 +812,100 @@ final class PlaykitRepository
 		return $resultSet;
 	}
 
-	private function removeAccent(string $text, string $replace = ''): string
+	public function getVideoById(int $id): ?array
 	{
-		$transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
-		$text = $transliterator->transliterate($text);
-		$text = preg_replace('/\p{C}+/u', '', $text) ?? $text;
-		if ($replace) {
-			$text = str_replace(' ', $replace, $text);
-		}
-		return $text;
-	}
-
-	public function getAlRegionsForSearch(string $query, ?int $region_id, ?int $city_id): ?string
-	{
-		$regions = $this->connection->createQueryBuilder()
-			->select('id', 'region', 'url', 'sort')
-			->from('polar_news_regions')
-			->orderBy('sort', 'ASC')
+		$result = $this->connection->createQueryBuilder()
+			->select('gf.*')
+			->from('gallery_files', 'gf')
+			->leftJoin('gf', 'polar_news_videos_tags2videos', 'pnvt2v', 'pnvt2v.video_id = gf.id')
+			->leftJoin('pnvt2v', 'polar_news_videos_tags', 'pnvt', 'pnvt.id = pnvt2v.video_tag_id')
+			->where('gf.id = :id')
+			->andWhere('gf.type = :type')
+			->setParameter('id', $id, ParameterType::INTEGER)
+			->setParameter('type', 'video')
 			->fetchAllAssociative();
 
-		if (!$regions) {
-			return null;
+		return $result ?: null;
+	}
+
+	public function getWeatherForNews(?string $region): ?array
+	{
+		$qb = $this->connection->createQueryBuilder()
+			->select('pwd.date', 'pwd.day', 'pwd.status', 'pwd.temperature_day')
+			->from('polar_weather_days', 'pwd')
+			->leftJoin('pwd', 'polar_weather_cities', 'pwc', 'pwc.id = pwd.city_id')
+			->orderBy('pwd.date', 'ASC')
+			->setMaxResults(3);
+
+		if ($region) {
+			$qb->where('pwc.title = :region')
+				->setParameter('region', $region);
 		}
 
-		$menu = '<li' . ((!$region_id && !$city_id) ? ' class="active"' : '') . '>' .
-			'<a' . ((!$region_id && !$city_id) ? ' class="font-weight-extra-bold"' : '') . ' href="/hledat?q=' . $query . '" title="">Vše</a>' .
-			'</li>';
+		$result = $qb->fetchAllAssociative();
+		return $result ?: null;
+	}
 
-		foreach ($regions as $region) {
-			$cities = $this->connection->createQueryBuilder()
-				->select('id', 'city', 'url')
-				->from('polar_news_cities')
-				->where('region_id = :regionId')
-				->setParameter('regionId', $region['id'])
-				->fetchAllAssociative();
+	public function getCityRank1ByArticleId(int $articleId): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('pnc.url AS city_rank1_url', 'pnr.url AS region_rank1_url')
+			->from('polar_news_articles2cities', 'pnac')
+			->leftJoin('pnac', 'polar_news_cities', 'pnc', 'pnc.id = pnac.city_id')
+			->leftJoin('pnc', 'polar_news_regions', 'pnr', 'pnr.id = pnc.region_id')
+			->where('pnac.article_id = :articleId')
+			->andWhere('pnac.rank = 1')
+			->setParameter('articleId', $articleId)
+			->setMaxResults(1)
+			->fetchAssociative();
 
-			$menu2 = '';
-			if ($cities) {
-				$menu2 .= '<ul>';
-				foreach ($cities as $city) {
-					$menu2 .= '<li' . ((int)$city['id'] === $city_id ? ' class="active"' : '') . '>' .
-						'<a' . ((int)$city['id'] === $city_id ? ' class="font-weight-extra-bold"' : '') . ' href="/hledat?q=' . $query . '&c=' . $city['id'] . '" title="">' . $city['city'] . '</a>' .
-						'</li>';
-				}
-				$menu2 .= '</ul>';
-			}
+		return $result ?: null;
+	}
 
-			$menu .= '<li' . ((int)$region['id'] === $region_id ? ' class="active"' : '') . '>' .
-				'<a' . ((int)$region['id'] === $region_id ? ' class="font-weight-extra-bold"' : '') . ' href="/hledat?q=' . $query . '&r=' . $region['id'] . '" title="">' . $region['region'] . '</a>' .
-				$menu2 .
-				'</li>';
+	public function getTopicIDByUrl(string $url): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('id')
+			->from('polar_news_tags')
+			->where('url = :url')
+			->setParameter('url', $url)
+			->setMaxResults(1)
+			->fetchAssociative();
+
+		return $result ?: null;
+	}
+
+	public function getArticlesIDsByTopicID(int $topicId): ?array
+	{
+		$result = $this->connection->createQueryBuilder()
+			->select('pna2t.article_id')
+			->from('polar_news_articles2tags', 'pna2t')
+			->innerJoin('pna2t', 'polar_news_articles', 'pna', 'pna.id = pna2t.article_id')
+			->where('pna2t.tag_id = :topicId')
+			->andWhere('pna.public = 1')
+			->andWhere('pna.public_from <= NOW()')
+			->andWhere('pna.public_to >= NOW()')
+			->orderBy('pna.public_from', 'DESC')
+			->setParameter('topicId', $topicId, ParameterType::INTEGER)
+			->fetchFirstColumn();
+
+		return $result ?: null;
+	}
+
+	public function getSpecial(): array
+	{
+		$rows = $this->connection->createQueryBuilder()
+			->select('label', 'value')
+			->from('polar_news_settings')
+			->where('flag = :flag')
+			->setParameter('flag', 'special')
+			->fetchAllAssociative();
+
+		$result = [];
+		foreach ($rows as $row) {
+			$result[$row['label']] = $row['value'];
 		}
-
-		return $menu;
+		return $result;
 	}
 
 	public function getOnlineNewsForSpecialByArticleId(int $article_id, int $limit = 5): ?array
@@ -918,26 +940,14 @@ final class PlaykitRepository
 		return $result !== false ? $result : null;
 	}
 
-	public function getAllRegionsForRss(): ?array
+	private function removeAccent(string $text, string $replace = ''): string
 	{
-		$result = $this->connection->createQueryBuilder()
-			->select('region', 'url')
-			->from('polar_news_regions')
-			->orderBy('sort', 'ASC')
-			->fetchAllAssociative();
-
-		return $result ?: null;
-	}
-
-	public function getAllCitiesForRss(): ?array
-	{
-		$result = $this->connection->createQueryBuilder()
-			->select('city', 'url')
-			->from('polar_news_cities')
-			->where('active = 1')
-			->orderBy('city', 'ASC')
-			->fetchAllAssociative();
-
-		return $result ?: null;
+		$transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);
+		$text = $transliterator->transliterate($text);
+		$text = preg_replace('/\p{C}+/u', '', $text) ?? $text;
+		if ($replace) {
+			$text = str_replace(' ', $replace, $text);
+		}
+		return $text;
 	}
 }

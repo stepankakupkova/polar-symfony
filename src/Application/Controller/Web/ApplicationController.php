@@ -22,23 +22,11 @@ final class ApplicationController
 		VideoRepository $videoRepository,
 		BannerRepository $bannerRepository,
 	): Response {
-		$special = $playkitRepository->getSpecial();
+		
+		// Celkový počet článků
+		$newsCount = $newsRepository->getCountFromSettings();
 
-		// Speciál na HP
-		$specialArticlesIds = null;
-		$specialOnlineArticleId = $specialOnlineArticleUrl = null;
-		if ($special['active'] === '1') {
-			if ($special['articles_ids'] !== null) {
-				$ids = $special['articles_ids'];
-				$specialArticlesIds = $newsRepository->getArticlesForSpecialByIDs($ids, 5);
-			}
-			if ($special['online_article_id'] !== null) {
-				$specialOnlineArticleId = $playkitRepository->getOnlineNewsForSpecialByArticleId((int)$special['online_article_id'], 5);
-				$specialOnlineArticleUrl = $newsRepository->getArticle((int)$special['online_article_id']);
-			}
-		}
-
-		// Hlavní články HP (section 1 = zprávy, 2 = PR, 3 = Triptip)
+		// Hlavní články
 		$newArticles = $playkitRepository->getAllHomepage();
 		if ($newArticles) {
 			foreach ($newArticles as $i => $iValue) {
@@ -51,23 +39,62 @@ final class ApplicationController
 			}
 		}
 
-		$newsCount  = $newsRepository->getCountFromSettings();
-		$pr         = $newsRepository->getPrArticles(19);
-		$regions    = $newsRepository->getAllArticlesForRegions();
-		$newVideos  = $videoRepository->getNewVideosForWeb(6);
+		// PR články
+		$pr = $newsRepository->getPrArticles(19);
+
+		// Nejnovější pořady
+		$newVideos = $videoRepository->getNewVideosForWeb(6);
+
+		// Články pro regiony
+		$articles_regions = $newsRepository->getAllArticles();
+		$regions = [];
+
+		if ($articles_regions) {
+			foreach ($articles_regions as $article) {
+				if (!isset($regions[$article['region_order']])) {
+					$regions[$article['region_order']] = [
+						'id' => $article['region_id'],
+						'title' => $article['region_title'],
+						'url' => $article['region_url'],
+						'articles' => [],
+					];
+				}
+				$regions[$article['region_order']]['articles'][] = $article;
+			}
+			unset($articles_regions);
+		}
+
+		// Speciál na HP
+		$specialArticlesIds = null;
+		$specialOnlineArticleId = $specialOnlineArticleUrl = null;
+		$special = $playkitRepository->getSpecial();
+		if ($special['active'] === '1') {
+			if ($special['articles_ids'] !== null) {
+				$ids = $special['articles_ids'];
+				$specialArticlesIds = $newsRepository->getArticlesForSpecialByIDs($ids, 5);
+			}
+			if ($special['online_article_id'] !== null) {
+				$specialOnlineArticleId = $playkitRepository->getOnlineNewsForSpecialByArticleId((int)$special['online_article_id'], 5);
+				$specialOnlineArticleUrl = $newsRepository->getArticle((int)$special['online_article_id']);
+				if (isset($specialOnlineArticleUrl[0])) {
+					$specialOnlineArticleUrl = $specialOnlineArticleUrl[0];
+				}
+			}
+		}
+		//var_dump($specialOnlineArticleUrl);
 
 		return new Response($renderer->renderWithLayout('application/web/index', [
-			'special'      => $special,
+			'newsCount' => $newsCount,
+			'newArticles' => $newArticles,
+			'pr' => $pr,
+			'regions' => $regions,
+			'newVideos' => $newVideos,
+			'special' => $special,
 			'specialArticlesIds' => $specialArticlesIds,
 			'specialOnlineArticleId' => $specialOnlineArticleId,
 			'specialOnlineArticleUrl' => $specialOnlineArticleUrl,
-			'newArticles'  => $newArticles,
-			'newsCount'    => $newsCount,
-			'pr'           => $pr,
-			'regions'      => $regions,
-			'newVideos'    => $newVideos,
-			'bannerRectangle'    => $bannerRepository->getRectangle(),
-			'bannerSquare'       => $bannerRepository->getSquare(),
+			'bannerRectangle' => $bannerRepository->getRectangle(),
+			'bannerSquare' => $bannerRepository->getSquare(),
 			'bannerMobilesquare1' => $bannerRepository->getMobilesquare1(),
 			'bannerMobilesquare2' => $bannerRepository->getMobilesquare2(),
 		]));

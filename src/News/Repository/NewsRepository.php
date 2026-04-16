@@ -9,7 +9,7 @@ final class NewsRepository
 {
 	public function __construct(
 		private Connection $connection,
-		private int $hoursDeleteLabels = 24,
+		private int $HOURS_DELETE_LABELS,
 	) {}
 
 	public function getPaginator(int $page, int $limit): array
@@ -233,7 +233,7 @@ final class NewsRepository
 			->executeStatement();
 	}
 
-	public function getAllArticlesForRegions(): array
+	public function getAllArticles(): ?array
 	{
 		$result = $this->connection->createQueryBuilder()
 			->select('*')
@@ -244,21 +244,20 @@ final class NewsRepository
 			->addOrderBy('public_from', 'DESC')
 			->fetchAllAssociative();
 
-		// Grouping by region
-		$regions = [];
-		foreach ($result as $row) {
-			$key = $row['region_url'] ?? $row['region_id'];
-			if (!isset($regions[$key])) {
-				$regions[$key] = [
-					'url'      => $row['region_url'],
-					'title'    => $row['region_title'] ?? '',
-					'articles' => [],
-				];
-			}
-			$regions[$key]['articles'][] = $row;
+		if (!$result) {
+			return null;
 		}
 
-		return array_values($regions);
+		$now_minus_x = new \Datetime();
+		$now_minus_x = $now_minus_x->modify('-'.$this->HOURS_DELETE_LABELS.' hours')->format('Y-m-d H:i:s');
+
+		foreach ($result as $i => $iValue) {
+			if ($iValue['updated_date'] < $now_minus_x) {
+				$result[$i]['label'] = '';
+			}
+		}
+
+		return $result;
 	}
 
 	public function getArticlesByRegionId(int $regionId, int $limit, int $withoutArticleId): ?array
@@ -373,7 +372,7 @@ final class NewsRepository
 		}
 
 		$now_minus_x = new \DateTime();
-		$now_minus_x = $now_minus_x->modify('-' . $this->hoursDeleteLabels . ' hours')->format('Y-m-d H:i:s');
+		$now_minus_x = $now_minus_x->modify('-' . $this->HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
 
 		foreach ($rows as $i => $iValue) {
 			if ($iValue['updated_date'] < $now_minus_x) {
