@@ -240,7 +240,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                         $detail_url = $view->path('news_pr_article', ['article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
                     } else if ($newArticles[$i]['section'] === 3) {
                         $region_city_url = null;
-                        $detail_url = $view->path('triptip_article', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url'], 'article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
+                        $detail_url = $view->path('news_triptip_article', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url'], 'article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
                     }
 
                     try {
@@ -345,7 +345,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                         </span>
                                     <?php } else if ($newArticles[$i]['section'] === 3) { ?>
                                         <span>
-                                            <a href="<?= $view->path('triptip') ?>" title="Kam vyrazit">
+                                            <a href="<?= $view->path('news_triptip') ?>" title="Kam vyrazit">
                                                 Kam vyrazit
                                             </a>
                                         </span>
@@ -392,7 +392,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                             </span>
                                         <?php } else if ($newArticles[$i]['section'] === 3) { ?>
                                             <span>
-                                                <a href="<?= $view->path('triptip') ?>" title="Kam vyrazit">
+                                                <a href="<?= $view->path('news_triptip') ?>" title="Kam vyrazit">
                                                     Kam vyrazit
                                                 </a>
                                             </span>
@@ -503,7 +503,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                                         if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
                                                             echo 'Včera,';
                                                         } else {
-                                                            echo $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                                            echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, 'd. MMMM yyyy,');
                                                         }
                                                     }
                                                     echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, ' HH:mm');
@@ -570,7 +570,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                                 if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
                                                     echo 'Včera,';
                                                 } else {
-                                                    echo $dateFormatHelper($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                                    echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, 'd. MMMM yyyy,');
                                                 }
                                             }
                                             echo $dateFormatHelper($date, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $locale, ' HH:mm');
@@ -941,31 +941,3 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
         <?php } ?>
     <?php } ?>
 <?php } ?>
-
-
-
-
-
-<!-- Kam vyrazit -->
-<?php //= $view->include('news/partial/triptip') ?>
-<!-- Dnešní premiéry -->
-<?php //= $view->include('program/partial/todays-premieres') ?>
-<?php // Nejčtenější články ?>
-<?php //if ($mostReadArticles) { ?>
-    <!--<div class="featured-box featured-box-primary featured-box-effect-2 my-0">
-        <div class="box-content box-content-border-bottom">
-            <h3 class="font-weight-normal text-5 text-primary mb-4">Nejčtenější články</h3>
-            <ol class="list list-secondary list-ordened list-ordened-style-3 text-start ps-0">
-                <?php //foreach ($mostReadArticles as $article) { ?>
-                    <li class="">
-                        <a href="<?php //= $view->path('news_region_city_article', ['url' => $article['region_url'], 'city_url' => $article['city_url'], 'article_id' => $article['article_id'], 'article_url' => $article['article_url']]) ?>" title="<?php //= $article['title'] ?>">
-                            <?php //= $article['title'] ?>
-                        </a>
-                    </li>
-                <?php //} ?>
-            </ol>
-        </div>
-    </div>-->
-<?php //} ?>
-<?php // Nejsledovanější pořady ?>
-<?php //= $view->include('program/partial/most-watched-shows') ?>

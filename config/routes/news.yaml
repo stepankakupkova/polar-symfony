@@ -38,33 +38,25 @@ news_overwrite_docx:
   controller: App\News\Controller\Web\NewsController::overwriteDocx
 
 news_pr:
-  path: /zpravy/pr
+  path: /zpravy/pr-clanky
   controller: App\News\Controller\Web\NewsController::prnews
 
 news_pr_article:
-  path: /zpravy/pr/{article_id}/{article_url}
+  path: /zpravy/pr-clanky/{article_id}/{article_url}
   controller: App\News\Controller\Web\NewsController::articlePr
 
-triptip:
-  path: /zpravy/kam-vyrazit
+news_triptip:
+  path: /kam-vyrazit
   controller: App\News\Controller\Web\TriptipController::index
 
 news_triptip_get_triptip_list:
-  path: /zpravy/kam-vyrazit/json/get-triptip-list
+  path: /kam-vyrazit/json/get-triptip-list
   controller: App\News\Controller\Web\TriptipController::getTriptipList
   methods: POST
 
-news_triptip_region:
-  path: /zpravy/kam-vyrazit/{url}
-  controller: App\News\Controller\Web\TriptipController::region
-
-news_triptip_city:
-  path: /zpravy/kam-vyrazit/{url}/{city_url}
-  controller: App\News\Controller\Web\TriptipController::city
-
-triptip_article:
-  path: /zpravy/kam-vyrazit/{url}/{city_url}/{article_id}/{article_url}
-  controller: App\News\Controller\Web\TriptipController::detail
+news_triptip_article:
+  path: /kam-vyrazit/{url}/{city_url}/{article_id}/{article_url}
+  controller: App\News\Controller\Web\TriptipController::article
 
 # news_redactor musí být před news_region_city (obě mají 3 segmenty)
 news_redactor:

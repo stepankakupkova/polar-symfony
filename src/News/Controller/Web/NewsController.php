@@ -347,7 +347,7 @@ final class NewsController
 		$printableText = '';
 
 		if (!$url || !$city_url || !$article_id) {
-			//return new RedirectResponse($this->urlGenerator->generate('news'));
+			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
 		try {
@@ -365,14 +365,14 @@ final class NewsController
 			}
 
 			if ($article['public'] === 0) {
-				//return new RedirectResponse($this->urlGenerator->generate('news'));
+				return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 
 			if (!$region || !$city || !$article) {
-				//return new RedirectResponse($this->urlGenerator->generate('news'));
+				return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 			if (!$article['region'] || !$article['city']) {
-				//return new RedirectResponse($this->urlGenerator->generate('news'));
+				return new RedirectResponse($this->urlGenerator->generate('news'));
 			}
 
 			// Text článku k tisku, bez widgetů
@@ -626,16 +626,13 @@ final class NewsController
 	public function articlePr(Request $request, PhtmlRenderer $renderer): Response
 	{
 		$article_id = (int) $request->attributes->get('article_id', 0);
-		error_log("=== articlePr START, id=$article_id ===");
 		if (! $article_id) {
 			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 		}
 		$printableText = '';
 
 		try {
-			error_log('articlePr: getArticlePr...');
 			$article = $this->playkitRepository->getArticlePr($article_id);
-			error_log('articlePr: getArticlePr OK');
 			if (! $article) {
 				return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 			}
@@ -684,15 +681,11 @@ final class NewsController
 			return new RedirectResponse($this->urlGenerator->generate('news_pr'));
 		}
 
-		error_log('articlePr: getCountPR...');
 		// Celkový počet článků
 		$newsCount = $this->playkitRepository->getCountPR();
-		error_log('articlePr: getCountPR OK');
 
 		// PR články
-		error_log('articlePr: getPrArticles...');
 		$pr = $this->newsRepository->getPrArticles(11);
-		error_log('articlePr: getPrArticles OK');
 
 		// Mohlo by Vás zajímat
 		/*$newArticles = $this->newsRepository->getNewArticles(3);
@@ -725,10 +718,10 @@ final class NewsController
 		$newArticles = $this->playkitRepository->getAllHomepage([$article_id]);   // Dříve název "$this->getHomepageTable()->getAll()"
 		if ($newArticles) {
 			foreach ($newArticles as $i => $iValue) {
-				if ($iValue['section'] === '1' || $iValue['section'] === '2') {
+				if ($iValue['section'] === 1 || $iValue['section'] === 2) {
 					$newArticles[$i]['url'] = '/zpravy/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
 				}
-				if ($iValue['section'] === '3') {
+				if ($iValue['section'] === 3) {
 					$newArticles[$i]['url'] = '/kam-vyrazit/' . $iValue['region_url'] . '/' . $iValue['city_url'] . '/' . $iValue['article_id'] . '/' . $this->removeAccent($iValue['title'], '-');
 				}
 			}
@@ -738,10 +731,8 @@ final class NewsController
 		$newArticlesFirstHalf = isset($dividedArray[0]) ? $dividedArray[0] : null;
 		$newArticlesSecondHalf = isset($dividedArray[1]) ? $dividedArray[1] : null;
 
-		error_log('articlePr: getArticlesByRegionId...');
 		// Nejnovější zprávy pro MSK
 		$regionArticles = $this->newsRepository->getArticlesByRegionId(7, 6, $article_id);
-		error_log('articlePr: getArticlesByRegionId OK');
 		if ($regionArticles) {
 			foreach ($regionArticles as $id => $item) {
 				$date = new \DateTime($item['public_from']);
@@ -761,22 +752,17 @@ final class NewsController
 		// Pořady
 		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
-		error_log('articlePr: blockTriptip...');
 		// Blok Kam vyrazit
 		$blockTriptip = $this->newsRepository->getTriptipArticles(4, false, true);
 
-		error_log('articlePr: blockJob...');
 		// Blok Nabídky práce
 		$blockJob = $this->jobRepository->getRandForWeb(132, 4);
 
-		error_log('articlePr: blockCamera...');
 		// Blok kamery
 		$blockCamera = $this->cameraRepository->fetchAllLimit(4);
 
-		error_log('articlePr: weather...');
 		// Počasí
 		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
-		error_log('articlePr: weather OK, rendering...');
 
 		// Banner rectangle
 		$bannerRectangle = $this->bannerRepository->getRectangle();
@@ -790,7 +776,6 @@ final class NewsController
 		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		error_log('articlePr: rendering template...');
 		return new Response($renderer->renderWithLayout('news/web/news/article-pr', [
 			'newsCount' => $newsCount,
 			'pr' => $pr,
@@ -1281,7 +1266,7 @@ final class NewsController
 					$html  = '<div class="header">Sledujte také</div>';
 					$html .= '<div class="relative-triptip-article">';
 					$html .= '<h3>';
-					$html .= '<a href="' . $this->urlGenerator->generate('triptip_region_city_article', ['url' => $relatedArticle['region_url'], 'city_url' => $relatedArticle['city_url'], 'article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '<a href="' . $this->urlGenerator->generate('news_triptip_article', ['url' => $relatedArticle['region_url'], 'city_url' => $relatedArticle['city_url'], 'article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
 					$html .= '</h3>';
 					$html .= '</div>';
 

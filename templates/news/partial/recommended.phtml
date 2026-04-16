@@ -13,7 +13,7 @@
             $detail_url = $view->path('news_pr_article', ['article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
         } else if ($newArticles[$i]['section'] === 3) {
             $region_city_url = null;
-            $detail_url = $view->path('triptip_region_city_article', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url'], 'article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
+            $detail_url = $view->path('news_triptip_article', ['url' => $newArticles[$i]['region_url'], 'city_url' => $newArticles[$i]['city_url'], 'article_id' => $newArticles[$i]['article_id'], 'article_url' => removeAccent($newArticles[$i]['title'], '-')]);
         }
 
         try {
@@ -118,7 +118,7 @@
                             </span>
                         <?php } else if ($newArticles[$i]['section'] === 3) { ?>
                             <span>
-                                <a href="<?= $view->path('triptip') ?>" title="Kam vyrazit">
+                                <a href="<?= $view->path('news_triptip') ?>" title="Kam vyrazit">
                                     Kam vyrazit
                                 </a>
                             </span>
@@ -165,7 +165,7 @@
                                 </span>
                             <?php } else if ($newArticles[$i]['section'] === 3) { ?>
                                 <span>
-                                    <a href="<?= $view->path('triptip') ?>" title="Kam vyrazit">
+                                    <a href="<?= $view->path('news_triptip') ?>" title="Kam vyrazit">
                                         Kam vyrazit
                                     </a>
                                 </span>

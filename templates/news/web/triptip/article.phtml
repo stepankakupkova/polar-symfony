@@ -2,18 +2,18 @@
 /** @var \App\Application\View\ViewHelper $view */
 
 // HeadTitle
-$view->setTitle($article['title'] . ' | ' . $city['city'] . ' | ' . 'Kam vyrazit');
+$view->setTitle($article['title'] . ' | ' . $article['city'] . ' | ' . 'Kam vyrazit');
 
 // HeadMeta
-$view->addMeta('description', $article['anotation'] . ' ' . $city['city'] . ', ' . $region['region']);
-$view->addMeta('keywords', $article['title'] . ', ' . $city['city'] . ', ' . $region['region']);
+$view->addMeta('description', $article['anotation'] . ' ' . $article['city'] . ', ' . $article['region']);
+$view->addMeta('keywords', $article['title'] . ', ' . $article['city'] . ', ' . $article['region']);
 // META pro Google News
-$view->addMeta('news_keywords', $article['title'] . ', ' . $city['city'] . ', ' . $region['region']);
+$view->addMeta('news_keywords', $article['title'] . ', ' . $article['city'] . ', ' . $article['region']);
 
 // META pro Facebook
 $currentUrl = $this->currentUrl ?? '';
-$view->addOgMeta('og:title', $article['title'] . ' | ' . $city['city'] . ' | Kam vyrazit | POLAR');
-$view->addOgMeta('og:description', $article['anotation'] . ' ' . $city['city'] . ', ' . $region['region']);
+$view->addOgMeta('og:title', $article['title'] . ' | ' . $article['city'] . ' | Kam vyrazit | POLAR');
+$view->addOgMeta('og:description', $article['anotation'] . ' ' . $article['city'] . ', ' . $article['region']);
 $view->addOgMeta('og:url', $currentUrl);
 $view->addOgMeta('og:type', 'article');
 $view->addOgMeta('article:author', !isset($article['surname']) ? 'PR článek' : $article['name'] . ' ' . $article['surname']);
@@ -199,6 +199,11 @@ $currencyFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 $dateFormat = function(DateTime $date, int $dateType, int $timeType, string $locale): string {
     return (new IntlDateFormatter($locale, $dateType, $timeType))->format($date) ?: '';
 };
+
+$view->setBreadcrumbs([
+	['label' => 'Kam vyrazit', 'url' => $view->path('news_triptip')],
+	['label' => mb_substr($article['title'], 0, 30) . (mb_strlen($article['title']) > 30 ? '…' : '')],
+]);
 
 ?>
 

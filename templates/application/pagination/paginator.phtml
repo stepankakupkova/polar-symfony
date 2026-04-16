@@ -14,7 +14,13 @@ if ($pageCount <= 1) {
 
 $previous     = $page > 1 ? $page - 1 : null;
 $next         = $page < $pageCount ? $page + 1 : null;
-$pagesInRange = range(max(1, $page - 4), min($pageCount, $page + 4));
+$rangeStart   = max(1, $page - 2);
+$rangeEnd     = min($pageCount, $page + 2);
+if ($rangeEnd - $rangeStart < 4) {
+    $rangeEnd   = min($pageCount, $rangeStart + 4);
+    $rangeStart = max(1, $rangeEnd - 4);
+}
+$pagesInRange = range($rangeStart, $rangeEnd);
 
 $urlFor = fn(int $p): string => $view->path($route, $routeParams + ['strana' => $p]);
 

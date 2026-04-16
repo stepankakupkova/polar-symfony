@@ -19,6 +19,10 @@ $view->addOgMeta('og:image:secure_url', 'https://polar.cz/img/web/layout/microfo
 $view->addOgMeta('og:image:width', '1920');
 $view->addOgMeta('og:image:height', '1080');
 
+$view->setBreadcrumbs([
+    ['label' => 'Kam vyrazit'],
+]);
+
     $view->addInlineScript(
     	    'function initData(){
                 $("#calendar ul li a").not(".disabled").click(function(){
@@ -28,8 +32,6 @@ $view->addOgMeta('og:image:height', '1080');
     	            $.post("' . $view->path('news_triptip_get_triptip_list') . '",
                         {
                             date: hash,
-                            region_id: null,
-                            city_id: null,
                         },
                         function(json) {
             				$("#calendar").html(json.calendar);
@@ -50,8 +52,6 @@ $view->addOgMeta('og:image:height', '1080');
     	    $.post("' . $view->path('news_triptip_get_triptip_list') . '",
                 {
                     date: hash,
-                    region_id: null,
-                    city_id: null,
                 },
                 function(json) {
     	            $("#calendar").html(json.calendar);
@@ -74,10 +74,6 @@ $view->addOgMeta('og:image:height', '1080');
             // Crawl
             getCrawlData();'
     	);
-
-    /** @var $articles */
-    /** @var $exhibitions */
-
 
 ?>
 

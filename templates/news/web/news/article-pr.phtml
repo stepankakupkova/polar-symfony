@@ -244,9 +244,8 @@ if (!empty($firstFile['medium'])) {
 }
 
 $view->setBreadcrumbs([
-	['label' => 'Zprávy', 'url' => $view->path('news')],
 	['label' => 'Komerční sdělení', 'url' => $view->path('news_pr')],
-	['label' => $article['title']],
+	['label' => mb_substr($article['title'], 0, 30) . (mb_strlen($article['title']) > 30 ? '…' : '')],
 ]);
 // --- END Symfony-specific ---
 ?>
@@ -716,7 +715,6 @@ $view->setBreadcrumbs([
 
 <?php // Blok Kam vyrazit  ?>
 <?= $view->include('news/partial/block-triptip', ['blockTriptip' => $blockTriptip ?? null, 'region' => $region ?? null]) ?>
-
 
 <div class="container">
     <!-- 2. polovina Doporučujeme -->

@@ -202,29 +202,86 @@ final class PlaykitRepository
 	{
 		$result = $this->connection->createQueryBuilder()
 			->select(
-				'pnt.id',
-				'pnt.title',
-				'pnt.public_from',
-				'pnc.url AS city_url',
-				'pnr.url AS region_url'
+				'pnt.id', 'pnt.title', 'pnt.anotation', 'pnt.text', 'pnt.created_date',
+				'pnt.public_from', 'pnt.public_to', 'pnt.term_from', 'pnt.term_to',
+				'pnt.place', 'pnt.address', 'pnt.ticket_price', 'pnt.ticket_link',
+				'pnt.operator', 'pnt.operator_address', 'pnt.operator_phone', 'pnt.operator_email', 'pnt.operator_www',
+				'pnt.description',
+				'pnc.url AS city_url', 'pnc.city',
+				'pnr.url AS region_url', 'pnr.region'
 			)
 			->from('polar_news_triptips', 'pnt')
 			->leftJoin('pnt', 'polar_news_triptips2cities', 'pnt2c', 'pnt2c.triptips_id = pnt.id')
-			->leftJoin('pnt2c', 'polar_news_cities', 'pnc', 'pnc.id = pnt2c.city_id')
-			->leftJoin('pnc', 'polar_news_regions', 'pnr', 'pnr.id = pnc.region_id')
+			->innerJoin('pnt2c', 'polar_news_cities', 'pnc', 'pnc.id = pnt2c.city_id')
+			->innerJoin('pnc', 'polar_news_regions', 'pnr', 'pnr.id = pnc.region_id')
 			->where('pnt.id = :articleId')
 			->andWhere('pnt.public_from <= NOW()')
 			->andWhere('pnt.public_to >= NOW()')
-			->orderBy('pnt2c.rank', 'ASC')
+			->groupBy('pnt.id')
 			->setParameter('articleId', $articleId, ParameterType::INTEGER)
-			->setMaxResults(1)
 			->fetchAssociative();
 
 		if (!$result) {
 			return null;
 		}
 
+		// Video soubor z galerie
+		$video = $this->connection->createQueryBuilder()
+			->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.size_hq', 'gf.ext', 'gf.updated_date', 'pnt2gf.file_id')
+			->from('gallery_files', 'gf')
+			->leftJoin('gf', 'polar_news_triptips2gallery_files', 'pnt2gf', 'pnt2gf.file_id = gf.id')
+			->where('pnt2gf.triptip_id = :triptipId')
+			->andWhere('gf.type = :type')
+			->andWhere('pnt2gf.checked = 1')
+			->orderBy('pnt2gf.rank', 'ASC')
+			->setMaxResults(1)
+			->setParameter('triptipId', $result['id'], ParameterType::INTEGER)
+			->setParameter('type', 'video')
+			->fetchAssociative();
+
+		if ($video) {
+			$version = str_replace(['-', ' ', ':'], '', (string) $video['updated_date']);
+			$result['medium'] = '/data/gallery/modules/' . $video['module'] . '/videos/' . $video['folder'] . '/715x402.jpg?ver=' . $version;
+			$result['type'] = $video['type'];
+			$result['folder_light'] = $video['folder_light'];
+			$result['file'] = $video['file'];
+			$result['file_id'] = $video['file_id'];
+			$result['size'] = $video['size'];
+			$result['size_hq'] = $video['size_hq'];
+		}
+
 		$result['url'] = $this->removeAccent((string) ($result['title'] ?? ''), '-');
+
+		// Všechny soubory z galerie
+		$files = $this->connection->createQueryBuilder()
+			->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.size_hq', 'gf.ext', 'gf.description', 'gf.updated_date', 'pnt2gf.file_id', 'pnt2gf.rank')
+			->from('gallery_files', 'gf')
+			->leftJoin('gf', 'polar_news_triptips2gallery_files', 'pnt2gf', 'pnt2gf.file_id = gf.id')
+			->where('pnt2gf.triptip_id = :triptipId')
+			->andWhere('pnt2gf.checked = 1')
+			->orderBy('pnt2gf.rank', 'ASC')
+			->setParameter('triptipId', $result['id'], ParameterType::INTEGER)
+			->fetchAllAssociative();
+
+		if ($files) {
+			foreach ($files as &$file) {
+				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
+				if ($file['type'] === 'video') {
+					$file['medium'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/715x402.jpg?ver=' . $version;
+					if ($result['public_from'] >= '2015-12-10') {
+						$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_lq.mp4';
+						$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+					} else {
+						$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+						$file['link_hq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_hq.mp4';
+					}
+				}
+			}
+			unset($file);
+			$result['files'] = $files;
+		} else {
+			$result['files'] = null;
+		}
 
 		return $result;
 	}
@@ -276,106 +333,93 @@ final class PlaykitRepository
 		usort($resultSet, fn($a, $b) => $a['term_from'] <=> $b['term_from']);
 
 		for ($i = 0, $iMax = count($resultSet); $i < $iMax; $i++) {
+
 			$resultSet[$i]['anotation'] = $resultSet[$i]['anotation'] ? mb_substr($resultSet[$i]['anotation'], 0, 300, 'UTF-8') . ((mb_strlen($resultSet[$i]['anotation'], 'UTF-8') > 300) ? '...' : '') : '';
+
+			$resultSet[$i]['url'] = '/kam-vyrazit/' . $resultSet[$i]['region_url'] . '/' . $resultSet[$i]['city_url'] . '/' . $resultSet[$i]['id'] . '/' . $this->removeAccent($resultSet[$i]['title'], '-');
+
+			// Soubor z galerie (video / obrázek)
+			$file = $this->connection->createQueryBuilder()
+				->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.ext', 'gf.description', 'gf.updated_date')
+				->from('gallery_files', 'gf')
+				->leftJoin('gf', 'polar_news_triptips2gallery_files', 'pnt2gf', 'pnt2gf.file_id = gf.id')
+				->where('pnt2gf.triptip_id = :triptipId')
+				->andWhere('pnt2gf.checked = 1')
+				->orderBy('pnt2gf.rank', 'ASC')
+				->setMaxResults(1)
+				->setParameter('triptipId', $resultSet[$i]['id'], ParameterType::INTEGER)
+				->fetchAssociative();
+
+			if ($file) {
+				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
+				if ($file['type'] === 'video') {
+					$resultSet[$i]['image'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/310x174.jpg?ver=' . $version;
+				}
+				if ($file['type'] === 'image') {
+					$resultSet[$i]['image'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/310x174.' . $file['ext'] . '?ver=' . $version;
+				}
+			} else {
+				$resultSet[$i]['image'] = null;
+			}
+		}
+		$data = [];
+		$count = 0;
+		for ($i = 0, $iMax = count($resultSet); $i < $iMax; $i++) {
+			if ($resultSet[$i]['image'] != null) {
+				$data[] = $resultSet[$i];
+				$count++;
+			}
+			if ($count == $limit) break;
 		}
 
-		return $this->processTriptipResults($resultSet, $limit, $fromDate);
-	}
-
-	public function getRandTriptipByRegion(int $limit, int $regionId, int $important = 1, ?string $fromDate = null, int $show = 0): ?array     // Dříve "$this->getCoverageTable()->getRandArticleBySectionAndRegion()"
-	{
-		$qb = $this->connection->createQueryBuilder()
-			->select(
-				'pnt.id', 'pnt.title', 'pnt.anotation', 'pnt.public_from AS date',
-				'pnt.term_from', 'pnt.term_to', 'pnt.place', 'pnt.address',
-				'pnt.ticket_price', 'pnt.ticket_link',
-				'pnt.operator', 'pnt.operator_address', 'pnt.operator_phone', 'pnt.operator_email', 'pnt.operator_www',
-				'pnc.url AS city_url', 'pnc.city',
-				'pnr.url AS region_url', 'pnr.region'
-			)
-			->from('polar_news_triptips', 'pnt')
-			->innerJoin('pnt', 'polar_news_triptips2cities', 'pnt2c', 'pnt2c.triptips_id = pnt.id')
-			->innerJoin('pnt2c', 'polar_news_cities', 'pnc', 'pnc.id = pnt2c.city_id')
-			->innerJoin('pnc', 'polar_news_regions', 'pnr', 'pnr.id = pnc.region_id')
-			->groupBy('pnt.id')
-			->setMaxResults($limit + 10);
-
-		if ($important) {
-			$qb->orderBy('RAND()')->addOrderBy('pnt.term_from', 'ASC')
-				->andWhere('pnt.recommended = 1');
-		} else {
-			$qb->orderBy('pnt.term_from', 'ASC');
+		// vicedenni udalosti na konec dne
+		if ($data) {
+			if ($fromDate) {
+				$fromDay = $fromDate;
+			}
+			for ($z = 0; $z < 2; $z++) {// pojistka, kvuly prvnim dvema dlouhym udalostem
+				for ($i = 0, $iMax = count($data); $i < $iMax; $i++) {
+					$term_from = new \DateTime($data[$i]['term_from']);
+					if ($data[$i]['term_to']) {
+						$term_to = new \DateTime($data[$i]['term_to']);
+					} else {
+						$term_to = null;
+					}
+					if ($term_to) {
+						$days = $term_to->diff($term_from, true);
+						$days = $days->format('%a');
+						if ($days >= 2) {
+							$x = 1;
+							while (isset($data[$i + $x]) AND isset($fromDay)) {
+								$dateTmp = new \DateTime($data[$i + $x]['term_from']);
+								if ($data[$i + $x]['term_to']) {
+									$dateToTmp = new \DateTime($data[$i + $x]['term_to']);
+									$daysTmp = $dateToTmp->diff($dateTmp, true);
+									$daysTmp = $daysTmp->format('%d');
+								}
+								if (($fromDay > $dateTmp->format('Y-m-d')) AND isset($daysTmp) AND ($daysTmp >= 2)) {
+									$x++;
+								} else {
+									if ($fromDay < $dateTmp->format('Y-m-d')) {
+										for ($y = $i; $y < $x; $y++) {
+											$dataTmp = $data[$y];
+											$data[$y] = $data[$y + 1];
+											$data[$y + 1] = $dataTmp;
+										}
+									} else {
+										$dataTmp = $data[$i];
+										$data[$i] = $data[$i + $x];
+										$data[$i + $x] = $dataTmp;
+									}
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
-
-		if ($fromDate) {
-			$qb->andWhere('((DATE(:fromDate1) BETWEEN DATE(pnt.term_from) AND DATE(pnt.term_to)) OR (DATE(pnt.term_from) >= DATE(:fromDate2)))')
-				->setParameter('fromDate1', $fromDate)
-				->setParameter('fromDate2', $fromDate);
-		} else {
-			$qb->andWhere('((DATE(NOW()) BETWEEN DATE(pnt.term_from) AND DATE(pnt.term_to)) OR (DATE(pnt.term_from) >= DATE(NOW())))');
-		}
-
-		$qb->andWhere('pnr.id = :regionId')
-			->andWhere('pnt.public_from <= NOW()')
-			->andWhere('pnt.public_to >= NOW()')
-			->andWhere('pnt.show = :show')
-			->setParameter('regionId', $regionId, ParameterType::INTEGER)
-			->setParameter('show', $show, ParameterType::INTEGER);
-
-		$resultSet = $qb->fetchAllAssociative();
-		if (!$resultSet) {
-			return null;
-		}
-
-		return $this->processTriptipResults($resultSet, $limit, $fromDate);
-	}
-
-	public function getRandTriptipByCity(int $limit, int $cityId, int $important = 1, ?string $fromDate = null, int $show = 0): ?array     // Dříve "$this->getCoverageTable()->getRandArticleBySectionAndCity()"
-	{
-		$qb = $this->connection->createQueryBuilder()
-			->select(
-				'pnt.id', 'pnt.title', 'pnt.anotation', 'pnt.public_from AS date',
-				'pnt.term_from', 'pnt.term_to', 'pnt.place', 'pnt.address',
-				'pnt.ticket_price', 'pnt.ticket_link',
-				'pnt.operator', 'pnt.operator_address', 'pnt.operator_phone', 'pnt.operator_email', 'pnt.operator_www',
-				'pnc.url AS city_url', 'pnc.city',
-				'pnr.url AS region_url', 'pnr.region'
-			)
-			->from('polar_news_triptips', 'pnt')
-			->innerJoin('pnt', 'polar_news_triptips2cities', 'pnt2c', 'pnt2c.triptips_id = pnt.id')
-			->innerJoin('pnt2c', 'polar_news_cities', 'pnc', 'pnc.id = pnt2c.city_id')
-			->innerJoin('pnc', 'polar_news_regions', 'pnr', 'pnr.id = pnc.region_id')
-			->groupBy('pnt.id')
-			->setMaxResults($limit + 10);
-
-		if ($important) {
-			$qb->orderBy('RAND()')->addOrderBy('pnt.term_from', 'ASC')
-				->andWhere('pnt.recommended = 1');
-		} else {
-			$qb->orderBy('pnt.term_from', 'ASC');
-		}
-
-		if ($fromDate) {
-			$qb->andWhere('((DATE(:fromDate1) BETWEEN DATE(pnt.term_from) AND DATE(pnt.term_to)) OR (DATE(pnt.term_from) >= DATE(:fromDate2)))')
-				->setParameter('fromDate1', $fromDate)
-				->setParameter('fromDate2', $fromDate);
-		} else {
-			$qb->andWhere('((DATE(NOW()) BETWEEN DATE(pnt.term_from) AND DATE(pnt.term_to)) OR (DATE(pnt.term_from) >= DATE(NOW())))');
-		}
-
-		$qb->andWhere('pnc.id = :cityId')
-			->andWhere('pnt.public_from <= NOW()')
-			->andWhere('pnt.public_to >= NOW()')
-			->andWhere('pnt.show = :show')
-			->setParameter('cityId', $cityId, ParameterType::INTEGER)
-			->setParameter('show', $show, ParameterType::INTEGER);
-
-		$resultSet = $qb->fetchAllAssociative();
-		if (!$resultSet) {
-			return null;
-		}
-
-		return $this->processTriptipResults($resultSet, $limit, $fromDate);
+		return $data;
 	}
 
 	public function getOnlineNewsByArticleId(int $articleId, int $page, int $limit = 10): ?array
@@ -603,99 +647,6 @@ final class PlaykitRepository
 			->fetchAssociative();
 
 		return (int) ($result['total'] ?? 0);
-	}
-
-	private function processTriptipResults(array $resultSet, int $limit, ?string $fromDate): array
-	{
-		for ($i = 0, $iMax = count($resultSet); $i < $iMax; $i++) {
-			$resultSet[$i]['url'] = '/kam-vyrazit/' . $resultSet[$i]['region_url'] . '/' . $resultSet[$i]['city_url'] . '/' . $resultSet[$i]['id'] . '/' . $this->removeAccent($resultSet[$i]['title'], '-');
-
-			// Soubor z galerie (video / obrázek)
-			$file = $this->connection->createQueryBuilder()
-				->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.ext', 'gf.description', 'gf.updated_date')
-				->from('gallery_files', 'gf')
-				->leftJoin('gf', 'polar_news_triptips2gallery_files', 'pnt2gf', 'pnt2gf.file_id = gf.id')
-				->where('pnt2gf.triptip_id = :triptipId')
-				->andWhere('pnt2gf.checked = 1')
-				->orderBy('pnt2gf.rank', 'ASC')
-				->setMaxResults(1)
-				->setParameter('triptipId', $resultSet[$i]['id'], ParameterType::INTEGER)
-				->fetchAssociative();
-
-			if ($file) {
-				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
-				if ($file['type'] === 'video') {
-					$resultSet[$i]['image'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/310x174.jpg?ver=' . $version;
-				}
-				if ($file['type'] === 'image') {
-					$resultSet[$i]['image'] = '/data/gallery/modules/' . $file['module'] . '/images/' . $file['folder'] . '/310x174.' . $file['ext'] . '?ver=' . $version;
-				}
-			} else {
-				$resultSet[$i]['image'] = null;
-			}
-		}
-
-		$data = [];
-		$count = 0;
-		for ($i = 0, $iMax = count($resultSet); $i < $iMax; $i++) {
-			if ($resultSet[$i]['image'] != null) {
-				$data[] = $resultSet[$i];
-				$count++;
-			}
-			if ($count == $limit) {
-				break;
-			}
-		}
-
-		// vícedenní události na konec dne
-		if ($data) {
-			if ($fromDate) {
-				$fromDay = $fromDate;
-			}
-			for ($z = 0; $z < 2; $z++) {// pojistka, kvuly prvnim dvema dlouhym udalostem
-				for ($i = 0, $iMax = count($data); $i < $iMax; $i++) {
-					$term_from = new \DateTime($data[$i]['term_from']);
-					if ($data[$i]['term_to']) {
-						$term_to = new \DateTime($data[$i]['term_to']);
-					} else {
-						$term_to = null;
-					}
-					if ($term_to) {
-						$days = $term_to->diff($term_from, true);
-						$days = $days->format('%a');
-						if ($days >= 2) {
-							$x = 1;
-							while (isset($data[$i + $x]) && isset($fromDay)) {
-								$dateTmp = new \DateTime($data[$i + $x]['term_from']);
-								if ($data[$i + $x]['term_to']) {
-									$dateToTmp = new \DateTime($data[$i + $x]['term_to']);
-									$daysTmp = $dateToTmp->diff($dateTmp, true);
-									$daysTmp = $daysTmp->format('%d');
-								}
-								if (($fromDay > $dateTmp->format('Y-m-d')) && isset($daysTmp) && ($daysTmp >= 2)) {
-									$x++;
-								} else {
-									if ($fromDay < $dateTmp->format('Y-m-d')) {
-										for ($y = $i; $y < $x; $y++) {
-											$dataTmp = $data[$y];
-											$data[$y] = $data[$y + 1];
-											$data[$y + 1] = $dataTmp;
-										}
-									} else {
-										$dataTmp = $data[$i];
-										$data[$i] = $data[$i + $x];
-										$data[$i + $x] = $dataTmp;
-									}
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return $data;
 	}
 
 	/**

@@ -39,10 +39,10 @@ return [
             'class' => 'p-0',
             'dropdown' => [
                 ['label' => 'Volby 2025',          'url' => '/volby-2025'],
-                ['label' => 'Kam vyrazit',          'url' => '/zpravy/kam-vyrazit'],
+                ['label' => 'Kam vyrazit',          'url' => '/kam-vyrazit'],
                 ['label' => 'Nabídka práce',        'url' => '/nabidka-prace'],
                 ['label' => 'Kamery',               'url' => '/kamery'],
-                ['label' => 'Komerční sdělení',     'url' => '/zpravy/pr'],
+                ['label' => 'Komerční sdělení',     'url' => '/zpravy/pr-clanky'],
                 ['label' => 'TV program',           'url' => '/tv-program'],
             ],
         ],

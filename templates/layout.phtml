@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= $view->getTitle() !== '' ? htmlspecialchars($view->getTitle()) . ' | POLAR' : 'POLAR televize Ostrava' ?></title>
+    <title><?= $view->getTitle() !== '' ? htmlspecialchars($view->getTitle()) . ' | ' : '' ?>POLAR - Moravskoslezská regionální televize</title>
     <meta name="author" content="POLAR televize Ostrava">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
     <meta name="application-name" content="POLAR televize Ostrava">
@@ -99,7 +99,7 @@
                                     // TODO: doplnit routes až budou implementovány: job_list, job_city_list, job_our_detail, job_city_detail,
                                     //       news_region, news_region_city, news_redactor, app_hd, app_polar2, app_reklama, app_kontakt,
                                     //       app_hbbtv, app_jak-naladit, election_*, program_*, show_*
-                                    $h1Routes = ['app_home', 'app_search', 'news', 'news_pr', 'triptip', 'camera_list', 'camera_detail'];
+                                    $h1Routes = ['app_home', 'app_search', 'news', 'news_pr', 'news_triptip', 'camera_list', 'camera_detail'];
                                     $h1Display = in_array($routeName ?? '', $h1Routes, true);
                                     $h1Title = htmlspecialchars($view->getTitle());
                                 ?>

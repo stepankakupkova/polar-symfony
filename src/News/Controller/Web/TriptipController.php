@@ -31,68 +31,16 @@ final class TriptipController
 		]));
 	}
 
-	public function region(Request $request, PhtmlRenderer $renderer, string $url): Response
+	public function article(Request $request, PhtmlRenderer $renderer, int $article_id): Response
 	{
-		if (!$url) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
+		if (!$article_id) {
+			return new RedirectResponse($this->urlGenerator->generate('news_triptip'));
 		}
 
-		$region = $this->playkitRepository->getRegionByUrl($url);
-		if (!$region) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
-		}
-
-		if ($region['url'] === 'moravskoslezsky-kraj') {
-			$articles = $this->playkitRepository->getTriptips(30);      // Dříve pojmenováno v CoverageTable "getRandArticleBySection"
-		} else {
-			$articles = $this->playkitRepository->getRandTriptipByRegion(3, $region['id']);       // Dříve "$this->getCoverageTable()->getRandArticleBySectionAndRegion(2, 3, $region['id'])"
-		}
-		$exhibitions = $this->playkitRepository->getRandTriptipByRegion(20, $region['id'], 0, null, 1);       // Dříve "$this->getCoverageTable()->getRandArticleBySectionAndRegion(2, 20, $region['id'], 0, null, 1)"
-
-		return new Response($renderer->renderWithLayout('news/web/triptip/region', [
-			'region' => $region,
-			'articles' => $articles,
-			'exhibitions' => $exhibitions,
-			'currentUrl' => $request->getUri(),
-		]));
-	}
-
-	public function city(Request $request, PhtmlRenderer $renderer, string $url, string $city_url): Response
-	{
-		if (!$url || !$city_url) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
-		}
-
-		$region = $this->playkitRepository->getRegionByUrl($url);
-		$city = $this->playkitRepository->getCityByUrl($city_url);
-		if (!$city || !$region) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
-		}
-
-		$articles = $this->playkitRepository->getRandTriptipByCity(3, $city['id']);       // Dříve "$this->getCoverageTable()->getRandArticleBySectionAndCity(2, 3, $city['id'])"
-		$exhibitions = $this->playkitRepository->getRandTriptipByCity(20, $city['id'], 0, null, 1);       // Dříve "$this->getCoverageTable()->getRandArticleBySectionAndCity(2, 20, $city['id'], 0, null, 1)"
-
-		return new Response($renderer->renderWithLayout('news/web/triptip/city', [
-			'region' => $region,
-			'city' => $city,
-			'articles' => $articles,
-			'exhibitions' => $exhibitions,
-			'currentUrl' => $request->getUri(),
-		]));
-	}
-
-	public function detail(Request $request, PhtmlRenderer $renderer, string $url, string $city_url, int $article_id): Response
-	{
-		if (!$url || !$city_url || !$article_id) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
-		}
-
-		$region = $this->playkitRepository->getRegionByUrl($url);
-		$city = $this->playkitRepository->getCityByUrl($city_url);
 		$article = $this->playkitRepository->getTriptip($article_id);   // Dříve "$this->getCoverageTable()->getArticleSection();"
 
-		if (!$region || !$city || !$article) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
+		if (!$article) {
+			return new RedirectResponse($this->urlGenerator->generate('news_triptip'));
 		}
 
 		// Nepovolit zobrazeni detailu pres URL, pokud je udalost mimo interval, nebo vice, nez 30 dni stara
@@ -101,16 +49,46 @@ final class TriptipController
 		$today = $today->format('Y-m-d H:i:s');
 		$today_minus_30_days = $today_minus_30_days->modify('- 30 days')->format('Y-m-d H:i:s');
 		if ($article['public_from'] >= $today) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
+			return new RedirectResponse($this->urlGenerator->generate('news_triptip'));
 		}
 		if ($article['public_to'] <= $today) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
+			return new RedirectResponse($this->urlGenerator->generate('news_triptip'));
 		}
 		if (isset($article['term_to']) && $article['term_to'] <= $today) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
+			return new RedirectResponse($this->urlGenerator->generate('news_triptip'));
 		}
 		if ($article['term_from'] <= $today && !isset($article['term_to']) && $article['created_date'] < $today_minus_30_days) {
-			return new RedirectResponse($this->urlGenerator->generate('triptip'));
+			return new RedirectResponse($this->urlGenerator->generate('news_triptip'));
+		}
+
+		// Souvísející články
+		if ($article['text']) {
+			$article['text'] = $this->insertRelativeArticle($article['text']);
+		}
+
+		// Souvísející PR články
+		if ($article['text']) {
+			$article['text'] = $this->insertRelativePrArticle($article['text']);
+		}
+
+		// Souvísející KAM VYRAZIT články
+		if ($article['text']) {
+			$article['text'] = $this->insertRelativeTriptipArticle($article['text']);
+		}
+
+		// Twitter feed
+		if ($article['text']) {
+			$article['text'] = $this->insertTwitter($article['text']);
+		}
+
+		// Facebook feed
+		if ($article['text']) {
+			$article['text'] = $this->insertFacebook($article['text']);
+		}
+
+		// Youtube video
+		if ($article['text']) {
+			$article['text'] = $this->insertYoutube($article['text'], $request->getSchemeAndHttpHost());
 		}
 
 		// Pocitani zobrazeni clanku
@@ -129,8 +107,6 @@ final class TriptipController
 		$weather = $this->playkitRepository->getWeatherForNews('Ostrava');
 
 		return new Response($renderer->renderWithLayout('news/web/triptip/article', [
-			'region' => $region,
-			'city' => $city,
 			'article' => $article,
 			'pr' => $pr,
 			'weather' => $weather,
@@ -142,8 +118,6 @@ final class TriptipController
 	public function getTriptipList(Request $request): JsonResponse
 	{
 		$date = $request->request->get('date');
-		$region_id = $request->request->get('region_id');
-		$city_id = $request->request->get('city_id');
 
 		if ($date) {
 			$date = new \DateTime($date);
@@ -216,15 +190,7 @@ final class TriptipController
 			'<li><a href="#' . $nextDay->format('Y-m-d') . '" title=""><i class="fas fa-chevron-right"></i></a></li>' .
 			'</ul>';
 
-		if ($region_id === '7') {
-			$articles = $this->playkitRepository->getTriptips(30, 0, $date->format('Y-m-d'));
-		} else if ($region_id) {
-			$articles = $this->playkitRepository->getRandTriptipByRegion(30, (int) $region_id, 0, $date->format('Y-m-d'));
-		} else if ($city_id) {
-			$articles = $this->playkitRepository->getRandTriptipByCity(30, (int) $city_id, 0, $date->format('Y-m-d'));
-		} else {
-			$articles = $this->playkitRepository->getTriptips(30, 0, $date->format('Y-m-d'));
-		}
+		$articles = $this->playkitRepository->getTriptips(30, 0, $date->format('Y-m-d'));
 
 		$dateFormatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, null, null, 'dd.MM.');
 		$timeFormatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::NONE, \IntlDateFormatter::SHORT);
@@ -320,5 +286,208 @@ final class TriptipController
 			'content' => $content,
 			'success' => true,
 		]);
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertRelativeArticle(string $text): string
+	{
+		RELATIVEARTICLE:
+		if (mb_strpos($text, '{{souvisejici-clanek', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{souvisejici-clanek',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$relative_article_id = mb_substr($id, 22, -3);
+			if (is_numeric($relative_article_id)) {
+				$relatedArticle = $this->playkitRepository->getArticle($relative_article_id);
+				if ($relatedArticle) {
+
+					$html  = '<div class="header">Sledujte také</div>';
+					$html .= '<div class="relative-article">';
+					$html .= '<h3>';
+					$html .= '<a href="' . $this->urlGenerator->generate('news_region_city_article', ['url' => $relatedArticle['region_url'], 'city_url' => $relatedArticle['city_url'], 'article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '</h3>';
+					$html .= '</div>';
+
+					$text = str_replace($id, $html, $text);
+				} else {
+					$text = str_replace($id, '', $text);
+				}
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			GOTO RELATIVEARTICLE;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertRelativePrArticle(string $text): string
+	{
+		RELATIVEARTICLE:
+		if (mb_strpos($text, '{{souvisejici-pr-clanek', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{souvisejici-pr-clanek',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$relative_article_id = mb_substr($id, 25, -3);
+			if (is_numeric($relative_article_id)) {
+				$relatedArticle = $this->playkitRepository->getArticlePr($relative_article_id);
+				if ($relatedArticle) {
+
+					$html  = '<div class="header">Sledujte také</div>';
+					$html .= '<div class="relative-pr-article">';
+					$html .= '<h3>';
+					$html .= '<a href="' . $this->urlGenerator->generate('news_pr_article', ['article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '</h3>';
+					$html .= '</div>';
+
+					$text = str_replace($id, $html, $text);
+				} else {
+					$text = str_replace($id, '', $text);
+				}
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			GOTO RELATIVEARTICLE;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertRelativeTriptipArticle(string $text): string
+	{
+		RELATIVEARTICLE:
+		if (mb_strpos($text, '{{souvisejici-kam-vyrazit-clanek', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{souvisejici-kam-vyrazit-clanek',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$relative_article_id = mb_substr($id, 34, -3);
+			if (is_numeric($relative_article_id)) {
+				$relatedArticle = $this->playkitRepository->getTriptip($relative_article_id); // Dříve "$this->getCoverageTable()->getArticleSection($relative_article_id, 2);"
+				if ($relatedArticle) {
+
+					$html  = '<div class="header">Sledujte také</div>';
+					$html .= '<div class="relative-triptip-article">';
+					$html .= '<h3>';
+					$html .= '<a href="' . $this->urlGenerator->generate('news_triptip_article', ['url' => $relatedArticle['region_url'], 'city_url' => $relatedArticle['city_url'], 'article_id' => $relatedArticle['id'], 'article_url' => $relatedArticle['url']]) . '" title="">' . $relatedArticle['title'] . '</a>';
+					$html .= '</h3>';
+					$html .= '</div>';
+
+					$text = str_replace($id, $html, $text);
+				} else {
+					$text = str_replace($id, '', $text);
+				}
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			GOTO RELATIVEARTICLE;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertTwitter(string $text): string
+	{
+		$i = 1;
+		TWITTERFEED:
+		if (mb_strpos($text, '{{twitter-feed-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{twitter-feed-',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$twitter_id = mb_substr($id, 16, -3);
+			if (is_numeric($twitter_id)) {
+				$html = '<div class="twitter-feed" id="twitter-feed-' . $i . '">';
+				$html .= '</div>';
+				$html .= '<script>
+								twttr.ready(function (twttr) {
+									twttr.widgets.createTweet(
+										"' . $twitter_id . '",
+										document.getElementById("twitter-feed-' . $i . '"),
+										{
+											theme: "light",
+											align: "center",
+											lang: "cs"
+										}
+									);
+								});
+							</script>';
+
+				$text = str_replace($id, $html, $text);
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			$i++;
+			GOTO TWITTERFEED;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertFacebook(string $text): string
+	{
+		$i = 1;
+		FACEBOOKFEED:
+		if (mb_strpos($text, '{{facebook-feed-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{facebook-feed-',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$code = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$both_ids = mb_substr($code, 16, -2);
+			$both_ids = str_replace('"', '', $both_ids);
+			if (mb_strpos($both_ids, '-', 0, 'UTF-8')) {
+				$two_ids = explode("-", $both_ids);
+				if (isset($two_ids[0]) && isset($two_ids[1])) {
+					$id_page = $two_ids[0];
+					$id_post = $two_ids[1];
+				}
+			}
+			if (isset($id_page) && isset($id_post)) {
+				$html = '<div class="fb-post" data-href="https://www.facebook.com/'.$id_page.'/posts/'.$id_post.'/" id="facebook-feed-' . $i . '"></div>';
+				$text = str_replace($code, $html, $text);
+			} else {
+				$text = str_replace($code, '', $text);
+			}
+			$i++;
+			GOTO FACEBOOKFEED;
+		}
+		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	private function insertYoutube(string $text, string $schemeHost): string
+	{
+		$i = 1;
+		YOUTUBEVIDEO:
+		if (mb_strpos($text, '{{youtube-video-', 0, 'UTF-8')) {
+			$posStart = mb_strpos($text, '{{youtube-video-',0, 'UTF-8');
+			$posEnd = mb_strpos($text, '}}', $posStart, 'UTF-8');
+			$id = mb_substr($text, $posStart, $posEnd - $posStart + 2);
+			$youtube_id = mb_substr($id, 17, -3);
+			if ($youtube_id) {
+				$html = '<div class="responsive_player"><iframe id="youtube-player-'.$i.'" type="text/html" width="640" height="360" src="https://www.youtube.com/embed/'.$youtube_id.'?enablejsapi=1&origin='.$schemeHost.'" frameborder="0" allowfullscreen></iframe></div>';
+				$text = str_replace($id, $html, $text);
+			} else {
+				$text = str_replace($id, '', $text);
+			}
+			$i++;
+			GOTO YOUTUBEVIDEO;
+		}
+		return $text;
 	}
 }
