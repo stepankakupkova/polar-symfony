@@ -1,0 +1,115 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$post = $post ?? [];
+$errors = $errors ?? [];
+$isEdit = $isEdit ?? false;
+$currentRole = $currentRole ?? '';
+
+$roleOptions = [
+	'' => '-- Vyberte --',
+	'owner' => 'Majitel',
+	'admin' => 'Admin',
+	'member' => 'Uživatel',
+];
+
+// Omezení role — ne-owner nevidí roli owner
+if (!in_array('owner', $identity->getRole(), true)) {
+	unset($roleOptions['owner']);
+}
+?>
+
+<form action="" method="post" class="needs-validation" novalidate>
+	<?php if (!empty($errors['general'])) { ?>
+		<div class="alert alert-danger"><?= htmlspecialchars($errors['general']) ?></div>
+	<?php } ?>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label required" for="username">Email</label>
+		<div class="col-sm-9">
+			<input type="email" name="username" id="username" class="form-control<?= isset($errors['username']) ? ' is-invalid' : '' ?>" required maxlength="50" value="<?= htmlspecialchars($post['username'] ?? '') ?>">
+			<?php if (isset($errors['username'])) { ?>
+				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['username']) ?></div>
+			<?php } ?>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label<?= !$isEdit ? ' required' : '' ?>" for="password">Heslo</label>
+		<div class="col-sm-9">
+			<input type="password" name="password" id="password" class="form-control<?= isset($errors['password']) ? ' is-invalid' : '' ?>" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'ponechte prázdné pro zachování' : 'povinné' ?>">
+			<?php if (isset($errors['password'])) { ?>
+				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['password']) ?></div>
+			<?php } ?>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label<?= !$isEdit ? ' required' : '' ?>" for="password2">Heslo znovu</label>
+		<div class="col-sm-9">
+			<input type="password" name="password2" id="password2" class="form-control<?= isset($errors['password2']) ? ' is-invalid' : '' ?>" <?= !$isEdit ? 'required' : '' ?> maxlength="50">
+			<?php if (isset($errors['password2'])) { ?>
+				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['password2']) ?></div>
+			<?php } ?>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label required" for="role">Role</label>
+		<div class="col-sm-9">
+			<select name="role" id="role" class="form-control<?= isset($errors['role']) ? ' is-invalid' : '' ?>" required>
+				<?php foreach ($roleOptions as $value => $label) { ?>
+					<option value="<?= htmlspecialchars($value) ?>"<?= ($post['role'] ?? $currentRole) === $value ? ' selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+				<?php } ?>
+			</select>
+			<?php if (isset($errors['role'])) { ?>
+				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['role']) ?></div>
+			<?php } ?>
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="active">Aktivní</label>
+		<div class="col-sm-9">
+			<div class="custom-control custom-checkbox">
+				<input type="checkbox" name="active" id="active" class="custom-control-input" value="1"<?= !empty($post['active']) || (!$isEdit && !isset($post['active'])) ? ' checked' : '' ?>>
+				<label class="custom-control-label" for="active">Ano</label>
+			</div>
+		</div>
+	</div>
+
+	<hr>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="first_name">Jméno</label>
+		<div class="col-sm-9">
+			<input type="text" name="first_name" id="first_name" class="form-control" maxlength="50" value="<?= htmlspecialchars($post['first_name'] ?? '') ?>">
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="last_name">Příjmení</label>
+		<div class="col-sm-9">
+			<input type="text" name="last_name" id="last_name" class="form-control" maxlength="50" value="<?= htmlspecialchars($post['last_name'] ?? '') ?>">
+		</div>
+	</div>
+
+	<input type="hidden" name="image" id="image" value="<?= htmlspecialchars($post['image'] ?? 'data/user/!default-user.png') ?>">
+
+	<div class="row">
+		<div class="col-sm-9 offset-sm-3">
+			<button type="submit" name="submit" class="btn btn-primary">
+				<i class="fa fa-save"></i> <?= $isEdit ? 'Uložit' : 'Vytvořit' ?>
+			</button>
+			<button type="submit" name="cancel" class="btn btn-default">
+				Zrušit
+			</button>
+		</div>
+	</div>
+</form>

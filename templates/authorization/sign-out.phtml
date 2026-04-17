@@ -1,0 +1,57 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$scheme = $scheme ?? 'dark';
+?>
+
+<div class="container py-2">
+	<?php if ($message) { ?>
+		<div class="row">
+			<div class="col-md-6 offset-md-3">
+				<div class="alert alert-success alert-lg alert-dismissible mb-0" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Zavřít">
+						<span aria-hidden="true">
+							×
+						</span>
+					</button>
+					<strong>
+						Úspěch!
+					</strong>
+					<br>
+					<?= htmlspecialchars($message) ?>
+				</div>
+			</div>
+		</div>
+	<?php } ?>
+	<div class="row">
+		<div class="col-md-6 offset-md-3">
+			<div class="featured-box featured-box-primary">
+				<div class="box-content p-5">
+					<div class="row">
+						<div class="col">
+							<i class="icon-featured fa fa-sign-out-alt m-0"></i>
+							<h2 class="font-weight-normal text-6">
+								Odhlášení
+								<strong>
+
+								</strong>
+							</h2>
+							<div class="divider divider-small divider-small-center">
+								<hr>
+							</div>
+							<a href="<?= $view->path('app_login') ?>" class="btn btn-modern btn-primary mr-1">
+								Přihlásit se
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

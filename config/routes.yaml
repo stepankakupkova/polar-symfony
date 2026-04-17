@@ -11,6 +11,15 @@ camera:
 banner:
   resource: routes/banner.yaml
 
+page:
+  resource: routes/page.yaml
+
+page_generated:
+  resource: routes/page_generated.yaml
+
+admin:
+  resource: routes/admin.yaml
+
 app_home:
   path: /
   controller: App\Application\Controller\Web\ApplicationController::index
@@ -64,3 +73,16 @@ app_robots_txt:
 app_embed_playerjs:
   path: /embed-playerjs
   controller: App\Application\Controller\Web\ApplicationController::embedPlayerjs
+
+# Authorization
+app_login:
+  path: /prihlaseni
+  controller: App\Authorization\Controller\SecurityController::login
+
+app_logout:
+  path: /odhlaseni
+  controller: App\Authorization\Controller\SecurityController::logout
+
+app_sign_out:
+  path: /autorizace/odhlasit
+  controller: App\Authorization\Controller\SecurityController::signOut

@@ -31,7 +31,7 @@ news_guests_guest:
 
 news_video_download:
   path: /zpravy/video-download/{video_id}/{quality}
-  controller: App\News\Controller\Web\NewsController::downloadVideo
+  controller: App\News\Controller\Web\NewsController::download
 
 news_overwrite_docx:
   path: /zpravy/overwrite-docx/{article_id}

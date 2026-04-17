@@ -20,6 +20,7 @@ final class ApplicationWriteController
 			if (!$url) {
 				return new JsonResponse(['success' => 'nok', 'message' => 'Neplatná URL.']);
 			}
+			$url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
 
 			$content = htmlspecialchars(trim((string) $request->request->get('content', '')), ENT_QUOTES, 'UTF-8');
 			if ($content === '') {
@@ -36,19 +37,29 @@ final class ApplicationWriteController
 
 			$recaptchaSecret = getenv('GOOGLE_RECAPTCHA_SECRET') ?: '';
 			$recaptchaToken = (string) $request->request->get('recaptchaToken', '');
-			if ($recaptchaSecret !== '') {
-				if ($recaptchaToken === '') {
-					return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'Chybí reCAPTCHA token.']);
-				}
+			if ($recaptchaToken === '') {
+				return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'Chybí reCAPTCHA token.']);
+			}
 
+			if ($recaptchaSecret !== '') {
 				$verifyUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=' . rawurlencode($recaptchaSecret) . '&response=' . rawurlencode($recaptchaToken);
 				$response = @file_get_contents($verifyUrl);
 				$data = $response ? json_decode($response, true) : null;
 				if (!is_array($data) || !($data['success'] ?? false)) {
 					return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'Ověření reCAPTCHA selhalo.']);
 				}
+
+				if (($data['hostname'] ?? '') !== $request->getHost()) {
+					return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'reCAPTCHA byla použita z jiného webu.']);
+				}
+
 				if (($data['score'] ?? 0) < 0.7) {
 					return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'Podezřelé chování. reCAPTCHA skóre je příliš nízké.']);
+				}
+
+				$challengeTime = strtotime($data['challenge_ts'] ?? '');
+				if (time() - $challengeTime > 120) {
+					return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'reCAPTCHA token je příliš starý.']);
 				}
 			}
 

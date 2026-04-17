@@ -25,15 +25,15 @@ final class ShowRepository
 	}
 
 	/**
-	 * Najde pořad podle ID
+	 * Najde pořad podle sloupce
 	 */
-	public function findById(int $id): ?array
+	public function findPostBy(string $column, int|string $value): ?array
 	{
 		$result = $this->connection->createQueryBuilder()
 			->select('*')
 			->from('program_shows')
-			->where('id = :id')
-			->setParameter('id', $id)
+			->where($column . ' = :value')
+			->setParameter('value', $value)
 			->fetchAssociative();
 
 		return $result ?: null;

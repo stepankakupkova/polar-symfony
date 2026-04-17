@@ -31,11 +31,11 @@ final class NewsController
 		private TickerRepository $tickerRepository,
 		private CrawlRepository $crawlRepository,
 		private JobRepository $jobRepository,
-		// TODO: private ShowRepository $showRepository,
 		private CameraRepository $cameraRepository,
 		private BannerRepository $bannerRepository,
 		private UrlGeneratorInterface $urlGenerator,
 		private string $PUBLIC_PATH,
+		private string $LIGHT_URL,
 	) {}
 
 	public function index(Request $request, PhtmlRenderer $renderer): Response
@@ -48,9 +48,6 @@ final class NewsController
 			//var_dump ($e->getMessage());
 			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
-
-		// Pořady
-		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
 		// Celkový počet článků
 		$newsCount = $this->newsRepository->getCountFromSettings();
@@ -82,14 +79,13 @@ final class NewsController
 		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		return new Response($renderer->renderWithLayout('news/web/news/index', [
+		$response = new Response($renderer->renderWithLayout('news/web/news/index', [
 			'newsCount' => $newsCount,
 			'pr' => $pr,
 			'blockTriptip' => $blockTriptip,
 			'blockJob' => $blockJob,
 			'blockCamera' => $blockCamera,
 			'articles' => $articles,
-			//'shows' => $shows,
 			'weather' => $weather,
 			'weather_region' => 'Ostrava',
 			'bannerRectangle' => $bannerRectangle,
@@ -104,6 +100,9 @@ final class NewsController
 			'currentUrl' => $request->getUri(),
 			'schemeHost' => $request->getSchemeAndHttpHost(),
 		]));
+		$response->setPublic();
+		$response->setMaxAge(120);
+		return $response;
 	}
 
 	public function region(Request $request, PhtmlRenderer $renderer): Response
@@ -136,9 +135,6 @@ final class NewsController
 			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
-		// Pořady
-		// TODO: $shows = $this->showRepository->fetchAllForNews();
-
 		// Celkový počet článků
 		$newsCount = $this->newsRepository->getCount($region['id']);
 
@@ -170,7 +166,7 @@ final class NewsController
 		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		return new Response($renderer->renderWithLayout('news/web/news/region', [
+		$response = new Response($renderer->renderWithLayout('news/web/news/region', [
 			'newsCount' => $newsCount,
 			'region' => $region,
 			'pr' => $pr,
@@ -178,7 +174,6 @@ final class NewsController
 			'blockJob' => $blockJob,
 			'blockCamera' => $blockCamera,
 			'articles' => $articles,
-			//'shows' => $shows,
 			'weather' => $weather,
 			'weather_region' => $weather_region,
 			'bannerRectangle' => $bannerRectangle,
@@ -192,6 +187,9 @@ final class NewsController
 			'currentUrl' => $request->getUri(),
 			'schemeHost' => $request->getSchemeAndHttpHost(),
 		]));
+		$response->setPublic();
+		$response->setMaxAge(120);
+		return $response;
 	}
 
 	public function city(Request $request, PhtmlRenderer $renderer): Response
@@ -221,9 +219,6 @@ final class NewsController
 			//var_dump ($e->getMessage());
 			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
-
-		// Pořady
-		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
 		// Celkový počet článků
 		$newsCount = $this->newsRepository->getCount(null, $city['id']);
@@ -256,7 +251,7 @@ final class NewsController
 		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		return new Response($renderer->renderWithLayout('news/web/news/city', [
+		$response = new Response($renderer->renderWithLayout('news/web/news/city', [
 			'newsCount' => $newsCount,
 			'pr' => $pr,
 			'blockTriptip' => $blockTriptip,
@@ -265,7 +260,6 @@ final class NewsController
 			'articles' => $articles,
 			'region' => $region,
 			'city' => $city,
-			//'shows' => $shows,
 			'weather' => $weather,
 			'weather_region' => $weather_region,
 			'bannerRectangle' => $bannerRectangle,
@@ -279,6 +273,9 @@ final class NewsController
 			'currentUrl' => $request->getUri(),
 			'schemeHost' => $request->getSchemeAndHttpHost(),
 		]));
+		$response->setPublic();
+		$response->setMaxAge(120);
+		return $response;
 	}
 
 	public function redactor(Request $request, PhtmlRenderer $renderer): Response
@@ -307,9 +304,6 @@ final class NewsController
 			return new RedirectResponse($this->urlGenerator->generate('news'));
 		}
 
-		// Pořady
-		// TODO: $shows = $this->showRepository->fetchAllForNews();
-
 		// Celkový počet článků
 		$newsCount = $this->newsRepository->getCount(null, null, $redactor['url']);
 
@@ -327,7 +321,6 @@ final class NewsController
 			'redactor' => $redactor,
 			'pr' => $pr,
 			'articles' => $articles,
-			//'shows' => $shows,
 			'bannerRectangle' => $bannerRectangle,
 			'bannerMobilesquare1' => $bannerMobilesquare1,
 			// Extra pro šablonu (paginator)
@@ -434,46 +427,6 @@ final class NewsController
 			$pr = null;
 		}
 
-		// Nabídky práce
-		/*switch ($url) {
-			case 'ostrava':
-				$joboffer_city_url = 'ostrava';
-				$okres_code = 3807;
-				break;
-			case 'karvinsko':
-				$joboffer_city_url = 'karvina';
-				$okres_code = 3803;
-				break;
-			case 'frydeckomistecko':
-				$joboffer_city_url = 'frydek-mistek';
-				$okres_code = 3802;
-				break;
-			case 'opavsko':
-				$joboffer_city_url = 'opava';
-				$okres_code = 3806;
-				break;
-			case 'novojicinsko':
-				$joboffer_city_url = 'novy-jicin';
-				$okres_code = 3804;
-				break;
-			case 'bruntalsko':
-				$joboffer_city_url = 'bruntal';
-				$okres_code = 3801;
-				break;
-			default:
-				$joboffer_city_url = '';
-				$okres_code = null;
-				break;
-		}
-		$joboffersArticles = $this->jobRepository->getRandForWebByCityCode($okres_code, 3);*/
-
-		// Dnešní premiéry
-		//$todayPremieres = $this->showRepository->getTodayPremieresForWeb();
-
-		// Nejčtenější články
-		//$ids = $this->newsRepository->getMostReadArticlesForWeb(3);
-		//$mostReadArticles = $this->newsRepository->getArticlesByIDs($ids, 3);
-
 		// Doporučujeme - hlavní články z HP
 		$newArticles = $this->playkitRepository->getAllHomepage([$article_id]);   // Dříve název "$this->getHomepageTable()->getAll()"
 		if ($newArticles) {
@@ -508,9 +461,6 @@ final class NewsController
 				$regionArticles[$id]['url'] = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'] . '/' . $item['article_id'] . '/' . $this->removeAccent($item['title'], '-');
 			}
 		}
-
-		// Pořady
-		// TODO: $shows = $this->showRepository->fetchAllForNews();
 
 		// Blok Kam vyrazit
 		$blockTriptip = $this->newsRepository->getTriptipArticles(4, $region['id'], true);
@@ -586,7 +536,7 @@ final class NewsController
 		// Banner mobile square 2
 		$bannerMobilesquare2 = $this->bannerRepository->getMobilesquare2();
 
-		return new Response($renderer->renderWithLayout('news/web/news/article', [
+		$response = new Response($renderer->renderWithLayout('news/web/news/article', [
 			'article' => $article,
 			'printableText' => $printableText,
 			'region' => $region,
@@ -595,12 +545,7 @@ final class NewsController
 			'newArticlesSecondHalf' => $newArticlesSecondHalf,
 			'newArticlesTopic' => $newArticlesTopic,
 			'regionArticles' => $regionArticles,
-			//'joboffersArticles' => $joboffersArticles,
-			//'joboffer_city_url' => $joboffer_city_url,
-			//'todayPremieres' => $todayPremieres,
-			//'mostReadArticles' => $mostReadArticles,
 			'pr' => $pr,
-			//'shows' => $shows,
 			'blockTriptip' => $blockTriptip,
 			'blockJob' => $blockJob,
 			'blockCamera' => $blockCamera,
@@ -621,6 +566,9 @@ final class NewsController
 			'currentUrl' => $request->getUri(),
 			'schemeHost' => $request->getSchemeAndHttpHost(),
 		]));
+		$response->setPublic();
+		$response->setMaxAge(300);
+		return $response;
 	}
 
 	public function articlePr(Request $request, PhtmlRenderer $renderer): Response
@@ -687,33 +635,6 @@ final class NewsController
 		// PR články
 		$pr = $this->newsRepository->getPrArticles(11);
 
-		// Mohlo by Vás zajímat
-		/*$newArticles = $this->newsRepository->getNewArticles(3);
-		if ($newArticles) {
-			foreach ($newArticles as $id => $item) {
-				$date = new \DateTime($item['public_from']);
-				$today = new \DateTime();
-				if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
-					$newArticles[$id]['date'] = 'Dnes';
-				} else if ($today->modify('-1 day')->format('Y-m-d') === $date->format('Y-m-d')) {
-					$newArticles[$id]['date'] = 'Včera';
-				} else {
-					$newArticles[$id]['date'] =  $date->format('d.m.');
-				}
-				$newArticles[$id]['time'] =  $date->format('H:i');
-			}
-		}*/
-
-		// Dnešní premiéry
-		//$todayPremieres = $this->showRepository->getTodayPremieresForWeb();
-
-		// Nejčtenější články
-		//$ids = $this->newsRepository->getMostReadArticlesForWeb(3);
-		//$mostReadArticles = $this->newsRepository->getArticlesByIDs($ids, 3);
-
-		// Nabídky práce
-		//$joboffersArticles = $this->jobRepository->getRandForWeb(132, 3);
-
 		// Doporučujeme - hlavní články z HP
 		$newArticles = $this->playkitRepository->getAllHomepage([$article_id]);   // Dříve název "$this->getHomepageTable()->getAll()"
 		if ($newArticles) {
@@ -749,9 +670,6 @@ final class NewsController
 			}
 		}
 
-		// Pořady
-		// TODO: $shows = $this->showRepository->fetchAllForNews();
-
 		// Blok Kam vyrazit
 		$blockTriptip = $this->newsRepository->getTriptipArticles(4, false, true);
 
@@ -781,14 +699,9 @@ final class NewsController
 			'pr' => $pr,
 			'article' => $article,
 			'printableText' => $printableText,
-			//'newArticles' => $newArticles,
-			//'todayPremieres' => $todayPremieres,
-			//'mostReadArticles' => $mostReadArticles,
-			//'joboffersArticles'  => $joboffersArticles,
 			'newArticlesFirstHalf' => $newArticlesFirstHalf,
 			'newArticlesSecondHalf' => $newArticlesSecondHalf,
 			'regionArticles' => $regionArticles,
-			//'shows' => $shows,
 			'blockTriptip' => $blockTriptip,
 			'blockJob' => $blockJob,
 			'blockCamera' => $blockCamera,
@@ -869,14 +782,14 @@ final class NewsController
 		}
 	}
 
-	public function downloadVideo(Request $request): Response
+	public function download(Request $request): Response
 	{
 		$video_id = $request->attributes->get('video_id', 0);
 		$quality = $request->attributes->get('quality', 'hq');
 
 		$video = $this->playkitRepository->getVideoById($video_id);
 
-		$fileUrl = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $video['folder_light'] . '/' . $video['file'] . '_' . $quality . '.mp4';
+		$fileUrl = $this->LIGHT_URL . 'zpravy/publikovano/' . $video['folder_light'] . '/' . $video['file'] . '_' . $quality . '.mp4';
 
 		$response = new StreamedResponse(static function () use ($fileUrl): void {
 			readfile($fileUrl);

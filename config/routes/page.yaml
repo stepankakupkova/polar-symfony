@@ -1,0 +1,92 @@
+# Page admin routes
+admin_page_index:
+  path: /admin/stranky
+  controller: App\Page\Controller\Admin\PageListController::index
+
+admin_page_list:
+  path: /admin/stranky/seznam
+  controller: App\Page\Controller\Admin\PageListController::list
+
+admin_page_add:
+  path: /admin/stranky/seznam/pridat
+  controller: App\Page\Controller\Admin\PageWriteController::add
+
+admin_page_edit:
+  path: /admin/stranky/seznam/upravit/{id}
+  controller: App\Page\Controller\Admin\PageWriteController::edit
+
+admin_page_sort:
+  path: /admin/stranky/seznam/razeni
+  controller: App\Page\Controller\Admin\PageWriteController::sort
+
+# Page setting
+admin_page_setting:
+  path: /admin/stranky/nastaveni
+  controller: App\Page\Controller\Admin\PageSettingController::setting
+
+# JSON endpointy - list
+admin_page_get_list:
+  path: /admin/stranky/json-list/get-list
+  controller: App\Page\Controller\Admin\PageListController::getList
+  methods: [GET]
+
+admin_page_get_page:
+  path: /admin/stranky/json-list/get-page
+  controller: App\Page\Controller\Admin\PageListController::getPage
+  methods: [POST]
+
+admin_page_get_sort:
+  path: /admin/stranky/json-list/get-sort
+  controller: App\Page\Controller\Admin\PageListController::getSort
+  methods: [POST]
+
+admin_page_get_url:
+  path: /admin/stranky/json-list/get-url
+  controller: App\Page\Controller\Admin\PageListController::getUrl
+  methods: [POST]
+
+admin_page_redactor_image_manager:
+  path: /admin/stranky/json-list/redactor-image-manager
+  controller: App\Page\Controller\Admin\PageListController::redactorImageManager
+  methods: [GET]
+
+admin_page_redactor_file_manager:
+  path: /admin/stranky/json-list/redactor-file-manager
+  controller: App\Page\Controller\Admin\PageListController::redactorFileManager
+  methods: [GET]
+
+# JSON endpointy - write
+admin_page_duplicate_page:
+  path: /admin/stranky/json-write/duplicate-page
+  controller: App\Page\Controller\Admin\PageWriteController::duplicatePage
+  methods: [POST]
+
+admin_page_delete_page:
+  path: /admin/stranky/json-write/delete-page
+  controller: App\Page\Controller\Admin\PageWriteController::deletePage
+  methods: [POST]
+
+admin_page_set_sort:
+  path: /admin/stranky/json-write/set-sort
+  controller: App\Page\Controller\Admin\PageWriteController::setSort
+  methods: [POST]
+
+admin_page_upload_image:
+  path: /admin/stranky/json-write/upload-image
+  controller: App\Page\Controller\Admin\PageWriteController::uploadImage
+  methods: [POST]
+
+admin_page_set_default_image:
+  path: /admin/stranky/json-write/set-default-image
+  controller: App\Page\Controller\Admin\PageWriteController::setDefaultImage
+  methods: [POST]
+
+admin_page_redactor_image_upload:
+  path: /admin/stranky/json-write/redactor-image-upload
+  controller: App\Page\Controller\Admin\PageWriteController::redactorImageUpload
+  methods: [POST]
+
+admin_page_redactor_file_upload:
+  path: /admin/stranky/json-write/redactor-file-upload
+  controller: App\Page\Controller\Admin\PageWriteController::redactorFileUpload
+  methods: [POST]

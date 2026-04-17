@@ -1,0 +1,174 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$scheme = $scheme ?? 'dark';
+$identity = $identity ?? null;
+?>
+<!DOCTYPE html>
+<html lang="cs" class="fixed sidebar-left-collapsed <?= $scheme === 'dark' ? 'dark' : 'light sidebar-light' ?>">
+<head>
+    <meta charset="utf-8">
+    <title><?= $view->getTitle() !== '' ? htmlspecialchars($view->getTitle()) . ' | ' : '' ?>Admin | POLAR</title>
+    <meta name="author" content="Rostislav Greipel">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="application-name" content="POLAR televize Ostrava">
+    <meta name="theme-color" content="#0f385a">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= $view->asset('img/admin/icon/apple-touch-icon.png') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= $view->asset('img/admin/icon/favicon-32x32.png') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= $view->asset('img/admin/icon/favicon-16x16.png') ?>">
+    <link rel="manifest" href="<?= $view->asset('img/admin/icon/site.webmanifest') ?>">
+    <link rel="mask-icon" href="<?= $view->asset('img/admin/icon/safari-pinned-tab.svg') ?>" color="#0f385a">
+    <link rel="shortcut icon" href="<?= $view->asset('img/admin/icon/favicon.ico') ?>">
+
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/font-google/css/font-google.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/jquery-ui/jquery-ui.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/jquery-ui/jquery-ui.theme.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/bootstrap/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/font-awesome/css/all.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/animate/css/animate.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/hover/css/hover.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/pnotify/css/pnotify.custom.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/magnific-popup/css/magnific-popup.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/admin/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('vendor/porto-admin/css/theme.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('css/admin/skin/' . $scheme . '.min.css') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('css/admin/custom.min.css?ver=0.0.6') ?>">
+    <?php foreach ($view->getHeadStyles() as $css) { ?>
+        <style><?= $css ?></style>
+    <?php } ?>
+    <?php foreach ($view->getHeadLinks() as $link) { ?>
+        <link rel="<?= $link['rel'] ?>" href="<?= $link['href'] ?>"<?= isset($link['media']) ? ' media="' . $link['media'] . '"' : '' ?>>
+    <?php } ?>
+    <script src="<?= $view->asset('vendor/admin/modernizr/js/modernizr.min.js') ?>"></script>
+</head>
+<body class="loading-overlay-showing" data-loading-overlay data-plugin-options="{'hideDelay': 150, 'effect': 'default'}">
+<div class="loading-overlay">
+    <div class="bounce-loader">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+    </div>
+</div>
+<section class="body">
+    <header class="header">
+        <div class="logo-container">
+            <a href="<?= $view->path('admin_dashboard') ?>" class="logo">
+                <img alt="POLAR" src="<?= $view->asset('img/admin/logo-' . $scheme . '.svg') ?>" width="166" height="35"/>
+            </a>
+            <div class="d-md-none toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
+                <i class="fa fa-bars" aria-label="Toggle sidebar"></i>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="separator"></span>
+            <div id="userbox" class="userbox">
+                <a href="#" data-toggle="dropdown">
+                    <?php if ($identity) { ?>
+                        <?php $avatarImage = $identity->getImage() ?: 'data/user/!default-user.png'; ?>
+                        <figure class="profile-picture">
+                            <img src="<?= $view->asset($avatarImage) ?>" alt="<?= htmlspecialchars($identity->getFirstName() . ' ' . $identity->getLastName()) ?>" class="rounded-circle" data-lock-picture="<?= $view->asset($avatarImage) ?>">
+                        </figure>
+                        <div class="profile-info">
+                            <span class="name"><?= htmlspecialchars($identity->getFirstName() . ' ' . $identity->getLastName()) ?></span>
+                            <span class="role"><?= htmlspecialchars(implode(', ', array_map(fn($r) => match($r) { 'owner' => 'majitel', 'admin' => 'admin', 'member' => 'uživatel', default => $r }, $identity->getRole()))) ?></span>
+                        </div>
+                    <?php } ?>
+                    <i class="fa custom-caret"></i>
+                </a>
+                <div class="dropdown-menu">
+                    <ul class="list-unstyled mb-2">
+                        <li class="divider"></li>
+                        <li>
+                            <a role="menuitem" tabindex="-1" class="dropdown-item" href="<?= $view->path('app_logout') ?>"><i class="fa fa-power-off"></i> Odhlásit</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="inner-wrapper">
+        <aside id="sidebar-left" class="sidebar-left">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    Navigace
+                </div>
+                <div class="sidebar-toggle d-none d-md-block" data-toggle-class="sidebar-left-collapsed" data-target="html" data-fire-event="sidebar-left-toggle">
+                    <i class="fa fa-bars" aria-label="Toggle sidebar"></i>
+                </div>
+            </div>
+            <div class="nano">
+                <div class="nano-content">
+                    <nav id="menu" class="nav-main" role="navigation">
+                        <ul class="nav nav-main">
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= $view->path('admin_dashboard') ?>">
+                                    <i class="fa fa-home" aria-hidden="true"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= $view->path('admin_user_list') ?>">
+                                    <i class="fa fa-users" aria-hidden="true"></i>
+                                    <span>Uživatelé</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= $view->path('admin_page_index') ?>">
+                                    <i class="fa fa-file-alt" aria-hidden="true"></i>
+                                    <span>Stránky</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <hr class="separator"/>
+                    <div class="text-center">
+                        <a href="https://polar.cz" title="POLAR" target="_blank" class="logo d-inline-block">
+                            <img alt="POLAR" height="10" src="<?= $view->asset('img/admin/logo-short-' . $scheme . '.svg') ?>" style="margin-top: -3px;">
+                        </a>
+                        <div class="d-inline-block">
+                            <?= date("Y"); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <section role="main" class="content-body">
+            <header class="page-header">
+                <h2><?= $pageTitle ?? '' ?></h2>
+            </header>
+            <?= $content ?>
+        </section>
+    </div>
+</section>
+<script src="<?= $view->asset('vendor/admin/jquery/js/jquery.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/jquery-ui/jquery-ui.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/browser-mobile/js/browser-mobile.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/popper/js/popper.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/bootstrap-datepicker/js/bootstrap-datepicker.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/nanoscroller/js/nanoscroller.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/magnific-popup/js/magnific-popup.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/pnotify/js/pnotify.custom.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/validation/js/validation.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/placeholder/js/placeholder.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/admin/appear/js/appear.min.js') ?>"></script>
+<script src="<?= $view->asset('vendor/porto-admin/js/theme.min.js') ?>"></script>
+<?php foreach ($view->getInlineScripts() as $script) { ?>
+    <script><?= $script ?></script>
+<?php } ?>
+<?php foreach ($view->getBodyScripts() as $src) { ?>
+    <script src="<?= $src ?>"></script>
+<?php } ?>
+<script src="<?= $view->asset('js/admin/custom.min.js?ver=0.0.3') ?>"></script>
+<script src="<?= $view->asset('vendor/porto-admin/js/theme.init.min.js') ?>"></script>
+</body>
+</html>

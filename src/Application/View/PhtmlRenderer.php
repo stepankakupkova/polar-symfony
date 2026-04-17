@@ -47,4 +47,17 @@ final class PhtmlRenderer
 		}
 		return $this->render($layout, $layoutParams, $sharedView);
 	}
+
+	public function renderWithAdminLayout(string $template, array $params = [], string $layout = 'admin/layout'): string
+	{
+		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->basePath);
+		$content = $this->render($template, $params, $sharedView);
+		$layoutParams = ['content' => $content];
+		foreach (['identity', 'scheme', 'pageTitle'] as $key) {
+			if (isset($params[$key])) {
+				$layoutParams[$key] = $params[$key];
+			}
+		}
+		return $this->render($layout, $layoutParams, $sharedView);
+	}
 }

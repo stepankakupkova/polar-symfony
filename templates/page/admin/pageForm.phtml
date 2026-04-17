@@ -1,0 +1,200 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$post = $post ?? [];
+$errors = $errors ?? [];
+$page_id = $page_id ?? 0;
+
+$locale = 'cs_CZ';
+$localeShort = 'cs';
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/redactor/css/redactor.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/redactor/plugin/filemanager/css/filemanager.min.css'));
+
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/js/redactor.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/counter/js/counter.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/fullscreen/js/fullscreen.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/imagemanager/js/imagemanager.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/filemanager/js/filemanager.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/ios7-switch/js/ios7-switch.min.js'));
+
+// Redactor
+$view->addInlineScript(
+    '$(".redactor").redactor({
+        lang: "' . $localeShort . '",
+        toolbarFixedTopOffset: (!$.browser.mobile)?120:30,
+        cleanOnEnter: false,
+        cleanInlineOnEnter: true,
+        removeScript: false,
+        replaceTags: false,
+        styles: false,
+        minHeight: "180px",
+        structure: true,
+        autoparse: false,
+        imageResizable: true,
+        imagePosition: true,
+        imageFigure: false,
+        buttonsHideOnMobile: ["redo", "undo"],
+        buttons: [
+            "html", "redo", "undo", "format", "bold", "italic", "underline", "deleted", "lists", "link", "image", "file"
+        ],
+        plugins: [
+            "counter", "fullscreen", "imagemanager", "filemanager"
+        ],
+        imageUpload: "' . $view->path('admin_page_redactor_image_upload') . '?page_id=' . $page_id . '",
+        imageManagerJson: "' . $view->path('admin_page_redactor_image_manager') . '?page_id=' . $page_id . '",
+        fileUpload: "' . $view->path('admin_page_redactor_file_upload') . '?page_id=' . $page_id . '",
+        fileManagerJson: "' . $view->path('admin_page_redactor_file_manager') . '?page_id=' . $page_id . '",
+        callbacks: {
+            image: {
+                uploaded: function(image, response)
+                {
+                    $(image).addClass("img-fluid");
+                },
+                inserted: function(image)
+                {
+                    $(image).addClass("img-fluid");
+                }
+            }
+        }
+    });'
+);
+
+// Url
+$view->addInlineScript(
+    '$("#btnGetUrl").click(function(e){
+        e.preventDefault();
+        let title = $("input[name=title]").val();
+        if (title === "") {
+            var notice = new PNotify({
+                title: "Chyba",
+                text: "Nejprve vyplňte název!",
+                type: "error",
+                addclass: "click-2-close",
+                buttons: {
+                    sticker: false
+                }
+            });
+        } else {
+            $.post("' . $view->path('admin_page_get_url') . '",
+                {
+                    title: title
+                },
+                function(json) {
+                    if (json.success) {
+                        $("input[name=url]").val(json.url);
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze získat název!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                    }
+                }, 
+                "json"      
+            );
+        }
+    });'
+);
+?>
+
+<form action="" method="post" class="form-horizontal" id="frmPage">
+    <?php if (!empty($errors['general'])) { ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($errors['general']) ?></div>
+    <?php } ?>
+
+    <input type="hidden" name="id" value="<?= htmlspecialchars($post['id'] ?? '') ?>">
+    <input type="hidden" name="lang" value="<?= htmlspecialchars($post['lang'] ?? $lang ?? '') ?>">
+    <input type="hidden" name="image" value="<?= htmlspecialchars($post['image'] ?? 'data/page/!default-page.png') ?>">
+    <input type="hidden" name="created_date" value="<?= htmlspecialchars($post['created_date'] ?? '') ?>">
+    <input type="hidden" name="updated_date" value="<?= htmlspecialchars($post['updated_date'] ?? '') ?>">
+    <input type="hidden" name="created_user" value="<?= htmlspecialchars($post['created_user'] ?? '') ?>">
+    <input type="hidden" name="updated_user" value="<?= htmlspecialchars($post['updated_user'] ?? '') ?>">
+
+    <div class="card-body">
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2">Aktivní</label>
+            <div class="col-sm-3">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="active" value="0">
+                    <input type="checkbox" name="active" value="1" data-plugin-ios-switch <?= !empty($post['active']) ? 'checked' : '' ?>>
+                </div>
+            </div>
+            <label class="col-sm-3 control-label text-sm-right pt-2">V hlavičce</label>
+            <div class="col-sm-3">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="header" value="0">
+                    <input type="checkbox" name="header" value="1" data-plugin-ios-switch <?= !empty($post['header']) ? 'checked' : '' ?>>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Název</label>
+            <div class="col-sm-9<?= isset($errors['title']) ? ' has-danger' : '' ?>">
+                <input type="text" name="title" class="form-control" placeholder="povinné" required maxlength="100" data-plugin-maxlength data-rule-rangeLength="[0, 100]" value="<?= htmlspecialchars($post['title'] ?? '') ?>">
+                <?php if (isset($errors['title'])) { ?>
+                    <small class="form-text text-danger"><?= htmlspecialchars($errors['title']) ?></small>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">URL adresa</label>
+            <div class="col-sm-9<?= isset($errors['url']) ? ' has-danger' : '' ?>">
+                <div class="input-group">
+                    <input type="text" name="url" class="form-control" placeholder="povinné" required maxlength="100" data-plugin-maxlength data-rule-rangeLength="[0, 100]" value="<?= htmlspecialchars($post['url'] ?? '') ?>">
+                    <span class="input-group-append">
+                        <button id="btnGetUrl" class="btn btn-primary" type="button" data-toggle="tooltip" data-placement="top" title="Vygenerovat URL z názvu">
+                            <i class="fa fa-fw fa-magic"></i>
+                        </button>
+                    </span>
+                </div>
+                <?php if (isset($errors['url'])) { ?>
+                    <small class="form-text text-danger"><?= htmlspecialchars($errors['url']) ?></small>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Obsah</label>
+            <div class="col-sm-9<?= isset($errors['content']) ? ' has-danger' : '' ?>">
+                <textarea name="content" class="form-control redactor" placeholder="povinné" required rows="10"><?= htmlspecialchars($post['content'] ?? '') ?></textarea>
+                <?php if (isset($errors['content'])) { ?>
+                    <small class="form-text text-danger"><?= htmlspecialchars($errors['content']) ?></small>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Klíčová slova <span class="text-muted">(SEO)</span></label>
+            <div class="col-sm-9<?= isset($errors['seo_keywords']) ? ' has-danger' : '' ?>">
+                <input type="text" name="seo_keywords" class="form-control" placeholder="povinné" required maxlength="100" data-plugin-maxlength data-rule-rangeLength="[0, 100]" value="<?= htmlspecialchars($post['seo_keywords'] ?? '') ?>">
+                <?php if (isset($errors['seo_keywords'])) { ?>
+                    <small class="form-text text-danger"><?= htmlspecialchars($errors['seo_keywords']) ?></small>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Popis <span class="text-muted">(SEO)</span></label>
+            <div class="col-sm-9<?= isset($errors['seo_description']) ? ' has-danger' : '' ?>">
+                <input type="text" name="seo_description" class="form-control" placeholder="povinné" required maxlength="255" data-plugin-maxlength data-rule-rangeLength="[0, 255]" value="<?= htmlspecialchars($post['seo_description'] ?? '') ?>">
+                <?php if (isset($errors['seo_description'])) { ?>
+                    <small class="form-text text-danger"><?= htmlspecialchars($errors['seo_description']) ?></small>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <footer class="card-footer text-right">
+        <button type="submit" name="submit" class="btn <?= $submitClass ?>"><?= $submitLabel ?></button>
+        <button type="submit" name="cancel" class="btn btn-default" formnovalidate>Zrušit</button>
+    </footer>
+</form>

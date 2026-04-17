@@ -9,6 +9,9 @@
 parameters:
     app.PUBLIC_PATH: '%kernel.project_dir%/public'
     app.HOURS_DELETE_LABELS: 24
+    app.LIGHT_URL: 'https://light.polar.cz/videa/polar/'
+    app.LIGHT_PATH_WITHOUT_HTTPS: '/data_webytv/dp/polar/'
+    app.LIGHT_URL_WITHOUT_HTTPS: 'http://plainvod.polar.cz/videa/polar/'
     app.GOOGLE_ANALYTICS_ID: '%env(GOOGLE_ANALYTICS_ID)%'
 
 services:
@@ -52,6 +55,7 @@ services:
         tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+            $LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Application\Controller\:
         resource: '../src/Application/Controller/'
@@ -68,6 +72,26 @@ services:
     App\Banner\Controller\:
         resource: '../src/Banner/Controller/'
         tags: ['controller.service_arguments']
+
+    App\Admin\Controller\:
+        resource: '../src/Admin/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\User\Controller\:
+        resource: '../src/User/Controller/'
+        tags: ['controller.service_arguments']
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Authorization\Controller\:
+        resource: '../src/Authorization/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Page\Controller\:
+        resource: '../src/Page/Controller/'
+        tags: ['controller.service_arguments']
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Application\View\PhtmlRenderer:
         arguments:

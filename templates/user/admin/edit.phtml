@@ -1,0 +1,37 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+<div class="row">
+	<div class="col-lg-6">
+		<section class="card">
+			<header class="card-header">
+				<h2 class="card-title">Upravit uživatele</h2>
+			</header>
+			<div class="card-body">
+				<?= $view->include('user/admin/userForm', [
+					'post' => $post,
+					'errors' => $errors,
+					'identity' => $identity,
+					'isEdit' => true,
+					'currentRole' => $currentRole,
+				]) ?>
+			</div>
+		</section>
+	</div>
+	<div class="col-lg-6">
+		<section class="card">
+			<header class="card-header">
+				<h2 class="card-title">Obrázek</h2>
+			</header>
+			<div class="card-body text-center">
+				<img id="avatarPreview" src="/<?= htmlspecialchars($post['image'] ?? 'data/user/!default-user.png') ?>" class="rounded-circle" width="200" height="200" alt="">
+			</div>
+		</section>
+	</div>
+</div>

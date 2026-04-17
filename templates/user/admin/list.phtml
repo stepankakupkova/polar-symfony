@@ -1,0 +1,297 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/cs_CZ.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/cs_CZ.min.js'));
+
+$view->addInlineScript(
+    '$("#btblUser").on("post-body.bs.table", function (e, data) {
+        // Zobrazení náhledu avatara
+        $(".image-popup-no-margins").magnificPopup({
+            type: "image",
+            image: {
+                verticalFit: true
+            },
+            zoom: {
+                enabled: true,
+                duration: 300
+            }
+        });
+        // Smazání uživatele
+        $(".btblBtnDeleteUser").unbind("click").bind("click", function() {
+            var id = $(this).data("user-id");
+            $.post("' . $view->path('admin_user_get_user') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        if (json.user.id !== "' . $identity->getId() . '") {
+                            $("#modalDanger .card-title").html("Smazat uživatele");
+                            $("#modalDanger .modal-text h4").html("Opravdu chcete smazat uživatele?<br><strong>\"" + json.user.username + "\"</strong> <small>(" + json.user.first_name + " " + json.user.last_name + ")</small>" );
+                            $("#modalDanger .modal-text p").html("Všechny závislé záznamy budou smazány. Tuto akci nelze vrátit!");
+                            var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+
+                            $.magnificPopup.open({
+                                items: {src: "#modalDanger"},
+                                type: "inline",
+                                fixedContentPos: false,
+                                fixedBgPos: true,
+                                overflowY: "auto",
+                                closeBtnInside: true,
+                                preloader: false,
+                                midClick: true,
+                                removalDelay: 300,
+                                mainClass: "my-mfp-slide-bottom",
+                                modal: true,
+                                callbacks: {
+                                    open: function() {
+                                        btnConfirm.unbind("click").click(function(e){
+                                            e.preventDefault();
+                                            $.post("' . $view->path('admin_user_delete') . '",
+                                                {
+                                                    id: id
+                                                },
+                                                function(json) {
+                                                    if (json.success) {
+                                                        var notice = new PNotify({
+                                                            title: "Úspěch",
+                                                            text: "Uživatel byl smazán!",
+                                                            type: "success",
+                                                            addclass: "click-2-close",
+                                                            buttons: {
+                                                                sticker: false
+                                                            }
+                                                        });
+                                                        $("#btblUser").bootstrapTable("refresh", {"silent": true});
+                                                    }else{
+                                                        var notice = new PNotify({
+                                                            title: "Chyba",
+                                                            text: "Nelze smazat uživatele!",
+                                                            type: "error",
+                                                            addclass: "click-2-close",
+                                                            buttons: {
+                                                                sticker: false
+                                                            }
+                                                        });
+                                                    }
+                                                    $.magnificPopup.close();
+                                                },
+                                                "json"
+                                            );
+                                        });
+                                    },
+                                    close: function() {
+
+                                    }
+                                }
+                            });
+                        }else{
+                            var notice = new PNotify({
+                                title: "Chyba",
+                                text: "Jste přihlášen pod tímto uživatelem!",
+                                type: "error",
+                                addclass: "click-2-close",
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+                            $.magnificPopup.close();
+                        }
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst informace o uživateli!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblUser").bootstrapTable("refresh", {"silent": true});
+                    }
+                },
+                "json"
+            );
+        });
+    });'
+);
+?>
+    <div id="toolbar" class="btn-group">
+        <a href="<?= $view->path('admin_user_add') ?>" class="btn btn-primary">
+            <i class="fa fa-fw fa-plus"></i>
+            <span class="hidden-sm hidden-xs">
+                Přidat uživatele
+            </span>
+        </a>
+    </div>
+    <table id="btblUser"
+           data-url="<?= $view->path('admin_user_get_list') ?>"
+           data-toggle="table"
+           data-show-search-button="true"
+           data-show-search-clear-button="true"
+           data-valign="middle"
+           data-sort-name="username"
+           data-sort-order="asc"
+           data-toolbar="#toolbar"
+           data-cookie-id-table="USER-<?= $identity->getId() ?>-userTable"
+           data-mobile-responsive="true">
+        <thead>
+        <tr>
+            <th class="text-nowrap width-nowrap"
+                data-formatter="optionsFormatter"
+                data-align="center">
+                <i class="fa fa-cogs" data-toggle="tooltip" data-placement="right" title="Možnosti"></i>
+                <span class="d-sm-none">Možnosti</span>
+            </th>
+            <th data-field="id"
+                class="text-nowrap width-nowrap"
+                data-sortable="true"
+                data-visible="false">
+                ID
+            </th>
+            <th data-field="active"
+                class="text-nowrap width-nowrap"
+                data-formatter="activeFormatter"
+                data-sortable="true"
+                data-align="center">
+                <i class="fa fa-toggle-on pb-sm-0 pb-2" data-toggle="tooltip" data-placement="right" title="Aktivní"></i>
+                <span class="d-sm-none">Aktivní</span>
+            </th>
+            <th data-field="image"
+                class="width-nowrap p-0"
+                data-formatter="imageFormatter"
+                data-align="center">
+                <i class="fa fa-image" data-toggle="tooltip" data-placement="right" title="Obrázek"></i>
+                <span class="d-sm-none">Obrázek</span>
+            </th>
+            <th data-field="username"
+                class="text-truncate"
+                data-sortable="true">
+                Uživatel
+            </th>
+            <th data-field="role"
+                class="text-nowrap width-nowrap line-height-xs"
+                data-formatter="roleFormatter"
+                data-sortable="true">
+                Role
+            </th>
+            <th data-field="first_name"
+                class="text-nowrap width-nowrap"
+                data-sortable="true">
+                Jméno
+            </th>
+            <th data-field="last_name"
+                class="text-nowrap width-nowrap"
+                data-sortable="true">
+                Příjmení
+            </th>
+            <th data-field="created_date"
+                class="text-nowrap width-nowrap"
+                data-formatter="datetimeFormatter"
+                data-sortable="true"
+                data-visible="false">
+                Datum vytvoření
+            </th>
+            <th data-field="updated_date"
+                class="text-nowrap width-nowrap"
+                data-formatter="datetimeFormatter"
+                data-sortable="true"
+                data-visible="false">
+                Datum úpravy
+            </th>
+            <th data-field="created_user"
+                class="text-nowrap width-nowrap"
+                data-sortable="true"
+                data-visible="false">
+                Vytvořil
+            </th>
+            <th data-field="updated_user"
+                class="text-nowrap width-nowrap"
+                data-sortable="true"
+                data-visible="false">
+                Upravil
+            </th>
+        </tr>
+        </thead>
+    </table>
+
+    <script>
+        function optionsFormatter(value, row) {
+            let data = '<div class="btn-group pb-sm-0 pb-2">';
+            if (row.role.indexOf("owner") === -1 || "<?= in_array('owner', $identity->getRole(), true) ? 'true' : 'false' ?>" === "true") {
+                data += '<a href="<?= $view->path('admin_user_edit', ['id' => '']) ?>' + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +
+                    '<button data-user-id="' + row.id + '" class="btblBtnDeleteUser btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>';
+            }
+            data += '</div>';
+            return data;
+        }
+
+        function roleFormatter(value) {
+            let role = '';
+            value.forEach(function (item) {
+                switch (item) {
+                    case 'owner':
+                        role += 'majitel';
+                        break;
+                    case 'admin':
+                        role += 'admin';
+                        break;
+                    case 'member':
+                        role += 'uživatel';
+                        break;
+                }
+                role += '<br>';
+            });
+            return role;
+        }
+
+        function activeFormatter(value) {
+            let icon = 'fa fa-fw fa-lg';
+            let color = 'text-success';
+            let text = '';
+            switch (value) {
+                case '1':
+                    icon = 'fa fa-fw fa-lg fa-check-circle';
+                    color = 'text-success';
+                    text = 'Aktivní';
+                    break;
+                case '0':
+                    icon = 'fa fa-fw fa-lg fa-times-circle';
+                    color = 'text-danger';
+                    text = 'Neaktivní';
+                    break;
+            }
+            return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+        }
+
+        function imageFormatter(value) {
+            if (value) {
+                return '<a class="image-popup-no-margins cur-zoom-in" href="/' + value + '">' +
+                    '<img src="/' + value + '" height="40" alt="" />' +
+                    '</a>';
+            }
+            return null;
+        }
+
+        function datetimeFormatter(value) {
+            if (value) {
+                return moment(value).format('LLLL');
+            }
+            return null;
+        }
+    </script>
+
+<?= $view->include('admin/modal/danger') ?>

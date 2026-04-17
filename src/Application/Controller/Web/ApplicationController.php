@@ -83,7 +83,7 @@ final class ApplicationController
 		}
 		//var_dump($specialOnlineArticleUrl);
 
-		return new Response($renderer->renderWithLayout('application/web/index', [
+		$response = new Response($renderer->renderWithLayout('application/web/index', [
 			'newsCount' => $newsCount,
 			'newArticles' => $newArticles,
 			'pr' => $pr,
@@ -98,6 +98,9 @@ final class ApplicationController
 			'bannerMobilesquare1' => $bannerRepository->getMobilesquare1(),
 			'bannerMobilesquare2' => $bannerRepository->getMobilesquare2(),
 		]));
+		$response->setPublic();
+		$response->setMaxAge(120);
+		return $response;
 	}
 
 	public function search(
@@ -119,8 +122,8 @@ final class ApplicationController
 		$region = isset($params['r']) ? (int)$params['r'] : null;
 		$city = isset($params['c']) ? (int)$params['c'] : null;
 		$limit = 10;
-		$paginator = [];
-		$program_paginator = [];
+		$paginator = null;
+		$program_paginator = null;
 		$count = 0;
 		$program_count = 0;
 		$countReprice = 0;

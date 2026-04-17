@@ -1,0 +1,92 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addInlineScript(
+    '$("#frmSignin input[name=email]").on("change paste keyup", function(e){
+        $("#frmSigninHeader input[name=email]").val($(this).val());
+    });
+    $("#frmSignin input[name=password]").on("change paste keyup", function(e){
+        $("#frmSigninHeader input[name=password]").val($(this).val());
+    });
+    $("#frmSignin input[name=remember_me]").change(function(e){console.log($(this).is(":checked"));
+        $("#frmSigninHeader input[name=remember_me]").prop("checked", $(this).is(":checked"));
+    });'
+);
+
+$scheme = $scheme ?? 'dark';
+?>
+
+<div class="container py-2">
+    <?php if ($message) { ?>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="alert alert-danger alert-lg alert-dismissible mb-0" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Zavřít">
+                        <span aria-hidden="true">
+                            ×
+                        </span>
+                    </button>
+                    <strong>
+                        Upozornění!
+                    </strong>
+                    <br>
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+    <div class="row">
+        <div class="col">
+            <div class="featured-boxes">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="featured-box featured-box-primary manual text-left mt-5">
+                            <div class="box-content">
+                                <h4 class="color-primary font-weight-semibold text-4 text-uppercase mb-3">
+                                    Přihlášení
+                                </h4>
+                                <form action="<?= $view->path('app_login') ?>" method="post" id="frmSignin" class="needs-validation">
+                                    <div class="form-row">
+                                        <div class="form-group col">
+                                            <label class="font-weight-bold text-2 required" for="email">Email</label>
+                                            <input type="email" name="email" id="email" class="form-control form-control-lg" placeholder="povinné" required maxlength="50" data-plugin-maxlength="true" data-rule-rangeLength="[8, 50]" value="<?= htmlspecialchars($lastUsername) ?>">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col">
+                                            <a class="float-right" href="<?= $view->path('app_home') ?>">
+                                                Zapomenuté heslo?
+                                            </a>
+                                            <label class="font-weight-bold text-2 required" for="password">Heslo</label>
+                                            <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="povinné" required maxlength="50" data-plugin-maxlength="true" data-rule-rangeLength="[8, 50]">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-lg-6">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" name="remember_me" id="rememberMe" class="custom-control-input" checked>
+                                                <label class="custom-control-label text-2" for="rememberMe">Zapamatovat si mě</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-lg-6">
+                                            <button type="submit" class="btn btn-primary btn-modern float-right">
+                                                Přihlásit se
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="_csrf_token" value="<?= $csrfToken ?>">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

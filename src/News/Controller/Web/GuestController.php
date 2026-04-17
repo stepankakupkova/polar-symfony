@@ -22,9 +22,6 @@ final class GuestController
 		private UrlGeneratorInterface $urlGenerator,
 	) {}
 
-	/**
-	 * Seznam hostů
-	 */
 	public function guests(Request $request, PhtmlRenderer $renderer): Response
 	{
 		$page = max(1, $request->query->getInt('strana', 1));
@@ -41,7 +38,7 @@ final class GuestController
 		}
 		//var_dump($shows_arr);
 
-		// Paginace
+		// Paginator
 		$total = $guests ? count($guests) : 0;
 		$offset = ($page - 1) * $limit;
 		$guestsPage = $guests ? array_slice($guests, $offset, $limit) : null;
@@ -56,9 +53,6 @@ final class GuestController
 		]));
 	}
 
-	/**
-	 * Detail hosta
-	 */
 	public function guest(Request $request, PhtmlRenderer $renderer, int $guest_id): Response
 	{
 		if (!$guest_id) {
@@ -72,7 +66,7 @@ final class GuestController
 
 		$show = null;
 		if ($guest['show_id']) {
-			$show = $this->showRepository->findById((int) $guest['show_id']);
+			$show = $this->showRepository->findPostBy('id', $guest['show_id']);
 		}
 
 		$newVideos = $this->videoRepository->getNewVideosForWeb(3);

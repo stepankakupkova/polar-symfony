@@ -1,0 +1,46 @@
+admin_index:
+  path: /admin
+  controller: App\Admin\Controller\AdminController::index
+
+admin_dashboard:
+  path: /admin/dashboard
+  controller: App\Admin\Controller\AdminController::dashboard
+
+# User
+admin_user_index:
+  path: /admin/users
+  controller: App\User\Controller\Admin\UserListController::index
+
+admin_user_list:
+  path: /admin/users/list
+  controller: App\User\Controller\Admin\UserListController::list
+
+admin_user_get_list:
+  path: /admin/users/json-list/get-list
+  controller: App\User\Controller\Admin\UserListController::getList
+  methods: [GET]
+
+admin_user_get_user:
+  path: /admin/users/json-list/get-user
+  controller: App\User\Controller\Admin\UserListController::getUser
+  methods: [POST]
+
+admin_user_add:
+  path: /admin/users/add
+  controller: App\User\Controller\Admin\UserWriteController::add
+
+admin_user_edit:
+  path: /admin/users/edit/{id}
+  controller: App\User\Controller\Admin\UserWriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_user_delete:
+  path: /admin/users/json-write/delete-user
+  controller: App\User\Controller\Admin\UserWriteController::deleteUser
+  methods: [POST]
+
+admin_user_upload_image:
+  path: /admin/users/json-write/upload-image
+  controller: App\User\Controller\Admin\UserWriteController::uploadImage
+  methods: [POST]

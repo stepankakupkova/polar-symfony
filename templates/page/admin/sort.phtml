@@ -1,0 +1,173 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$locales = ['cs_CZ' => 'Čeština'];
+
+$view->addBodyScript($view->asset('vendor/admin/nestable/js/nestable.min.js'));
+
+// Hlavní menu
+$view->addInlineScript(
+    '$.post("' . $view->path('admin_page_get_sort') . '",
+        {
+            lang: "' . $lang . '",
+            header: false
+        },
+        function(json) {
+            if (json.success) {
+                $("#nestable").html(json.html);
+                $("#nestable").nestable({
+                    group: 1,
+                    maxDepth: 2
+                }).on("change", function() {
+                    $.post("' . $view->path('admin_page_set_sort') . '",
+                        {
+                            lang: "' . $lang . '",
+                            data: $(this).nestable("serialize")
+                        },
+                        function(json) {
+                            if (json.success) {
+                                var notice = new PNotify({
+                                    title: "Úspěch",
+                                    text: "Stránky byly seřazeny!",
+                                    type: "success",
+                                    addclass: "click-2-close",
+                                    buttons: {
+                                        sticker: false
+                                    }
+                                });
+                            } else {
+                                var notice = new PNotify({
+                                    title: "Chyba",
+                                    text: "Stránky nelze seřadit!",
+                                    type: "error",
+                                    addclass: "click-2-close",
+                                    buttons: {
+                                        sticker: false
+                                    }
+                                });
+                            }
+                        }, 
+                        "json"      
+                    );
+                });
+            }else{
+                var notice = new PNotify({
+                    title: "Chyba",
+                    text: "Stránky nelze načíst!",
+                    type: "error",
+                    addclass: "click-2-close",
+                    buttons: {
+                        sticker: false
+                    }
+                });
+            }
+        }, 
+        "json"      
+    );'
+);
+
+// Menu v záhlaví
+$view->addInlineScript(
+    '$.post("' . $view->path('admin_page_get_sort') . '",
+        {
+            lang: "' . $lang . '",
+            header: true
+        },
+        function(json) {
+            if (json.success) {
+                $("#nestable2").html(json.html);
+                $("#nestable2").nestable({
+                    group: 2,
+                    maxDepth: 2
+                }).on("change", function() {
+                    $.post("' . $view->path('admin_page_set_sort') . '",
+                        {
+                            lang: "' . $lang . '",
+                            data: $(this).nestable("serialize")
+                        },
+                        function(json) {
+                            if (json.success) {
+                                var notice = new PNotify({
+                                    title: "Úspěch",
+                                    text: "Stránky byly seřazeny!",
+                                    type: "success",
+                                    addclass: "click-2-close",
+                                    buttons: {
+                                        sticker: false
+                                    }
+                                });
+                            } else {
+                                var notice = new PNotify({
+                                    title: "Chyba",
+                                    text: "Stránky nelze seřadit!",
+                                    type: "error",
+                                    addclass: "click-2-close",
+                                    buttons: {
+                                        sticker: false
+                                    }
+                                });
+                            }
+                        }, 
+                        "json"      
+                    );
+                });
+            }else{
+                var notice = new PNotify({
+                    title: "Chyba",
+                    text: "Stránky nelze načíst!",
+                    type: "error",
+                    addclass: "click-2-close",
+                    buttons: {
+                        sticker: false
+                    }
+                });
+            }
+        }, 
+        "json"      
+    );'
+);
+?>
+
+<section class="card card-primary">
+    <header class="card-header">
+        <h2 class="card-title">
+            Seřadit stránky
+        </h2>
+    </header>
+    <div class="card-body">
+        <div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>
+                        Hlavní menu
+                    </h4>
+                    <div class="dd" id="nestable">
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4>
+                        Menu v záhlaví
+                    </h4>
+                    <div class="dd my-2" id="nestable2">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="<?= $view->path('admin_page_list') ?>" class="btn btn-default">
+            <i class="fa fa-fw fa-arrow-left"></i>
+            <span class="hidden-sm hidden-xs">
+                Zpět
+            </span>
+        </a>
+    </div>
+</section>

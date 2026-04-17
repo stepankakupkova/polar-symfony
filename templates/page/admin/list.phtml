@@ -1,0 +1,427 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$locale = 'cs_CZ';
+
+$selectLang = '';
+foreach ($locales as $item => $text) {
+    $selectLang .= '<option value=\"' . $item . '\">' . $text . '</option>';
+}
+$selectLang = '<select name=\"language\" class=\"form-control\" required=\"required\">' . $selectLang . '</select>';
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/bootstrap-select.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
+
+// Zobrazení náhledu
+$view->addInlineScript(
+    '$("#btblPage").on("post-body.bs.table", function (e, data) {
+        $(".image-popup-no-margins").magnificPopup({
+            type: "image",
+            image: {
+                verticalFit: true
+            },
+            zoom: {
+                enabled: true,
+                duration: 300
+            }
+        });
+    });'
+);
+
+// Duplikování stránky
+$view->addInlineScript(
+    '$("#btblPage").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnDuplicatePage").unbind("click").bind("click", function() {
+            var id = $(this).data("page-id");
+            $.post("' . $view->path('admin_page_get_page') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        $("#modalWarning .card-title").html("Duplikovat stránku");
+                        $("#modalWarning .modal-text h4").html("Opravdu chcete duplikovat stránku?<br><strong>\"" + json.page.title + "\"</strong>" );
+                        $("#modalWarning .modal-text p").html("<label class=\"control-label required\">Vyberte jazyk<i class=\"fa fa-asterisk\"></i></label><br>' . $selectLang . '");
+                        var btnConfirm = $("#modalWarning .card-footer button.modal-confirm");
+                        
+                        $.magnificPopup.open({
+                            items: {src: "#modalWarning"},
+                            type: "inline",
+                            fixedContentPos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    let select = $("#modalWarning .modal-text p select");
+                                    select.selectpicker({
+                                        style: "btn-warning"
+                                    });
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_page_duplicate_page') . '",
+                                            {
+                                                id: id,
+                                                lang: select.children("option:selected"). val()
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěch",
+                                                        text: "Stránka byla duplikována!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblPage").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Stránku nelze duplikovat!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            }, 
+                                            "json"      
+                                        );
+                                    });
+                                },
+                                close: function() {
+                                    
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst informace o stránce!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblPage").bootstrapTable("refresh", {"silent": true});
+                    }
+                }, 
+                "json"      
+            );
+        });
+    });'
+);
+
+// Smazání stránky
+$view->addInlineScript(
+    '$("#btblPage").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnDeletePage").unbind("click").bind("click", function() {
+            var id = $(this).data("page-id");
+            $.post("' . $view->path('admin_page_get_page') . '",
+                {
+                    id: id,
+                    lang: "' . $lang . '"
+                },
+                function(json) {
+                    if (json.success) {
+                        $("#modalDanger .card-title").html("Smazat stránku");
+                        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat stránku?<br><strong>\"" + json.page.title + "\"</strong>" );
+                        $("#modalDanger .modal-text p").html("Všechny závislé záznamy budou smazány. Tuto akci nelze vrátit!");
+                        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+                        
+                        $.magnificPopup.open({
+                            items: {src: "#modalDanger"},
+                            type: "inline",
+                            fixedContentPos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_page_delete_page') . '",
+                                            {
+                                                id: id,
+                                                lang: "' . $lang . '"
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěch",
+                                                        text: "Stránka byla smazána!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblPage").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Stránku nelze smazat!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            }, 
+                                            "json"      
+                                        );
+                                    });
+                                },
+                                close: function() {
+                                    
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst informace o stránce!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblPage").bootstrapTable("refresh", {"silent": true});
+                    }
+                }, 
+                "json"      
+            );
+        });
+    });'
+);
+?>
+    <div>
+        <div id="toolbar" class="btn-group">
+            <a href="<?= $view->path('admin_page_add') ?>" class="btn btn-primary">
+                <i class="fa fa-fw fa-plus"></i>
+                <span class="hidden-sm hidden-xs">
+                Přidat stránku
+            </span>
+            </a>
+            <a href="<?= $view->path('admin_page_sort') ?>" class="btn btn-info">
+                <i class="fa fa-fw fa-sort"></i>
+                <span class="hidden-sm hidden-xs">
+                Seřadit stránky
+            </span>
+            </a>
+        </div>
+        <table id="btblPage"
+                data-url="<?= $view->path('admin_page_get_list') ?>"
+                data-toggle="table"
+                data-show-search-button="true"
+                data-show-search-clear-button="true"
+                data-page-size="15"
+                data-valign="middle"
+                data-sort-name="rank_total"
+                data-sort-order="asc"
+                data-toolbar="#toolbar"
+                data-query-params="queryParams"
+                data-cookie-id-table="USER-<?= $identity->getId() ?>-pageTable"
+                data-mobile-responsive="true">
+            <thead>
+            <tr>
+                <th class="text-nowrap width-nowrap"
+                    data-formatter="optionsFormatter"
+                    data-align="center">
+                    <i class="fa fa-cogs" data-toggle="tooltip" data-placement="right" title="Možnosti"></i>
+                    <span class="d-sm-none">
+                        Možnosti
+                    </span>
+                </th>
+                <th data-field="id"
+                    class="text-nowrap width-nowrap"
+                    data-visible="false">
+                    ID
+                </th>
+                <th data-field="active"
+                    class="text-nowrap width-nowrap"
+                    data-formatter="activeFormatter"
+                    data-align="center">
+                    <i class="fa fa-toggle-on pb-sm-0 pb-2" data-toggle="tooltip" data-placement="right" title="Aktivní"></i>
+                    <span class="d-sm-none">
+                        Aktivní
+                    </span>
+                </th>
+                <th data-field="header"
+                    class="text-nowrap width-nowrap"
+                    data-formatter="headerFormatter"
+                    data-align="center">
+                    <i class="fa fa-toggle-on pb-sm-0 pb-2" data-toggle="tooltip" data-placement="right" title="V hlavičce"></i>
+                    <span class="d-sm-none">
+                        V hlavičce
+                    </span>
+                </th>
+                <th data-field="image"
+                    class="width-nowrap p-0"
+                    data-formatter="imageFormatter"
+                    data-align="center">
+                    <i class="fa fa-image" data-toggle="tooltip" data-placement="right" title="Obrázek"></i>
+                    <span class="d-sm-none">
+                        Obrázek
+                    </span>
+                </th>
+                <th data-field="title"
+                    class="text-truncate"
+                    data-formatter="titleFormatter">
+                    Název
+                </th>
+                <th data-field="url"
+                    class="text-nowrap width-nowrap">
+                    Url
+                </th>
+                <th data-field="created_date"
+                    class="text-nowrap width-nowrap"
+                    data-formatter="datetimeFormatter"
+                    data-visible="false">
+                    Datum vytvoření
+                </th>
+                <th data-field="updated_date"
+                    class="text-nowrap width-nowrap"
+                    data-formatter="datetimeFormatter"
+                    data-visible="false">
+                    Datum úpravy
+                </th>
+                <th data-field="created_user"
+                    class="text-nowrap width-nowrap"
+                    data-visible="false">
+                    Vytvořil
+                </th>
+                <th data-field="updated_user"
+                    class="text-nowrap width-nowrap"
+                    data-visible="false">
+                    Upravil
+                </th>
+            </tr>
+            </thead>
+        </table>
+
+        <script>
+            function queryParams(params) {
+                params.lang = '<?= $lang ?>';
+                return params
+            }
+
+            function optionsFormatter(value, row) {
+                let url = "<?= $view->path('admin_page_list') ?>/upravit";
+                let data = '';
+                data += '<div class="btn-group pb-sm-0 pb-2">';
+                data += '<a href="' + url + "/" + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ';
+                data += '<button data-page-id="' + row.id + '" class="btblBtnDuplicatePage btn btn-sm btn-warning"><i class="fa fa-copy"></i> <span class="d-none">Duplikovat</span></button> ';
+                data += '<button data-page-id="' + row.id + '" class="btblBtnDeletePage btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>';
+                data += '</div>';
+                return data;
+            }
+
+            function activeFormatter(value) {
+                let icon = 'fa fa-fw fa-lg';
+                let color = 'text-success';
+                let text = '';
+                switch (parseInt(value)) {
+                    case 1:
+                        icon = 'fa fa-fw fa-lg fa-check-circle';
+                        color = 'text-success';
+                        text = 'Aktivní';
+                        break;
+                    case 0:
+                        icon = 'fa fa-fw fa-lg fa-times-circle';
+                        color = 'text-danger';
+                        text = 'Neaktivní';
+                        break;
+                }
+                return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+            }
+
+            function headerFormatter(value) {
+                let icon = 'fa fa-fw fa-lg';
+                let color = 'text-success';
+                let text = '';
+                switch (parseInt(value)) {
+                    case 1:
+                        icon = 'fa fa-fw fa-lg fa-check-circle';
+                        color = 'text-success';
+                        text = 'Ano';
+                        break;
+                    case 0:
+                        icon = 'fa fa-fw fa-lg fa-times-circle';
+                        color = 'text-danger';
+                        text = 'Ne';
+                        break;
+                }
+                return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+            }
+
+            function imageFormatter(value) {
+                if (value) {
+                    return '<a class="image-popup-no-margins cur-zoom-in" href="/' + value + '">' +
+                        '<img src="/' + value + '" height="40" alt="" />' +
+                        '</a>';
+                }
+                return null;
+            }
+
+            function titleFormatter(value, row) {
+                if (value) {
+                    let tab = '<i class="fa fa-fw fa-arrow-alt-circle-right"></i> ';
+                    return tab.repeat(row.depth) + value;
+                }
+                return null;
+            }
+
+            function dateFormatter(value) {
+                if (value) {
+                    return moment(value).format('LL');
+                }
+                return null;
+            }
+
+            function datetimeFormatter(value) {
+                if (value) {
+                    return moment(value).format('LLLL');
+                }
+                return null;
+            }
+        </script>
+    </div>
+
+
+<?= $view->include('admin/modal/danger') ?>
+<?= $view->include('admin/modal/warning') ?>
