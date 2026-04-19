@@ -893,7 +893,7 @@ final class PageWriteController
 		foreach ($routes as $row) {
 			$yaml .= "page_" . $row['id'] . ":\n";
 			$yaml .= "  path: /" . $row['url'] . "\n";
-			$yaml .= "  controller: App\\Page\\Controller\\Web\\PageWebController::page\n";
+			$yaml .= "  controller: App\\Page\\Controller\\Web\\PageController::page\n";
 			$yaml .= "  defaults:\n";
 			$yaml .= "    page_id: " . $row['id'] . "\n";
 			$yaml .= "\n";
@@ -913,10 +913,6 @@ final class PageWriteController
 					'route' => 'page_' . $row['id'],
 					'visible' => 1,
 					'order' => 1 + (int) $row['rank_total'],
-					'priority' => '0.5',
-					'lastmod' => $row['updated_date'],
-					'changefreq' => 'weekly',
-					'icon' => 'fa fa-fw fa-file-alt',
 				];
 
 				$children = $buildNavigation($lang, $header, (int) $row['id']);
@@ -950,10 +946,6 @@ final class PageWriteController
 						'route' => 'page_' . $row['id'],
 						'visible' => 1,
 						'order' => 1 + (int) $row['rank_total'],
-						'priority' => '0.5',
-						'lastmod' => $row['updated_date'],
-						'changefreq' => 'weekly',
-						'icon' => 'fa fa-fw fa-file-alt',
 					];
 				}
 
@@ -971,8 +963,34 @@ final class PageWriteController
 		$content = "<?php\n\n";
 		$content .= "// Auto-generated page navigation - DO NOT EDIT MANUALLY\n";
 		$content .= "// Generated: " . date('Y-m-d H:i:s') . "\n\n";
-		$content .= "return " . var_export($navigation, true) . ";\n";
+		$content .= "return " . $this->exportArray($navigation) . ";\n";
 
 		file_put_contents($configDir . 'page_navigation.php', $content);
+	}
+
+	/**
+	 * Čistý export PHP pole (bez var_export ošklivostí)
+	 */
+	private function exportArray(array $array, int $indent = 0): string
+	{
+		$pad = str_repeat("\t", $indent);
+		$padInner = str_repeat("\t", $indent + 1);
+		$isAssoc = array_keys($array) !== range(0, count($array) - 1);
+		$lines = [];
+
+		foreach ($array as $key => $value) {
+			$keyStr = $isAssoc ? var_export($key, true) . ' => ' : '';
+			if (is_array($value)) {
+				$lines[] = $padInner . $keyStr . $this->exportArray($value, $indent + 1);
+			} else {
+				$lines[] = $padInner . $keyStr . var_export($value, true);
+			}
+		}
+
+		if (empty($lines)) {
+			return '[]';
+		}
+
+		return "[\n" . implode(",\n", $lines) . ",\n" . $pad . ']';
 	}
 }

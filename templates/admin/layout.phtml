@@ -162,11 +162,11 @@ $identity = $identity ?? null;
 <script src="<?= $view->asset('vendor/admin/placeholder/js/placeholder.min.js') ?>"></script>
 <script src="<?= $view->asset('vendor/admin/appear/js/appear.min.js') ?>"></script>
 <script src="<?= $view->asset('vendor/porto-admin/js/theme.min.js') ?>"></script>
-<?php foreach ($view->getInlineScripts() as $script) { ?>
-    <script><?= $script ?></script>
-<?php } ?>
 <?php foreach ($view->getBodyScripts() as $src) { ?>
     <script src="<?= $src ?>"></script>
+<?php } ?>
+<?php foreach ($view->getInlineScripts() as $script) { ?>
+    <script><?= $script ?></script>
 <?php } ?>
 <script src="<?= $view->asset('js/admin/custom.min.js?ver=0.0.3') ?>"></script>
 <script src="<?= $view->asset('vendor/porto-admin/js/theme.init.min.js') ?>"></script>

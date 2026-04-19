@@ -12,18 +12,21 @@ return [
             'label'  => '<img src="/img/web/layout/header/zive-polar.svg" alt="Živě Polar">',
             'url'    => '/hd',
             'class'  => '',
+            'order'  => 1,
         ],
         [
             'id'     => 'zive-polar2',
             'label'  => '<img src="/img/web/layout/header/zive-polar2.svg" alt="Živě Polar 2" class="me-3">',
             'url'    => '/polar2',
             'class'  => '',
+            'order'  => 1,
         ],
         [
             'id'    => 'show',
             'label' => 'Pořady',
             'url'   => '/porady',
             'class' => '',
+            'order' => 1,
         ],
         [
             'id'     => 'multimedia',
@@ -31,6 +34,7 @@ return [
             'url'    => 'https://polarmultimedia.cz/',
             'target' => '_blank',
             'class'  => '',
+            'order'  => 3,
         ],
         [
             'id'    => 'menuPageWeb-15',

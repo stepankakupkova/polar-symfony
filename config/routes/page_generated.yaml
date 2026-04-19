@@ -1,2 +1,33 @@
 # Auto-generated page routes - DO NOT EDIT MANUALLY
-# This file is empty until pages are created/edited in admin.
+# Generated: 2026-04-19 09:37:49
+
+page_13:
+  path: /reklama
+  controller: App\Page\Controller\Web\PageController::page
+  defaults:
+    page_id: 13
+
+page_14:
+  path: /jak-naladit
+  controller: App\Page\Controller\Web\PageController::page
+  defaults:
+    page_id: 14
+
+page_15:
+  path: /o-tv-polar
+  controller: App\Page\Controller\Web\PageController::page
+  defaults:
+    page_id: 15
+
+page_20:
+  path: /hbbtv
+  controller: App\Page\Controller\Web\PageController::page
+  defaults:
+    page_id: 20
+
+page_25:
+  path: /kontakt
+  controller: App\Page\Controller\Web\PageController::page
+  defaults:
+    page_id: 25
+

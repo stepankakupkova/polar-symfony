@@ -7,6 +7,11 @@
 $nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// Načtení dynamických page items z page_navigation.php
+$pageNavFile = dirname(__DIR__, 3) . '/config/page_navigation.php';
+$pageNav = file_exists($pageNavFile) ? require $pageNavFile : [];
+$pageDropdown = $pageNav['submenu-dropdown'] ?? [];
+
 // Sestaví flat seznam: submenu přímé položky + dropdown children jako samostatné položky
 $items = [];
 foreach ($nav['submenu'] as $item) {
@@ -14,9 +19,25 @@ foreach ($nav['submenu'] as $item) {
         foreach ($item['dropdown'] as $child) {
             $items[] = $child;
         }
+        // Přidej page children z menuPageWeb-15 (O TV POLAR → HbbTV, Jak naladit)
+        foreach ($pageDropdown as $pageItem) {
+            if (!($pageItem['visible'] ?? 1)) { continue; }
+            if (isset($pageItem['pages'])) {
+                foreach ($pageItem['pages'] as $child) {
+                    if (!($child['visible'] ?? 1)) { continue; }
+                    $items[] = ['label' => $child['label'], 'url' => $view->path($child['route']), 'id' => $child['id']];
+                }
+            }
+        }
     } else {
         $items[] = ['label' => $item['label'], 'url' => $item['url'], 'id' => $item['id'], 'target' => $item['target'] ?? null];
     }
+}
+
+// Přidej přímé page items (Reklama, Kontakt)
+foreach ($pageDropdown as $pageItem) {
+    if (!($pageItem['visible'] ?? 1) || isset($pageItem['pages'])) { continue; }
+    $items[] = ['label' => $pageItem['label'], 'url' => $view->path($pageItem['route']), 'id' => $pageItem['id']];
 }
 
 $left  = array_slice($items, 0, 5);

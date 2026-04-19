@@ -1,7 +1,8 @@
 <?php
 /**
  * Submenu — horní lišta (desktop) + mobile verze
- * Obsahuje: Živě Polar 1+2, Pořady, Multimedia, O TV POLAR dropdown (hamburger)
+ * Obsahuje: Živě Polar 1+2, Pořady, Multimedia, stránky z DB (Reklama, Kontakt),
+ * O TV POLAR dropdown (hamburger) s children z DB + statickými položkami
  *
  * @param bool $mobile  true = mobilní verze (bez hamburgeru, jen přímé položky)
  */
@@ -10,13 +11,70 @@ $mobile = $mobile ?? false;
 $nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $items = $nav['submenu'];
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Načtení dynamických page items z page_navigation.php
+$pageNavFile = dirname(__DIR__, 3) . '/config/page_navigation.php';
+$pageNav = file_exists($pageNavFile) ? require $pageNavFile : [];
+$pageDropdown = $pageNav['submenu-dropdown'] ?? [];
+
+// Najdi hamburger item v navigation.php (menuPageWeb-15)
+$hamburgerKey = null;
+foreach ($items as $k => $item) {
+    if (isset($item['dropdown']) && ($item['id'] ?? '') === 'menuPageWeb-15') {
+        $hamburgerKey = $k;
+        break;
+    }
+}
+
+// Přidej page items (Reklama, Kontakt) jako přímé nav linky (ty BEZ pages/children)
+// a children z O TV POLAR (menuPageWeb-15) přidej do hamburger dropdown
+foreach ($pageDropdown as $key => $pageItem) {
+    if (!($pageItem['visible'] ?? 1)) { continue; }
+    if (isset($pageItem['pages'])) {
+        // Item s children (O TV POLAR) — přidej jeho children do hamburger dropdown
+        if ($hamburgerKey !== null) {
+            $children = $pageItem['pages'];
+            uasort($children, fn($a, $b) => ($a['order'] ?? 0) <=> ($b['order'] ?? 0));
+            foreach ($children as $child) {
+                if (!($child['visible'] ?? 1)) { continue; }
+                $items[$hamburgerKey]['dropdown'][] = [
+                    'label' => $child['label'],
+                    'url' => $view->path($child['route']),
+                ];
+            }
+        }
+    } else {
+        // Přímý page item (Reklama, Kontakt) — vlož před hamburger
+        $items[] = [
+            'id'    => $pageItem['id'],
+            'label' => $pageItem['label'],
+            'url'   => $view->path($pageItem['route']),
+            'class' => '',
+            'order' => $pageItem['order'] ?? 99,
+        ];
+    }
+}
+
+// Seřadíme items podle order (stabilní řazení — zachová pořadí u stejného order)
+$ordered = [];
+$hamburgerItem = null;
+foreach ($items as $item) {
+    if (isset($item['dropdown'])) {
+        $hamburgerItem = $item; // hamburger vždy na konec
+    } else {
+        $ordered[] = $item;
+    }
+}
+usort($ordered, fn($a, $b) => ($a['order'] ?? 99) <=> ($b['order'] ?? 99));
+if ($hamburgerItem) { $ordered[] = $hamburgerItem; }
+$items = $ordered;
 ?>
 <?php foreach ($items as $item) { ?>
     <?php
         $isHamburger = isset($item['dropdown']);
         if ($mobile && $isHamburger) { continue; }
 
-        $active = $item['url'] !== '#' && str_starts_with($currentPath, $item['url']);
+        $active = isset($item['url']) && $item['url'] !== '#' && str_starts_with($currentPath, $item['url']);
     ?>
     <?php if ($isHamburger) { ?>
         <li class="nav-item dropdown d-none d-sm-block">
@@ -42,7 +100,7 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     <?php } else { ?>
         <li class="nav-item nav-item-anim-icon">
             <a id="<?= $item['id'] ?>"
-                class="<?= $item['class'] ?> text-secondary text-hover-primary text-3 nav-link text-decoration-none line-height-3 font-weight-500 px-1 px-md-2<?= $active ? ' active' : '' ?>"
+                class="<?= $item['class'] ?? '' ?> text-secondary text-hover-primary text-3 nav-link text-decoration-none line-height-3 font-weight-500 px-1 px-md-2<?= $active ? ' active' : '' ?>"
                 href="<?= htmlspecialchars($item['url']) ?>"
                 <?= isset($item['target']) ? 'target="' . $item['target'] . '"' : '' ?>>
                 <?= $item['label'] ?>

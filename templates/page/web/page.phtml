@@ -1,0 +1,129 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->setTitle($page['title']);
+$view->addMeta('description', $page['seo_description'] ?? '');
+$view->addMeta('keywords', $page['seo_keywords'] ?? '');
+
+// META pro Facebook
+$view->addOgMeta('og:title', $page['title'] . ' | TV POLAR');
+$view->addOgMeta('og:description', $page['seo_description'] ?? '');
+$view->addOgMeta('og:url', $schemeHost . '/' . $page['url']);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', $schemeHost . '/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:secure_url', 'https://' . $_SERVER['SERVER_NAME'] . '/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addHeadStyle(
+    '@media (min-width: 992px) {
+        .custom-height-1 {height:95px;}
+        .custom-height-2 {height:50px;}
+    }'
+);
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+
+// google mapa
+$view->addBodyScript('https://maps.googleapis.com/maps/api/js?key=' . $GOOGLE_MAP_KEY . '&callback=initMap');
+$view->addInlineScript(
+    'function initMap() {
+        var place = {
+            lat: 49.8309733,
+            lng: 18.2508454
+        };
+        var map = new google.maps.Map(
+            document.getElementById("googlemaps"), {
+                zoom: 15,
+                center: place
+            }
+        );
+        var infowindow = new google.maps.InfoWindow({
+            content: "<strong>POLAR televize Ostrava, s.r.o.</strong><br>Boleslavova 710/19, 709 00,<br>Ostrava-Mariánské Hory"
+        });
+        var marker = new google.maps.Marker({
+            position: place,
+            map: map,
+            title: "POLAR televize Ostrava, s.r.o.",
+            icon: "/img/web/layout/pin.png"
+        });
+        marker.addListener("click", function() {
+            infowindow.open(map, marker);
+        });
+        infowindow.open(map, marker);
+    }
+    '
+);
+
+// Přepočet ceny pro stránku REKLAMA
+$view->addInlineScript(
+    '$("#cena").on("change", function()
+        {       
+            var procento = $(this).val();  
+            
+            var castka1 = procento * 1500 / 100;
+            $("#castka1").text(castka1);
+            
+            var castka2 = procento * 2500 / 100;
+            $("#castka2").text(castka2);
+            
+            var castka3 = procento * 2000 / 100;
+            $("#castka3").text(castka3);
+            
+            var castka4 = procento * 1500 / 100;
+            $("#castka4").text(castka4);
+            
+            var castka5 = procento * 500 / 100;
+            $("#castka5").text(castka5);
+            
+            var castka6 = procento * 1000 / 100;
+            $("#castka6").text(castka6);
+        });
+    '
+);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?php
+                    // TODO: breadcrumb navigace
+                ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php if ($page['url'] === 'kontakt') { ?>
+    <div id="googlemaps" class="google-map"></div>
+<?php } ?>
+
+<div class="container-fluid py-4 px-0">
+    <div class="row gx-0">
+        <div class="col">
+            <div class="blog-posts single-post">
+                <article class="page-post post post-large blog-single-post border-0 m-0 p-0">
+                    <?php if ($page['image']) { ?>
+                        <div class="post-image ms-0">
+                            <img src="/<?= $page['image'] ?>" class="img-fluid img-thumbnail img-thumbnail-no-borders rounded-0" alt="<?= $page['title'] ?>"/>
+                        </div>
+                    <?php } ?>
+                    <div class="post-content ms-0">
+                        <?= $page['content'] ?>
+
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>

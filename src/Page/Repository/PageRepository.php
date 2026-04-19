@@ -147,6 +147,7 @@ final class PageRepository
 				'created_date', 'updated_date', 'created_user', 'updated_user'
 			)
 			->from('page')
+			->where('active = 1')
 			->orderBy('id', 'ASC');
 
 		$rows = $qb->fetchAllAssociative();
