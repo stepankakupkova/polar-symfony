@@ -1,0 +1,55 @@
+<?php
+/**
+ * @var string $errorReference
+ * @var bool $displayExceptions
+ * @var \Throwable|null $exception
+ */
+?>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-1 fw-bold text-muted">500</h1>
+            <h2>Nastala chyba</h2>
+            <p class="text-muted">
+                Omlouváme se, došlo k neočekávané chybě. Zkuste to prosím později.
+            </p>
+            <?php if (!empty($errorReference)) { ?>
+                <p class="small text-muted">Reference: <?= htmlspecialchars($errorReference) ?></p>
+            <?php } ?>
+            <a href="/" class="btn btn-primary mt-3">Zpět na úvodní stránku</a>
+        </div>
+    </div>
+
+    <?php if (!empty($displayExceptions) && $exception instanceof \Throwable) { ?>
+        <hr />
+        <h3>Podrobnosti (jen dev):</h3>
+        <dl>
+            <dt>Exception:</dt>
+            <dd><?= htmlspecialchars($exception::class) ?></dd>
+            <dt>File:</dt>
+            <dd><pre><?= htmlspecialchars($exception->getFile()) ?>:<?= $exception->getLine() ?></pre></dd>
+            <dt>Message:</dt>
+            <dd><pre><?= htmlspecialchars($exception->getMessage()) ?></pre></dd>
+            <dt>Stack trace:</dt>
+            <dd><pre><?= htmlspecialchars($exception->getTraceAsString()) ?></pre></dd>
+        </dl>
+        <?php
+        $ex = $exception->getPrevious();
+        $count = 0;
+        while ($ex && $count < 50) { ?>
+            <hr />
+            <h4>Previous: <?= htmlspecialchars($ex::class) ?></h4>
+            <dl>
+                <dt>File:</dt>
+                <dd><pre><?= htmlspecialchars($ex->getFile()) ?>:<?= $ex->getLine() ?></pre></dd>
+                <dt>Message:</dt>
+                <dd><pre><?= htmlspecialchars($ex->getMessage()) ?></pre></dd>
+                <dt>Stack trace:</dt>
+                <dd><pre><?= htmlspecialchars($ex->getTraceAsString()) ?></pre></dd>
+            </dl>
+        <?php
+            $ex = $ex->getPrevious();
+            $count++;
+        } ?>
+    <?php } ?>
+</div>

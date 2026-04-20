@@ -2,6 +2,8 @@
 
 namespace App\Page\Controller\Admin;
 
+use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Page\Repository\PageRepository;
 use App\Page\Repository\PageSettingRepository;
@@ -28,6 +30,8 @@ final class PageWriteController
 	private string $imageDefault;
 
 	public function __construct(
+		private FlashMessenger $flashMessenger,
+		private Logger $logger,
 		private PageRepository $pageRepository,
 		private PageSettingRepository $settingRepository,
 		private PhtmlRenderer $renderer,
@@ -145,8 +149,26 @@ final class PageWriteController
 
 			$this->createConfig($lang);
 
+			$this->logger->notice('PAGE - Add page', [
+				'description' => 'OK',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+			]);
+
+			$this->flashMessenger->addMessage(
+				'success',
+				'Stránky',
+				'Stránka <strong>' . htmlspecialchars($post['title']) . '</strong> byla vytvořena'
+			);
+
 			return new RedirectResponse($this->urlGenerator->generate('admin_page_list'));
 		} catch (Exception $e) {
+			$this->logger->err('PAGE - Add page', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
 			$errors['general'] = $e->getMessage();
 		}
 
@@ -236,8 +258,26 @@ final class PageWriteController
 
 			$this->createConfig($lang);
 
+			$this->logger->notice('PAGE - Edit page', [
+				'description' => 'OK',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+			]);
+
+			$this->flashMessenger->addMessage(
+				'success',
+				'Stránky',
+				'Stránka <strong>' . htmlspecialchars($post['title']) . '</strong> byla upravena'
+			);
+
 			return new RedirectResponse($this->urlGenerator->generate('admin_page_list'));
 		} catch (Exception $e) {
+			$this->logger->err('PAGE - Edit page', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
 			$errors['general'] = $e->getMessage();
 		}
 
@@ -297,13 +337,31 @@ final class PageWriteController
 
 				$this->createConfig($lang);
 
+				$this->logger->notice('PAGE - Duplicate page', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
+
 			} else {
 				$success = false;
 				$message = 'Stránka nenalezena';
+				$this->logger->err('PAGE - Duplicate page', [
+					'description' => 'ERROR',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+					'trace' => $message,
+				]);
 			}
 		} catch (Exception $e) {
 			$success = false;
 			$message = $e->getMessage();
+			$this->logger->err('PAGE - Duplicate page', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
 		}
 
 		return new JsonResponse([
@@ -323,6 +381,8 @@ final class PageWriteController
 		$message = null;
 		$page_id = null;
 
+		$identity = $this->security->getUser();
+
 		try {
 			$params = $request->request->all();
 			$page_id = $params['id'];
@@ -337,13 +397,31 @@ final class PageWriteController
 
 				$this->createConfig($lang);
 
+				$this->logger->notice('PAGE - Delete page', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
+
 			} else {
 				$success = false;
 				$message = 'Stránka nenalezena';
+				$this->logger->err('PAGE - Delete page', [
+					'description' => 'ERROR',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+					'trace' => $message,
+				]);
 			}
 		} catch (Exception $e) {
 			$success = false;
 			$message = $e->getMessage();
+			$this->logger->err('PAGE - Delete page', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
 		}
 
 		return new JsonResponse([
@@ -549,13 +627,31 @@ final class PageWriteController
 						]);
 						break;
 				}
+
+				$this->logger->notice('PAGE - Set page image', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
 			} else {
 				$success = false;
 				$message = 'Stránka nenalezena';
+				$this->logger->err('PAGE - Set page image', [
+					'description' => 'ERROR',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+					'trace' => $message,
+				]);
 			}
 		} catch (Exception $e) {
 			$success = false;
 			$message = $e->getMessage();
+			$this->logger->err('PAGE - Set page image', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
 		}
 
 		return new JsonResponse([

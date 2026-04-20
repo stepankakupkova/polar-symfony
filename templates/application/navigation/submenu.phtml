@@ -1,13 +1,45 @@
 <?php
 /**
  * Submenu — horní lišta (desktop) + mobile verze
- * Obsahuje: Živě Polar 1+2, Pořady, Multimedia, stránky z DB (Reklama, Kontakt),
- * O TV POLAR dropdown (hamburger) s children z DB + statickými položkami
+ * Desktop: Živě Polar 1+2, Pořady, Multimedia, stránky z DB (Reklama, Kontakt),
+ *          O TV POLAR dropdown (hamburger) s children z DB + statickými položkami
+ * Mobile:  jen Živě Polar 1+2 (menší SVG)
  *
- * @param bool $mobile  true = mobilní verze (bez hamburgeru, jen přímé položky)
+ * @param bool $mobile  true = mobilní verze (jen živě polar/polar2)
  */
 
 $mobile = $mobile ?? false;
+
+// Mobilní verze — pouze živě polar a polar2 s menšími ikonami
+if ($mobile) {
+    $mobileItems = [
+        [
+            'id'    => 'zivePolar',
+            'label' => '<img src="/img/web/layout/header/zive-polar-small.svg" alt="Živě Polar">',
+            'url'   => '/hd',
+            'class' => '',
+        ],
+        [
+            'id'    => 'zivePolar2',
+            'label' => '<img src="/img/web/layout/header/zive-polar2-small.svg" alt="Živě Polar 2">',
+            'url'   => '/polar2',
+            'class' => 'hide-xs',
+        ],
+    ];
+    $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    foreach ($mobileItems as $item) { ?>
+        <li class="nav-item nav-item-anim-icon">
+            <a id="<?= $item['id'] ?>"
+                class="<?= $item['class'] ?> text-secondary text-hover-primary text-3 nav-link text-decoration-none line-height-3 font-weight-500 px-1 px-md-2<?= str_starts_with($currentPath, $item['url']) ? ' active' : '' ?>"
+                href="<?= htmlspecialchars($item['url']) ?>">
+                <?= $item['label'] ?>
+            </a>
+        </li>
+    <?php }
+    return;
+}
+
+// Desktop verze — plné submenu
 $nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $items = $nav['submenu'];
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -72,7 +104,6 @@ $items = $ordered;
 <?php foreach ($items as $item) { ?>
     <?php
         $isHamburger = isset($item['dropdown']);
-        if ($mobile && $isHamburger) { continue; }
 
         $active = isset($item['url']) && $item['url'] !== '#' && str_starts_with($currentPath, $item['url']);
     ?>

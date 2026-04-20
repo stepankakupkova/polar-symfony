@@ -8,6 +8,33 @@
  */
 
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
+
+if ($success) {
+	$view->addInlineScript(
+		'var notice = new PNotify({
+			title: "Stránky",
+			text: "' . addslashes($success) . '",
+			type: "success",
+			addclass: "click-2-close",
+			buttons: {
+				sticker: false
+			}
+		});'
+	);
+}
+if ($error) {
+	$view->addInlineScript(
+		'var notice = new PNotify({
+			title: "Chyba",
+			text: "' . addslashes($error) . '",
+			type: "error",
+			addclass: "click-2-close",
+			buttons: {
+				sticker: false
+			}
+		});'
+	);
+}
 ?>
 
 <div class="row">
@@ -28,12 +55,6 @@ $view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap
             </header>
 
             <form action="<?= $view->path('admin_page_setting') ?>" method="post" class="form-horizontal" id="frmSetting">
-                <?php if ($success) { ?>
-                    <div class="alert alert-success m-3"><?= htmlspecialchars($success) ?></div>
-                <?php } ?>
-                <?php if ($error) { ?>
-                    <div class="alert alert-danger m-3"><?= htmlspecialchars($error) ?></div>
-                <?php } ?>
 
                 <div class="card-body">
                     <div class="form-group row">

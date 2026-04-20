@@ -2,6 +2,7 @@
 
 namespace App\Application\View;
 
+use App\Application\Service\FlashMessenger;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class PhtmlRenderer
@@ -10,6 +11,7 @@ final class PhtmlRenderer
 		private string $templatesDir,
 		private string $basePath,
 		private UrlGeneratorInterface $urlGenerator,
+		private FlashMessenger $flashMessenger,
 		private array $globals = [],
 	) {}
 
@@ -51,6 +53,24 @@ final class PhtmlRenderer
 	public function renderWithAdminLayout(string $template, array $params = [], string $layout = 'admin/layout'): string
 	{
 		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->basePath);
+
+		// Flash messages → PNotify inline scripty (jako polar InlineScriptPlugin)
+		foreach ($this->flashMessenger->getMessages() as $type => $flashes) {
+			foreach ($flashes as $flash) {
+				$sharedView->addInlineScript(
+					'var notice = new PNotify({
+						title: "' . addslashes($flash['title'] ?? '') . '",
+						text: "' . addslashes($flash['text'] ?? '') . '",
+						type: "' . $type . '",
+						addclass: "click-2-close",
+						buttons: {
+							sticker: false
+						}
+					});'
+				);
+			}
+		}
+
 		$content = $this->render($template, $params, $sharedView);
 		$layoutParams = ['content' => $content];
 		foreach (['identity', 'scheme', 'pageTitle'] as $key) {

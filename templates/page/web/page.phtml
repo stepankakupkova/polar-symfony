@@ -34,7 +34,6 @@ $view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
 $view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
 
 // google mapa
-$view->addBodyScript('https://maps.googleapis.com/maps/api/js?key=' . $GOOGLE_MAP_KEY . '&callback=initMap');
 $view->addInlineScript(
     'function initMap() {
         var place = {
@@ -63,6 +62,8 @@ $view->addInlineScript(
     }
     '
 );
+$view->addBodyScript('https://maps.googleapis.com/maps/api/js?key=' . $GOOGLE_MAP_KEY);
+$view->addInlineScript('initMap();');
 
 // Přepočet ceny pro stránku REKLAMA
 $view->addInlineScript(
@@ -96,9 +97,18 @@ $view->addInlineScript(
     <div class="container">
         <div class="row">
             <div class="col-md-12 align-self-center order-1">
-                <?php
-                    // TODO: breadcrumb navigace
-                ?>
+                <ul class="breadcrumb d-inline-block">
+                    <li>
+                        <a href="<?= $view->path('app_home') ?>" title="Domů">
+                            Domů
+                        </a>
+                    </li>
+                    <li>
+                        <span class="text-primary">
+                            <?= htmlspecialchars($page['title']) ?>
+                        </span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

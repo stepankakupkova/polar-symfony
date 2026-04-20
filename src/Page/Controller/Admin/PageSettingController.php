@@ -2,6 +2,7 @@
 
 namespace App\Page\Controller\Admin;
 
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Page\Repository\PageSettingRepository;
 use Exception;
@@ -24,6 +25,7 @@ final class PageSettingController
 	private string $imageDefault;
 
 	public function __construct(
+		private Logger $logger,
 		private PageSettingRepository $settingRepository,
 		private PhtmlRenderer $renderer,
 		private Security $security,
@@ -91,11 +93,29 @@ final class PageSettingController
 				$image->save($this->PUBLIC_PATH . '/' . $this->imageDefault, ['png_compression_level' => 8]);
 				unset($image);
 
+				$this->logger->notice('PAGE - Edit settings', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
+
 				$success = 'Nastavení uloženo';
 			} catch (\Imagine\Exception\RuntimeException $e) {
+				$this->logger->err('PAGE - Edit settings', [
+					'description' => 'ERROR',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+					'trace' => $e->getMessage(),
+				]);
 				$error = $e->getMessage();
 			}
 		} catch (Exception $e) {
+			$this->logger->err('PAGE - Edit settings', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
 			$error = $e->getMessage();
 		}
 

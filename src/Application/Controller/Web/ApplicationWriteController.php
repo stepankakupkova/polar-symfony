@@ -2,11 +2,16 @@
 
 namespace App\Application\Controller\Web;
 
+use App\Application\Service\Logger;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ApplicationWriteController
 {
+	public function __construct(
+		private Logger $logger,
+	) {}
+
 	public function sendEmail(Request $request): JsonResponse
 	{
 		// TODO: az bude v projektu mailer, nahradit primy mail() za standardni sluzbu.
@@ -54,6 +59,12 @@ final class ApplicationWriteController
 				}
 
 				if (($data['score'] ?? 0) < 0.7) {
+					$this->logger->err('Odeslání chyby návštěvníkem - reCAPTCHA fail', [
+						'description' => 'ERROR',
+						'user' => '',
+						'file' => __FILE__,
+						'trace' => 'reCAPTCHA fail: IP=' . $request->getClientIp() . ' Score=' . ($data['score'] ?? 0),
+					]);
 					return new JsonResponse(['success' => 'nok_recaptcha', 'message' => 'Podezřelé chování. reCAPTCHA skóre je příliš nízké.']);
 				}
 
@@ -73,6 +84,9 @@ final class ApplicationWriteController
 			];
 
 			if (!@mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, implode("\r\n", $headers))) {
+				$this->logger->err('Odeslání chyby návštěvníkem - EMAIL ERROR', [
+					'trace' => 'mail() failed',
+				]);
 				return new JsonResponse(['success' => 'nok', 'message' => 'Odeslání e-mailu selhalo.']);
 			}
 

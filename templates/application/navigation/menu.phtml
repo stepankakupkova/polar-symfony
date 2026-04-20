@@ -6,6 +6,7 @@
  */
 
 $ulClass = $ulClass ?? 'nav nav-pills';
+$isMobile = str_contains($ulClass, 'mobile-menu');
 $nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $regions = $nav['regions'];
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -23,8 +24,8 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                 : str_starts_with($currentPath, $region['url']);
             $hasDropdown = $region['id'] !== 'region-all' && !empty($region['cities']);
         ?>
-        <li class="<?= $hasDropdown ? 'dropdown' : 'nav-item nav-item-anim-icon' ?>">
-            <a class="dropdown-item dropdown-toggle d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light<?= $active ? ' active' : '' ?>"
+        <li class="<?= $hasDropdown ? 'dropdown' : '' ?>">
+            <a class="<?= $hasDropdown ? 'dropdown-item dropdown-toggle ' : '' ?>d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light<?= $active ? ' active' : '' ?>"
                href="<?= htmlspecialchars($region['url']) ?>"
                title="<?= htmlspecialchars($region['label']) ?>">
                 <?= htmlspecialchars($region['label']) ?>
@@ -33,7 +34,7 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                 <ul class="dropdown-menu">
                     <?php foreach ($region['cities'] as $city) { ?>
                         <li>
-                            <a class="dropdown-item<?= str_starts_with($currentPath, $city['url']) ? ' active' : '' ?>"
+                            <a class="dropdown-item text-2<?= str_starts_with($currentPath, $city['url']) ? ' active' : '' ?>"
                                href="<?= htmlspecialchars($city['url']) ?>"
                                title="<?= htmlspecialchars($city['label']) ?>">
                                 <?= htmlspecialchars($city['label']) ?>

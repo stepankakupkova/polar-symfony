@@ -2,6 +2,8 @@
 
 namespace App\User\Controller\Admin;
 
+use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Authorization\Repository\AuthorizationRepository;
 use App\Security\User;
@@ -16,6 +18,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class UserWriteController
 {
 	public function __construct(
+		private FlashMessenger $flashMessenger,
+		private Logger $logger,
 		private UserRepository $userRepository,
 		private AuthorizationRepository $authorizationRepository,
 		private PhtmlRenderer $renderer,
@@ -80,8 +84,26 @@ final class UserWriteController
 					]);
 				}
 
+				$this->flashMessenger->addMessage(
+					'success',
+					'Uživatelé',
+					'Uživatel <strong>' . htmlspecialchars($post['username']) . '</strong> byl vytvořen'
+				);
+
+				$this->logger->notice('USER - Add user', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
+
 				return new RedirectResponse($this->urlGenerator->generate('admin_user_list'));
 			} catch (\Exception $e) {
+				$this->logger->err('USER - Add user', [
+					'description' => 'ERROR',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+					'trace' => $e->getMessage(),
+				]);
 				return new Response($this->renderer->renderWithAdminLayout('user/admin/add', [
 					'identity' => $identity,
 					'pageTitle' => 'Uživatelé',
@@ -169,8 +191,26 @@ final class UserWriteController
 					'updated_user' => $identity->getUserIdentifier(),
 				]);
 
+				$this->flashMessenger->addMessage(
+					'success',
+					'Uživatelé',
+					'Uživatel <strong>' . htmlspecialchars($post['username']) . '</strong> byl upraven'
+				);
+
+				$this->logger->notice('USER - Edit user', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
+
 				return new RedirectResponse($this->urlGenerator->generate('admin_user_list'));
 			} catch (\Exception $e) {
+				$this->logger->err('USER - Edit user', [
+					'description' => 'ERROR',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+					'trace' => $e->getMessage(),
+				]);
 				return new Response($this->renderer->renderWithAdminLayout('user/admin/edit', [
 					'identity' => $identity,
 					'pageTitle' => 'Uživatelé',
@@ -196,6 +236,8 @@ final class UserWriteController
 
 	public function deleteUser(Request $request): JsonResponse
 	{
+		$identity = $this->security->getUser();
+
 		try {
 			$userId = $request->request->getInt('id');
 			$user = $this->userRepository->findPostBy('id', $userId);
@@ -209,6 +251,12 @@ final class UserWriteController
 
 				$this->authorizationRepository->deletePost((int) $user['authorization_id']);
 
+				$this->logger->notice('USER - Delete user', [
+					'description' => 'OK',
+					'user' => $identity->getUserIdentifier(),
+					'file' => __FILE__,
+				]);
+
 				return new JsonResponse([
 					'success' => true,
 					'message' => null,
@@ -216,12 +264,26 @@ final class UserWriteController
 				]);
 			}
 
+			$this->logger->err('USER - Delete user', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => 'Uživatel nenalezen',
+			]);
+
 			return new JsonResponse([
 				'success' => false,
 				'message' => 'Uživatel nenalezen',
 				'user_id' => $userId,
 			]);
 		} catch (\Exception $e) {
+			$this->logger->err('USER - Delete user', [
+				'description' => 'ERROR',
+				'user' => $identity->getUserIdentifier(),
+				'file' => __FILE__,
+				'trace' => $e->getMessage(),
+			]);
+
 			return new JsonResponse([
 				'success' => false,
 				'message' => $e->getMessage(),

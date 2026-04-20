@@ -13,7 +13,7 @@ parameters:
     app.LIGHT_PATH_WITHOUT_HTTPS: '/data_webytv/dp/polar/'
     app.LIGHT_URL_WITHOUT_HTTPS: 'http://plainvod.polar.cz/videa/polar/'
     app.GOOGLE_ANALYTICS_ID: '%env(GOOGLE_ANALYTICS_ID)%'
-    app.GOOGLE_MAP_KEY: 'AIzaSyCEO1ZmSNm02a0Mqp3bRYmOUBIYcR0IE6k'
+    app.GOOGLE_MAP_KEY: '%env(GOOGLE_MAP_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -105,6 +105,14 @@ services:
     App\Application\EventSubscriber\LayoutSubscriber:
         arguments:
             $GOOGLE_ANALYTICS_ID: '%app.GOOGLE_ANALYTICS_ID%'
+
+    App\Application\EventSubscriber\ErrorSubscriber:
+        arguments:
+            $environment: '%kernel.environment%'
+
+    App\Application\EventSubscriber\FatalErrorHandler:
+        arguments:
+            $templatesDir: '%kernel.project_dir%/templates'
 
     App\Banner\EventListener\BannerGlobalListener:
         tags:

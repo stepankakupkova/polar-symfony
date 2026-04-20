@@ -12,33 +12,45 @@ $pageNavFile = dirname(__DIR__, 3) . '/config/page_navigation.php';
 $pageNav = file_exists($pageNavFile) ? require $pageNavFile : [];
 $pageDropdown = $pageNav['submenu-dropdown'] ?? [];
 
-// Sestaví flat seznam: submenu přímé položky + dropdown children jako samostatné položky
+// Sestaví flat seznam položek v pořadí odpovídajícím Laminasu:
+// Přímé submenu items (bez živě polar/polar2, multimedia) + dropdown children + page items
+// V Laminasu šlo vše z jednoho navigation containeru v daném order.
+$skipIds = ['zive-polar', 'zive-polar2', 'multimedia'];
 $items = [];
+
+// 1) Přímé submenu položky (Pořady)
 foreach ($nav['submenu'] as $item) {
-    if (isset($item['dropdown'])) {
-        foreach ($item['dropdown'] as $child) {
-            $items[] = $child;
-        }
-        // Přidej page children z menuPageWeb-15 (O TV POLAR → HbbTV, Jak naladit)
-        foreach ($pageDropdown as $pageItem) {
-            if (!($pageItem['visible'] ?? 1)) { continue; }
-            if (isset($pageItem['pages'])) {
-                foreach ($pageItem['pages'] as $child) {
-                    if (!($child['visible'] ?? 1)) { continue; }
-                    $items[] = ['label' => $child['label'], 'url' => $view->path($child['route']), 'id' => $child['id']];
-                }
+    if (isset($item['dropdown'])) { continue; }
+    if (in_array($item['id'] ?? '', $skipIds, true)) { continue; }
+    $items[] = ['label' => $item['label'], 'url' => $item['url'], 'id' => $item['id'], 'target' => $item['target'] ?? null, 'order' => $item['order'] ?? 99];
+}
+
+// 2) Přímé page items (Reklama, Kontakt)
+foreach ($pageDropdown as $pageItem) {
+    if (!($pageItem['visible'] ?? 1) || isset($pageItem['pages'])) { continue; }
+    $items[] = ['label' => $pageItem['label'], 'url' => $view->path($pageItem['route']), 'id' => $pageItem['id'], 'order' => $pageItem['order'] ?? 99];
+}
+
+// 3) Dropdown children (Volby, Kam vyrazit, Nabídka práce, Kamery, Komerční sdělení, TV program)
+foreach ($nav['submenu'] as $item) {
+    if (!isset($item['dropdown'])) { continue; }
+    foreach ($item['dropdown'] as $child) {
+        $items[] = $child;
+    }
+    // 4) Page children z menuPageWeb-15 (HbbTV, Jak naladit)
+    foreach ($pageDropdown as $pageItem) {
+        if (!($pageItem['visible'] ?? 1)) { continue; }
+        if (isset($pageItem['pages'])) {
+            foreach ($pageItem['pages'] as $child) {
+                if (!($child['visible'] ?? 1)) { continue; }
+                $items[] = ['label' => $child['label'], 'url' => $view->path($child['route']), 'id' => $child['id']];
             }
         }
-    } else {
-        $items[] = ['label' => $item['label'], 'url' => $item['url'], 'id' => $item['id'], 'target' => $item['target'] ?? null];
     }
 }
 
-// Přidej přímé page items (Reklama, Kontakt)
-foreach ($pageDropdown as $pageItem) {
-    if (!($pageItem['visible'] ?? 1) || isset($pageItem['pages'])) { continue; }
-    $items[] = ['label' => $pageItem['label'], 'url' => $view->path($pageItem['route']), 'id' => $pageItem['id']];
-}
+// Seřadíme podle order (stabilní řazení zachová pořadí u stejného order)
+usort($items, fn($a, $b) => ($a['order'] ?? 99) <=> ($b['order'] ?? 99));
 
 $left  = array_slice($items, 0, 5);
 $right = array_slice($items, 5);
