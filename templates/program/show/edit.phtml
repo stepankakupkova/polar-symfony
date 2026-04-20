@@ -1,0 +1,424 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$srcImage = $view->asset('data/program/show/!default-show.png') . '?ver=' . date('YmdHis');
+if (!empty($show['image'])) {
+    $srcImage = '/' . $show['image'];
+}
+
+$view->addHeadLink($view->asset('vendor/admin/file-upload/css/file-upload.css'));
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/iframe-transport.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/file-upload.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/cs_CZ.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+
+// Nahrání obrázku
+$view->addInlineScript(
+    '$("#fileupload").fileupload({
+        formData: {
+            show_id: ' . $show['id'] . '
+        },
+        dropZone: "#image",
+        dataType: "json",
+        add: function (e, data) {
+            $("#image .progress").removeClass("d-none");
+            $("#image .progress .progress-bar").css("width", "0%");
+            data.submit();
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $("#image .progress .progress-bar").css("width", progress + "%");
+        },
+        done: function (e, data) {
+            $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+            $("#image .progress").addClass("d-none");
+            $("#image .image-outer-container img").attr("src", "/" + data.result.url);
+            $("input[name=image]").val(data.result.url);
+            if (data.result.error) {
+                new PNotify({
+                    title: "Obrázek pořadu",
+                    text: data.result.error,
+                    type: "error"
+                });
+            } else {
+                new PNotify({
+                    title: "Obrázek pořadu",
+                    text: "Obrázek pořadu byl úspěšně nahrán",
+                    type: "success"
+                });
+            }
+        },
+        fail: function (e, data) {
+            $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+            $("#image .progress").addClass("d-none");
+            new PNotify({
+                title: "Obrázek pořadu",
+                text: "Obrázek pořadu se nepodařilo nahrát",
+                type: "error"
+            });
+        }
+    });'
+);
+
+// Nahrání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .image-button").click(function(e){
+        $("#fileupload").click();
+    });'
+);
+
+// Smazání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .delete-button").click(function(e){
+        $.post("' . $view->path('admin_program_show_json_set_default_image') . '",
+            {
+                show_id: ' . $show['id'] . ',
+                field: "image"
+            },
+            function(json) {
+                if (json.success) {
+                    var notice = new PNotify({
+                        title: "Úspěch",
+                        text: "Obrázek pořadu byl nastaven na výchozí",
+                        type: "success",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                    $("input[name=image]").val(json.url);
+                    $("#image .image-outer-container img").attr("src", "/" + json.url);
+                } else {
+                    var notice = new PNotify({
+                        title: "Chyba",
+                        text: "Nepodařilo se nastavit obrázek pořadu na výchozí",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                }
+            }, 
+            "json"      
+        );
+    });'
+);
+
+$view->addInlineScript(
+    '$("#btblTimes").on("post-body.bs.table", function (e, data) {
+        $(".btnEdit").unbind("click").bind("click", function() {
+            var id = $(this).data("id");
+            var day = $(this).data("day");
+            var value = $(this).data("value");
+            var premiere = $(this).data("premiere");
+            if (id == undefined) {
+                $("#modalTime .card-title").html("Přidat čas");
+                id = "";
+                value = "";
+                premiere = 0;
+            } else {
+                $("#modalTime .card-title").html("Upravit čas");
+            }
+            
+            $("#modalTime #time").val(value);
+            if (premiere) {
+                $("#modalTime .ios-switch").addClass("on");
+            } else {
+                $("#modalTime .ios-switch").addClass("off");
+            }
+            
+            $.magnificPopup.open({
+                items: {
+                    src: "#modalTime"
+                },
+                type: "inline",
+                fixedContentPos: false,
+                fixedBgPos: true,
+                overflowY: "auto",
+                closeBtnInside: true,
+                preloader: false,
+                midClick: true,
+                removalDelay: 300,
+                mainClass: "my-mfp-slide-bottom",
+                modal: true,
+                callbacks: {
+                    open: function() {
+                        $("#modalTime #btnSaveTime").unbind("click").click(function(e){
+                            e.preventDefault();
+                            $.post("' . $view->path('admin_program_show_json_set_time') . '",
+                                {
+                                    id: id,
+                                    show_id: ' . $show['id'] . ',
+                                    day: day,
+                                    value: $("#modalTime #time").val(),
+                                    premiere: $("#modalTime .ios-switch").hasClass("on")
+                                },
+                                function(json) {
+                                    if (json.success == true) {
+                                        var notice = new PNotify({
+                                            title: "Úspěch",
+                                            text: "Čas byl uložen!",
+                                            type: "success",
+                                            addclass: "click-2-close",
+                                            buttons: {
+                                                sticker: false
+                                            }
+                                        });
+                                        $.magnificPopup.close();
+                                        $("#btblTimes").bootstrapTable("refresh", {"silent": true});
+                                    }else{
+                                        $(function(){
+                                            new PNotify({
+                                                title: "Chyba",
+                                                text: "Data nebyla uložena!",
+                                                type: "error",
+                                                hide: true,
+                                                buttons: {
+                                                    sticker: true
+                                                }
+                                            });
+                                        });
+                                    }
+                                    $.magnificPopup.close();
+                                },
+                                "json"
+                            );
+                        });
+                    }
+                }
+            });
+        });
+    });'
+);
+?>
+
+<div class="row">
+    <div class="col-lg-3">
+        <div id="image">
+            <h3 class="mt-0">
+                Obrázek
+                <small class="pull-right text-muted">
+                    (<?= $setting['show_img_width'] ?>px x <?= $setting['show_img_height'] ?>px)
+                </small>
+            </h3>
+            <div class="mb-4">
+                <div class="image-outer-container d-inline-flex">
+                    <div class="image-inner-container bg-primary">
+                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $srcImage ?>" alt="">
+                        <span class="delete-button bg-danger">
+                            <i class="fa fa-trash-alt text-color-light"></i>
+                        </span>
+                        <span class="image-button bg-<?= $schemeOpposite ?>">
+                            <i class="fa fa-camera text-color-<?= $scheme ?>"></i>
+                        </span>
+                    </div>
+                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_program_show_json_upload_image') ?>" accept="image/*">
+                </div>
+            </div>
+            <div class="progress mb-3 d-none">
+                <div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0">
+                    <span class="sr-only">0%</span>
+                </div>
+            </div>
+        </div>
+        <div id="times">
+            <h3 class="mt-5">
+                Vysílací časy
+            </h3>
+            <div class="mb-4">
+                <table id="btblTimes"
+                       data-url="<?= $view->path('admin_program_show_json_get_times_list') ?>"
+                       data-toggle="table"
+                       data-search="false"
+                       data-show-columns="false"
+                       data-show-fullscreen="false"
+                       data-show-refresh="false"
+                       data-valign="middle"
+                       data-query-params="queryParams"
+                       data-sort-name="id"
+                       data-sort-order="asc"
+                       data-id-field="id"
+                       data-pagination="false"
+                       data-cookie-id-table="USER-<?= $identity['id'] ?>-showTimesTable"
+                       data-mobile-responsive="true">
+                    <thead>
+                    <tr>
+                        <th data-field="day"
+                            class="width-nowrap p-0"
+                            data-align="center">
+                            Den / Čas
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter0"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter1"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter2"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter3"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter4"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter5"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter6"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter7"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter8"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                        <th data-field="data"
+                            class="width-nowrap p-0"
+                            data-formatter="dataFormatter9"
+                            data-align="center">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" title="Čas"></i>
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+                <script>
+                    function queryParams(p) {
+                        return {
+                            show_id: $('input[name=id]').val(),
+                            limit: p.limit,
+                            offset: p.offset,
+                            search: p.search,
+                            sort: p.sort,
+                            order: p.order
+                        };
+                    }
+                    <?php for ($i = 0; $i < 10; $i++) { ?>
+                        function dataFormatter<?= $i ?>(value, row) {
+                            if (value[<?= $i ?>] !== undefined) {
+                                let time = value[<?= $i ?>].time;
+                                if (value[<?= $i ?>].premiere === '1') {
+                                    return '<span class="btnEdit text-danger" data-id="' + value[<?= $i ?>].id + '" data-premiere="' + value[<?= $i ?>].premiere + '" data-value="' + value[<?= $i ?>].time + '" data-day="' + row.day + '">' + time + '</span>';
+                                } else {
+                                    return '<span class="btnEdit" data-id="' + value[<?= $i ?>].id + '" data-premiere="' + value[<?= $i ?>].premiere + '" data-value="' + value[<?= $i ?>].time + '" data-day="' + row.day + '">' + time + '</span>';
+                                }
+                            } else {
+                                return '<i class="fa fa-fw fa-pencil-alt btnEdit text-success cur-pointer" data-day="' + row.day + '"></i>';
+                            }
+                        }
+                    <?php } ?>
+                </script>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <section class="card card-primary">
+            <header class="card-header">
+                <div class="card-actions">
+                    <span id="msgNotSaved" class="badge badge-danger d-none">
+                        Neuloženo
+                    </span>
+                </div>
+                <h2 class="card-title">
+                    Upravit pořad
+                </h2>
+            </header>
+            <?= $view->include('program/show/showForm', [
+                'setting' => $setting,
+                'categories' => $categories,
+                'show' => $show,
+                'show_id' => $show['id'],
+            ]) ?>
+        </section>
+    </div>
+</div>
+<div id="modalTime" class="zoom-anim-dialog modal-block modal-header-color modal-block-primary mfp-hide">
+    <section class="card">
+        <header class="card-header">
+            <a class="btn-close modal-dismiss pull-right" title="Zavřít">
+                <i class="fa fa-fw fa-times text-color-light"></i>
+            </a>
+            <h2 class="card-title">
+
+            </h2>
+        </header>
+        <div class="card-body">
+            <div class="modal-wrapper">
+                <div class="modal-icon">
+                    <i class="fa fa-pencil-alt"></i>
+                </div>
+                <div class="modal-text mb-3">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label class="control-label" for="time">
+                                Čas / Text
+                            </label>
+                            <input type="text" name="time" id="time" class="form-control" value="">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="control-label" for="premiere">
+                                Premiéra
+                            </label>
+                            <div class="switch switch-primary">
+                                <input type="checkbox" name="premiere" id="premiere" data-plugin-ios-switch>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="card-footer">
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <button id="btnSaveTime" class="btn btn-primary">
+                        Uložit
+                    </button>
+                    <button class="btn btn-default modal-dismiss">
+                        Zavřít
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </section>
+</div>

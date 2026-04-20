@@ -17,6 +17,12 @@ page:
 page_generated:
   resource: routes/page_generated.yaml
 
+program_show_generated:
+  resource: routes/program_show_generated.yaml
+
+program_showex_generated:
+  resource: routes/program_showex_generated.yaml
+
 admin:
   resource: routes/admin.yaml
 

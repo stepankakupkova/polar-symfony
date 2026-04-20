@@ -1,0 +1,235 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-timepicker/css/bootstrap-timepicker.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/redactor/css/redactor.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/redactor/plugin/filemanager/css/filemanager.min.css'));
+
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/bootstrap-select.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-timepicker/bootstrap-timepicker.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/js/redactor.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/counter/js/counter.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/fullscreen/js/fullscreen.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/imagemanager/js/imagemanager.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/redactor/plugin/filemanager/js/filemanager.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/ios7-switch/js/ios7-switch.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
+
+// Redactor
+$view->addInlineScript(
+    '$(".redactor").redactor({
+        lang: "' . $localeShort . '",
+        toolbarFixedTopOffset: (!$.browser.mobile)?120:30,
+        cleanOnEnter: false,
+        cleanInlineOnEnter: true,
+        removeScript: false,
+        replaceTags: false,
+        styles: false,
+        minHeight: "180px",
+        structure: true,
+        imageResizable: true,
+        imagePosition: true,
+        imageFigure: false,
+        buttonsHideOnMobile: ["redo", "undo"],
+        buttons: [
+            "html", "redo", "undo", "format", "bold", "italic", "underline", "deleted", "lists", "link", "image", "file"
+        ],
+        plugins: [
+            "counter", "fullscreen", "imagemanager", "filemanager"
+        ],
+        imageUpload: "' . $view->path('admin_program_show_json_redactor_image_upload', ['show_id' => $show_id ?? 0]) . '",
+        imageManagerJson: "' . $view->path('admin_program_show_json_redactor_image_manager', ['show_id' => $show_id ?? 0]) . '",
+        fileUpload: "' . $view->path('admin_program_show_json_redactor_file_upload', ['show_id' => $show_id ?? 0]) . '",
+        fileManagerJson: "' . $view->path('admin_program_show_json_redactor_file_manager', ['show_id' => $show_id ?? 0]) . '",
+        callbacks: {
+            image: {
+                uploaded: function(image, response)
+                {
+                    $(image).addClass("img-fluid");
+                },
+                inserted: function(image)
+                {
+                    $(image).addClass("img-fluid");
+                }
+            }
+        }
+    });'
+);
+
+// Url
+$view->addInlineScript(
+    '$("#btnGetUrl").click(function(e){
+        e.preventDefault();
+        let title = $("input[name=title]").val();
+        if (title === "") {
+            var notice = new PNotify({
+                title: "Chyba",
+                text: "Nejdříve vyplňte název!",
+                type: "error",
+                addclass: "click-2-close",
+                buttons: {
+                    sticker: false
+                }
+            });
+        } else {
+            $.post("' . $view->path('admin_program_show_json_get_url') . '",
+                {
+                    title: title
+                },
+                function(json) {
+                    if (json.success) {
+                        $("input[name=url]").val(json.url);
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nepodařilo se načíst informace o\u00a0názvu!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                    }
+                }, 
+                "json"      
+            );
+        }
+    });'
+);
+
+$form = $show ?? [];
+$formAction = $show ? $view->path('admin_program_show_edit', ['id' => $show['id']]) : $view->path('admin_program_show_add');
+$submitLabel = $show ? 'Uložit' : 'Přidat';
+$imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
+?>
+
+<form action="<?= $formAction ?>" method="post" id="frmShow" class="form-horizontal">
+    <input type="hidden" name="id" value="<?= htmlspecialchars($form['id'] ?? '') ?>">
+    <input type="hidden" name="image" value="<?= htmlspecialchars($imageValue) ?>">
+    <div class="card-body">
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2">Status</label>
+            <div class="col-sm-1">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="status" value="0">
+                    <input type="checkbox" name="status" value="1" data-plugin-ios-switch<?= !empty($form['status']) ? ' checked' : '' ?>>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label text-sm-right pt-2">Zobrazit v archivu</label>
+            <div class="col-sm-1">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="show_in_archive" value="0">
+                    <input type="checkbox" name="show_in_archive" value="1" data-plugin-ios-switch<?= !empty($form['show_in_archive']) ? ' checked' : '' ?>>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label text-sm-right pt-2">Video části</label>
+            <div class="col-sm-1">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="video_parts" value="0">
+                    <input type="checkbox" name="video_parts" value="1" data-plugin-ios-switch<?= !empty($form['video_parts']) ? ' checked' : '' ?>>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2">Zobrazit datum a čas</label>
+            <div class="col-sm-1">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="show_datetime" value="0">
+                    <input type="checkbox" name="show_datetime" value="1" data-plugin-ios-switch<?= !empty($form['show_datetime']) ? ' checked' : '' ?>>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label text-sm-right pt-2">Povolit stahování</label>
+            <div class="col-sm-1">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="download" value="0">
+                    <input type="checkbox" name="download" value="1" data-plugin-ios-switch<?= !empty($form['download']) ? ' checked' : '' ?>>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label text-sm-right pt-2">Newton export</label>
+            <div class="col-sm-1">
+                <div class="switch switch-primary">
+                    <input type="hidden" name="newton" value="0">
+                    <input type="checkbox" name="newton" value="1" data-plugin-ios-switch<?= !empty($form['newton']) ? ' checked' : '' ?>>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Kategorie</label>
+            <div class="col-sm-9">
+                <select name="category_id" class="form-control selectpicker show-tick" required>
+                    <option value="">---</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= $cat['id'] ?>"<?= (string)($form['category_id'] ?? '') === (string)$cat['id'] ? ' selected' : '' ?>><?= htmlspecialchars($cat['title']) ?></option>
+                    <?php endforeach ?>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Název</label>
+            <div class="col-sm-9">
+                <input type="text" name="title" class="form-control" placeholder="required" required
+                       maxlength="254" data-plugin-maxlength data-rule-rangeLength="[0, 254]"
+                       value="<?= htmlspecialchars($form['title'] ?? '') ?>">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">URL adresa</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input type="text" name="url" class="form-control" placeholder="required" required
+                           maxlength="254" data-plugin-maxlength data-rule-rangeLength="[0, 254]"
+                           value="<?= htmlspecialchars($form['url'] ?? '') ?>">
+                    <span class="input-group-append">
+                        <button id="btnGetUrl" class="btn btn-primary" type="button" data-toggle="tooltip" data-placement="top" title="Generovat URL adresu z&nbsp;názvu">
+                            <i class="fa fa-fw fa-magic"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2">Krátký popis</label>
+            <div class="col-sm-9">
+                <textarea name="short_description" class="form-control" placeholder="optional"
+                          rows="3" data-plugin-textarea-autosize><?= htmlspecialchars($form['short_description'] ?? '') ?></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2">Obsah</label>
+            <div class="col-sm-9">
+                <textarea name="content" class="form-control redactor" placeholder="optional"
+                          rows="10"><?= htmlspecialchars($form['content'] ?? '') ?></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Klíčová slova <span class="text-muted">(SEO)</span></label>
+            <div class="col-sm-9">
+                <input type="text" name="seo_keywords" class="form-control" placeholder="required" required
+                       maxlength="100" data-plugin-maxlength data-rule-rangeLength="[0, 100]"
+                       value="<?= htmlspecialchars($form['seo_keywords'] ?? '') ?>">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Popis <span class="text-muted">(SEO)</span></label>
+            <div class="col-sm-9">
+                <input type="text" name="seo_description" class="form-control" placeholder="required" required
+                       maxlength="200" data-plugin-maxlength data-rule-rangeLength="[0, 200]"
+                       value="<?= htmlspecialchars($form['seo_description'] ?? '') ?>">
+            </div>
+        </div>
+    </div>
+    <footer class="card-footer text-right">
+        <button type="submit" class="btn btn-primary"><?= $submitLabel ?></button>
+        <a href="<?= $view->path('admin_program_show') ?>" class="btn btn-default">Zrušit</a>
+    </footer>
+</form>

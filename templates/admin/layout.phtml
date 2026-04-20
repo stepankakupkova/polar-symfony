@@ -169,6 +169,31 @@ $identity = $identity ?? null;
     <script><?= $script ?></script>
 <?php } ?>
 <script src="<?= $view->asset('js/admin/custom.min.js?ver=0.0.3') ?>"></script>
+<script>
+// Změna schématu - přepnutí CSS tříd na image widgetech
+$("#btnThemeChange").on("click", function (event) {
+    event.preventDefault();
+    let scheme = "dark";
+    let html = $("html");
+
+    if (html.hasClass("dark")) {
+        scheme = "light";
+    }
+    
+    let image = $(".image-inner-container img");
+    let btnImage = $(".image-button");
+    
+    if (scheme === "dark") {
+        image.removeClass("border-color-light").addClass("border-color-dark");
+        btnImage.removeClass("bg-dark").addClass("bg-light");
+        btnImage.find("i").removeClass("text-color-light").addClass("text-color-dark");
+    } else {
+        image.removeClass("border-color-dark").addClass("border-color-light");
+        btnImage.removeClass("bg-light").addClass("bg-dark");
+        btnImage.find("i").removeClass("text-color-dark").addClass("text-color-light");
+    }
+});
+</script>
 <script src="<?= $view->asset('vendor/porto-admin/js/theme.init.min.js') ?>"></script>
 </body>
 </html>

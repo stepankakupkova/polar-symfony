@@ -1,0 +1,164 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var array $video */
+$video = $video;
+
+$view->addHeadLink($view->asset('vendor/admin/video-js/video-js.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/file-upload/css/file-upload.css'));
+
+$view->addBodyScript($view->asset('vendor/admin/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/iframe-transport.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/file-upload.js'));
+
+// Vytvoření náhledu
+$view->addInlineScript(
+    'var player = videojs("video");
+    $("#createPreview").click(function(){
+        var currentPos = Math.round(player.currentTime());
+        player.pause();
+        $.post("' . $view->path('admin_program_video_json_create_preview') . '",
+            {
+                video_id: ' . $video['id'] . ',
+                sec: currentPos
+            },
+            function(json) {
+                if (json.success) {
+                    $("#imgPreview").html("<img class=\"img-fluid\" src=\"" + json.preview + "?" + (Math.floor(Math.random() * 999) + 1) + "\" alt=\"Náhled\" />");
+                } else {
+                    var notice = new PNotify({
+                        title: "Chyba",
+                        text: "Nelze vytvořit náhled!",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                }
+            }, 
+            "json"      
+        );
+    });'
+);
+
+// nahrání náhledu z počítače
+$view->addInlineScript(
+    '		
+    $("#btnVideoPreviewUpload").fileupload({
+        dataType: "json",
+        singleFileUploads: true,
+        add: function (e, data) {
+            data.url = "' . $view->path('admin_program_video_json_upload_preview') . '";
+            data.formData = { video_id: ' . $video['id'] . ' };
+            data.submit();
+        },
+        done: function (e, data) {
+            if (data.result.error) {
+                $(function(){
+                    new PNotify({
+                        title: data.result.message,
+                        text: data.result.description,
+                        type: "error",
+                        hide: true,
+                        buttons: {
+                            sticker: true
+                        }
+                    });
+                });
+                return; // dál už nerenderujeme náhled
+            }
+            $("#btnVideoPreviewUpload").button("reset");
+            $("#imgPreview").html("<img class=\"img-fluid\" src=\"" + data.result.preview + "?" + (Math.floor(Math.random() * 999) + 1) + "\" alt=\"Náhled\" />");
+        },
+        fail: function (e, data) {
+            $(function(){
+                new PNotify({
+                    title: "Chyba",
+                    text: "Nelze nahrát náhled!",
+                    type: "error",
+                    hide: true,
+                    buttons: {
+                        sticker: true
+                    }
+                });
+            });
+        }
+    });
+    '
+);
+?>
+
+<div class="row">
+    <div class="col-lg-3">
+
+    </div>
+    <div class="col-lg-9">
+        <section class="card card-primary">
+            <header class="card-header">
+                <div class="card-actions">
+                    <span id="msgNotSaved" class="badge badge-danger d-none">
+                        Neuloženo
+                    </span>
+                </div>
+                <h2 class="card-title">
+                    Upravit video
+                </h2>
+            </header>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>
+                            Video
+                        </h4>
+                        <video id="video" class="video-js vjs-fluid vjs-16-9" controls preload="auto" data-setup="{}">
+                            <source src="<?= $LIGHT_URL . 'porady/publikovano/' . $video['path'] . '/' . $video['name'] ?>_hq.mp4" type="video/mp4"/>
+                            <p class="vjs-no-js">
+                                Váš prohlížeč nepodporuje HTML video.
+                            </p>
+                        </video>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>
+                            Náhled
+                        </h4>
+                        <div id="imgPreview">
+                            <?php if (file_exists($PUBLIC_PATH . '/data/program/thumbs/' . $video['name'] . '.jpg')) { ?>
+                                <img class="img-fluid" src="/data/program/thumbs/<?= $video['name'] ?>.jpg" alt="Náhled"/>
+                            <?php } else { ?>
+                                <div class="well danger">
+                                    <h4>
+                                        <i class="fa fa-fw fa-times-circle"></i>
+                                        Náhled ještě nebyl vytvořen.
+                                    </h4>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-right">
+                <button id="createPreview" class="btn btn-success">
+                    Vytvořit náhled z videa
+                </button>
+				<span class="btn btn-primary btn-md fileinput-button">
+					<i class="fa fa-upload mr-xs"></i>
+					<span>
+						Nahrát náhled z počítače
+					</span>
+					<input id="btnVideoPreviewUpload" type="file" name="file" accept="image/jpg, image/jpeg, image/pjpeg">
+				</span>
+                <a href="<?= $view->path('admin_program_video') ?>" class="btn btn-default">
+                    Storno
+                </a>
+            </div>
+        </section>
+    </div>
+</div>

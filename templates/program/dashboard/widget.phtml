@@ -1,0 +1,164 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+// Czech plural helper
+$plural = function (array $forms, int $count): string {
+    if ($count === 1) return $forms[0];
+    if ($count >= 2 && $count <= 4) return $forms[1];
+    return $forms[2];
+};
+
+$version = '0.0.1';
+
+?>
+
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-list-alt"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">
+                            Program
+                        </h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount">
+                                <?= number_format($countProgram, 0, ',', ' ') ?>
+                            </strong>
+                            <span class="text-primary">
+                                (<?= number_format($countProgramPremiere, 0, ',', ' ') ?> <?= $plural(['premiéra', 'premiéry', 'premiér'], $countProgramPremiere) ?>)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span class="pull-left" data-toggle="tooltip" data-placement="right" title="Verze">
+                            <?= $version ?>
+                        </span>
+                        <a href="<?= $view->path('admin_program_list') ?>" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-video"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">
+                            Videa
+                        </h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount">
+                                <?= number_format($countVideo, 0, ',', ' ') ?>
+                            </strong>
+                            <span class="text-primary">
+
+                            </span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span class="pull-left" data-toggle="tooltip" data-placement="right" title="Verze">
+                            <?= $version ?>
+                        </span>
+                        <a href="#" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-star"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">
+                            Pořady
+                        </h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount">
+                                <?= number_format($countShow, 0, ',', ' ') ?>
+                            </strong>
+                            <span class="text-primary">
+                                (<?= number_format($countShowActive, 0, ',', ' ') ?> <?= $plural(['aktivní', 'aktivní', 'aktivních'], $countShowActive) ?>)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span class="pull-left" data-toggle="tooltip" data-placement="right" title="Verze">
+                            <?= $version ?>
+                        </span>
+                        <a href="#" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-file-code"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">
+                            Newton
+                        </h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount">
+
+                            </strong>
+                            <span class="text-primary">
+                                (Export pořadů)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <span class="pull-left" data-toggle="tooltip" data-placement="right" title="Verze">
+                            <?= $version ?>
+                        </span>
+                        <a href="#" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -36,5 +36,6 @@ class LayoutSubscriber implements EventSubscriberInterface
         $this->renderer->addGlobal('footerNumbers', $this->settingRepository->fetchFooterNumbers());
         $this->renderer->addGlobal('GOOGLE_ANALYTICS_ID', $this->GOOGLE_ANALYTICS_ID);
         $this->renderer->addGlobal('locale', 'cs_CZ');
+        $this->renderer->addGlobal('localeShort', 'cs');
     }
 }

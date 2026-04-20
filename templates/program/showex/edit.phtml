@@ -7,42 +7,22 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$view->addHeadLink('stylesheet', '/vendor/admin/file-upload/css/file-upload.css');
-$view->addBodyScript('/vendor/admin/file-upload/js/ui-widget.js');
-$view->addBodyScript('/vendor/admin/file-upload/js/iframe-transport.js');
-$view->addBodyScript('/vendor/admin/file-upload/js/file-upload.js');
+$srcImage = $view->asset('data/mimoradne/show/!default-show.png') . '?ver=' . date('YmdHis');
+if (!empty($show['image'])) {
+    $srcImage = $view->asset($show['image']);
+}
 
-// Změna schématu
-$view->addInlineScript(
-    '$("#btnThemeChange").on("click", function (event) {
-        event.preventDefault();
-        let scheme = "dark";
-        let html = $("html");
+$view->addHeadLink($view->asset('vendor/admin/file-upload/css/file-upload.css'));
 
-        if (html.hasClass("dark")) {
-            scheme = "light";
-        }
-        
-        let image = $(".image-inner-container img");
-        let btnImage = $(".image-button");
-        
-        if (scheme === "dark") {
-            image.removeClass("border-color-light").addClass("border-color-dark");
-            btnImage.removeClass("bg-dark").addClass("bg-light");
-            btnImage.find("i").removeClass("text-color-light").addClass("text-color-dark");
-        } else {
-            image.removeClass("border-color-dark").addClass("border-color-light");
-            btnImage.removeClass("bg-light").addClass("bg-dark");
-            btnImage.find("i").removeClass("text-color-dark").addClass("text-color-light");
-        }
-    });'
-);
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/iframe-transport.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/file-upload.js'));
 
 // Nahrání obrázku
 $view->addInlineScript(
     '$("#fileupload").fileupload({
         formData: {
-            page_id: null
+            show_id: ' . $show['id'] . '
         },
         dropZone: "#image",
         dataType: "json",
@@ -62,14 +42,14 @@ $view->addInlineScript(
             $("input[name=image]").val(data.result.url);
             if (data.result.error) {
                 new PNotify({
-                    title: "Obrázek stránky",
+                    title: "Obrázek pořadu",
                     text: data.result.error,
                     type: "error"
                 });
             } else {
                 new PNotify({
-                    title: "Obrázek stránky",
-                    text: "Obrázek stránky byl úspěšně nahrán",
+                    title: "Obrázek pořadu",
+                    text: "Obrázek pořadu byl úspěšně nahrán",
                     type: "success"
                 });
             }
@@ -78,8 +58,8 @@ $view->addInlineScript(
             $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
             $("#image .progress").addClass("d-none");
             new PNotify({
-                title: "Obrázek stránky",
-                text: "Obrázek stránky nebyl úspěšně nahrán",
+                title: "Obrázek pořadu",
+                text: "Obrázek pořadu se nepodařilo nahrát",
                 type: "error"
             });
         }
@@ -92,6 +72,44 @@ $view->addInlineScript(
         $("#fileupload").click();
     });'
 );
+
+// Smazání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .delete-button").click(function(e){
+        $.post("' . $view->path('admin_program_showex_json_set_default_image') . '",
+            {
+                show_id: ' . $show['id'] . ',
+                field: "image"
+            },
+            function(json) {
+                if (json.success) {
+                    var notice = new PNotify({
+                        title: "Úspěch",
+                        text: "Obrázek pořadu byl nastaven na výchozí",
+                        type: "success",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                    $("input[name=image]").val(json.url);
+                    $("#image .image-outer-container img").attr("src", "/" + json.url);
+                } else {
+                    var notice = new PNotify({
+                        title: "Chyba",
+                        text: "Nelze nastavit obrázek pořadu na výchozí",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                }
+            },
+            "json"
+        );
+    });'
+);
 ?>
 
 <div class="row">
@@ -100,18 +118,21 @@ $view->addInlineScript(
             <h3 class="mt-0">
                 Obrázek
                 <small class="pull-right text-muted">
-                    (<?= $setting['img_width'] ?>px x <?= $setting['img_height'] ?>px)
+                    (<?= $setting['show_img_width'] ?>px x <?= $setting['show_img_height'] ?>px)
                 </small>
             </h3>
             <div class="mb-4">
                 <div class="image-outer-container d-inline-flex">
                     <div class="image-inner-container bg-primary">
-                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $view->asset('data/page/!default-page.png') . '?ver=' . date('YmdHis') ?>" alt="">
+                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $srcImage ?>" alt="">
+                        <span class="delete-button bg-danger">
+                            <i class="fa fa-trash-alt text-color-light"></i>
+                        </span>
                         <span class="image-button bg-<?= $schemeOpposite ?>">
                             <i class="fa fa-camera text-color-<?= $scheme ?>"></i>
                         </span>
                     </div>
-                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_page_upload_image') ?>" accept="image/*">
+                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_program_showex_json_upload_image') ?>" accept="image/*">
                 </div>
             </div>
             <div class="progress mb-3 d-none">
@@ -130,17 +151,14 @@ $view->addInlineScript(
                     </span>
                 </div>
                 <h2 class="card-title">
-                    Přidat stránku
+                    Upravit mimořádný pořad
                 </h2>
             </header>
-            <?= $view->include('page/admin/pageForm', [
-                'view' => $view,
-                'post' => $post,
-                'errors' => $errors,
-                'lang' => $lang,
-                'page_id' => 0,
-                'submitLabel' => 'Uložit',
-                'submitClass' => 'btn-primary',
+            <?= $view->include('program/showex/showexForm', [
+                'setting' => $setting,
+                'categories' => $categories,
+                'show' => $show,
+                'show_id' => $show['id'],
             ]) ?>
         </section>
     </div>

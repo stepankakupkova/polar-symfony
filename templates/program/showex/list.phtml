@@ -1,0 +1,291 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/extension/reorder-rows/css/reorder-rows.min.css'));
+
+$view->addBodyScript($view->asset('vendor/admin/table-dnd/js/table-dnd.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/reorder-rows/js/reorder-rows.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
+
+// Zobrazení náhledu
+$view->addInlineScript(
+    '$("#btblShow").on("post-body.bs.table", function (e, data) {
+        $(".image-popup-no-margins").magnificPopup({
+            type: "image",
+            image: {
+                verticalFit: true
+            },
+            zoom: {
+                enabled: true,
+                duration: 300
+            }
+        });
+    });'
+);
+
+// Smazání pořadu
+$view->addInlineScript(
+    '$("#btblShow").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnDeleteShow").unbind("click").bind("click", function() {
+            var id = $(this).data("video-id");
+            $.post("' . $view->path('admin_program_showex_json_get_show') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        $("#modalDanger .card-title").html("Odstranit mimořádný pořad");
+                        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat pořad?<br><strong>\"" + json.show.title + "\"</strong>" );
+                        $("#modalDanger .modal-text p").html("Všechny závislosti budou odstraněny. Tuto akci nelze vrátit zpět!");
+                        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+                        
+                        $.magnificPopup.open({
+                            items: {src: "#modalDanger"},
+                            type: "inline",
+                            fixedContentPos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_program_showex_json_delete_show') . '",
+                                            {
+                                                id: id
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěch",
+                                                        text: "Pořad byl odstraněn!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblShow").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Nelze odstranit pořad!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            }, 
+                                            "json"      
+                                        );
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst informace o pořadu!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblShow").bootstrapTable("refresh", {"silent": true});
+                    }
+                }, 
+                "json"      
+            );
+        });
+    });'
+);
+
+// Řazení pořadů
+$view->addInlineScript(
+    '$("#btblShow").on("reorder-row.bs.table", function (e, data) {
+        $.post("' . $view->path('admin_program_showex_json_set_order') . '",
+            {
+                data: data
+            },
+            function(json) {
+                var notice = new PNotify({
+                    title: "Úspěch",
+                    text: "Pořadí pořadů bylo změněno!",
+                    type: "success",
+                    addclass: "click-2-close",
+                    buttons: {
+                        sticker: false
+                    }
+                });
+                $("#btblShow").bootstrapTable("refresh", {silent: true});
+            },  
+            "json"      
+        );
+    });'
+);
+?>
+<div class="tabs">
+    <ul class="nav nav-tabs nav-justified">
+        <li class="nav-item">
+            <a class="nav-link" href="<?= $view->path('admin_program_show') ?>">
+                Pořady
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="#shows" data-toggle="tab">
+                Mimořádné pořady
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div id="shows" class="tab-pane active">
+            <div id="toolbar" class="btn-group">
+                <a href="<?= $view->path('admin_program_showex_add') ?>" class="btn btn-primary">
+                    <i class="fa fa-fw fa-plus"></i>
+                    <span class="hidden-sm hidden-xs">
+                        Přidat pořad
+                    </span>
+                </a>
+            </div>
+            <table id="btblShow"
+                   data-url="<?= $view->path('admin_program_showex_json_get_list') ?>"
+                   data-toggle="table"
+                   data-page-list="[25, 50, 100, 200]"
+                   data-page-size="200"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-valign="middle"
+                   data-sort-name="order"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar"
+                   data-cookie-id-table="USER-<?= $identity->getUserIdentifier() ?>-showexTable"
+                   data-mobile-responsive="true"
+                   data-use-row-attr-func="true"
+                   data-reorderable-rows="true"
+                   data-drag-handle=">tbody>tr>td.rank">
+                <thead>
+                <tr>
+                    <th class="text-nowrap width-nowrap"
+                        data-formatter="optionsFormatter"
+                        data-align="center">
+                        <i class="fa fa-cogs" data-toggle="tooltip" data-placement="right" title="Možnosti"></i>
+                        <span class="d-sm-none">
+                            Možnosti
+                        </span>
+                    </th>
+                    <th data-field="id"
+                        class="text-nowrap width-nowrap"
+                        data-sortable="true"
+                        data-visible="false">
+                        ID
+                    </th>
+                    <th data-field="order"
+                        class="text-nowrap width-nowrap cur-rank rank"
+                        data-formatter="rankFormatter"
+                        data-sortable="true"
+                        data-align="center">
+                        <i class="fa fa-sort" data-toggle="tooltip" data-placement="right" title="Pořadí"></i>
+                        <span class="d-sm-none">
+                            Pořadí
+                        </span>
+                    </th>
+                    <th data-field="image"
+                        class="width-nowrap p-0"
+                        data-formatter="imageFormatter"
+                        data-align="center">
+                        <i class="fa fa-image" data-toggle="tooltip" data-placement="right" title="Obrázek"></i>
+                        <span class="d-sm-none">
+                            Obrázek
+                        </span>
+                    </th>
+                    <th data-field="category_name"
+                        class="width-nowrap"
+                        data-sortable="true"
+                        data-align="center">
+                        Kategorie
+                    </th>
+                    <th data-field="title"
+                        class="text-truncate"
+                        data-sortable="true">
+                        Pořad
+                    </th>
+                    <th data-field="status"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                        <i class="fa fa-eye" data-toggle="tooltip" data-placement="right" title="Status"></i>
+                        <span class="d-sm-none">
+                            Status
+                        </span>
+                    </th>
+                </tr>
+                </thead>
+            </table>
+
+            <script>
+                function optionsFormatter(value, row) {
+                    return '<div class="btn-group pb-sm-0 pb-2">' +
+                        '<a href="<?= $view->path('admin_program_showex_edit', ['id' => '']) ?>' + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +
+                        '<button data-video-id="' + row.id + '" class="btblBtnDeleteShow btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>' +
+                        '</div>';
+                }
+
+                function rankFormatter(value) {
+                    return value + ' <i class="fa fa-fw fa-arrows-alt-v ml-1"></i>';
+                }
+
+                function imageFormatter(value, row) {
+                    if (value) {
+                        return '<a class="image-popup-no-margins cur-zoom-in" href="/' + value + '">' +
+                            '<img src="/' + value + '" height="48" alt="" />' +
+                            '</a>';
+                    }
+                    return '';
+                }
+
+                function enableFormatter(value) {
+                    let icon = 'fa fa-fw fa-lg';
+                    let color = 'text-success';
+                    let text = '';
+                    switch (value) {
+                        case true:
+                            icon = 'fa fa-fw fa-lg fa-check-circle';
+                            color = 'text-success';
+                            text = 'Aktivní';
+                            break;
+                        case false:
+                            icon = 'fa fa-fw fa-lg fa-times-circle';
+                            color = 'text-danger';
+                            text = 'Neaktivní';
+                            break;
+                    }
+                    return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+                }
+            </script>
+        </div>
+    </div>
+</div>
+
+<?= $view->include('admin/modal/danger') ?>

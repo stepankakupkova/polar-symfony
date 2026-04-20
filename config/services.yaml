@@ -12,6 +12,7 @@ parameters:
     app.LIGHT_URL: 'https://light.polar.cz/videa/polar/'
     app.LIGHT_PATH_WITHOUT_HTTPS: '/data_webytv/dp/polar/'
     app.LIGHT_URL_WITHOUT_HTTPS: 'http://plainvod.polar.cz/videa/polar/'
+    app.LIGHT_PATH: '%env(LIGHT_PATH)%'
     app.GOOGLE_ANALYTICS_ID: '%env(GOOGLE_ANALYTICS_ID)%'
     app.GOOGLE_MAP_KEY: '%env(GOOGLE_MAP_KEY)%'
 
@@ -93,6 +94,51 @@ services:
         tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Web\:
+        resource: '../src/Program/Controller/Web/'
+        tags: ['controller.service_arguments']
+
+    App\Program\Controller\Admin\:
+        resource: '../src/Program/Controller/Admin/'
+        tags: ['controller.service_arguments']
+
+    App\Program\Controller\Admin\SettingController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Admin\ShowListController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Admin\ShowWriteController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Admin\ShowexListController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Admin\ShowexWriteController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Admin\VideoWriteController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+            $LIGHT_PATH: '%app.LIGHT_PATH%'
+            $LIGHT_URL: '%app.LIGHT_URL%'
+
+    App\Program\Controller\Admin\ProgramWriteController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+            $LIGHT_URL: '%app.LIGHT_URL%'
+
+    App\Program\Controller\Admin\VideoexWriteController:
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+            $LIGHT_PATH: '%app.LIGHT_PATH%'
+            $LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Application\View\PhtmlRenderer:
         arguments:

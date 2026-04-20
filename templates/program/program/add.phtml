@@ -1,0 +1,39 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+?>
+
+<div class="row">
+    <div class="col-lg-3">
+
+    </div>
+    <div class="col-lg-9">
+        <section class="card card-primary">
+            <header class="card-header">
+                <div class="card-actions">
+                    <span id="msgNotSaved" class="badge badge-danger d-none">
+                        Neuloženo
+                    </span>
+                </div>
+                <h2 class="card-title">
+                    Přidat program
+                </h2>
+            </header>
+            <?= $view->include('program/program/programForm', [
+                'form' => $form,
+                'errors' => $errors,
+                'videoOptions' => $videoOptions,
+                'showOptions' => $showOptions,
+                'formAction' => $view->path('admin_program_add'),
+                'submitLabel' => 'Uložit',
+                'submitClass' => 'btn-primary',
+            ]) ?>
+        </section>
+    </div>
+</div>

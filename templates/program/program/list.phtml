@@ -1,0 +1,249 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
+
+$view->addInlineScript(
+    '$("#btblProgram").on("post-body.bs.table", function (e, data) {
+        // Zobrazení náhledu
+        $(".image-popup-no-margins").magnificPopup({
+            type: "image",
+            image: {
+                verticalFit: true
+            },
+            zoom: {
+                enabled: true,
+                duration: 300
+            }
+        });
+        // Smazání programu
+        $(".btblBtnDeleteProgram").unbind("click").bind("click", function() {
+            var id = $(this).data("program-id");
+            $.post("' . $view->path('admin_program_json_get_program') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        $("#modalDanger .card-title").html("Odstranit program");
+                        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat tento program?<br><strong>\"" + json.program.title + "\"</strong> <small>(" + json.program.short_description + ")</small>" );
+                        $("#modalDanger .modal-text p").html("Všechny závislosti budou smazány. Tato akce se nedá vrátit!");
+                        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+                        
+                        $.magnificPopup.open({
+                            items: {src: "#modalDanger"},
+                            type: "inline",
+                            fixedContentPos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_program_json_delete_program') . '",
+                                            {
+                                                id: id
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěšné",
+                                                        text: "Program byl odstraněn!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblProgram").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Nelze odstranit program!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            }, 
+                                            "json"      
+                                        );
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nepodařilo se načíst informace o\u00a0programu!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblProgram").bootstrapTable("refresh", {"silent": true});
+                    }
+                }, 
+                "json"      
+            );
+        });
+    });'
+);
+?>
+    <div id="toolbar" class="btn-group">
+        <a href="<?= $view->path('admin_program_add') ?>" class="btn btn-primary">
+            <i class="fa fa-fw fa-plus"></i>
+            <span class="hidden-sm hidden-xs">
+                Přidat program
+            </span>
+        </a>
+    </div>
+    <table id="btblProgram"
+           data-url="<?= $view->path('admin_program_json_get_list') ?>"
+           data-toggle="table"
+           data-show-search-button="true"
+           data-show-search-clear-button="true"
+           data-valign="middle"
+           data-sort-name="time"
+           data-sort-order="desc"
+           data-toolbar="#toolbar"
+           data-cookie-id-table="USER-<?= $identity->getId() ?>-programTable"
+           data-mobile-responsive="true">
+        <thead>
+        <tr>
+            <th class="text-nowrap width-nowrap"
+                data-formatter="optionsFormatter"
+                data-align="center">
+                <i class="fa fa-cogs" data-toggle="tooltip" data-placement="right" title="Možnosti"></i>
+                <span class="d-sm-none">
+                        Možnosti
+                    </span>
+            </th>
+            <th data-field="id"
+                class="text-nowrap width-nowrap"
+                data-sortable="true"
+                data-visible="false">
+                ID
+            </th>
+            <th data-field="premiere"
+                class="text-nowrap width-nowrap"
+                data-formatter="premiereFormatter"
+                data-sortable="true"
+                data-align="center">
+                <i class="fa fa-toggle-on pb-sm-0 pb-2" data-toggle="tooltip" data-placement="right" title="Premiéra"></i>
+                <span class="d-sm-none">
+                        Premiéra
+                    </span>
+            </th>
+            <th data-field="video_name"
+                class="width-nowrap p-0"
+                data-formatter="imageFormatter"
+                data-align="center">
+                <i class="fa fa-video" data-toggle="tooltip" data-placement="right" title="Video"></i>
+                <span class="d-sm-none">
+                        Video
+                    </span>
+            </th>
+            <th data-field="time"
+                class="text-nowrap width-nowrap"
+                data-formatter="datetimeFormatter"
+                data-sortable="true">
+                Čas
+            </th>
+            <th data-field="title"
+                class="text-truncate"
+                data-sortable="true">
+                název
+            </th>
+            <th data-field="short_description"
+                class=""
+                data-sortable="true">
+                Krátký popis
+            </th>
+            <th data-field="video_showed"
+                class="text-nowrap width-nowrap"
+                data-formatter="showedFormatter"
+                data-sortable="true">
+                Zobrazeno
+            </th>
+        </tr>
+        </thead>
+    </table>
+
+    <script>
+        function optionsFormatter(value, row) {
+            return '<div class="btn-group pb-sm-0 pb-2">' +
+                '<a href="<?= $view->path('admin_program_edit') ?>/' + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +
+                '<button data-program-id="' + row.id + '" class="btblBtnDeleteProgram btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>' +
+                '</div>';
+        }
+
+        function premiereFormatter(value) {
+            let icon = 'fa fa-fw fa-lg';
+            let color = 'text-success';
+            let text = '';
+            switch (value) {
+                case true:
+                    icon = 'fa fa-fw fa-lg fa-check-circle';
+                    color = 'text-success';
+                    text = 'Premiéra';
+                    break;
+                case false:
+                    icon = 'fa fa-fw fa-lg fa-times-circle';
+                    color = 'text-danger';
+                    text = 'Repríza';
+                    break;
+            }
+            return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+        }
+
+        function imageFormatter(value) {
+            if (value) {
+                let randNum = Math.floor(Math.random() * 999) + 1;
+                return '<a class="image-popup-no-margins cur-zoom-in" href="/data/program/thumbs/' + value + '.jpg?' + randNum + '">' +
+                    '<img src="/data/program/thumbs/' + value + '.jpg?' + randNum + '" height="40" alt="" />' +
+                    '</a>';
+            }
+            return '';
+        }
+
+        function datetimeFormatter(value) {
+            if (value) {
+                return moment(value).format('LLLL');
+            }
+            return null;
+        }
+
+        function showedFormatter(value) {
+            if (value) {
+                return number_format(value, 0, ',', ' ') + " x";
+            } else {
+                return "0 x";
+            }
+        }
+    </script>
+
+<?= $view->include('admin/modal/danger') ?>

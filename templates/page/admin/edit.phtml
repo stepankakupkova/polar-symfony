@@ -7,9 +7,6 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$scheme = $scheme ?? 'dark';
-$schemeOpposite = $scheme === 'dark' ? 'light' : 'dark';
-
 $srcImage = $view->asset('data/page/!default-page.png') . '?ver=' . date('YmdHis');
 $imageValue = $post['image'] ?? null;
 if ($imageValue) {

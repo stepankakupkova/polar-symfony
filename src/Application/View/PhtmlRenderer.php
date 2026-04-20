@@ -54,6 +54,10 @@ final class PhtmlRenderer
 	{
 		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->basePath);
 
+		// Scheme
+		$params['scheme'] = $params['scheme'] ?? 'dark';
+		$params['schemeOpposite'] = $params['scheme'] === 'dark' ? 'light' : 'dark';
+
 		// Flash messages → PNotify inline scripty (jako polar InlineScriptPlugin)
 		foreach ($this->flashMessenger->getMessages() as $type => $flashes) {
 			foreach ($flashes as $flash) {
@@ -73,7 +77,7 @@ final class PhtmlRenderer
 
 		$content = $this->render($template, $params, $sharedView);
 		$layoutParams = ['content' => $content];
-		foreach (['identity', 'scheme', 'pageTitle'] as $key) {
+		foreach (['identity', 'scheme', 'schemeOpposite', 'pageTitle'] as $key) {
 			if (isset($params[$key])) {
 				$layoutParams[$key] = $params[$key];
 			}

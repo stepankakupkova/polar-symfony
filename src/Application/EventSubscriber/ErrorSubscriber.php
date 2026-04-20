@@ -55,7 +55,7 @@ class ErrorSubscriber implements EventSubscriberInterface
 		// Renderování šablony
 		$displayExceptions = ($this->environment === 'dev');
 
-		$template = $statusCode === 404 ? 'error/404' : 'error/500';
+		$template = $statusCode === 404 ? 'application/error/404' : 'application/error/500';
 
 		try {
 			$html = $this->renderer->renderWithLayout($template, [

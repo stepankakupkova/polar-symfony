@@ -58,7 +58,7 @@ class FatalErrorHandler implements EventSubscriberInterface
 				// DB může být nedostupná při fatální chybě
 			}
 
-			$fatalTemplatePath = $templatesDir . '/error/fatal.phtml';
+			$fatalTemplatePath = $templatesDir . '/application/error/fatal.phtml';
 
 			if (is_file($fatalTemplatePath)) {
 				$body = file_get_contents($fatalTemplatePath);

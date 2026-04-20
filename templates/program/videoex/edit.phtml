@@ -1,0 +1,630 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink($view->asset('vendor/admin/video-js/video-js.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink($view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
+
+$view->addBodyScript($view->asset('vendor/admin/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/bootstrap-select.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
+
+// Vytvoření náhledu
+$view->addInlineScript(
+    'var player = videojs("video");
+    $("#createPreview").click(function(){
+        var currentPos = Math.round(player.currentTime());
+        player.pause();
+        $.post("' . $view->path('admin_program_videoex_json_create_preview') . '",
+            {
+                video_id: ' . $video['id'] . ',
+                sec: currentPos
+            },
+            function(json) {
+                if (json.success) {
+                    $("#imgPreview").html("<img class=\"img-fluid\" src=\"" + json.preview + "?" + (Math.floor(Math.random() * 999) + 1) + "\" alt=\"Náhled\" />");
+                } else {
+                    var notice = new PNotify({
+                        title: "Chyba",
+                        text: "Nelze vytvořit náhled!",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                }
+            }, 
+            "json"      
+        );
+    });'
+);
+
+// Vytvoření části videa
+$view->addInlineScript(
+    'var btn = $("#btnAddPart");
+    var modal = $("#modalPart");
+    modal.find(".card-title").html("Přidat část");
+    $("#slider").slider({
+        range: true,
+        values: [0, moment.duration("' . $video['duration'] . '").asSeconds()],
+        min: 0,
+        max: moment.duration("' . $video['duration'] . '").asSeconds(),
+        step: 1,
+        slide: function(event, ui) {
+            var sec_num = parseInt(ui.values[0], 10);
+            var time1 = moment.utc(sec_num * 1000).format("HH:mm:ss");
+            sec_num = parseInt(ui.values[1], 10);
+            var time2 = moment.utc(sec_num * 1000).format("HH:mm:ss");
+            $("#time").html(time1 + " - " + time2);
+            $(".part-from-slider-value").val(time1);
+            $(".part-to-slider-value").val(time2);
+        }
+    });
+    $("#time").html("00:00:00 - ' . $video['duration'] . '");
+    $(".part-from-slider-value").val("00:00:00");
+    $(".part-to-slider-value").val("' . $video['duration'] . '");
+    $(".part-from-slider-value, .part-to-slider-value").on("change", function(e) {
+        var partFromSliderValue = $(".part-from-slider-value").val();
+        var partToSliderValue = $(".part-to-slider-value").val();
+        $("#time").html(partFromSliderValue + " - " + partToSliderValue);
+        $("#slider").slider("values", [moment.duration(partFromSliderValue).asSeconds(), moment.duration(partToSliderValue).asSeconds()]); 
+    });
+    btn.click(function(e){
+        e.preventDefault();
+        var btnConfirm = $("#modalPart .card-footer button.modal-confirm");
+        $.magnificPopup.open({
+            items: {src: "#modalPart"},
+            type: "inline",
+            fixedContentPos: false,
+            fixedBgPos: true,
+            overflowY: "auto",
+            closeBtnInside: true,
+            preloader: false,
+            midClick: true,
+            removalDelay: 300,
+            mainClass: "my-mfp-slide-bottom",
+            modal: true,
+            callbacks: {
+                open: function() {
+                    btnConfirm.unbind("click").click(function(e){
+                        e.preventDefault();
+                        $.post("' . $view->path('admin_program_videoex_json_set_part') . '",
+                            {
+                                video_id: ' . $video['id'] . ',
+                                sec_from: $("#slider").slider("values", 0),
+                                sec_to: $("#slider").slider("values", 1),
+                                title: $("#partTitle").val()
+                            },
+                            function(json) {
+                                if (json.success) {
+                                    var notice = new PNotify({
+                                        title: "Úspěch",
+                                        text: "Část videa byla vytvořena!",
+                                        type: "success",
+                                        addclass: "click-2-close",
+                                        buttons: {
+                                            sticker: false
+                                        }
+                                    });
+                                    $("#btblParts").bootstrapTable("refresh", {"silent": true});
+                                }else{
+                                    var notice = new PNotify({
+                                        title: "Chyba",
+                                        text: "Nelze vytvořit část videa!",
+                                        type: "error",
+                                        addclass: "click-2-close",
+                                        buttons: {
+                                            sticker: false
+                                        }
+                                    });
+                                }
+                                $.magnificPopup.close();
+                            }, 
+                            "json"      
+                        );
+                    });
+                }
+            }
+        });
+    });'
+);
+
+// Úprava části videa
+$view->addInlineScript(
+    '$("#btblParts").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnEditPart").unbind("click").bind("click", function() {
+            var id = $(this).data("part-id");
+            $.post("' . $view->path('admin_program_videoex_json_get_video_part') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        var modal = $("#modalPart");
+                        modal.find(".card-title").html("Upravit část");
+                        $("#slider").slider({
+                            range: true,
+                            values: [json.part.sec_from, json.part.sec_to],
+                            min: 0,
+                            max: moment.duration("' . $video['duration'] . '").asSeconds(),
+                            step: 1,
+                            slide: function(event, ui) {
+                                var sec_num = parseInt(ui.values[0], 10);
+                                var time1 = moment.utc(sec_num * 1000).format("HH:mm:ss");
+                                sec_num = parseInt(ui.values[1], 10);
+                                var time2 = moment.utc(sec_num * 1000).format("HH:mm:ss");
+                                $("#time").html(time1 + " - " + time2);
+                                $(".part-from-slider-value").val(time1);
+                                $(".part-to-slider-value").val(time2);
+                            }
+                        });
+                        $("#partTitle").val(json.part.title);
+                        $("#time").html(moment.utc(json.part.sec_from * 1000).format("HH:mm:ss") + " - " + moment.utc(json.part.sec_to * 1000).format("HH:mm:ss"));
+                        $(".part-from-slider-value").val(moment.utc(json.part.sec_from * 1000).format("HH:mm:ss"));
+                        $(".part-to-slider-value").val(moment.utc(json.part.sec_to * 1000).format("HH:mm:ss"));
+                    
+                        var btnConfirm = $("#modalPart .card-footer button.modal-confirm");
+                        $.magnificPopup.open({
+                            items: {src: "#modalPart"},
+                            type: "inline",
+                            fixedContentPos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_program_videoex_json_set_part') . '",
+                                            {
+                                                part_id: id,
+                                                video_id: ' . $video['id'] . ',
+                                                sec_from: $("#slider").slider("values", 0),
+                                                sec_to: $("#slider").slider("values", 1),
+                                                title: $("#partTitle").val()
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěch",
+                                                        text: "Část videa byla vytvořena!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblParts").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Nelze vytvořit část videa!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            }, 
+                                            "json"      
+                                        );
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst informace o části videa!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblParts").bootstrapTable("refresh", {"silent": true});
+                    }
+                }, 
+                "json"      
+            );
+        });
+    });'
+);
+
+// Smazání části videa
+$view->addInlineScript(
+    '$("#btblParts").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnDeletePart").unbind("click").bind("click", function() {
+            var id = $(this).data("part-id");
+            $.post("' . $view->path('admin_program_videoex_json_get_video_part') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        $("#modalDanger .card-title").html("Odstranit část mimořádného videa");
+                        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat video?<br><strong>\"" + json.part.title + "\"</strong>" );
+                        $("#modalDanger .modal-text p").html("Všechny závislosti budou odstraněny. Tuto akci nelze vrátit zpět!");
+                        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+                        
+                        $.magnificPopup.open({
+                            items: {src: "#modalDanger"},
+                            type: "inline",
+                            fixedContentPos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_program_videoex_json_delete_video_part') . '",
+                                            {
+                                                id: id
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěch",
+                                                        text: "Část videa byla odstraněna!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblParts").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Nelze odstranit část videa!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            }, 
+                                            "json"      
+                                        );
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst informace o části videa!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblParts").bootstrapTable("refresh", {"silent": true});
+                    }
+                }, 
+                "json"      
+            );
+        });
+    });'
+);
+
+// Url
+$view->addInlineScript(
+    '$("#btnGetUrl").click(function(e){
+        e.preventDefault();
+        let title = $("input[name=title]").val();
+        if (title === "") {
+            var notice = new PNotify({
+                title: "Chyba",
+                text: "Nejdříve vyplňte titulek!",
+                type: "error",
+                addclass: "click-2-close",
+                buttons: {
+                    sticker: false
+                }
+            });
+        } else {
+            $.post("' . $view->path('admin_program_videoex_json_get_url') . '",
+                {
+                    title: title
+                },
+                function(json) {
+                    if (json.success) {
+                        $("input[name=url]").val(json.url);
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nelze načíst titulek!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                    }
+                }, 
+                "json"      
+            );
+        }
+    });'
+);
+?>
+
+<div class="row">
+    <div class="col-lg-3">
+        <section class="card card-primary">
+            <header class="card-header">
+                <h2 class="card-title">
+                    Části videa
+                </h2>
+            </header>
+            <div class="card-body">
+                <div id="toolbar">
+                    <div class="btn-group">
+                        <button id="btnAddPart" class="btn btn-primary">
+                            Přidat část
+                        </button>
+                    </div>
+                </div>
+                <table id="btblParts"
+                       data-url="<?= $view->path('admin_program_videoex_json_get_list_parts') ?>"
+                       data-toggle="table"
+                       data-show-search-button="true"
+                       data-show-search-clear-button="true"
+                       data-valign="middle"
+                       data-sort-name="sec_from"
+                       data-sort-order="asc"
+                       data-toolbar="#toolbar"
+                       data-query-params="queryParams"
+                       data-cookie-id-table="USER-<?= $identity->getUserIdentifier() ?>-partsTable"
+                       data-mobile-responsive="true"
+                       data-page-size="13">
+                    <thead>
+                    <tr>
+                        <th class="text-nowrap width-nowrap"
+                            data-formatter="optionsFormatter"
+                            data-align="center">
+                            <i class="fa fa-cogs" data-toggle="tooltip" data-placement="right" title="Možnosti"></i>
+                            <span class="d-sm-none">
+                                Možnosti
+                            </span>
+                        </th>
+                        <th data-field="id"
+                            class="text-nowrap width-nowrap"
+                            data-sortable="true"
+                            data-visible="false">
+                            ID
+                        </th>
+                        <th data-field="sec_from"
+                            data-formatter="timeFormatter"
+                            data-sortable="true"
+                            class="text-nowrap width-nowrap">
+                            Od/Do
+                        </th>
+                        <th data-field="title"
+                            class="text-truncate"
+                            data-sortable="true">
+                            Titulek
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <script>
+                    function queryParams(params) {
+                        params.video_id = '<?= $video['id'] ?>';
+                        return params
+                    }
+                    function optionsFormatter(value, row) {
+                        return '<div class="btn-group pb-sm-0 pb-2">' +
+                            '<button data-part-id="' + row.id + '" class="btblBtnEditPart btn btn-sm btn-success"><i class="fa fa-pencil-alt"></i> <span class="d-none">Upravit</span></button>' +
+                            '<button data-part-id="' + row.id + '" class="btblBtnDeletePart btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Odstranit</span></button>' +
+                            '</div>';
+                    }
+                    function timeFormatter(value, row) {
+                        return moment.utc(value * 1000).format('HH:mm:ss') + '<br>' + moment.utc(row.sec_to * 1000).format('HH:mm:ss');
+                    }
+                </script>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-9">
+        <section class="card card-primary">
+            <header class="card-header">
+                <div class="card-actions">
+                    <span id="msgNotSaved" class="badge badge-danger d-none">
+                        Neuloženo
+                    </span>
+                </div>
+                <h2 class="card-title">
+                    Upravit mimořádné video
+                </h2>
+            </header>
+            <form action="<?= $view->path('admin_program_videoex_edit', ['id' => $video['id']]) ?>" method="post" id="frmVideoex" class="form-horizontal">
+                <input type="hidden" name="id" value="<?= $video['id'] ?>">
+                <input type="hidden" name="name" value="<?= htmlspecialchars($video['name']) ?>">
+                <input type="hidden" name="path" value="<?= htmlspecialchars($video['path']) ?>">
+                <input type="hidden" name="duration" value="<?= htmlspecialchars($video['duration']) ?>">
+                <input type="hidden" name="time" value="<?= htmlspecialchars($video['time']) ?>">
+                <input type="hidden" name="lenght" value="<?= $video['lenght'] ?>">
+                <input type="hidden" name="showed" value="<?= $video['showed'] ?>">
+
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="title" class="col-sm-3 control-label text-sm-right pt-2 required">Titulek</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="title" id="title" class="form-control" placeholder="povinné" required maxlength="254" data-plugin-maxlength="true" data-rule-rangeLength="[0, 254]" value="<?= htmlspecialchars($video['title']) ?>">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="url" class="col-sm-3 control-label text-sm-right pt-2 required">URL adresa</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="text" name="url" id="url" class="form-control" placeholder="povinné" required maxlength="254" data-plugin-maxlength="true" data-rule-rangeLength="[0, 254]" value="<?= htmlspecialchars($video['url']) ?>">
+                                <span class="input-group-append">
+                                    <button id="btnGetUrl" class="btn btn-primary" type="button" data-toggle="tooltip" data-placement="top" title="Vygenerovat URL z titulku">
+                                        <i class="fa fa-fw fa-magic"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="show_id" class="col-sm-3 control-label text-sm-right pt-2">Pořad</label>
+                        <div class="col-sm-9">
+                            <select name="show_id" id="show_id" class="form-control selectpicker show-tick" data-hide-disabled="false" data-live-search="true" data-size="10">
+                                <?php foreach ($shows as $show): ?>
+                                    <option value="<?= $show['value'] ?>"<?= ((int)$video['show_id'] === (int)$show['value']) ? ' selected' : '' ?>><?= htmlspecialchars($show['label'] ?? '') ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <footer class="card-footer text-right">
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                    <button type="submit" name="cancel" class="btn btn-default" formnovalidate>Storno</button>
+                </footer>
+            </form>
+        </section>
+        <section class="card card-primary">
+            <header class="card-header">
+                <h2 class="card-title">
+                    Upravit video
+                </h2>
+            </header>
+            <div class="card-body">
+                <div class="row" style="height:370px;">
+                    <div class="col-md-6">
+                        <h4>
+                            Video
+                        </h4>
+                        <video id="video" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "/data/mimoradne/thumbs/<?= $video['name'] ?>.jpg"}'>
+                            <source src="<?= $LIGHT_URL . 'mimoradne/publikovano/' . $video['path'] . '/' . $video['name'] ?>_lq.mp4" type="video/mp4"/>
+                            <p class="vjs-no-js">
+                                Váš prohlížeč nepodporuje HTML video.
+                            </p>
+                        </video>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>
+                            Náhled
+                        </h4>
+                        <div id="imgPreview">
+                            <?php if (file_exists($PUBLIC_PATH . '/data/mimoradne/thumbs/' . $video['name'] . '.jpg')) { ?>
+                                <img class="img-fluid" src="/data/mimoradne/thumbs/<?= $video['name'] ?>.jpg" alt="Náhled"/>
+                            <?php } else { ?>
+                                <div class="well danger">
+                                    <h4>
+                                        <i class="fa fa-fw fa-times-circle"></i>
+                                        Náhled ještě nebyl vytvořen.
+                                    </h4>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-right">
+                <button id="createPreview" class="btn btn-primary">
+                    Vytvořit náhled
+                </button>
+                <a href="<?= $view->path('admin_program_videoex') ?>" class="btn btn-default">
+                    Storno
+                </a>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="modalPart" class="zoom-anim-dialog modal-block modal-header-color modal-block-primary mfp-hide">
+    <section class="card">
+        <header class="card-header">
+            <a class="btn-close modal-dismiss pull-right" title="Zavřít">
+                <i class="fa fa-fw fa-times"></i>
+            </a>
+            <h2 class="card-title">
+
+            </h2>
+        </header>
+        <div class="card-body">
+            <div class="modal-wrapper">
+                <div class="modal-text">
+                    <div class="text-center" style="margin-bottom: 15px; color: #fff;">
+                        <i class="fa fa-fw fa-clock-o"></i>
+                        Interval v čase:
+                        <strong id="time"></strong>
+                    </div>
+                    <div class="form-group">
+                        <div id="slider" class="mb-4 slider-primary">
+                            <input id="partTime" type="hidden" />
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">Od</span>
+                            </div>
+                            <input type="text" class="form-control part-from-slider-value" aria-describedby="basic-addon1">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Do</span>
+                            </div>
+                            <input type="text" class="form-control part-to-slider-value" aria-describedby="basic-addon2">
+                        </div>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label for="partTitle" class="control-label text-sm-right pt-2 required">
+                                Titulek
+                            </label>
+                            <div>
+                                <input type="text" name="partTitle" id="partTitle" class="form-control" placeholder="povinné">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <footer class="card-footer">
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <button class="btn btn-success modal-confirm">
+                        Potvrdit
+                    </button>
+                    <button class="btn btn-default modal-dismiss">
+                        Zavřít
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </section>
+</div>
+<?= $view->include('admin/modal/danger') ?>

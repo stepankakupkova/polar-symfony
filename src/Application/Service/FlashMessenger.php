@@ -3,12 +3,20 @@
 namespace App\Application\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 final class FlashMessenger
 {
 	public function __construct(
 		private RequestStack $requestStack,
 	) {}
+
+	private function getFlashBag(): \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
+	{
+		/** @var Session $session */
+		$session = $this->requestStack->getSession();
+		return $session->getFlashBag();
+	}
 
 	/**
 	 * @param string $type 'success' | 'error'
@@ -17,7 +25,7 @@ final class FlashMessenger
 	 */
 	public function addMessage(string $type, string $title, string $text): void
 	{
-		$this->requestStack->getSession()->getFlashBag()->add($type, [
+		$this->getFlashBag()->add($type, [
 			'title' => $title,
 			'text' => $text,
 		]);
@@ -30,7 +38,7 @@ final class FlashMessenger
 	public function getMessages(): array
 	{
 		$messages = [];
-		$flashBag = $this->requestStack->getSession()->getFlashBag();
+		$flashBag = $this->getFlashBag();
 		foreach (['success', 'error'] as $type) {
 			$flashes = $flashBag->get($type);
 			if (!empty($flashes)) {
