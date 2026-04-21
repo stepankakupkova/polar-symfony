@@ -10,8 +10,8 @@
 /** @var array $video */
 $video = $video;
 
-$view->addHeadLink($view->asset('vendor/admin/video-js/video-js.min.css'));
-$view->addHeadLink($view->asset('vendor/admin/file-upload/css/file-upload.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/file-upload/css/file-upload.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/video-js/video.min.js'));
 $view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));

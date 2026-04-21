@@ -28,7 +28,8 @@ admin_program_json_get_url:
 
 admin_program_setting:
   path: /admin/program/setting
-  controller: App\Program\Controller\Admin\SettingController::index
+  controller: App\Program\Controller\Admin\SettingController::setting
+  methods: [GET, POST]
 
 admin_program_setting_edit:
   path: /admin/program/setting/edit
@@ -51,6 +52,16 @@ admin_program_json_delete_program:
   path: /admin/program/json/delete-program
   controller: App\Program\Controller\Admin\ProgramWriteController::deleteProgram
   methods: POST
+
+admin_program_newton:
+  path: /admin/program/newton
+  controller: App\Program\Controller\Admin\ProgramWriteController::newton
+  methods: [GET]
+
+admin_program_json_export_shows:
+  path: /admin/program/json/export-shows
+  controller: App\Program\Controller\Admin\ProgramWriteController::exportShows
+  methods: [GET, POST]
 
 # Video - Admin
 admin_program_video:

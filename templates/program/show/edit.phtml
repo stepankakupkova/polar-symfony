@@ -12,8 +12,8 @@ if (!empty($show['image'])) {
     $srcImage = '/' . $show['image'];
 }
 
-$view->addHeadLink($view->asset('vendor/admin/file-upload/css/file-upload.css'));
-$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/file-upload/css/file-upload.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
 $view->addBodyScript($view->asset('vendor/admin/file-upload/js/iframe-transport.js'));

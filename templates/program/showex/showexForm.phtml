@@ -7,10 +7,10 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$view->addHeadLink($view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
-$view->addHeadLink($view->asset('vendor/admin/bootstrap-timepicker/css/bootstrap-timepicker.min.css'));
-$view->addHeadLink($view->asset('vendor/admin/redactor/css/redactor.min.css'));
-$view->addHeadLink($view->asset('vendor/admin/redactor/plugin/filemanager/css/filemanager.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-timepicker/css/bootstrap-timepicker.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/redactor/css/redactor.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/redactor/plugin/filemanager/css/filemanager.min.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/bootstrap-select.min.js'));
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/locale/' . $locale . '.min.js'));

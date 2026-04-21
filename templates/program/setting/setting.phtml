@@ -6,9 +6,6 @@
  * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
  * @license https://rogr.cz/license/eula EULA License
  */
-
-/** @var array $setting */
-$setting = $this->setting;
 ?>
 <div class="row">
     <div class="col-lg-3">
@@ -26,7 +23,7 @@ $setting = $this->setting;
                     Upravit nastavení
                 </h2>
             </header>
-            <form action="<?= $view->path('admin_program_setting_edit') ?>" method="post" id="frmSetting" class="form-horizontal">
+            <form action="<?= $view->path('admin_program_setting') ?>" method="post" id="frmSetting" class="form-horizontal">
                 <div class="card-body">
                     <div class="form-group row">
                         <label class="col-sm-3 control-label text-sm-right pt-2 required" for="show_img_width">Pořad - Šířka obrázku</label>

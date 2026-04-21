@@ -180,7 +180,7 @@ final class ShowRepository
 	 * @param bool|null $active
 	 * @return int
 	 */
-	public function getCount(bool $active = null): int
+	public function getCount(?bool $active = null): int
 	{
 		$qb = $this->connection->createQueryBuilder()
 			->select('COUNT(*) AS count')

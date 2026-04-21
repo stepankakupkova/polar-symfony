@@ -207,7 +207,7 @@ final class ProgramRepository
 	 * @param bool|null $premiere
 	 * @return int
 	 */
-	public function getCount(bool $premiere = null): int
+	public function getCount(?bool $premiere = null): int
 	{
 		$qb = $this->connection->createQueryBuilder()
 			->select('COUNT(*) AS count')

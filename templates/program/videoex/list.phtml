@@ -7,7 +7,7 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));

@@ -1,0 +1,59 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+
+<div id="modalProgress" class="zoom-anim-dialog modal-block modal-header-color modal-block-primary mfp-hide">
+	<section class="card">
+		<header class="card-header">
+			<a class="btn-close modal-dismiss pull-right" title="Zavrit">
+				<i class="fa fa-fw fa-times"></i>
+			</a>
+			<h2 class="card-title">
+
+			</h2>
+		</header>
+		<div class="card-body">
+			<div class="modal-wrapper">
+				<div class="modal-icon">
+					<i class="fa fa-upload" style="top: 9px;"></i>
+				</div>
+				<div class="modal-text">
+					<div class="row">
+						<div class="col text-left">
+							<span class="timeTaken"></span>
+						</div>
+						<div class="col text-center">
+							<span class="percent"></span>
+							%
+						</div>
+						<div class="col text-right">
+							<span class="timeRemaining"></span>
+						</div>
+					</div>
+					<div class="progress light mt-1 mb-1">
+						<div class="progress-bar progress-bar-primary" role="progressbar"></div>
+					</div>
+					<div class="scrollable colored-slider" data-plugin-scrollable style="height: 25px;">
+						<div class="scrollable-content"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer class="card-footer">
+			<div class="row">
+				<div class="col-md-12 text-right">
+					<button class="btn btn-default modal-dismiss">
+						<i class="fa fa-fw fa-times"></i>
+						Zavrit
+					</button>
+				</div>
+			</div>
+		</footer>
+	</section>
+</div>

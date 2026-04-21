@@ -7,7 +7,7 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$view->addHeadLink($view->asset('vendor/admin/file-upload/css/file-upload.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/file-upload/css/file-upload.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
 $view->addBodyScript($view->asset('vendor/admin/file-upload/js/iframe-transport.js'));

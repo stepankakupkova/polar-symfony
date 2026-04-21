@@ -7,9 +7,19 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$view->addHeadLink($view->asset('vendor/admin/video-js/video-js.min.css'));
-$view->addHeadLink($view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
-$view->addHeadLink($view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
+/**
+ * @var \App\Application\View\ViewHelper $view
+ * @var \Symfony\Component\Security\Core\User\UserInterface $identity
+ * @var array $video
+ * @var array $shows
+ * @var string $locale
+ * @var string $PUBLIC_PATH
+ * @var string $LIGHT_URL
+ */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/video-js/video.min.js'));
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));

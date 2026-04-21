@@ -1,0 +1,103 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addInlineScript(
+	'var btn = $("#btnExportNewton");
+	var modal = $("#modalProgress");
+	btn.click(function(e){
+		e.preventDefault();
+		btn.button("loading");
+		modal.find(".card-title").html("Nacitani videi");
+		$.magnificPopup.open({
+			items: {src: "#modalProgress"},
+			closeOnBgClick: false,
+			callbacks: {
+				close: function() {
+					btn.button("reset");
+				},
+			}
+		});
+		startProgress();
+	});
+
+	function startProgress(){
+		modal.find(".progress-bar").css("width", "0%");
+		modal.find(".percent").html("");
+		modal.find(".timeTaken").html("0s celkem");
+		modal.find(".timeRemaining").html("0s zbyva");
+		modal.find(".modal-text .scrollable-content").html("Cekejte prosim...");
+		modal.find(".btn-close").hide();
+		modal.find("button.modal-dismiss").attr("disabled", true);
+		var iFrame = document.createElement("iframe");
+		iFrame.className = "loadData";
+		document.getElementsByTagName("body")[0].appendChild(iFrame);
+		iFrame.src = "' . $view->path('admin_program_json_export_shows', ['cron' => 'false']) . '";
+	}
+	function updateProgress(data){
+		modal.find(".progress-bar").css("width", Math.round(data.percent) + "%");
+		modal.find(".percent").html(Math.round(data.percent));
+		modal.find(".timeTaken").html(data.timeTaken + "s celkem");
+		if (data.timeRemaining) modal.find(".timeRemaining").html(((data.timeRemaining)?data.timeRemaining:0) + "s zbyva");
+		if (data.text) modal.find(".modal-text .scrollable-content").prepend(data.text + "<br />");
+	}
+	function finishProgress(){
+		modal.find(".progress-bar").css("width", "100%");
+		modal.find(".percent").html("100");
+		modal.find(".btn-close").show();
+		modal.find("button.modal-dismiss").removeAttr("disabled");
+		modal.find(".timeRemaining").html("");
+		$(".modal-text .nano").nanoScroller();
+		$("[data-toggle=tooltip]").tooltip();
+	}'
+);
+?>
+
+<div class="row">
+	<div class="col-lg-3">
+
+	</div>
+	<div class="col-lg-9">
+		<section class="card card-primary">
+			<header class="card-header">
+				<div class="card-actions">
+
+				</div>
+				<h2 class="card-title">
+					Newton
+				</h2>
+			</header>
+			<div class="card-body">
+				<div class="btn-group">
+					<button class="btn btn-primary" id="btnExportNewton">
+						Export
+					</button>
+					<a class="btn btn-default" id="btnExportNewtonCron" href="<?= $view->path('admin_program_json_export_shows', ['cron' => 'true']) ?>" target="_blank">
+						Export (CRON)
+					</a>
+				</div>
+				<a class="btn btn-info" href="/data/program/export/shows/polar.xml" target="_blank">
+					Soubor
+				</a>
+				<span class="badge bg-info rounded-pill text-2 text-dark ml-3">
+					Posledni export:
+					<?php
+						try {
+							$date = new DateTime($setting['newton_update_date']);
+							echo $date->format('j. F Y, H:i');
+						} catch (Exception) {
+							echo 'NaN';
+						}
+					?>
+				</span>
+			</div>
+		</section>
+	</div>
+</div>
+
+<?= $view->include('admin/modal/progress') ?>

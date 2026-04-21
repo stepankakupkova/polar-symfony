@@ -82,7 +82,7 @@ final class SettingController
 					$image->save($this->PUBLIC_PATH . '/' . $this->showImageDefault, ['png_compression_level' => 8]);
 					unset($image);
 
-					$flashMessenger->addSuccess('Settings saved');
+					$flashMessenger->addMessage('success', 'Úspěšně uloženo', 'Settings saved');
 
 					// Log
 					$logger->notice('PROGRAM - Edit settings', [
@@ -91,7 +91,7 @@ final class SettingController
 						'file' => __FILE__
 					]);
 				} catch (\Imagine\Exception\RuntimeException $e) {
-					$flashMessenger->addError($e->getMessage());
+					$flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
 
 					// Log
 					$logger->error('PROGRAM - Edit settings', [
@@ -102,7 +102,7 @@ final class SettingController
 					]);
 				}
 			} catch (\Exception $e) {
-				$flashMessenger->addError($e->getMessage());
+				$flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
 
 				// Log
 				$logger->error('PROGRAM - Edit settings', [
