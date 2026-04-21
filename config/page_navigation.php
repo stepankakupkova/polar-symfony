@@ -1,7 +1,7 @@
 <?php
 
 // Auto-generated page navigation - DO NOT EDIT MANUALLY
-// Generated: 2026-04-19 18:24:18
+// Generated: 2026-04-21 12:57:19
 
 return [
 	'default' => [],

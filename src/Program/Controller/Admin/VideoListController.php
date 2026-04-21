@@ -21,9 +21,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class VideoListController
 {
+	public function __construct(
+		private FlashMessenger $flashMessenger,
+	) {}
+
 	public function list(
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		SettingRepository $settingRepository,
 		Security $security,
 	): Response
@@ -32,7 +35,6 @@ final class VideoListController
 
 		return new Response($renderer->renderWithAdminLayout('program/video/list', [
 			'pageTitle' => 'Videa',
-			'flashMessages' => $flashMessenger->getMessages(),
 			'setting' => $setting,
 		]));
 	}

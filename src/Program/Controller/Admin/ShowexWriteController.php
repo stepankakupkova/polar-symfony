@@ -37,12 +37,12 @@ final class ShowexWriteController
 	public function __construct(
 		private string $PUBLIC_PATH,
 		private Security $security,
+		private FlashMessenger $flashMessenger,
 	) {}
 
 	public function add(
 		Request $request,
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		ShowexRepository $showexRepository,
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
@@ -125,9 +125,9 @@ final class ShowexWriteController
 				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showexRepository);
 
-				$flashMessenger->addMessage(
+				$this->flashMessenger->addMessage(
 					'success',
-					'Uspesne',
+					'Úspěšně',
 					'Mimoradny porad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> vytvoren'
 				);
 
@@ -161,7 +161,6 @@ final class ShowexWriteController
 	public function edit(
 		Request $request,
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		ShowexRepository $showexRepository,
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
@@ -219,9 +218,9 @@ final class ShowexWriteController
 				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showexRepository);
 
-				$flashMessenger->addMessage(
+				$this->flashMessenger->addMessage(
 					'success',
-					'Uspesne',
+					'Úspěšně',
 					'Mimoradny porad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraven'
 				);
 

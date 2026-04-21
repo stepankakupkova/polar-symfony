@@ -125,14 +125,12 @@ $view->addInlineScript(
             <label class="col-sm-3 control-label text-sm-right pt-2">Aktivní</label>
             <div class="col-sm-3">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="active" value="0">
                     <input type="checkbox" name="active" value="1" data-plugin-ios-switch <?= !empty($post['active']) ? 'checked' : '' ?>>
                 </div>
             </div>
             <label class="col-sm-3 control-label text-sm-right pt-2">V hlavičce</label>
             <div class="col-sm-3">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="header" value="0">
                     <input type="checkbox" name="header" value="1" data-plugin-ios-switch <?= !empty($post['header']) ? 'checked' : '' ?>>
                 </div>
             </div>

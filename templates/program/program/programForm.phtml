@@ -103,8 +103,7 @@ $e = $errors ?? [];
             <label class="col-sm-3 control-label text-sm-right pt-2">Premiéra</label>
             <div class="col-sm-3">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="premiere" value="0">
-                    <input type="checkbox" name="premiere" value="1" data-plugin-ios-switch<?= $form['premiere'] ? ' checked' : '' ?>>
+                    <input type="checkbox" name="premiere" value="1" data-plugin-ios-switch<?= !empty($form['premiere']) ? ' checked' : '' ?>>
                 </div>
             </div>
         </div>

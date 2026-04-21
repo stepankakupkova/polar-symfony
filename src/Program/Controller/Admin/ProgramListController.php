@@ -2,7 +2,6 @@
 
 namespace App\Program\Controller\Admin;
 
-use App\Application\Service\FlashMessenger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\ShowRepository;
@@ -38,13 +37,11 @@ final class ProgramListController
 
 	public function list(
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		Security $security,
 	): Response
 	{
 		return new Response($renderer->renderWithAdminLayout('program/program/list', [
 			'pageTitle' => 'Program',
-			'flashMessages' => $flashMessenger->getMessages(),
 		]));
 	}
 

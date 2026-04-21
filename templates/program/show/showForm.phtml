@@ -121,21 +121,18 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
             <label class="col-sm-3 control-label text-sm-right pt-2">Stav</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="status" value="0">
                     <input type="checkbox" name="status" value="1" data-plugin-ios-switch<?= !empty($form['status']) ? ' checked' : '' ?>>
                 </div>
             </div>
             <label class="col-sm-2 control-label text-sm-right pt-2">Zobrazit v archivu</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="show_in_archive" value="0">
                     <input type="checkbox" name="show_in_archive" value="1" data-plugin-ios-switch<?= !empty($form['show_in_archive']) ? ' checked' : '' ?>>
                 </div>
             </div>
             <label class="col-sm-2 control-label text-sm-right pt-2">Použít části videa</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="video_parts" value="0">
                     <input type="checkbox" name="video_parts" value="1" data-plugin-ios-switch<?= !empty($form['video_parts']) ? ' checked' : '' ?>>
                 </div>
             </div>
@@ -144,21 +141,18 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
             <label class="col-sm-3 control-label text-sm-right pt-2">Zobrazit datum a čas</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="show_datetime" value="0">
                     <input type="checkbox" name="show_datetime" value="1" data-plugin-ios-switch<?= !empty($form['show_datetime']) ? ' checked' : '' ?>>
                 </div>
             </div>
             <label class="col-sm-2 control-label text-sm-right pt-2">Povolit stahování</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="download" value="0">
                     <input type="checkbox" name="download" value="1" data-plugin-ios-switch<?= !empty($form['download']) ? ' checked' : '' ?>>
                 </div>
             </div>
             <label class="col-sm-2 control-label text-sm-right pt-2">Export pro Newton</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
-                    <input type="hidden" name="newton" value="0">
                     <input type="checkbox" name="newton" value="1" data-plugin-ios-switch<?= !empty($form['newton']) ? ' checked' : '' ?>>
                 </div>
             </div>

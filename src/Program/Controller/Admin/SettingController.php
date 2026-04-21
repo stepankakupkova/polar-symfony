@@ -25,6 +25,7 @@ final class SettingController
 	public function __construct(
 		private string $PUBLIC_PATH,
 		private Security $security,
+		private FlashMessenger $flashMessenger,
 	) {}
 
 	public function index(
@@ -40,7 +41,6 @@ final class SettingController
 		Request $request,
 		PhtmlRenderer $renderer,
 		SettingRepository $settingRepository,
-		FlashMessenger $flashMessenger,
 		LoggerInterface $logger,
 		UrlGeneratorInterface $urlGenerator,
 	): Response
@@ -81,7 +81,7 @@ final class SettingController
 					$image->save($this->PUBLIC_PATH . '/' . $this->showImageDefault, ['png_compression_level' => 8]);
 					unset($image);
 
-					$flashMessenger->addMessage('success', 'Úspěšně uloženo', 'Settings saved');
+					$this->flashMessenger->addMessage('success', 'Úspěšně uloženo', 'Settings saved');
 
 					// Log
 					$logger->notice('PROGRAM - Edit settings', [
@@ -90,7 +90,7 @@ final class SettingController
 						'file' => __FILE__
 					]);
 				} catch (\Imagine\Exception\RuntimeException $e) {
-					$flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
+					$this->flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
 
 					// Log
 					$logger->error('PROGRAM - Edit settings', [
@@ -101,7 +101,7 @@ final class SettingController
 					]);
 				}
 			} catch (\Exception $e) {
-				$flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
+				$this->flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
 
 				// Log
 				$logger->error('PROGRAM - Edit settings', [

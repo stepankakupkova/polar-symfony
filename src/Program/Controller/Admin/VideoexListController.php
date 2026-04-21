@@ -21,9 +21,12 @@ use Transliterator;
 
 final class VideoexListController
 {
+	public function __construct(
+		private FlashMessenger $flashMessenger,
+	) {}
+
 	public function list(
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		SettingRepository $settingRepository,
 	): Response
 	{
@@ -31,7 +34,6 @@ final class VideoexListController
 
 		return new Response($renderer->renderWithAdminLayout('program/videoex/list', [
 			'pageTitle' => 'Mimořádná videa',
-			'flashMessages' => $flashMessenger->getMessages(),
 			'setting' => $setting,
 		]));
 	}

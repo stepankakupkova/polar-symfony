@@ -33,12 +33,12 @@ final class VideoexWriteController
 		private string $LIGHT_PATH,
 		private string $LIGHT_URL,
 		private Security $security,
+		private FlashMessenger $flashMessenger,
 	) {}
 
 	public function edit(
 		Request $request,
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		VideoexRepository $videoexRepository,
 		ShowexRepository $showexRepository,
 		UrlGeneratorInterface $urlGenerator,
@@ -81,9 +81,9 @@ final class VideoexWriteController
 
 				$videoexRepository->updatePost($video_id, $data);
 
-				$flashMessenger->addMessage(
+				$this->flashMessenger->addMessage(
 					'success',
-					'Uspesne',
+					'Úspěšně',
 					'Mimoradne video <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraveno'
 				);
 

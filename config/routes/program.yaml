@@ -121,48 +121,48 @@ admin_program_videoex_json_get_list_parts:
   controller: App\Program\Controller\Admin\VideoexListController::getListParts
 
 admin_program_videoex_json_get_video:
-  path: /admin/program/mimoradne-porady/json/get-video
+  path: /admin/program/mimoradne-videa/json/get-video
   controller: App\Program\Controller\Admin\VideoexListController::getVideo
   methods: POST
 
 admin_program_videoex_json_get_video_part:
-  path: /admin/program/vidmimoradne-poradyeoex/json/get-video-part
+  path: /admin/program/mimoradne-videa/json/get-video-part
   controller: App\Program\Controller\Admin\VideoexListController::getVideoPart
   methods: POST
 
 admin_program_videoex_json_get_url:
-  path: /admin/program/mimoradne-porady/json/get-url
+  path: /admin/program/mimoradne-videa/json/get-url
   controller: App\Program\Controller\Admin\VideoexListController::getUrl
   methods: POST
 
 admin_program_videoex_edit:
-  path: /admin/program/mimoradne-porady/seznam/upravit/{id}
+  path: /admin/program/mimoradne-videa/seznam/upravit/{id}
   controller: App\Program\Controller\Admin\VideoexWriteController::edit
   requirements:
     id: '\d+'
   methods: [GET, POST]
 
 admin_program_videoex_json_delete_video:
-  path: /admin/program/mimoradne-porady/json/delete-video
+  path: /admin/program/mimoradne-videa/json/delete-video
   controller: App\Program\Controller\Admin\VideoexWriteController::deleteVideo
   methods: POST
 
 admin_program_videoex_json_load_videos:
-  path: /admin/program/mimoradne-porady/json/load-videos
+  path: /admin/program/mimoradne-videa/json/load-videos
   controller: App\Program\Controller\Admin\VideoexWriteController::loadVideos
 
 admin_program_videoex_json_set_part:
-  path: /admin/program/mimoradne-porady/json/set-part
+  path: /admin/program/mimoradne-videa/json/set-part
   controller: App\Program\Controller\Admin\VideoexWriteController::setPart
   methods: POST
 
 admin_program_videoex_json_delete_video_part:
-  path: /admin/program/mimoradne-porady/json/delete-video-part
+  path: /admin/program/mimoradne-videa/json/delete-video-part
   controller: App\Program\Controller\Admin\VideoexWriteController::deleteVideoPart
   methods: POST
 
 admin_program_videoex_json_create_preview:
-  path: /admin/program/mimoradne-porady/json/create-preview
+  path: /admin/program/mimoradne-videa/json/create-preview
   controller: App\Program\Controller\Admin\VideoexWriteController::createPreviewAction
   methods: POST
 
@@ -272,12 +272,12 @@ admin_program_showex_json_redactor_file_manager:
 
 # Showex - Write
 admin_program_showex_add:
-  path: /admin/program/mimoradne-porady/pridat
+  path: /admin/program/mimoradne-porady/seznam/pridat
   controller: App\Program\Controller\Admin\ShowexWriteController::add
   methods: [GET, POST]
 
 admin_program_showex_edit:
-  path: /admin/program/mimoradne-porady/upravit/{id}
+  path: /admin/program/mimoradne-porady/seznam/upravit/{id}
   controller: App\Program\Controller\Admin\ShowexWriteController::edit
   methods: [GET, POST]
 

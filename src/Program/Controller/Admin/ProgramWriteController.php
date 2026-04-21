@@ -32,12 +32,12 @@ final class ProgramWriteController
 		private string $PUBLIC_PATH,
 		private string $LIGHT_URL,
 		private Security $security,
+		private FlashMessenger $flashMessenger,
 	) {}
 
 	public function add(
 		Request $request,
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		ProgramRepository $programRepository,
 		VideoRepository $videoRepository,
 		ShowRepository $showRepository,
@@ -109,7 +109,7 @@ final class ProgramWriteController
 						$programRepository->insertProgram2Shows($programId, (int) $post['show_id']);
 					}
 
-					$flashMessenger->addMessage(
+					$this->flashMessenger->addMessage(
 						'success',
 						'Úspěšné',
 						'Program <strong>&quot;' . htmlspecialchars($post['title']) . '&quot;</strong> vytvořen'
@@ -149,7 +149,6 @@ final class ProgramWriteController
 	public function edit(
 		Request $request,
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 		ProgramRepository $programRepository,
 		VideoRepository $videoRepository,
 		ShowRepository $showRepository,
@@ -247,7 +246,7 @@ final class ProgramWriteController
 
 					$programRepository->updatePost($program_id, $programData);
 
-					$flashMessenger->addMessage(
+					$this->flashMessenger->addMessage(
 						'success',
 						'Úspěšné',
 						'Program <strong>&quot;' . htmlspecialchars($post['title']) . '&quot;</strong> upraven'

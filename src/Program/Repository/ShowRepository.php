@@ -247,6 +247,11 @@ final class ShowRepository
 	 */
 	public function updatePost(int $id, array $data): void
 	{
+		// 'order' je rezervované slovo v MySQL/MariaDB, nutno escapovat
+		if (array_key_exists('order', $data)) {
+			$data['`order`'] = $data['order'];
+			unset($data['order']);
+		}
 		$this->connection->update($this->table, $data, ['id' => $id]);
 	}
 

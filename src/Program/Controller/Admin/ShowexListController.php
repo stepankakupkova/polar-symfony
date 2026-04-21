@@ -21,16 +21,15 @@ class ShowexListController extends AbstractController
 {
 	public function __construct(
 		private string $PUBLIC_PATH,
+		private FlashMessenger $flashMessenger,
 	) {}
 
 	public function list(
 		PhtmlRenderer $renderer,
-		FlashMessenger $flashMessenger,
 	): Response
 	{
 		return new Response($renderer->renderWithAdminLayout('program/showex/list', [
 			'pageTitle' => 'Mimořádné pořady',
-			'flashMessages' => $flashMessenger->getMessages(),
 		]));
 	}
 
