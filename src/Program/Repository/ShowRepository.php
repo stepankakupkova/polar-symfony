@@ -26,12 +26,12 @@ final class ShowRepository
 				'program_shows.status', 'program_shows.show_in_archive', 'program_shows.video_parts',
 				'program_shows.show_datetime', 'program_shows.download', 'program_shows.newton',
 				'program_shows.content', 'program_shows.seo_keywords', 'program_shows.seo_description',
-				'program_shows.order',
+				'program_shows.`order`',
 				'program_shows_categories.title AS category_name'
 			)
 			->from($this->table)
 			->leftJoin('program_shows', 'program_shows_categories', 'program_shows_categories', 'program_shows_categories.id = program_shows.category_id')
-			->orderBy($params['sort'], $params['order']);
+			->orderBy($params['sort'] === 'order' ? '`order`' : $params['sort'], $params['order']);
 
 		if (isset($params['limit'])) {
 			$qb->setMaxResults((int) $params['limit']);

@@ -31,10 +31,9 @@ final class VideoListController
 		$setting = $settingRepository->fetchSetting();
 
 		return new Response($renderer->renderWithAdminLayout('program/video/list', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Videa',
 			'flashMessages' => $flashMessenger->getMessages(),
 			'setting' => $setting,
-			'identity' => $security->getUser(),
 		]));
 	}
 

@@ -32,7 +32,6 @@ final class UserWriteController
 	{
 		/** @var User $identity */
 		$identity = $this->security->getUser();
-
 		if ($request->isMethod('POST')) {
 			$post = $request->request->all();
 
@@ -44,7 +43,6 @@ final class UserWriteController
 			$errors = $this->validateForm($post, true);
 			if (!empty($errors)) {
 				return new Response($this->renderer->renderWithAdminLayout('user/admin/add', [
-					'identity' => $identity,
 					'pageTitle' => 'Uživatelé',
 					'post' => $post,
 					'errors' => $errors,
@@ -105,7 +103,6 @@ final class UserWriteController
 					'trace' => $e->getMessage(),
 				]);
 				return new Response($this->renderer->renderWithAdminLayout('user/admin/add', [
-					'identity' => $identity,
 					'pageTitle' => 'Uživatelé',
 					'post' => $post,
 					'errors' => ['general' => $e->getMessage()],
@@ -114,7 +111,6 @@ final class UserWriteController
 		}
 
 		return new Response($this->renderer->renderWithAdminLayout('user/admin/add', [
-			'identity' => $identity,
 			'pageTitle' => 'Uživatelé',
 			'post' => [],
 			'errors' => [],
@@ -125,7 +121,6 @@ final class UserWriteController
 	{
 		/** @var User $identity */
 		$identity = $this->security->getUser();
-
 		$user = $this->userRepository->findPostBy('id', $id);
 		if (!$user) {
 			return new RedirectResponse($this->urlGenerator->generate('admin_user_list'));
@@ -150,7 +145,6 @@ final class UserWriteController
 			$errors = $this->validateForm($post, false);
 			if (!empty($errors)) {
 				return new Response($this->renderer->renderWithAdminLayout('user/admin/edit', [
-					'identity' => $identity,
 					'pageTitle' => 'Uživatelé',
 					'id' => $id,
 					'post' => array_merge($user, $authorization, $post),
@@ -212,7 +206,6 @@ final class UserWriteController
 					'trace' => $e->getMessage(),
 				]);
 				return new Response($this->renderer->renderWithAdminLayout('user/admin/edit', [
-					'identity' => $identity,
 					'pageTitle' => 'Uživatelé',
 					'id' => $id,
 					'post' => array_merge($user, $authorization, $post),
@@ -225,7 +218,6 @@ final class UserWriteController
 		$post = array_merge($user, $authorization);
 
 		return new Response($this->renderer->renderWithAdminLayout('user/admin/edit', [
-			'identity' => $identity,
 			'pageTitle' => 'Uživatelé',
 			'id' => $id,
 			'post' => $post,
@@ -237,7 +229,6 @@ final class UserWriteController
 	public function deleteUser(Request $request): JsonResponse
 	{
 		$identity = $this->security->getUser();
-
 		try {
 			$userId = $request->request->getInt('id');
 			$user = $this->userRepository->findPostBy('id', $userId);

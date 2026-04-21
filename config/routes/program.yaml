@@ -9,7 +9,7 @@ admin_program:
   controller: App\Program\Controller\Admin\ProgramListController::index
 
 admin_program_list:
-  path: /admin/program/list
+  path: /admin/program/seznam
   controller: App\Program\Controller\Admin\ProgramListController::list
 
 admin_program_json_get_list:
@@ -32,17 +32,17 @@ admin_program_setting:
   methods: [GET, POST]
 
 admin_program_setting_edit:
-  path: /admin/program/setting/edit
+  path: /admin/program/setting/upravit
   controller: App\Program\Controller\Admin\SettingController::setting
   methods: [GET, POST]
 
 admin_program_add:
-  path: /admin/program/list/add
+  path: /admin/program/seznam/pridat
   controller: App\Program\Controller\Admin\ProgramWriteController::add
   methods: [GET, POST]
 
 admin_program_edit:
-  path: /admin/program/list/edit/{id}
+  path: /admin/program/seznam/upravit/{id}
   controller: App\Program\Controller\Admin\ProgramWriteController::edit
   requirements:
     id: '\d+'
@@ -63,245 +63,250 @@ admin_program_json_export_shows:
   controller: App\Program\Controller\Admin\ProgramWriteController::exportShows
   methods: [GET, POST]
 
+admin_program_json_write_export_shows:
+  path: /admin/program/json-write/export-shows
+  controller: App\Program\Controller\Admin\ProgramWriteController::exportShows
+  methods: [GET, POST]
+
 # Video - Admin
-admin_program_video:
-  path: /admin/program/video
+admin_program_video_list:
+  path: /admin/program/videa/seznam
   controller: App\Program\Controller\Admin\VideoListController::list
 
 admin_program_video_json_get_list:
-  path: /admin/program/video/json/get-list
+  path: /admin/program/videa/json/get-list
   controller: App\Program\Controller\Admin\VideoListController::getList
 
 admin_program_video_json_get_video:
-  path: /admin/program/video/json/get-video
+  path: /admin/program/videa/json/get-video
   controller: App\Program\Controller\Admin\VideoListController::getVideo
   methods: POST
 
 admin_program_video_edit:
-  path: /admin/program/video/edit/{id}
+  path: /admin/program/videa/seznam/upravit/{id}
   controller: App\Program\Controller\Admin\VideoWriteController::edit
   requirements:
     id: '\d+'
 
 admin_program_video_json_delete_video:
-  path: /admin/program/video/json/delete-video
+  path: /admin/program/videa/json/delete-video
   controller: App\Program\Controller\Admin\VideoWriteController::deleteVideo
   methods: POST
 
 admin_program_video_json_load_videos:
-  path: /admin/program/video/json/load-videos
+  path: /admin/program/videa/json/load-videos
   controller: App\Program\Controller\Admin\VideoWriteController::loadVideos
 
 admin_program_video_json_create_preview:
-  path: /admin/program/video/json/create-preview
+  path: /admin/program/videa/json/create-preview
   controller: App\Program\Controller\Admin\VideoWriteController::createPreviewAction
   methods: POST
 
 admin_program_video_json_upload_preview:
-  path: /admin/program/video/json/upload-preview-from-pc
+  path: /admin/program/videa/json/upload-preview-from-pc
   controller: App\Program\Controller\Admin\VideoWriteController::uploadPreviewFromPc
   methods: POST
 
 # Videoex - Admin
-admin_program_videoex:
-  path: /admin/program/videoex
+admin_program_videoex_list:
+  path: /admin/program/mimoradne-videa/seznam
   controller: App\Program\Controller\Admin\VideoexListController::list
 
 admin_program_videoex_json_get_list:
-  path: /admin/program/videoex/json/get-list
+  path: /admin/program/mimoradne-videa/json/get-list
   controller: App\Program\Controller\Admin\VideoexListController::getList
 
 admin_program_videoex_json_get_list_parts:
-  path: /admin/program/videoex/json/get-list-parts
+  path: /admin/program/mimoradne-videa/json/get-list-parts
   controller: App\Program\Controller\Admin\VideoexListController::getListParts
 
 admin_program_videoex_json_get_video:
-  path: /admin/program/videoex/json/get-video
+  path: /admin/program/mimoradne-porady/json/get-video
   controller: App\Program\Controller\Admin\VideoexListController::getVideo
   methods: POST
 
 admin_program_videoex_json_get_video_part:
-  path: /admin/program/videoex/json/get-video-part
+  path: /admin/program/vidmimoradne-poradyeoex/json/get-video-part
   controller: App\Program\Controller\Admin\VideoexListController::getVideoPart
   methods: POST
 
 admin_program_videoex_json_get_url:
-  path: /admin/program/videoex/json/get-url
+  path: /admin/program/mimoradne-porady/json/get-url
   controller: App\Program\Controller\Admin\VideoexListController::getUrl
   methods: POST
 
 admin_program_videoex_edit:
-  path: /admin/program/videoex/edit/{id}
+  path: /admin/program/mimoradne-porady/seznam/upravit/{id}
   controller: App\Program\Controller\Admin\VideoexWriteController::edit
   requirements:
     id: '\d+'
   methods: [GET, POST]
 
 admin_program_videoex_json_delete_video:
-  path: /admin/program/videoex/json/delete-video
+  path: /admin/program/mimoradne-porady/json/delete-video
   controller: App\Program\Controller\Admin\VideoexWriteController::deleteVideo
   methods: POST
 
 admin_program_videoex_json_load_videos:
-  path: /admin/program/videoex/json/load-videos
+  path: /admin/program/mimoradne-porady/json/load-videos
   controller: App\Program\Controller\Admin\VideoexWriteController::loadVideos
 
 admin_program_videoex_json_set_part:
-  path: /admin/program/videoex/json/set-part
+  path: /admin/program/mimoradne-porady/json/set-part
   controller: App\Program\Controller\Admin\VideoexWriteController::setPart
   methods: POST
 
 admin_program_videoex_json_delete_video_part:
-  path: /admin/program/videoex/json/delete-video-part
+  path: /admin/program/mimoradne-porady/json/delete-video-part
   controller: App\Program\Controller\Admin\VideoexWriteController::deleteVideoPart
   methods: POST
 
 admin_program_videoex_json_create_preview:
-  path: /admin/program/videoex/json/create-preview
+  path: /admin/program/mimoradne-porady/json/create-preview
   controller: App\Program\Controller\Admin\VideoexWriteController::createPreviewAction
   methods: POST
 
 # Show - Admin
 admin_program_show:
-  path: /admin/program/show
+  path: /admin/program/porady/seznam
   controller: App\Program\Controller\Admin\ShowListController::list
 
 admin_program_show_json_get_list:
-  path: /admin/program/show/json/get-list
+  path: /admin/program/porady/json/get-list
   controller: App\Program\Controller\Admin\ShowListController::getList
 
 admin_program_show_json_get_times_list:
-  path: /admin/program/show/json/get-times-list
+  path: /admin/program/porady/json/get-times-list
   controller: App\Program\Controller\Admin\ShowListController::getTimesList
 
 admin_program_show_json_get_show:
-  path: /admin/program/show/json/get-show
+  path: /admin/program/porady/json/get-show
   controller: App\Program\Controller\Admin\ShowListController::getShow
   methods: POST
 
 admin_program_show_json_get_url:
-  path: /admin/program/show/json/get-url
+  path: /admin/program/porady/json/get-url
   controller: App\Program\Controller\Admin\ShowListController::getUrl
   methods: POST
 
 admin_program_show_json_redactor_image_manager:
-  path: /admin/program/show/json/redactor-image-manager
+  path: /admin/program/porady/json/redactor-image-manager
   controller: App\Program\Controller\Admin\ShowListController::redactorImageManager
 
 admin_program_show_json_redactor_file_manager:
-  path: /admin/program/show/json/redactor-file-manager
+  path: /admin/program/porady/json/redactor-file-manager
   controller: App\Program\Controller\Admin\ShowListController::redactorFileManager
 
 # Show - Write
 admin_program_show_add:
-  path: /admin/program/show/add
+  path: /admin/program/porady/seznam/pridat
   controller: App\Program\Controller\Admin\ShowWriteController::add
   methods: [GET, POST]
 
 admin_program_show_edit:
-  path: /admin/program/show/edit/{id}
+  path: /admin/program/porady/seznam/upravit/{id}
   controller: App\Program\Controller\Admin\ShowWriteController::edit
   methods: [GET, POST]
 
 admin_program_show_json_delete_show:
-  path: /admin/program/show/json/delete-show
+  path: /admin/program/porady/json/delete-show
   controller: App\Program\Controller\Admin\ShowWriteController::deleteShow
   methods: POST
 
 admin_program_show_json_set_order:
-  path: /admin/program/show/json/set-order
+  path: /admin/program/porady/json/set-order
   controller: App\Program\Controller\Admin\ShowWriteController::setOrder
   methods: POST
 
 admin_program_show_json_set_time:
-  path: /admin/program/show/json/set-time
+  path: /admin/program/porady/json/set-time
   controller: App\Program\Controller\Admin\ShowWriteController::setTime
   methods: POST
 
 admin_program_show_json_upload_image:
-  path: /admin/program/show/json/upload-image
+  path: /admin/program/porady/json/upload-image
   controller: App\Program\Controller\Admin\ShowWriteController::uploadImage
   methods: POST
 
 admin_program_show_json_set_default_image:
-  path: /admin/program/show/json/set-default-image
+  path: /admin/program/porady/json/set-default-image
   controller: App\Program\Controller\Admin\ShowWriteController::setDefaultImage
   methods: POST
 
 admin_program_show_json_redactor_image_upload:
-  path: /admin/program/show/json/redactor-image-upload
+  path: /admin/program/porady/json/redactor-image-upload
   controller: App\Program\Controller\Admin\ShowWriteController::redactorImageUpload
   methods: POST
 
 admin_program_show_json_redactor_file_upload:
-  path: /admin/program/show/json/redactor-file-upload
+  path: /admin/program/porady/json/redactor-file-upload
   controller: App\Program\Controller\Admin\ShowWriteController::redactorFileUpload
   methods: POST
 
 # Showex - List
 admin_program_showex:
-  path: /admin/program/showex
+  path: /admin/program/mimoradne-porady/seznam
   controller: App\Program\Controller\Admin\ShowexListController::list
 
 admin_program_showex_json_get_list:
-  path: /admin/program/showex/json/get-list
+  path: /admin/program/mimoradne-porady/json/get-list
   controller: App\Program\Controller\Admin\ShowexListController::getList
 
 admin_program_showex_json_get_show:
-  path: /admin/program/showex/json/get-show
+  path: /admin/program/mimoradne-porady/json/get-show
   controller: App\Program\Controller\Admin\ShowexListController::getShow
   methods: POST
 
 admin_program_showex_json_get_url:
-  path: /admin/program/showex/json/get-url
+  path: /admin/program/mimoradne-porady/json/get-url
   controller: App\Program\Controller\Admin\ShowexListController::getUrl
   methods: POST
 
 admin_program_showex_json_redactor_image_manager:
-  path: /admin/program/showex/json/redactor-image-manager
+  path: /admin/program/mimoradne-porady/json/redactor-image-manager
   controller: App\Program\Controller\Admin\ShowexListController::redactorImageManager
 
 admin_program_showex_json_redactor_file_manager:
-  path: /admin/program/showex/json/redactor-file-manager
+  path: /admin/program/mimoradne-porady/json/redactor-file-manager
   controller: App\Program\Controller\Admin\ShowexListController::redactorFileManager
 
 # Showex - Write
 admin_program_showex_add:
-  path: /admin/program/showex/add
+  path: /admin/program/mimoradne-porady/pridat
   controller: App\Program\Controller\Admin\ShowexWriteController::add
   methods: [GET, POST]
 
 admin_program_showex_edit:
-  path: /admin/program/showex/edit/{id}
+  path: /admin/program/mimoradne-porady/upravit/{id}
   controller: App\Program\Controller\Admin\ShowexWriteController::edit
   methods: [GET, POST]
 
 admin_program_showex_json_delete_show:
-  path: /admin/program/showex/json/delete-show
+  path: /admin/program/mimoradne-porady/json/delete-show
   controller: App\Program\Controller\Admin\ShowexWriteController::deleteShow
   methods: POST
 
 admin_program_showex_json_set_order:
-  path: /admin/program/showex/json/set-order
+  path: /admin/program/mimoradne-porady/json/set-order
   controller: App\Program\Controller\Admin\ShowexWriteController::setOrder
   methods: POST
 
 admin_program_showex_json_upload_image:
-  path: /admin/program/showex/json/upload-image
+  path: /admin/program/mimoradne-porady/json/upload-image
   controller: App\Program\Controller\Admin\ShowexWriteController::uploadImage
   methods: POST
 
 admin_program_showex_json_set_default_image:
-  path: /admin/program/showex/json/set-default-image
+  path: /admin/program/mimoradne-porady/json/set-default-image
   controller: App\Program\Controller\Admin\ShowexWriteController::setDefaultImage
   methods: POST
 
 admin_program_showex_json_redactor_image_upload:
-  path: /admin/program/showex/json/redactor-image-upload
+  path: /admin/program/mimoradne-porady/json/redactor-image-upload
   controller: App\Program\Controller\Admin\ShowexWriteController::redactorImageUpload
   methods: POST
 
 admin_program_showex_json_redactor_file_upload:
-  path: /admin/program/showex/json/redactor-file-upload
+  path: /admin/program/mimoradne-porady/json/redactor-file-upload
   controller: App\Program\Controller\Admin\ShowexWriteController::redactorFileUpload
   methods: POST

@@ -24,6 +24,7 @@ final class SettingController
 
 	public function __construct(
 		private string $PUBLIC_PATH,
+		private Security $security,
 	) {}
 
 	public function index(
@@ -41,13 +42,11 @@ final class SettingController
 		SettingRepository $settingRepository,
 		FlashMessenger $flashMessenger,
 		LoggerInterface $logger,
-		Security $security,
 		UrlGeneratorInterface $urlGenerator,
 	): Response
 	{
 		/** @var User $identity */
-		$identity = $security->getUser();
-
+		$identity = $this->security->getUser();
 		try {
 			$setting = $settingRepository->fetchSetting();
 		} catch (\Exception) {
@@ -87,7 +86,7 @@ final class SettingController
 					// Log
 					$logger->notice('PROGRAM - Edit settings', [
 						'description' => 'OK',
-						'user' => $identity->getUsername(),
+						'user' => $identity->getUserIdentifier(),
 						'file' => __FILE__
 					]);
 				} catch (\Imagine\Exception\RuntimeException $e) {
@@ -96,7 +95,7 @@ final class SettingController
 					// Log
 					$logger->error('PROGRAM - Edit settings', [
 						'description' => 'ERROR',
-						'user' => $identity->getUsername(),
+						'user' => $identity->getUserIdentifier(),
 						'file' => __FILE__,
 						'trace' => $e->getMessage(),
 					]);
@@ -107,7 +106,7 @@ final class SettingController
 				// Log
 				$logger->error('PROGRAM - Edit settings', [
 					'description' => 'ERROR',
-					'user' => $identity->getUsername(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $e->getMessage(),
 				]);

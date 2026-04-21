@@ -37,7 +37,7 @@ $view->addInlineScript(
 		var iFrame = document.createElement("iframe");
 		iFrame.className = "loadData";
 		document.getElementsByTagName("body")[0].appendChild(iFrame);
-		iFrame.src = "' . $view->path('admin_program_json_export_shows', ['cron' => 'false']) . '";
+		iFrame.src = "' . $view->path('admin_program_json_write_export_shows', ['cron' => 0]) . '";
 	}
 	function updateProgress(data){
 		modal.find(".progress-bar").css("width", Math.round(data.percent) + "%");
@@ -77,7 +77,7 @@ $view->addInlineScript(
 					<button class="btn btn-primary" id="btnExportNewton">
 						Export
 					</button>
-					<a class="btn btn-default" id="btnExportNewtonCron" href="<?= $view->path('admin_program_json_export_shows', ['cron' => 'true']) ?>" target="_blank">
+					<a class="btn btn-default" id="btnExportNewtonCron" href="<?= $view->path('admin_program_json_write_export_shows', ['cron' => 1]) ?>" target="_blank">
 						Export (CRON)
 					</a>
 				</div>
@@ -89,7 +89,8 @@ $view->addInlineScript(
 					<?php
 						try {
 							$date = new DateTime($setting['newton_update_date']);
-							echo $date->format('j. F Y, H:i');
+							$fmt = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::SHORT, null, null, 'd. MMMM Y, HH:mm');
+								echo $fmt->format($date);
 						} catch (Exception) {
 							echo 'NaN';
 						}

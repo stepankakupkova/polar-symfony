@@ -41,13 +41,13 @@ $identity = $identity ?? null;
     <link rel="stylesheet" href="<?= $view->asset('vendor/admin/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') ?>">
     <link rel="stylesheet" href="<?= $view->asset('vendor/porto-admin/css/theme.min.css') ?>">
     <link rel="stylesheet" href="<?= $view->asset('css/admin/skin/' . $scheme . '.min.css') ?>">
-    <link rel="stylesheet" href="<?= $view->asset('css/admin/custom.min.css?ver=0.0.6') ?>">
     <?php foreach ($view->getHeadStyles() as $css) { ?>
         <style><?= $css ?></style>
     <?php } ?>
     <?php foreach ($view->getHeadLinks() as $link) { ?>
         <link rel="<?= $link['rel'] ?>" href="<?= $link['href'] ?>"<?= isset($link['media']) ? ' media="' . $link['media'] . '"' : '' ?>>
     <?php } ?>
+    <link rel="stylesheet" href="<?= $view->asset('css/admin/custom.min.css?ver=0.0.6') ?>">
     <script src="<?= $view->asset('vendor/admin/modernizr/js/modernizr.min.js') ?>"></script>
 </head>
 <body class="loading-overlay-showing" data-loading-overlay data-plugin-options="{'hideDelay': 150, 'effect': 'default'}">
@@ -70,6 +70,19 @@ $identity = $identity ?? null;
         </div>
         <div class="header-right">
             <span class="separator"></span>
+            <ul class="notifications">
+                <li>
+                    <a href="/" class="notification-icon" title="Web">
+                        <i class="fa fa-globe"></i>
+                    </a>
+                </li>
+                <li>
+                    <a id="btnThemeChange" href="#" class="notification-icon" title="Schéma">
+                        <i class="fa fa-adjust"></i>
+                    </a>
+                </li>
+            </ul>
+            <span class="separator"></span>
             <div id="userbox" class="userbox">
                 <a href="#" data-toggle="dropdown">
                     <?php if ($identity) { ?>
@@ -77,7 +90,7 @@ $identity = $identity ?? null;
                         <figure class="profile-picture">
                             <img src="<?= $view->asset($avatarImage) ?>" alt="<?= htmlspecialchars($identity->getFirstName() . ' ' . $identity->getLastName()) ?>" class="rounded-circle" data-lock-picture="<?= $view->asset($avatarImage) ?>">
                         </figure>
-                        <div class="profile-info">
+                        <div class="profile-info" data-lock-name="<?= htmlspecialchars($identity->getUserIdentifier()) ?>" data-lock-email="<?= htmlspecialchars($identity->getUserIdentifier()) ?>">
                             <span class="name"><?= htmlspecialchars($identity->getFirstName() . ' ' . $identity->getLastName()) ?></span>
                             <span class="role"><?= htmlspecialchars(implode(', ', array_map(fn($r) => match($r) { 'owner' => 'majitel', 'admin' => 'admin', 'member' => 'uživatel', default => $r }, $identity->getRole()))) ?></span>
                         </div>
@@ -108,30 +121,62 @@ $identity = $identity ?? null;
             <div class="nano">
                 <div class="nano-content">
                     <nav id="menu" class="nav-main" role="navigation">
+                        <?php $currentPath = strtok($_SERVER['REQUEST_URI'], '?'); ?>
                         <ul class="nav nav-main">
-                            <li class="nav-item">
+                            <li class="nav-item<?= $currentPath === $view->path('admin_dashboard') ? ' nav-active' : '' ?>">
                                 <a class="nav-link" href="<?= $view->path('admin_dashboard') ?>">
                                     <i class="fa fa-home" aria-hidden="true"></i>
                                     <span>Dashboard</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_user_list')) ? ' nav-active' : '' ?>">
                                 <a class="nav-link" href="<?= $view->path('admin_user_list') ?>">
                                     <i class="fa fa-users" aria-hidden="true"></i>
                                     <span>Uživatelé</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_page_index')) ? ' nav-active' : '' ?>">
                                 <a class="nav-link" href="<?= $view->path('admin_page_index') ?>">
                                     <i class="fa fa-file-alt" aria-hidden="true"></i>
                                     <span>Stránky</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= $view->path('admin_program') ?>">
+                            <?php
+                                $programPaths = [
+                                    $view->path('admin_program_list'),
+                                    $view->path('admin_program_video_list'),
+                                    $view->path('admin_program_show'),
+                                    $view->path('admin_program_newton'),
+                                ];
+                                $isProgramActive = array_filter($programPaths, fn($p) => str_starts_with($currentPath, $p));
+                            ?>
+                            <li class="nav-parent<?= $isProgramActive ? ' nav-expanded nav-active' : '' ?>">
+                                <a class="nav-link">
                                     <i class="fa fa-list-alt" aria-hidden="true"></i>
                                     <span>Program</span>
                                 </a>
+                                <ul class="nav nav-children">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_program_list')) && !str_starts_with($currentPath, $view->path('admin_program_video_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_program_list') ?>">
+                                            <span>Program</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_program_video_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_program_video_list') ?>">
+                                            <span>Videa</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_program_show')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_program_show') ?>">
+                                            <span>Pořady</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_program_newton')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_program_newton') ?>">
+                                            <span>Newton</span>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </nav>
@@ -178,17 +223,10 @@ $identity = $identity ?? null;
 <script>
 // Změna schématu - přepnutí CSS tříd na image widgetech
 $("#btnThemeChange").on("click", function (event) {
-    event.preventDefault();
-    let scheme = "dark";
-    let html = $("html");
-
-    if (html.hasClass("dark")) {
-        scheme = "light";
-    }
-    
     let image = $(".image-inner-container img");
     let btnImage = $(".image-button");
-    
+    let scheme = $("html").hasClass("dark") ? "light" : "dark";
+
     if (scheme === "dark") {
         image.removeClass("border-color-light").addClass("border-color-dark");
         btnImage.removeClass("bg-dark").addClass("bg-light");

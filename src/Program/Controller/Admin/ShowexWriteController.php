@@ -36,6 +36,7 @@ final class ShowexWriteController
 
 	public function __construct(
 		private string $PUBLIC_PATH,
+		private Security $security,
 	) {}
 
 	public function add(
@@ -46,10 +47,9 @@ final class ShowexWriteController
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
 		LoggerInterface $logger,
-		Security $security,
 	): Response
 	{
-		$identity = $security->getUser();
+		$identity = $this->security->getUser();
 		$setting = $settingRepository->fetchSetting();
 		$categories = $showexRepository->fetchCategoryForBootstrapSelect();
 
@@ -75,7 +75,7 @@ final class ShowexWriteController
 
 				$show_id = $showexRepository->insertPost($data);
 
-				// Adresář
+				// AdresĂˇĹ™
 				$folder = 'data/mimoradne/show/' . $show_id;
 				if (!is_dir($this->PUBLIC_PATH . '/' . $folder)) {
 					if (!mkdir($concurrentDirectory = $this->PUBLIC_PATH . '/' . $folder, 0777, true) && !is_dir($concurrentDirectory)) {
@@ -84,7 +84,7 @@ final class ShowexWriteController
 					chmod($this->PUBLIC_PATH . '/' . $folder, 0777);
 				}
 
-				// Obrázek
+				// ObrĂˇzek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$image = null;
@@ -122,7 +122,7 @@ final class ShowexWriteController
 					$showexRepository->updatePost($show_id, ['content' => $content]);
 				}
 
-				// Vygenerování souboru config
+				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showexRepository);
 
 				$flashMessenger->addMessage(
@@ -134,7 +134,7 @@ final class ShowexWriteController
 				// Log
 				$logger->notice('PROGRAM - Add extraordinary shows', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 
@@ -143,7 +143,7 @@ final class ShowexWriteController
 				// Log
 				$logger->error('PROGRAM - Add extraordinary shows', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $e->getMessage(),
 				]);
@@ -151,7 +151,7 @@ final class ShowexWriteController
 		}
 
 		return new Response($renderer->renderWithAdminLayout('program/showex/add', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Mimořádné pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'setting' => $setting,
 			'categories' => $categories,
@@ -166,9 +166,9 @@ final class ShowexWriteController
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
 		LoggerInterface $logger,
-		Security $security,
 	): Response
 	{
+		$identity = $this->security->getUser();
 		$show_id = (int) $request->attributes->get('id', 0);
 
 		if ($show_id === 0) {
@@ -185,7 +185,6 @@ final class ShowexWriteController
 			return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
 		}
 
-		$identity = $security->getUser();
 		$setting = $settingRepository->fetchSetting();
 		$categories = $showexRepository->fetchCategoryForBootstrapSelect();
 
@@ -208,7 +207,7 @@ final class ShowexWriteController
 					'seo_description' => trim(strip_tags($post['seo_description'] ?? '')),
 				];
 
-				// Obrázek
+				// ObrĂˇzek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$data['image'] = null;
@@ -217,7 +216,7 @@ final class ShowexWriteController
 
 				$showexRepository->updatePost($show_id, $data);
 
-				// Vygenerování souboru config
+				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showexRepository);
 
 				$flashMessenger->addMessage(
@@ -229,7 +228,7 @@ final class ShowexWriteController
 				// Log
 				$logger->notice('PROGRAM - Edit extraordinary shows', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 
@@ -238,7 +237,7 @@ final class ShowexWriteController
 				// Log
 				$logger->error('PROGRAM - Edit extraordinary shows', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $e->getMessage(),
 				]);
@@ -246,12 +245,11 @@ final class ShowexWriteController
 		}
 
 		return new Response($renderer->renderWithAdminLayout('program/showex/edit', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Mimořádné pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'show' => $show,
 			'setting' => $setting,
 			'categories' => $categories,
-			'identity' => $identity,
 		]));
 	}
 
@@ -260,14 +258,12 @@ final class ShowexWriteController
 		ShowexRepository $showexRepository,
 		ProgramRepository $programRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$show_id = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -289,23 +285,23 @@ final class ShowexWriteController
 					$rank++;
 				}
 
-				// Vygenerování souboru config
+				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showexRepository);
 
 				// Log
 				$logger->notice('PROGRAM - Delete extraordinary shows', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najít mimořádný pořad';
+				$message = 'Nelze najĂ­t mimoĹ™ĂˇdnĂ˝ poĹ™ad';
 
 				// Log
 				$logger->error('PROGRAM - Delete extraordinary shows', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -317,7 +313,7 @@ final class ShowexWriteController
 			// Log
 			$logger->error('PROGRAM - Delete extraordinary shows', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -366,7 +362,7 @@ final class ShowexWriteController
 		$file = $request->files->get('file');
 		if (!$file) {
 			return new JsonResponse([
-				'error' => 'Žádné soubory k nahrání',
+				'error' => 'Ĺ˝ĂˇdnĂ© soubory k nahrĂˇnĂ­',
 			]);
 		}
 
@@ -414,7 +410,7 @@ final class ShowexWriteController
 		if ($show_id && $show_id !== 'null') {
 			$show = $showexRepository->findPostBy('id', (int) $show_id);
 
-			// Smazat bývalý obrázek
+			// Smazat bĂ˝valĂ˝ obrĂˇzek
 			if ($show && $show['image'] && $show['image'] !== $this->imageDefault) {
 				@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 			}
@@ -429,7 +425,7 @@ final class ShowexWriteController
 			return new JsonResponse([
 				'name' => $file->getClientOriginalName(),
 				'url' => $imageFileName,
-				'error' => 'Obrázek je příliš velký',
+				'error' => 'ObrĂˇzek je pĹ™Ă­liĹˇ velkĂ˝',
 			]);
 		}
 
@@ -444,15 +440,13 @@ final class ShowexWriteController
 		Request $request,
 		ShowexRepository $showexRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$show_id = null;
 		$field = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -464,7 +458,7 @@ final class ShowexWriteController
 			if ($show) {
 				switch ($field) {
 					case 'image':
-						// Smazat bývalý obrázek
+						// Smazat bĂ˝valĂ˝ obrĂˇzek
 						if ($show['image'] && $show['image'] !== $this->imageDefault) {
 							@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 						}
@@ -479,17 +473,17 @@ final class ShowexWriteController
 				// Log
 				$logger->notice('PROGRAM - Set showex image', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najít mimořádný pořad';
+				$message = 'Nelze najĂ­t mimoĹ™ĂˇdnĂ˝ poĹ™ad';
 
 				// Log
 				$logger->error('PROGRAM - Set showex image', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -501,7 +495,7 @@ final class ShowexWriteController
 			// Log
 			$logger->error('PROGRAM - Set showex image', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);

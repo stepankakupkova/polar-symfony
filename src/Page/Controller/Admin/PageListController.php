@@ -6,7 +6,6 @@ use App\Application\View\PhtmlRenderer;
 use App\Page\Repository\PageRepository;
 use Exception;
 use RuntimeException;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +16,6 @@ final class PageListController
 	public function __construct(
 		private PageRepository $pageRepository,
 		private PhtmlRenderer $renderer,
-		private Security $security,
 		private string $PUBLIC_PATH,
 	) {}
 
@@ -26,10 +24,7 @@ final class PageListController
 	 */
 	public function index(): Response
 	{
-		$identity = $this->security->getUser();
-
 		return new Response($this->renderer->renderWithAdminLayout('page/admin/index', [
-			'identity' => $identity,
 			'pageTitle' => 'Stránky',
 			'countPage' => $this->pageRepository->getCount(),
 			'countPageActive' => $this->pageRepository->getCount(true),
@@ -41,11 +36,9 @@ final class PageListController
 	 */
 	public function list(): Response
 	{
-		$identity = $this->security->getUser();
 		$lang = 'cs_CZ';
 
 		return new Response($this->renderer->renderWithAdminLayout('page/admin/list', [
-			'identity' => $identity,
 			'pageTitle' => 'Stránky',
 			'lang' => $lang,
 			'locales' => ['cs_CZ' => 'Čeština'],

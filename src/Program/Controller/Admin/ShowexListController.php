@@ -29,7 +29,7 @@ class ShowexListController extends AbstractController
 	): Response
 	{
 		return new Response($renderer->renderWithAdminLayout('program/showex/list', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Mimořádné pořady',
 			'flashMessages' => $flashMessenger->getMessages(),
 		]));
 	}

@@ -235,7 +235,7 @@ $view->addInlineScript(
         </div>
         <div id="times">
             <h3 class="mt-5">
-                Vysílací časy
+                Časy vysílání
             </h3>
             <div class="mb-4">
                 <table id="btblTimes"
@@ -251,7 +251,7 @@ $view->addInlineScript(
                        data-sort-order="asc"
                        data-id-field="id"
                        data-pagination="false"
-                       data-cookie-id-table="USER-<?= $identity['id'] ?>-showTimesTable"
+                       data-cookie-id-table="USER-<?= $identity->getId() ?>-showTimesTable"
                        data-mobile-responsive="true">
                     <thead>
                     <tr>
@@ -338,7 +338,7 @@ $view->addInlineScript(
                         function dataFormatter<?= $i ?>(value, row) {
                             if (value[<?= $i ?>] !== undefined) {
                                 let time = value[<?= $i ?>].time;
-                                if (value[<?= $i ?>].premiere === '1') {
+                                if (value[<?= $i ?>].premiere === 1) {
                                     return '<span class="btnEdit text-danger" data-id="' + value[<?= $i ?>].id + '" data-premiere="' + value[<?= $i ?>].premiere + '" data-value="' + value[<?= $i ?>].time + '" data-day="' + row.day + '">' + time + '</span>';
                                 } else {
                                     return '<span class="btnEdit" data-id="' + value[<?= $i ?>].id + '" data-premiere="' + value[<?= $i ?>].premiere + '" data-value="' + value[<?= $i ?>].time + '" data-day="' + row.day + '">' + time + '</span>';

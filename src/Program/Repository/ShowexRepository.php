@@ -22,12 +22,12 @@ final class ShowexRepository
 				'special_shows.id', 'special_shows.title', 'special_shows.url', 'special_shows.short_description',
 				'special_shows.image', 'special_shows.thumb',
 				'special_shows.status', 'special_shows.content', 'special_shows.seo_keywords',
-				'special_shows.seo_description', 'special_shows.order',
+				'special_shows.seo_description', 'special_shows.`order`',
 				'program_shows_categories.title AS category_name'
 			)
 			->from($this->table)
 			->leftJoin('special_shows', 'program_shows_categories', 'program_shows_categories', 'program_shows_categories.id = special_shows.category_id')
-			->orderBy($params['sort'], $params['order']);
+			->orderBy($params['sort'] === 'order' ? '`order`' : $params['sort'], $params['order']);
 
 		if (isset($params['limit'])) {
 			$qb->setMaxResults((int) $params['limit']);

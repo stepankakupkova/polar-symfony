@@ -47,8 +47,8 @@ final class PageWriteController
 	 */
 	public function add(Request $request): Response
 	{
-		$lang = 'cs_CZ';
 		$identity = $this->security->getUser();
+		$lang = 'cs_CZ';
 		$setting = $this->settingRepository->fetchSetting();
 
 		$post = [];
@@ -57,7 +57,6 @@ final class PageWriteController
 		try {
 			if (!$request->isMethod('POST')) {
 				return new Response($this->renderer->renderWithAdminLayout('page/admin/add', [
-					'identity' => $identity,
 					'pageTitle' => 'Stránky',
 					'lang' => $lang,
 					'setting' => $setting,
@@ -76,7 +75,6 @@ final class PageWriteController
 
 			if (!empty($errors)) {
 				return new Response($this->renderer->renderWithAdminLayout('page/admin/add', [
-					'identity' => $identity,
 					'pageTitle' => 'Stránky',
 					'lang' => $lang,
 					'setting' => $setting,
@@ -173,7 +171,6 @@ final class PageWriteController
 		}
 
 		return new Response($this->renderer->renderWithAdminLayout('page/admin/add', [
-			'identity' => $identity,
 			'pageTitle' => 'Stránky',
 			'lang' => $lang,
 			'setting' => $setting,
@@ -187,9 +184,8 @@ final class PageWriteController
 	 */
 	public function edit(Request $request, int $id = 0): Response
 	{
-		$lang = 'cs_CZ';
 		$identity = $this->security->getUser();
-
+		$lang = 'cs_CZ';
 		if ($id === 0) {
 			return new RedirectResponse($this->urlGenerator->generate('admin_page_add'));
 		}
@@ -207,7 +203,6 @@ final class PageWriteController
 		try {
 			if (!$request->isMethod('POST')) {
 				return new Response($this->renderer->renderWithAdminLayout('page/admin/edit', [
-					'identity' => $identity,
 					'pageTitle' => 'Stránky',
 					'page' => $page,
 					'lang' => $lang,
@@ -227,7 +222,6 @@ final class PageWriteController
 
 			if (!empty($errors)) {
 				return new Response($this->renderer->renderWithAdminLayout('page/admin/edit', [
-					'identity' => $identity,
 					'pageTitle' => 'Stránky',
 					'page' => array_merge($page, $post),
 					'lang' => $lang,
@@ -282,7 +276,6 @@ final class PageWriteController
 		}
 
 		return new Response($this->renderer->renderWithAdminLayout('page/admin/edit', [
-			'identity' => $identity,
 			'pageTitle' => 'Stránky',
 			'page' => is_array($post) ? array_merge($page, $post) : $page,
 			'lang' => $lang,
@@ -297,12 +290,11 @@ final class PageWriteController
 	 */
 	public function duplicatePage(Request $request): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$page_id = null;
 		$lang = null;
-
-		$identity = $this->security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -377,11 +369,10 @@ final class PageWriteController
 	 */
 	public function deletePage(Request $request): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$page_id = null;
-
-		$identity = $this->security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -437,10 +428,7 @@ final class PageWriteController
 	public function sort(): Response
 	{
 		$lang = 'cs_CZ';
-		$identity = $this->security->getUser();
-
 		return new Response($this->renderer->renderWithAdminLayout('page/admin/sort', [
-			'identity' => $identity,
 			'pageTitle' => 'Stránky',
 			'lang' => $lang,
 		]));
@@ -484,9 +472,8 @@ final class PageWriteController
 	 */
 	protected function savePagesSort(array $data, ?int $parent = null, int $depth = 1, int $rank = 1, int $rankTotal = 1): int
 	{
+		$identity = $this->security->getUser();
 		if ($data) {
-			$identity = $this->security->getUser();
-
 			foreach ($data as $item) {
 				$this->pageRepository->updatePost((int) $item['id'], [
 					'parent' => $parent,
@@ -511,6 +498,7 @@ final class PageWriteController
 	 */
 	public function uploadImage(Request $request): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$file = $request->files->get('file');
 
 		if (!$file) {
@@ -561,8 +549,6 @@ final class PageWriteController
 		}
 
 		if ($page_id !== 'null' && $page_id !== null) {
-			$identity = $this->security->getUser();
-
 			$page = $this->pageRepository->findPostBy('id', (int) $page_id);
 
 			// Smazat bývalý obrázek
@@ -599,12 +585,11 @@ final class PageWriteController
 	 */
 	public function setDefaultImage(Request $request): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$page_id = null;
 		$field = null;
-
-		$identity = $this->security->getUser();
 
 		try {
 			$params = $request->request->all();

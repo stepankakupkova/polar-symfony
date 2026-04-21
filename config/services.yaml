@@ -104,37 +104,45 @@ services:
         tags: ['controller.service_arguments']
 
     App\Program\Controller\Admin\SettingController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Program\Controller\Admin\ShowListController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Program\Controller\Admin\ShowWriteController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Program\Controller\Admin\ShowexListController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Program\Controller\Admin\ShowexWriteController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Program\Controller\Admin\VideoWriteController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
             $LIGHT_PATH: '%app.LIGHT_PATH%'
             $LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Program\Controller\Admin\ProgramWriteController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
             $LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Program\Controller\Admin\VideoexWriteController:
+        tags: ['controller.service_arguments']
         bind:
             $PUBLIC_PATH: '%app.PUBLIC_PATH%'
             $LIGHT_PATH: '%app.LIGHT_PATH%'

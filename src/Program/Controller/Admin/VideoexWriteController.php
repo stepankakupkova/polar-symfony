@@ -32,6 +32,7 @@ final class VideoexWriteController
 		private string $PUBLIC_PATH,
 		private string $LIGHT_PATH,
 		private string $LIGHT_URL,
+		private Security $security,
 	) {}
 
 	public function edit(
@@ -41,27 +42,25 @@ final class VideoexWriteController
 		VideoexRepository $videoexRepository,
 		ShowexRepository $showexRepository,
 		UrlGeneratorInterface $urlGenerator,
-		Security $security,
 		LoggerInterface $logger,
 	): Response
 	{
+		$identity = $this->security->getUser();
 		$video_id = (int) $request->attributes->get('id', 0);
 
 		if ($video_id === 0) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_videoex'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_videoex_list'));
 		}
 
 		try {
 			$video = $videoexRepository->findPostBy('id', $video_id);
 		} catch (Exception) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_videoex'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_videoex_list'));
 		}
 
 		if (!$video) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_videoex'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_videoex_list'));
 		}
-
-		$identity = $security->getUser();
 
 		// Pořady
 		$shows = $showexRepository->fetchForBootstrapSelect(200);
@@ -70,7 +69,7 @@ final class VideoexWriteController
 			$post = $request->request->all();
 
 			if (isset($post['cancel'])) {
-				return new RedirectResponse($urlGenerator->generate('admin_program_videoex'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_videoex_list'));
 			}
 
 			try {
@@ -91,16 +90,16 @@ final class VideoexWriteController
 				// Log
 				$logger->notice('PROGRAM - Edit extraordinary video', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 
-				return new RedirectResponse($urlGenerator->generate('admin_program_videoex'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_videoex_list'));
 			} catch (Exception $e) {
 				// Log
 				$logger->error('PROGRAM - Edit extraordinary video', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $e->getMessage(),
 				]);
@@ -108,10 +107,9 @@ final class VideoexWriteController
 		}
 
 		return new Response($renderer->renderWithAdminLayout('program/videoex/edit', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Mimořádná videa',
 			'video' => $video,
 			'shows' => $shows,
-			'identity' => $identity,
 			'PUBLIC_PATH' => $this->PUBLIC_PATH,
 			'LIGHT_URL' => $this->LIGHT_URL,
 		]));
@@ -122,14 +120,12 @@ final class VideoexWriteController
 		VideoexRepository $videoexRepository,
 		ProgramRepository $programRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$video_id = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -157,7 +153,7 @@ final class VideoexWriteController
 				// Log
 				$logger->notice('PROGRAM - Delete extraordinary video', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
@@ -167,7 +163,7 @@ final class VideoexWriteController
 				// Log
 				$logger->error('PROGRAM - Delete extraordinary video', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -179,7 +175,7 @@ final class VideoexWriteController
 			// Log
 			$logger->error('PROGRAM - Delete extraordinary video', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -197,9 +193,9 @@ final class VideoexWriteController
 		VideoexRepository $videoexRepository,
 		SettingRepository $settingRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): Response
 	{
+		$identity = $this->security->getUser();
 		$cron = $request->query->get('cron');
 		$message = null;
 
@@ -215,8 +211,6 @@ final class VideoexWriteController
 				ob_end_flush();
 			}
 		}
-
-		$identity = $security->getUser();
 
 		try {
 			$dir = $this->LIGHT_PATH . 'mimoradne/nepublikovano';
@@ -362,9 +356,9 @@ final class VideoexWriteController
 		Request $request,
 		VideoexRepository $videoexRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$part_id = null;
@@ -372,8 +366,6 @@ final class VideoexWriteController
 		$sec_from = null;
 		$sec_to = null;
 		$title = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -392,7 +384,7 @@ final class VideoexWriteController
 			// Log
 			$logger->notice('PROGRAM - Add video part', [
 				'description' => 'OK',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 			]);
 		} catch (Exception $e) {
@@ -402,7 +394,7 @@ final class VideoexWriteController
 			// Log
 			$logger->error('PROGRAM - Add video part', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -423,14 +415,12 @@ final class VideoexWriteController
 		Request $request,
 		VideoexRepository $videoexRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$part_id = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -441,7 +431,7 @@ final class VideoexWriteController
 			// Log
 			$logger->notice('PROGRAM - Delete extraordinary video part', [
 				'description' => 'OK',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 			]);
 
@@ -452,7 +442,7 @@ final class VideoexWriteController
 			// Log
 			$logger->error('PROGRAM - Delete extraordinary video part', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -469,16 +459,14 @@ final class VideoexWriteController
 		Request $request,
 		VideoexRepository $videoexRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$video_id = null;
 		$sec = null;
 		$preview = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -500,7 +488,7 @@ final class VideoexWriteController
 				// Log
 				$logger->notice('PROGRAM - Edit extraordinary video - Create preview', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
@@ -510,7 +498,7 @@ final class VideoexWriteController
 				// Log
 				$logger->error('PROGRAM - Edit extraordinary video - Create preview', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -522,7 +510,7 @@ final class VideoexWriteController
 			// Log
 			$logger->error('PROGRAM - Edit extraordinary video - Create preview', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);

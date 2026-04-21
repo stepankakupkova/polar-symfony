@@ -36,6 +36,7 @@ final class VideoWriteController
 		private string $PUBLIC_PATH,
 		private string $LIGHT_PATH,
 		private string $LIGHT_URL,
+		private Security $security,
 	) {}
 
 	public function edit(
@@ -48,21 +49,21 @@ final class VideoWriteController
 		$video_id = (int) $request->attributes->get('id', 0);
 
 		if ($video_id === 0) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_video'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_video_list'));
 		}
 
 		try {
 			$video = $videoRepository->findPostBy('id', $video_id);
 		} catch (Exception) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_video'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_video_list'));
 		}
 
 		if (!$video) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_video'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_video_list'));
 		}
 
 		return new Response($renderer->renderWithAdminLayout('program/video/edit', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Videa',
 			'video' => $video,
 			'PUBLIC_PATH' => $this->PUBLIC_PATH,
 			'LIGHT_URL' => $this->LIGHT_URL,
@@ -74,14 +75,12 @@ final class VideoWriteController
 		VideoRepository $videoRepository,
 		ProgramRepository $programRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$video_id = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -109,7 +108,7 @@ final class VideoWriteController
 				// Log
 				$logger->notice('PROGRAM - Delete video', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
@@ -119,7 +118,7 @@ final class VideoWriteController
 				// Log
 				$logger->error('PROGRAM - Delete video', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -131,7 +130,7 @@ final class VideoWriteController
 			// Log
 			$logger->error('PROGRAM - Delete video', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -150,9 +149,9 @@ final class VideoWriteController
 		ProgramRepository $programRepository,
 		SettingRepository $settingRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): Response
 	{
+		$identity = $this->security->getUser();
 		$cron = $request->query->get('cron');
 		$message = null;
 
@@ -168,8 +167,6 @@ final class VideoWriteController
 				ob_end_flush();
 			}
 		}
-
-		$identity = $security->getUser();
 
 		try {
 			$dir = $this->LIGHT_PATH . 'porady/nepublikovano';
@@ -325,16 +322,14 @@ final class VideoWriteController
 		Request $request,
 		VideoRepository $videoRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$video_id = null;
 		$sec = null;
 		$preview = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -356,7 +351,7 @@ final class VideoWriteController
 				// Log
 				$logger->notice('PROGRAM - Edit video - Create preview', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
@@ -366,7 +361,7 @@ final class VideoWriteController
 				// Log
 				$logger->error('PROGRAM - Edit video - Create preview', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -378,7 +373,7 @@ final class VideoWriteController
 			// Log
 			$logger->error('PROGRAM - Edit video - Create preview', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -397,15 +392,13 @@ final class VideoWriteController
 		Request $request,
 		VideoRepository $videoRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$video_id = null;
 		$preview = null;
-
-		$identity = $security->getUser();
 
 		$file = $request->files->get('file');
 		if (!$file) {
@@ -445,7 +438,7 @@ final class VideoWriteController
 					// Log
 					$logger->notice('PROGRAM - Edit video - Upload preview', [
 						'description' => 'OK',
-						'user' => $identity?->getUserIdentifier(),
+						'user' => $identity->getUserIdentifier(),
 						'file' => __FILE__,
 					]);
 				}
@@ -456,7 +449,7 @@ final class VideoWriteController
 				// Log
 				$logger->error('PROGRAM - Edit video - Upload preview', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -497,13 +490,13 @@ final class VideoWriteController
 			// Log
 			$logger->notice('PROGRAM - Load videos - Create preview', [
 				'description' => 'OK',
-				'user' => $identity?->getUserIdentifier() ?? 'CRON',
+				'user' => $identity->getUserIdentifier() ?? 'CRON',
 				'file' => __FILE__,
 			]);
 		} catch (Exception $e) {
 			$logger->error('PROGRAM - Load videos - Create preview', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier() ?? 'CRON',
+				'user' => $identity->getUserIdentifier() ?? 'CRON',
 				'file' => __FILE__,
 				'trace' => $e->getMessage(),
 			]);

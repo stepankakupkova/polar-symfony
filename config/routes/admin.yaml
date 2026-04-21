@@ -6,6 +6,12 @@ admin_dashboard:
   path: /admin/dashboard
   controller: App\Admin\Controller\AdminController::dashboard
 
+
+admin_json_write_set_scheme:
+  path: /admin/json-write/set-scheme
+  controller: App\Admin\Controller\AdminWriteController::setScheme
+  methods: [POST]
+
 # User
 admin_user_index:
   path: /admin/users

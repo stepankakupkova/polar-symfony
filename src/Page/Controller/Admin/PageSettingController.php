@@ -41,7 +41,6 @@ final class PageSettingController
 	public function setting(Request $request): Response
 	{
 		$identity = $this->security->getUser();
-
 		try {
 			$setting = $this->settingRepository->fetchSetting();
 		} catch (Exception) {
@@ -54,7 +53,6 @@ final class PageSettingController
 		try {
 			if (!$request->isMethod('POST')) {
 				return new Response($this->renderer->renderWithAdminLayout('page/admin/setting', [
-					'identity' => $identity,
 					'pageTitle' => 'Stránky - nastavení',
 					'setting' => $setting,
 					'success' => $success,
@@ -120,7 +118,6 @@ final class PageSettingController
 		}
 
 		return new Response($this->renderer->renderWithAdminLayout('page/admin/setting', [
-			'identity' => $identity,
 			'pageTitle' => 'Stránky - nastavení',
 			'setting' => $setting,
 			'success' => $success,

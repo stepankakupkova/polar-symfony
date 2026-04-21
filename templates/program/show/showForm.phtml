@@ -118,7 +118,7 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
     <input type="hidden" name="image" value="<?= htmlspecialchars($imageValue) ?>">
     <div class="card-body">
         <div class="form-group row">
-            <label class="col-sm-3 control-label text-sm-right pt-2">Status</label>
+            <label class="col-sm-3 control-label text-sm-right pt-2">Stav</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
                     <input type="hidden" name="status" value="0">
@@ -132,7 +132,7 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
                     <input type="checkbox" name="show_in_archive" value="1" data-plugin-ios-switch<?= !empty($form['show_in_archive']) ? ' checked' : '' ?>>
                 </div>
             </div>
-            <label class="col-sm-2 control-label text-sm-right pt-2">Video části</label>
+            <label class="col-sm-2 control-label text-sm-right pt-2">Použít části videa</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
                     <input type="hidden" name="video_parts" value="0">
@@ -155,23 +155,12 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
                     <input type="checkbox" name="download" value="1" data-plugin-ios-switch<?= !empty($form['download']) ? ' checked' : '' ?>>
                 </div>
             </div>
-            <label class="col-sm-2 control-label text-sm-right pt-2">Newton export</label>
+            <label class="col-sm-2 control-label text-sm-right pt-2">Export pro Newton</label>
             <div class="col-sm-1">
                 <div class="switch switch-primary">
                     <input type="hidden" name="newton" value="0">
                     <input type="checkbox" name="newton" value="1" data-plugin-ios-switch<?= !empty($form['newton']) ? ' checked' : '' ?>>
                 </div>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-3 control-label text-sm-right pt-2 required">Kategorie</label>
-            <div class="col-sm-9">
-                <select name="category_id" class="form-control selectpicker show-tick" required>
-                    <option value="">---</option>
-                    <?php foreach ($categories as $cat): ?>
-                        <option value="<?= $cat['id'] ?>"<?= (string)($form['category_id'] ?? '') === (string)$cat['id'] ? ' selected' : '' ?>><?= htmlspecialchars($cat['title']) ?></option>
-                    <?php endforeach ?>
-                </select>
             </div>
         </div>
         <div class="form-group row">
@@ -198,7 +187,18 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-3 control-label text-sm-right pt-2">Krátký popis</label>
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Kategorie</label>
+            <div class="col-sm-9">
+                <select name="category_id" class="form-control selectpicker show-tick" required>
+                    <option value="">---</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= $cat['value'] ?>"<?= (string)($form['category_id'] ?? '') === (string)$cat['value'] ? ' selected' : '' ?>><?= htmlspecialchars($cat['label']) ?></option>
+                    <?php endforeach ?>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 control-label text-sm-right pt-2 required">Krátký popis</label>
             <div class="col-sm-9">
                 <textarea name="short_description" class="form-control" placeholder="optional"
                           rows="3" data-plugin-textarea-autosize><?= htmlspecialchars($form['short_description'] ?? '') ?></textarea>
@@ -230,6 +230,6 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
     </div>
     <footer class="card-footer text-right">
         <button type="submit" class="btn btn-primary"><?= $submitLabel ?></button>
-        <a href="<?= $view->path('admin_program_show') ?>" class="btn btn-default">Zrušit</a>
+        <a href="<?= $view->path('admin_program_show') ?>" class="btn btn-default">Storno</a>
     </footer>
 </form>

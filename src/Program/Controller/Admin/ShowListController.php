@@ -14,7 +14,6 @@ use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ShowRepository;
 use Exception;
 use RuntimeException;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,15 +28,11 @@ final class ShowListController
 	public function list(
 		PhtmlRenderer $renderer,
 		FlashMessenger $flashMessenger,
-		Security $security,
 	): Response
 	{
-		$identity = $security->getUser();
-
 		return new Response($renderer->renderWithAdminLayout('program/show/list', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Pořady',
 			'flashMessages' => $flashMessenger->getMessages(),
-			'identity' => $identity,
 		]));
 	}
 

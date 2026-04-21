@@ -36,6 +36,7 @@ final class ShowWriteController
 
 	public function __construct(
 		private string $PUBLIC_PATH,
+		private Security $security,
 	) {}
 
 	public function add(
@@ -46,10 +47,9 @@ final class ShowWriteController
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
 		LoggerInterface $logger,
-		Security $security,
 	): Response
 	{
-		$identity = $security->getUser();
+		$identity = $this->security->getUser();
 		$setting = $settingRepository->fetchSetting();
 		$categories = $showRepository->fetchCategoryForBootstrapSelect();
 
@@ -80,7 +80,7 @@ final class ShowWriteController
 
 				$show_id = $showRepository->insertPost($data);
 
-				// Adresář
+				// AdresĂˇĹ™
 				$folder = 'data/program/show/' . $show_id;
 				if (!is_dir($this->PUBLIC_PATH . '/' . $folder)) {
 					if (!mkdir($concurrentDirectory = $this->PUBLIC_PATH . '/' . $folder, 0777, true) && !is_dir($concurrentDirectory)) {
@@ -89,7 +89,7 @@ final class ShowWriteController
 					chmod($this->PUBLIC_PATH . '/' . $folder, 0777);
 				}
 
-				// Obrázek
+				// ObrĂˇzek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$image = null;
@@ -127,7 +127,7 @@ final class ShowWriteController
 					$showRepository->updatePost($show_id, ['content' => $content]);
 				}
 
-				// Vygenerování souboru config
+				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showRepository);
 
 				$flashMessenger->addMessage(
@@ -139,7 +139,7 @@ final class ShowWriteController
 				// Log
 				$logger->notice('PROGRAM - Add show', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 
@@ -148,7 +148,7 @@ final class ShowWriteController
 				// Log
 				$logger->error('PROGRAM - Add show', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $e->getMessage(),
 				]);
@@ -156,7 +156,7 @@ final class ShowWriteController
 		}
 
 		return new Response($renderer->renderWithAdminLayout('program/show/add', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'setting' => $setting,
 			'categories' => $categories,
@@ -171,9 +171,9 @@ final class ShowWriteController
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
 		LoggerInterface $logger,
-		Security $security,
 	): Response
 	{
+		$identity = $this->security->getUser();
 		$show_id = (int) $request->attributes->get('id', 0);
 
 		if ($show_id === 0) {
@@ -190,7 +190,6 @@ final class ShowWriteController
 			return new RedirectResponse($urlGenerator->generate('admin_program_show'));
 		}
 
-		$identity = $security->getUser();
 		$setting = $settingRepository->fetchSetting();
 		$categories = $showRepository->fetchCategoryForBootstrapSelect();
 
@@ -218,7 +217,7 @@ final class ShowWriteController
 					'seo_description' => trim(strip_tags($post['seo_description'] ?? '')),
 				];
 
-				// Obrázek
+				// ObrĂˇzek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$data['image'] = null;
@@ -227,7 +226,7 @@ final class ShowWriteController
 
 				$showRepository->updatePost($show_id, $data);
 
-				// Vygenerování souboru config
+				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showRepository);
 
 				$flashMessenger->addMessage(
@@ -239,7 +238,7 @@ final class ShowWriteController
 				// Log
 				$logger->notice('PROGRAM - Edit show', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 
@@ -248,7 +247,7 @@ final class ShowWriteController
 				// Log
 				$logger->error('PROGRAM - Edit show', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $e->getMessage(),
 				]);
@@ -256,12 +255,11 @@ final class ShowWriteController
 		}
 
 		return new Response($renderer->renderWithAdminLayout('program/show/edit', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'show' => $show,
 			'setting' => $setting,
 			'categories' => $categories,
-			'identity' => $identity,
 		]));
 	}
 
@@ -270,14 +268,12 @@ final class ShowWriteController
 		ShowRepository $showRepository,
 		ProgramRepository $programRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$show_id = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -300,23 +296,23 @@ final class ShowWriteController
 					$rank++;
 				}
 
-				// Vygenerování souboru config
+				// VygenerovĂˇnĂ­ souboru config
 				$this->createConfig($showRepository);
 
 				// Log
 				$logger->notice('PROGRAM - Delete show', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najít pořad';
+				$message = 'Nelze najĂ­t poĹ™ad';
 
 				// Log
 				$logger->error('PROGRAM - Delete show', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -328,7 +324,7 @@ final class ShowWriteController
 			// Log
 			$logger->error('PROGRAM - Delete show', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);
@@ -416,7 +412,7 @@ final class ShowWriteController
 		$file = $request->files->get('file');
 		if (!$file) {
 			return new JsonResponse([
-				'error' => 'Žádné soubory k nahrání',
+				'error' => 'Ĺ˝ĂˇdnĂ© soubory k nahrĂˇnĂ­',
 			]);
 		}
 
@@ -464,7 +460,7 @@ final class ShowWriteController
 		if ($show_id && $show_id !== 'null') {
 			$show = $showRepository->findPostBy('id', (int) $show_id);
 
-			// Smazat bývalý obrázek
+			// Smazat bĂ˝valĂ˝ obrĂˇzek
 			if ($show && $show['image'] && $show['image'] !== $this->imageDefault) {
 				@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 			}
@@ -479,7 +475,7 @@ final class ShowWriteController
 			return new JsonResponse([
 				'name' => $file->getClientOriginalName(),
 				'url' => $imageFileName,
-				'error' => 'Obrázek je příliš velký',
+				'error' => 'ObrĂˇzek je pĹ™Ă­liĹˇ velkĂ˝',
 			]);
 		}
 
@@ -494,15 +490,13 @@ final class ShowWriteController
 		Request $request,
 		ShowRepository $showRepository,
 		LoggerInterface $logger,
-		Security $security,
 	): JsonResponse
 	{
+		$identity = $this->security->getUser();
 		$success = true;
 		$message = null;
 		$show_id = null;
 		$field = null;
-
-		$identity = $security->getUser();
 
 		try {
 			$params = $request->request->all();
@@ -514,7 +508,7 @@ final class ShowWriteController
 			if ($show) {
 				switch ($field) {
 					case 'image':
-						// Smazat bývalý obrázek
+						// Smazat bĂ˝valĂ˝ obrĂˇzek
 						if ($show['image'] && $show['image'] !== $this->imageDefault) {
 							@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 						}
@@ -529,17 +523,17 @@ final class ShowWriteController
 				// Log
 				$logger->notice('PROGRAM - Set show image', [
 					'description' => 'OK',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najít pořad';
+				$message = 'Nelze najĂ­t poĹ™ad';
 
 				// Log
 				$logger->error('PROGRAM - Set show image', [
 					'description' => 'ERROR',
-					'user' => $identity?->getUserIdentifier(),
+					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
 					'trace' => $message,
 				]);
@@ -551,7 +545,7 @@ final class ShowWriteController
 			// Log
 			$logger->error('PROGRAM - Set show image', [
 				'description' => 'ERROR',
-				'user' => $identity?->getUserIdentifier(),
+				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
 				'trace' => $message,
 			]);

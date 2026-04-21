@@ -22,10 +22,7 @@ final class AdminController
 	): Response
 	{
 		/** @var User $identity */
-		$identity = $security->getUser();
-
 		return new Response($renderer->renderWithAdminLayout('admin/dashboard', [
-			'identity' => $identity,
 			'pageTitle' => 'Dashboard',
 		]));
 	}

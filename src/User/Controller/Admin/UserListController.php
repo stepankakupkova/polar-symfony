@@ -4,9 +4,7 @@ namespace App\User\Controller\Admin;
 
 use App\Application\View\PhtmlRenderer;
 use App\Authorization\Repository\AuthorizationRepository;
-use App\Security\User;
 use App\User\Repository\UserRepository;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,16 +15,11 @@ final class UserListController
 		private UserRepository $userRepository,
 		private AuthorizationRepository $authorizationRepository,
 		private PhtmlRenderer $renderer,
-		private Security $security,
 	) {}
 
 	public function index(): Response
 	{
-		/** @var User $identity */
-		$identity = $this->security->getUser();
-
 		return new Response($this->renderer->renderWithAdminLayout('user/admin/index', [
-			'identity' => $identity,
 			'pageTitle' => 'Uživatelé',
 			'countUsers' => $this->userRepository->getCount(),
 			'countUsersActive' => $this->userRepository->getCount(true),
@@ -35,11 +28,7 @@ final class UserListController
 
 	public function list(): Response
 	{
-		/** @var User $identity */
-		$identity = $this->security->getUser();
-
 		return new Response($this->renderer->renderWithAdminLayout('user/admin/list', [
-			'identity' => $identity,
 			'pageTitle' => 'Uživatelé',
 		]));
 	}

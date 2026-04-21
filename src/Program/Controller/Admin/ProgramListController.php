@@ -45,7 +45,6 @@ final class ProgramListController
 		return new Response($renderer->renderWithAdminLayout('program/program/list', [
 			'pageTitle' => 'Program',
 			'flashMessages' => $flashMessenger->getMessages(),
-			'identity' => $security->getUser(),
 		]));
 	}
 

@@ -195,10 +195,13 @@ $view->addInlineScript(
 
     <script>
         function optionsFormatter(value, row) {
-            return '<div class="btn-group pb-sm-0 pb-2">' +
-                '<a href="<?= $view->path('admin_program_edit') ?>/' + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +
-                '<button data-program-id="' + row.id + '" class="btblBtnDeleteProgram btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>' +
-                '</div>';
+            let url = "<?= $view->path('admin_program_list') ?>/upravit";
+            let data = '';
+            data += '<div class="btn-group pb-sm-0 pb-2">';
+            data += '<a href="' + url + "/" + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ';
+            data += '<button data-program-id="' + row.id + '" class="btblBtnDeleteProgram btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>';
+            data += '</div>';
+            return data;
         }
 
         function premiereFormatter(value) {

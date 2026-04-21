@@ -14,7 +14,6 @@ use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\SettingRepository;
 use App\Program\Repository\VideoexRepository;
 use Exception;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,17 +25,14 @@ final class VideoexListController
 		PhtmlRenderer $renderer,
 		FlashMessenger $flashMessenger,
 		SettingRepository $settingRepository,
-		Security $security,
 	): Response
 	{
 		$setting = $settingRepository->fetchSetting();
-		$identity = $security->getUser();
 
 		return new Response($renderer->renderWithAdminLayout('program/videoex/list', [
-			'pageTitle' => 'Program',
+			'pageTitle' => 'Mimořádná videa',
 			'flashMessages' => $flashMessenger->getMessages(),
 			'setting' => $setting,
-			'identity' => $identity,
 		]));
 	}
 

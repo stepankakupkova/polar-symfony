@@ -3,6 +3,8 @@
 namespace App\Application\View;
 
 use App\Application\Service\FlashMessenger;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class PhtmlRenderer
@@ -12,6 +14,8 @@ final class PhtmlRenderer
 		private string $basePath,
 		private UrlGeneratorInterface $urlGenerator,
 		private FlashMessenger $flashMessenger,
+		private RequestStack $requestStack,
+		private Security $security,
 		private array $globals = [],
 	) {}
 
@@ -54,8 +58,12 @@ final class PhtmlRenderer
 	{
 		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->basePath);
 
-		// Scheme
-		$params['scheme'] = $params['scheme'] ?? 'dark';
+		// Scheme – načti ze session, fallback dark
+		$session = $this->requestStack->getSession();
+		$params['scheme'] = $params['scheme'] ?? $session->get('scheme', 'dark');
+
+		// Identity – automaticky doplň pokud controller nepředal
+		$params['identity'] = $params['identity'] ?? $this->security->getUser();
 		$params['schemeOpposite'] = $params['scheme'] === 'dark' ? 'light' : 'dark';
 
 		// Flash messages → PNotify inline scripty (jako polar InlineScriptPlugin)
