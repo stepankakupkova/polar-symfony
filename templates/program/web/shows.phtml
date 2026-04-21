@@ -1,0 +1,160 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+$showsForAutocomplete_json = json_encode($showsForAutocomplete);
+
+$view->addBodyScript($view->asset('vendor/web/bootstrap-autocomplete/autocomplete.js'));
+
+// Bootstrap autocomplete - našeptávač JS
+$view->addInlineScript(
+    '
+    var src = ' . $showsForAutocomplete_json . ';
+    Autocomplete.init("input#autocomplete", {
+        items: src.map(item => ({label: item.title, value: item.url, special: item.special})),
+        highlightTyped: true,
+        onSelectItem: function(item, autocomplete) {
+            if (item.special === "ano") {
+                window.location.href = "/mimoradne/" + item.value;
+            } else {
+                window.location.href = "/porady/" + item.value;
+            }
+            
+        },
+    });
+    '
+);
+
+// Bootstrap autocomplete - našeptávač CSS
+$view->addHeadStyle(
+    '
+    ul.dropdown-menu.autocomplete-menu {
+        width: 300px;
+    }
+    /* highlightTyped use mark */
+    .autocomplete-menu mark {
+        background: #f5f553;
+        padding: 0;
+    }
+    /* Optional nicer scrollbars */
+    .autocomplete-menu {
+        top: 39px;
+        --scroller-color: 0, 0%;
+        --scroller-color-lightness: 80%;
+        --scroller-bg-lightness: 94%;
+        --scroller-hover-factor: 0.8;
+        --scroller-thumb: hsl(var(--scroller-color), var(--scroller-color-lightness));
+        /* Replicate hover for webkit */
+        --scroller-thumb-hover: hsl(var(--scroller-color), calc(var(--scroller-color-lightness) * var(--scroller-hover-factor)));
+        --scroller-background: hsl(var(--scroller-color), calc(var(--scroller-bg-lightness)));
+        scrollbar-color: var(--scroller-thumb) var(--scroller-background);
+        scrollbar-width: thin;
+    }
+    a.dropdown-item {
+        font-size: 0.85rem;
+    }
+    .autocomplete-menu::-webkit-scrollbar {
+        width: 8px;
+    }
+    .autocomplete-menu::-webkit-scrollbar-track {
+        background: var(--scroller-background);
+    }
+    .autocomplete-menu::-webkit-scrollbar-thumb {
+        background: var(--scroller-thumb);
+    }
+    .autocomplete-menu::-webkit-scrollbar-thumb:hover {
+        background: var(--scroller-thumb-hover);
+    }
+    '
+);
+
+$view->setBreadcrumbs([
+    ['label' => 'Pořady'],
+]);
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="container pb-4">
+    <div class="row mb-3 mt-3 mt-lg-0">
+        <div class="col-12 d-flex justify-content-center">
+            <form class="searchShowsForm" action="<?= $view->path('program_web_shows') ?>" method="get">
+                <div class="simple-search input-group line-height-1">
+                    <input id="autocomplete" class="form-control search" name="q" type="text" placeholder="Název pořadu" value="<?= $query ?>" minlength="3">
+                    <button class="btn btn-rounded" type="submit">
+                        <i class="fa fa-search header-nav-top-icon"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <?php
+        if ($shows) {
+            $i = 0;
+            foreach ($shows as $category) { ?>
+                <h2 class="anchor text-5 font-weight-500 text-secondary mt-4 mb-3" id="<?= $category['category_url'] ?>">
+                    <?= $category['category_title'] ?>
+                </h2>
+                <?php
+                foreach ($category['shows'] as $show) {
+                    if ($show['special'] === 'ano') {
+                        $href = $view->path('program_showex_' . $show['id'], ['url' => $show['url']]);
+                    } else if ($show['special'] === 'hoste') {
+                        $href = $view->path('application_guests');
+                    } else {
+                        $href = $view->path('program_show_' . $show['id'], ['url' => $show['url']]);
+                    }
+                    ?>
+                    <div class="col-6 col-sm-4 col-lg-3 mb-2 mb-md-4 px-1 px-md-3-5">
+                        <a href="<?= $href ?>">
+                            <span class="thumb-info thumb-info-no-borders thumb-info-centered-info">
+                                <span class="thumb-info-wrapper">
+                                    <?php
+                                    if (!empty($show['image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $show['image'])) {
+                                        $image = $view->asset($show['image']);
+                                    } else {
+                                        $image = $view->asset('/data/program/show/!default-show.png');
+                                    }
+                                    ?>
+                                    <img src="<?= $image ?>" class="img-fluid" alt="">
+                                    <span class="thumb-info-title line-height-4">
+                                        <span class="thumb-info-inner mb-2">
+                                            <?= $show['title'] ?>
+                                        </span>
+                                        <span class="">
+                                            <?= $show['short_description'] ?>
+                                        </span>
+                                    </span>
+                                </span>
+                            </span>
+                        </a>
+                    </div>
+                <?php } ?>
+
+                <?php if ($i === 3) { ?>
+                    <?php // REKLAMA ?>
+                    <?= $view->include('ads/article') ?>
+                <?php } ?>
+                <?php $i++; ?>
+            <?php } ?>
+        <?php } ?>
+    </div>
+
+
+</div>

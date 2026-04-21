@@ -162,4 +162,107 @@ final class VideoRepository
 	{
 		$this->connection->delete($this->table, ['id' => $id]);
 	}
+
+	public function getPaginatorByShow(int $show_id, int $page, int $limit): array
+	{
+		$offset = ($page - 1) * $limit;
+
+		return $this->connection->createQueryBuilder()
+			->select('program_videos.id', 'program_videos.name', 'program_videos.path', 'program_videos.duration',
+				'program.title', 'program.short_description', 'program.description', 'program.url', 'program.time',
+				'program_shows.id AS show_id'
+			)
+			->from('program_videos')
+			->leftJoin('program_videos', 'program', 'program', 'program.video_id = program_videos.id')
+			->leftJoin('program', 'program2shows', 'program2shows', 'program2shows.program_id = program.id')
+			->leftJoin('program2shows', 'program_shows', 'program_shows', 'program_shows.id = program2shows.show_id')
+			->where('program.premiere = 1')
+			->andWhere('program_shows.id = :show_id')
+			->andWhere('program.time < NOW()')
+			->setParameter('show_id', $show_id)
+			->orderBy('program.time', 'DESC')
+			->setFirstResult($offset)
+			->setMaxResults($limit)
+			->fetchAllAssociative();
+	}
+
+	public function getCountByShow(int $show_id): int
+	{
+		return (int) $this->connection->createQueryBuilder()
+			->select('COUNT(*)')
+			->from('program_videos')
+			->leftJoin('program_videos', 'program', 'program', 'program.video_id = program_videos.id')
+			->leftJoin('program', 'program2shows', 'program2shows', 'program2shows.program_id = program.id')
+			->leftJoin('program2shows', 'program_shows', 'program_shows', 'program_shows.id = program2shows.show_id')
+			->where('program.premiere = 1')
+			->andWhere('program_shows.id = :show_id')
+			->andWhere('program.time < NOW()')
+			->setParameter('show_id', $show_id)
+			->fetchOne();
+	}
+
+	public function getNewVideosForWeb(int $limit): array
+	{
+		$rows = $this->connection->createQueryBuilder()
+			->select(
+				'program_videos.name', 'program_videos.duration',
+				'program.time', 'program.title', 'program.short_description', 'program.url',
+				'program_shows.url AS show_url'
+			)
+			->from('program_videos')
+			->innerJoin('program_videos', 'program', 'program', 'program.video_id = program_videos.id')
+			->innerJoin('program', 'program2shows', 'program2shows', 'program2shows.program_id = program.id')
+			->innerJoin('program2shows', 'program_shows', 'program_shows', 'program_shows.id = program2shows.show_id')
+			->where('program.premiere = 1')
+			->orderBy('program.time', 'DESC')
+			->setMaxResults($limit)
+			->fetchAllAssociative();
+
+		foreach ($rows as $i => $row) {
+			$rows[$i]['url'] = '/porady/' . $row['show_url'] . '/' . $row['url'];
+			$short_desc = (string) ($row['short_description'] ?? '');
+			$rows[$i]['anotation'] = mb_substr($short_desc, 0, 160, 'UTF-8') . ((mb_strlen($short_desc, 'UTF-8') > 160) ? '...' : '');
+			$rows[$i]['image'] = '/data/program/thumbs/' . $row['name'] . '.jpg';
+			unset(
+				$rows[$i]['name'],
+				$rows[$i]['show_url'],
+				$rows[$i]['short_description']
+			);
+		}
+		return $rows;
+	}
+
+	public function getMostWatchedShowsForWeb(int $limit): array
+	{
+		$rows = $this->connection->createQueryBuilder()
+			->select(
+				'program_videos.name',
+				'program.time', 'program.title', 'program.short_description AS anotation', 'program.url', 'program.time AS date',
+				'program_shows.url AS show_url'
+			)
+			->from('program_videos')
+			->innerJoin('program_videos', 'program', 'program', 'program.video_id = program_videos.id')
+			->innerJoin('program', 'program2shows', 'program2shows', 'program2shows.program_id = program.id')
+			->innerJoin('program2shows', 'program_shows', 'program_shows', 'program_shows.id = program2shows.show_id')
+			->where('program.premiere = 1')
+			->andWhere('DATE(program.time) >= DATE(DATE_ADD(NOW(), INTERVAL -3 DAY))')
+			->andWhere('DATE(program.time) <= NOW()')
+			->orderBy('program_videos.showed', 'DESC')
+			->setMaxResults($limit)
+			->fetchAllAssociative();
+
+		foreach ($rows as $i => $iValue) {
+			$rows[$i]['url'] = '/porady/' . $iValue['show_url'] . '/' . $iValue['url'];
+			$rows[$i]['anotation'] = '';
+			if ($iValue['anotation']) {
+				$rows[$i]['anotation'] = mb_substr($iValue['anotation'], 0, 160, 'UTF-8') . ((mb_strlen($iValue['anotation'], 'UTF-8') > 160) ? '...' : '');
+			}
+			$rows[$i]['image'] = '/data/program/thumbs/' . $iValue['name'] . '.jpg';
+			unset(
+				$iValue['name'],
+				$iValue['show_url']
+			);
+		}
+		return $rows;
+	}
 }

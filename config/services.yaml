@@ -99,6 +99,17 @@ services:
         resource: '../src/Program/Controller/Web/'
         tags: ['controller.service_arguments']
 
+    App\Program\Controller\Web\ShowController:
+        tags: ['controller.service_arguments']
+        bind:
+            $LIGHT_URL: '%app.LIGHT_URL%'
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+
+    App\Program\Controller\Web\ShowexController:
+        tags: ['controller.service_arguments']
+        bind:
+            $LIGHT_URL: '%app.LIGHT_URL%'
+
     App\Program\Controller\Admin\:
         resource: '../src/Program/Controller/Admin/'
         tags: ['controller.service_arguments']

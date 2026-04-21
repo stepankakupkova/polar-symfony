@@ -1,7 +1,43 @@
 # Program - Web
 program_web:
   path: /program
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ProgramController::program
+
+program_web_json_get_program:
+  path: /program/json-list/get-program-for-web
+  controller: App\Program\Controller\Web\ProgramController::getProgramForWeb
+
+program_web_json_get_program2:
+  path: /program/json-list/get-program2-for-web
+  controller: App\Program\Controller\Web\ProgramController::getProgram2ForWeb
+
+program_web_json_get_program_hd:
+  path: /program/json-list/get-program-for-hd
+  controller: App\Program\Controller\Web\ProgramController::getProgramForHd
+
+program_web_shows:
+  path: /porady
+  controller: App\Program\Controller\Web\ShowController::shows
+
+program_web_download:
+  path: /porady/download/{video_id}/{quality}
+  controller: App\Program\Controller\Web\ShowController::download
+  requirements:
+    video_id: '\d+'
+    quality: '[a-z]+'
+
+program_web_overwrite_docx:
+  path: /porady/overwrite-docx/{video_id}
+  controller: App\Program\Controller\Web\ShowController::overwriteDocx
+  requirements:
+    video_id: '\d+'
+
+program_web_downloadex:
+  path: /mimoradne/download/{video_id}/{quality}
+  controller: App\Program\Controller\Web\ShowexController::downloadex
+  requirements:
+    video_id: '\d+'
+    quality: '[a-z]+'
 
 # Program - Admin
 admin_program:

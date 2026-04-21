@@ -323,4 +323,109 @@ final class ProgramRepository
 
 		return $qb->fetchAllAssociative();
 	}
+
+	public function fetchForWeb(string $date): array
+	{
+		$rows = $this->connection->createQueryBuilder()
+			->select(
+				'program.id', 'program.time', 'program.premiere', 'program.title', 'program.short_description', 'program.url',
+				'program_videos.name AS video_name',
+				'program_shows.id AS show_id', 'program_shows.url AS show_url'
+			)
+			->from('program')
+			->leftJoin('program', 'program_videos', 'program_videos', 'program_videos.id = program.video_id')
+			->leftJoin('program', 'program2shows', 'program2shows', 'program2shows.program_id = program.id')
+			->leftJoin('program2shows', 'program_shows', 'program_shows', 'program_shows.id = program2shows.show_id')
+			->where('program.time LIKE :date')
+			->setParameter('date', $date . '%')
+			->orderBy('program.time', 'ASC')
+			->fetchAllAssociative();
+
+		foreach ($rows as $i => $row) {
+			$rows[$i]['id'] = (int) $row['id'];
+			$rows[$i]['premiere'] = (bool) $row['premiere'];
+		}
+
+		return $rows;
+	}
+
+	public function getProgram2FromNow(): ?array
+	{
+		$now = new \DateTime();
+
+		$lastRow = $this->connection->createQueryBuilder()
+			->select('time')
+			->from('program2')
+			->where('time < :now')
+			->setParameter('now', $now->format('Y-m-d H:i:s'))
+			->orderBy('time', 'DESC')
+			->setMaxResults(1)
+			->fetchAssociative();
+
+		if (!$lastRow) {
+			return null;
+		}
+
+		$rows = $this->connection->createQueryBuilder()
+			->select('time', 'premiere', 'title', 'short_description')
+			->from('program2')
+			->where('time >= :from')
+			->andWhere('DATE(time) <= :to')
+			->setParameter('from', $lastRow['time'])
+			->setParameter('to', $now->modify('+2 days')->format('Y-m-d'))
+			->orderBy('time', 'ASC')
+			->fetchAllAssociative();
+
+		if (!$rows) {
+			return null;
+		}
+
+		$data = [];
+		foreach ($rows as $item) {
+			$date = new \DateTime($item['time']);
+			$data[$date->format('Y-m-d')][] = $item;
+		}
+
+		return $data;
+	}
+
+	public function getProgramFromNow(): ?array
+	{
+		$now = new \DateTime();
+
+		$lastRow = $this->connection->createQueryBuilder()
+			->select('time')
+			->from('program')
+			->where('time < :now')
+			->setParameter('now', $now->format('Y-m-d H:i:s'))
+			->orderBy('time', 'DESC')
+			->setMaxResults(1)
+			->fetchAssociative();
+
+		if (!$lastRow) {
+			return null;
+		}
+
+		$rows = $this->connection->createQueryBuilder()
+			->select('time', 'premiere', 'title', 'short_description')
+			->from('program')
+			->where('time >= :from')
+			->andWhere('DATE(time) <= :to')
+			->setParameter('from', $lastRow['time'])
+			->setParameter('to', $now->modify('+2 days')->format('Y-m-d'))
+			->orderBy('time', 'ASC')
+			->fetchAllAssociative();
+
+		if (!$rows) {
+			return null;
+		}
+
+		$data = [];
+		foreach ($rows as $item) {
+			$date = new \DateTime($item['time']);
+			$data[$date->format('Y-m-d')][] = $item;
+		}
+
+		return $data;
+	}
 }

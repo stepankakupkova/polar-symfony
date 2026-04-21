@@ -1,0 +1,126 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+
+$view->setTitle('TV program');
+$view->addMeta('description', 'Podrobný televizní program TV Polar nejen pro dnešní den.');
+$view->addMeta('keywords', 'tv program polar, program, televize');
+$view->addOgMeta('og:title', 'TV program | TV POLAR');
+$view->addOgMeta('og:description', 'Podrobný televizní program TV Polar nejen pro dnešní den.');
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', 'https://' . $_SERVER['SERVER_NAME'] . '/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:secure_url', 'https://' . $_SERVER['SERVER_NAME'] . '/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/magnific-popup/css/magnific-popup.min.css'));
+
+$view->addInlineScript(
+    '$(".datepicker_cal").datepicker({
+            language: "cs",
+            todayHighlight: true,
+            todayBtn: "linked",
+            weekStart: 1,
+        }).on("changeDate", function(e){
+            var date = new Date(e.date);
+            var d = date.getDate();
+            var m = date.getMonth()+1;
+            var y = date.getFullYear();
+            if (d < 10) d= "0" + d
+            if (m < 10) m = "0" + m;
+            $.post("' . $view->path('program_web_json_get_program') . '?date=" + y + "-" + m + "-" + d,
+                function(json) {
+                    $("#program").html(json.content);
+                    $(".page-header h1 strong").html(moment(json.date).format("LL"));
+                }, 
+                "json"      
+            );
+        });
+        $(".datepicker_cal").datepicker("setDate", new Date());'
+);
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->setBreadcrumbs([
+                    ['label' => 'Domů', 'url' => '/'],
+                    ['label' => 'TV program'],
+                ]) ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8 mb-4">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <!-- kalendář pro mobily -->
+            <div class="col-12 d-lg-none">
+                <div class="featured-boxes featured-boxes-flat">
+                    <div class="featured-box featured-box-secondary featured-box-effect-2">
+                        <div class="box-content mt-4">
+                            <i class="icon-featured fa fa-calendar-alt d-none d-lg-inline-block"></i>
+                            <div class="datepicker_cal"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="program"></div>
+        </div>
+        <div class="col-12 col-lg-4 d-none d-lg-block">
+            <div class="featured-boxes featured-boxes-flat">
+                <div class="featured-box featured-box-secondary featured-box-effect-2">
+                    <div class="box-content mt-4">
+                        <i class="icon-featured fa fa-calendar-alt d-none d-lg-inline-block"></i>
+                        <div class="datepicker_cal"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Nejsledovanější pořady -->
+            <?= $view->include('program/partial/web/most-watched-shows', ['mostWatchedShows' => $mostWatchedShows]) ?>
+        </div>
+    </div>
+</div>

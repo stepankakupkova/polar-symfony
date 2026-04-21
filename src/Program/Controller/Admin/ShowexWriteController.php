@@ -746,12 +746,12 @@ final class ShowexWriteController
 		foreach ($routes as $row) {
 			$yaml .= 'program_showex_' . $row['id'] . ":\n";
 			$yaml .= '  path: /mimoradne/' . $row['url'] . "\n";
-			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowController::index\n";
+			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowexController::showex\n";
 			$yaml .= "\n";
 
 			$yaml .= 'program_showex_video_' . $row['id'] . ":\n";
 			$yaml .= '  path: /mimoradne/' . $row['url'] . '/{video_url}' . "\n";
-			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowController::index\n";
+			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowexController::videoex\n";
 			$yaml .= "  requirements:\n";
 			$yaml .= "    video_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'\n";
 			$yaml .= "\n";

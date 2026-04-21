@@ -1,0 +1,256 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+
+$view->addInlineScript(
+    'var part = (window.location.hash).substr(1);
+    if (part) {
+        var id = part.substring(5);
+        $("#btn" + id).click();
+    }
+    var btnPart = $(".btnPart");
+    btnPart.click(function(e){
+        e.preventDefault();
+        var sec = $(this).data("sec");
+        var video = videojs("player");
+        video.play();
+        video.currentTime(sec);
+    });'
+);
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+    let player = videojs("player", {
+        controlBar: {
+            children: {
+                playToggle: true,
+                progressControl: true,
+                currentTimeDisplay: true,
+                timeDivider: true,
+                durationDisplay: true,
+                volumePanel: {
+                    inline: true
+                },
+                fullscreenToggle: true
+            }
+        }
+    });
+    '
+);
+
+function formatBytes($size, $precision = 0){
+    $base = log($size, 1024);
+    $suffixes = array('B', 'KB', 'MB', 'GB');
+    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)];
+}
+
+// Breadcrumbs
+$view->setBreadcrumbs([
+    ['label' => 'Mimořádné pořady'],
+    ['label' => $show['title'], 'url' => $view->path('program_showex_' . $show['id'], ['url' => $show['url']])],
+    ['label' => $video['title']],
+]);
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row sticky-square">
+        <div class="col-12 col-md-7">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <article class="post post-medium">
+                <div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                    <?php
+                        try {
+                            if ($video) {
+                                $date = new DateTime($video['time']);
+                                $video_url_lq = $LIGHT_URL . 'mimoradne/publikovano/' . $video['path'] . '/' . $video['name'] . '_lq.mp4';
+                                $poster = '/data/mimoradne/thumbs/' . $video['name'] . '.jpg';
+                                if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $poster)) {
+                                    $poster = '/data/program/show/!default-show.png';
+                                }
+                    ?>
+                                <meta itemprop="width" content="460">
+                                <meta itemprop="height" content="259">
+                                <meta itemprop="url" content="<?= 'https://' . $_SERVER['SERVER_NAME'] . $poster ?>">
+
+                                <video id="player" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $poster ?>" }'>
+                                    <source src="<?= $video_url_lq ?>" type="video/mp4" />
+                                    <p>Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video_url_lq ?>">video</a>.</p>
+                                </video>
+                    <?php
+                            }
+                        } catch (Exception $e) {
+                        }
+                    ?>
+                </div>
+
+                <?php if ($video) { ?>
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-secondary btn-xs"
+                           href="<?= $view->path('program_web_downloadex', ['video_id' => $video['id'], 'quality' => 'lq']) ?>"
+                           title="<?= $video['name'] ?>">
+                            <i class="fa fa-fw fa-download"></i>
+                            Stáhnout video <?= isset($video['size_lq']) && $video['size_lq'] ? '('.formatBytes($video['size_lq']).')' : ''; ?>
+                        </a>
+                    </div>
+                <?php } ?>
+                <div class="clearfix"></div>
+                <div class="row mt-4 mb-5">
+                    <div class="col-12 col-lg-3 d-none d-lg-block">
+                        <?php
+                            if (!empty($show['image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $show['image'])) {
+                                $image = $show['image'];
+                            } else {
+                                $image = '/data/program/show/!default-show.png';
+                            }
+                        ?>
+                        <img class="img-fluid" src="<?= $view->asset($image) ?>" alt="<?= $show['title'] ?>"/>
+                    </div>
+                    <div class="col-12 col-lg-9">
+                        <div class="post-content">
+                            <h2>
+                                <a href="<?= $view->path('program_showex_video_' . $show['id'], ['url' => $show['url'], 'video_url' => $video['url']]) ?>">
+                                    <?= $video['title'] ?>
+                                </a>
+                            </h2>
+                            <div class="post-meta">
+                                <span>
+                                    <i class="far fa-calendar-alt"></i>
+                                    <?php
+                                        try {
+                                            $date = new DateTime($video['time']);
+                                            $today = new DateTime();
+                                            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                echo 'Dnes,';
+                                            } else {
+                                                $yesterday = new DateTime();
+                                                $yesterday->modify('-1 day');
+                                                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                    echo 'Včera,';
+                                                } else {
+                                                    $formatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, 'dd. MMMM yyyy,');
+                                                    echo $formatter->format($date);
+                                                }
+                                            }
+                                            $timeFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, ' HH:mm');
+                                            echo $timeFormatter->format($date);
+                                        } catch (Exception $e) {
+                                            echo 'NaN';
+                                        }
+                                    ?>
+                                </span>
+                            </div>
+                            <div class="mb-none">
+                                <?php if ($parts) { ?>
+                                    <br />
+                                    <div class="videoparts">
+                                        <h2>
+                                            Seznam částí zasedání
+                                        </h2>
+                                        <ul>
+                                            <?php foreach ($parts as $part) { ?>
+                                                <li id="btn<?= $part['id'] ?>" class="btnPart" data-sec="<?= $part['sec_from'] ?>">
+                                                    <a href="#cast-<?= $part['id'] ?>">
+                                                        <?= $part['title'] ?>
+                                                    </a>
+                                                </li>
+                                            <?php } ?>
+                                        </ul>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <!-- Mohlo by vás také zajímat -->
+            <?= $view->include('program/partial/interested-shows') ?>
+            <!-- Dnešní premiéry -->
+            <?php //= $view->include('program/partial/todays-premieres') ?>
+        </div>
+
+        <div class="col-md-5 align-self-start p-relative">
+            <!-- Nejsledovanější pořady -->
+            <?php //= $view->include('program/partial/most-watched-shows') ?>
+            <aside class="section-best-news px-3 py-2" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 40}}">
+                <?php // REKLAMA ?>
+                <!-- reklama nad nejčtenějšími články -->
+                <?= $view->include('ads/article/right/top') ?>
+
+                <!-- Nejčtenější články -->
+                <?php //= $view->include('news/partial/most-read-articles') ?>
+
+                <?php // REKLAMA ?>
+                <!-- reklama pod nejčtenějšími články -->
+                <?= $view->include('ads/article/right/bottom') ?>
+                <div style="height:30px;"></div>
+
+                <!-- PR články -->
+                <?= $view->include('news/partial/pr') ?>
+            </aside>
+        </div>
+    </div>
+</div>

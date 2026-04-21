@@ -1,0 +1,261 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+$view->setBreadcrumbs([
+    ['label' => 'Pořady', 'url' => $view->path('program_web_shows')],
+    ['label' => $show['title']],
+]);
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row sticky-square">
+        <div class="col-12 col-md-8">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 col-sm-5">
+                    <i class="fa fa-fw fa-2x fa-info text-color-primary"></i>
+                    <h4 class="d-inline text-4">
+                        O pořadu
+                    </h4>
+                    <p class="mb-lg pt-2">
+                        <?= $show['short_description'] ?>
+                    </p>
+
+                    <?= $show['content'] ?>
+
+                </div>
+                <div class="col-md-8 col-sm-7 mb-4">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <i class="fa fa-fw fa-2x fa-play-circle text-color-primary"></i>
+                            <h4 class="d-inline text-4">
+                                Vysílání pořadu
+                            </h4>
+                        </div>
+                        <div class="col-lg-7 mt-1">
+                            <small>
+                                (<strong class="text-color-primary" data-redactor-tag="strong">červeně</strong>
+                                jsou vyznačeny premiéry pořadu)
+                            </small>
+                        </div>
+                    </div>
+                    <?= $times ?>
+                </div>
+                <div class="divider my-3">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="py-2">
+                    <?php if ($videos) { ?>
+                        <div class="blog-posts">
+                            <?php foreach ($videos as $item) { ?>
+                                <article class="post post-medium mb-3 pb-2">
+                                    <div class="row mb-3">
+                                        <div class="col-lg-5">
+                                            <div class="post-image mt-2">
+                                                <a href="<?= $view->path('program_show_video_' . $item['show_id'], ['url' => $show['url'], 'program_url' => $item['url']]) ?>">
+                                                    <span class="thumb-info thumb-info-lighten">
+                                                        <span class="thumb-info-wrapper">
+                                                            <?php
+                                                                if (!empty($item['name']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/data/program/thumbs/' . $item['name'] . '.jpg')) {
+                                                                    $image = '/data/program/thumbs/' . $item['name'] . '.jpg';
+                                                                } else {
+                                                                    $image = '/data/program/show/!default-show.png';
+                                                                }
+                                                            ?>
+                                                            <img src="<?= $image ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+                                                            <span class="thumb-info-action">
+                                                                <span class="thumb-info-action-icon">
+                                                                    <i class="fas fa-play"></i>
+                                                                    <span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <div class="post-content">
+                                                <h2 class="font-weight-semibold pt-4 pt-lg-0 text-5 line-height-4 mb-2">
+                                                    <a href="<?= $view->path('program_show_video_' . $item['show_id'], ['url' => $show['url'], 'program_url' => $item['url']]) ?>">
+                                                        <?= $item['title'] ?>
+                                                    </a>
+                                                </h2>
+                                                <div class="post-meta">
+                                                    <span>
+                                                        <i class="far fa-calendar-alt"></i>
+                                                        <?php
+                                                            try {
+                                                                $date = new DateTime($item['time']);
+                                                                $today = new DateTime();
+                                                                if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                                    echo 'Dnes,';
+                                                                } else {
+                                                                    $yesterday = new DateTime();
+                                                                    $yesterday->modify('-1 day');
+                                                                    if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                                        echo 'Včera,';
+                                                                    } else {
+                                                                        $formatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, 'dd. MMMM yyyy,');
+                                                                        echo $formatter->format($date);
+                                                                    }
+                                                                }
+                                                                $timeFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, ' HH:mm');
+                                                                echo $timeFormatter->format($date);
+                                                            } catch (Exception $e) {
+                                                                echo 'NaN';
+                                                            }
+                                                        ?>
+                                                    </span>
+                                                </div>
+                                                <?php
+                                                    $ms = '';
+                                                    $description = $item['short_description'];
+                                                    if (strpos($description, PHP_EOL) !== false) {
+                                                        $tmpDescription = '<ul class="ul_shows">'. "\n";
+                                                        foreach (explode(PHP_EOL, $description) as $row) {
+                                                            $tmpDescription .= '<li><span>'.$row.'</span></li>'. "\n";
+                                                        }
+                                                        $tmpDescription .= '</ul>';
+                                                        $description = $tmpDescription;
+                                                        $ms = 'ms-2';
+                                                    }
+                                                ?>
+                                                <div class="<?= $ms; ?>">
+                                                    <?= $description; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            <?php } ?>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <?= $view->include('application/pagination/paginator', [
+                                    'total' => $videosTotal,
+                                    'page' => $page,
+                                    'limit' => $limit,
+                                    'route' => 'program_show_' . $show['id'],
+                                    'params' => ['url' => $show['url']],
+                                ]) ?>
+                            </div>
+                        </div>
+                    <?php } else { ?>
+                        <div class="alert alert-warning alert-lg">
+                            <strong>
+                                Žádná videa nebyla nalezena.
+                            </strong>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 align-self-start p-relative">
+            <aside class="section-best-news px-3 py-2" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 40}}">
+                <?php // REKLAMA ?>
+                <!-- reklama nad nejčtenějšími články -->
+                <?= $view->include('ads/article/right/top') ?>
+
+                <!-- Nejčtenější články -->
+                <?php //= $view->include('news/partial/most-read-articles') ?>
+
+
+
+                <?php // REKLAMA ?>
+                <!-- Banner square na 1 rok pro Beskydský expres, 16.1.2026 změnit zpátky na include ads/article/right/bottom -->
+                <?php
+                $currentDate = new DateTime();
+                $checkDate = new DateTime('2026-01-16');
+                if ($show['title'] === 'Beskydský expres' && $currentDate < $checkDate) {
+                    echo    '<div class="row">
+                                <div class="col-md-12">
+                                    <div class="reklama">
+                                        Reklama
+                                    </div>
+                                    <div style="margin: 0 auto;">
+                                        <a class="d-block text-center" href="https://www.rumasportshop.cz/" title="Reklama" target="_blank">
+                                            <img class="img-fluid" src="' . $view->asset('img/web/poster/banner-beskydsky-expres-cervenec.jpeg') . '" alt="Reklama" />
+                                        </a>
+                                        <div class="banner-pixel">
+                                            <img src="https://www.rumasport.cz/aff/pixel_polar.php?partner=polar&campaign=polarBeExpres">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>';
+                } else {
+                    echo $view->include('ads/article/right/bottom');
+                }
+                ?>
+                <!-- END Banner square na 1 rok pro Beskydský expres, 16.1.2026 změnit zpátky na include ads/article/right/bottom -->
+
+
+
+                <div style="height:30px;"></div>
+
+                <!-- PR články -->
+                <?= $view->include('news/partial/pr') ?>
+            </aside>
+        </div>
+    </div>
+</div>

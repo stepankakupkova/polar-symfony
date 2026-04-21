@@ -1,0 +1,538 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/quality-selector.css?ver=9'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/silvermine-videojs-quality-selector.min.js'));
+
+// V popisu pořadu vezmeme jednotlivé odrážky, najdeme je v přepisu a vytvoříme kotvy
+$view->addInlineScript(
+    '$("ul.ul_shows li span").each(function(index) {
+        var text_origin = $.trim($(this).text());
+        var text_convert = "section" + index;
+        if ($("#overwrite h1, #overwrite p strong").text().includes(text_origin) === true) {
+            $(this).html($("<a></a>").attr("href", "#" + text_convert).text($(this).text()));
+        }
+        $("#overwrite h1, #overwrite p strong").each(function(index) {
+            if ($.trim($(this).text()).includes(text_origin) === true) {
+                $(this).attr("id", text_convert);
+                $(this).css({"color": "#900", "font-size": "23px", "line-height": "32px"});
+                return false;
+            }
+        });
+    });
+    var ww = $(window).width();
+    var sticky_menu = ww > 991 ? 40 : 150;
+    $("ul.ul_shows li span a").click(function(e) {
+        e.preventDefault();
+        var target = $(this).attr("href");
+        if (target.length) {
+            $("html,body").animate({
+                scrollTop: $("#overwrite h1"+target+", #overwrite p strong"+target).offset().top-sticky_menu
+            }, 600);
+            return false;
+        }
+    });'
+);
+
+// Tisk stránky
+$view->addInlineScript(
+    'function printPageArea(areaID){
+        var printContent = document.getElementById(areaID).innerHTML;
+        var originalContent = document.body.innerHTML;
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+    }'
+);
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+    let player = videojs("player", {
+        controlBar: {
+            children: {
+                playToggle: true,
+                progressControl: true,
+                currentTimeDisplay: true,
+                timeDivider: true,
+                durationDisplay: true,
+                volumePanel: {
+                    inline: true
+                },
+                fullscreenToggle: true,
+                qualitySelector: true,
+            }
+        },
+        playsinline: true,
+    });
+    // kvůli Chrome explicitní načtení pluginu qualitySelector
+    player.ready(function() {
+        this.controlBar.addChild("QualitySelector");
+    });
+    '
+);
+
+function formatBytes($size, $precision = 0){
+    $base = log($size, 1024);
+    $suffixes = array('B', 'KB', 'MB', 'GB');
+    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)];
+}
+
+// pro google LD+JSON
+$programTime = new DateTime($program['time']);
+$formatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::NONE, IntlDateFormatter::NONE, null, null, 'd. MMMM y, H:mm');
+$prettyProgramTime = $formatter->format($programTime);
+$poster = '/data/program/show/!default-show.png';
+$durationIso = null;
+if (!empty($video)) {
+    $try = '/data/program/thumbs/' . $video['name'] . '.jpg';
+    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $try)) {
+        $poster = $try;
+    }
+    $d = (int)$video['duration'];
+    $durationIso = 'PT' . ($d >= 60 ? floor($d/60) . 'M' . ($d % 60) : $d) . 'S';
+}
+$schemeHost = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+$data = [
+    "@context"      => "https://schema.org",
+    "@type"         => "TVEpisode",
+    "name"          => $program['title'] . ', ' . $prettyProgramTime,
+    "description"   => $program['short_description'],
+    "datePublished" => $programTime->format('c'),
+    "thumbnailUrl"  => 'https://polar.cz' . $poster,
+];
+if (!empty($video)) {
+    $data['duration'] = $durationIso;
+    $videoUrl = $LIGHT_URL . 'porady/publikovano/' . $video['path'] . '/' . $video['name'] . '_hq.mp4';
+    $data['video'] = [
+        "@type"        => "VideoObject",
+        "name"         => $program['title'] . ', ' . $prettyProgramTime,
+        "description"  => $program['short_description'],
+        "thumbnailUrl" => 'https://polar.cz' . $poster,
+        "uploadDate"   => $programTime->format('c'),
+        "duration"     => $durationIso,
+        "contentUrl"   => $videoUrl,
+        "embedUrl"     => $videoUrl,
+        "publisher"    => [
+            "@type" => "Organization",
+            "name"  => "POLAR - moravskoslezská regionální televize",
+            "logo"  => [
+                "@type" => "ImageObject",
+                "url"   => "https://polar.cz/data/microformats/polar.png",
+            ],
+        ],
+    ];
+}
+
+// Breadcrumbs
+$breadcrumbItems = [
+    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Domů', 'item' => '/'],
+    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Pořady', 'item' => '/porady'],
+    ['@type' => 'ListItem', 'position' => 3, 'name' => $show['title'], 'item' => '/porady/' . $show['url']],
+    ['@type' => 'ListItem', 'position' => 4, 'name' => $prettyProgramTime, 'item' => $schemeHost . $view->path('program_show_video_' . $show['id'], ['url' => $show['url'], 'program_url' => $program['url']])],
+];
+
+$view->setBreadcrumbs([
+    ['label' => 'Pořady', 'url' => $view->path('program_web_shows')],
+    ['label' => $show['title'], 'url' => $view->path('program_show_' . $show['id'], ['url' => $show['url']])],
+    ['label' => $prettyProgramTime],
+]);
+
+?>
+<script type="application/ld+json">
+    <?= json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) ?>
+</script>
+
+<!-- JSON-LD pro BreadcrumbList -->
+<script type="application/ld+json">
+<?= json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $breadcrumbItems], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+</script>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1 show-episode-detail">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row sticky-square">
+        <div class="col-12 col-md-7">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <article class="post post-medium">
+                <div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                    <?php
+                    try {
+                        if ($video) {
+                            $date = new DateTime($program['time']);
+                            $video_url = $LIGHT_URL . 'porady/publikovano/' . $video['path'] . '/' . $video['name'];
+                            if ($date->format('Y-m-d') >= '2015-12-10') {
+                                $video_url_lq = $video_url . '_lq.mp4';
+                                $video_url_hq = $video_url . '_hq.mp4';
+                            } else {
+                                $video_url_lq = $video_url . '_hq.mp4';
+                                $video_url_hq = $video_url . '_hq.mp4';
+                            }
+                            $poster = '/data/program/thumbs/' . $video['name'] . '.jpg';
+                            if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $poster)) {
+                                $poster = '/data/program/show/!default-show.png';
+                            }
+                            ?>
+                            <meta itemprop="width" content="460">
+                            <meta itemprop="height" content="259">
+                            <meta itemprop="url" content="<?= 'https://' . $_SERVER['SERVER_NAME'] . $poster ?>">
+
+                            <video id="player" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $poster ?>" }'>
+                                <source src="<?= $video_url_lq ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
+                                <source src="<?= $video_url_hq ?>" type="video/mp4" label="vysoká HD 1080p" />
+                                <p>Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video_url_lq ?>">video</a>.</p>
+                            </video>
+                            <?php
+                        }
+                    } catch (Exception $e) {
+                    }
+                    ?>
+                </div>
+                <?php if ($video && (bool)$show['download']) { ?>
+                    <div class="btn-group pull-right">
+
+                        <?php if ($program['overwrite']) { ?>
+                            <a class="btn btn-secondary btn-xs me-1"
+                               href="<?= $view->path('program_web_overwrite_docx', ['video_id' => $video['id']]) ?>"
+                               title="Stáhnout přepis"
+                               rel="nofollow">
+                                <i class="fa fa-fw fa-file-word"></i>
+                                Stáhnout přepis
+                            </a>
+                        <?php } ?>
+
+                        <a class="btn btn-secondary btn-xs"
+                           href="<?= $view->path('program_web_download', ['video_id' => $video['id'], 'quality' => 'hq']) ?>"
+                           title="<?= $video['name'] ?>"
+                           rel="nofollow">
+                            <i class="fa fa-fw fa-video"></i>&nbsp;
+                            Stáhnout video
+                        </a>
+                        <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">
+                                Stáhnout video
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton1">
+                            <li>
+                                <a class="dropdown-item"
+                                   href="<?= $view->path('program_web_download', ['video_id' => $video['id'], 'quality' => 'hq']) ?>"
+                                   title="<?= $video['name'] . '_hq.mp4' ?>"
+                                   rel="nofollow">
+                                    Vysoká kvalita <?= $video['size_hq'] ? '('.formatBytes($video['size_hq']).')' : ''; ?>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="<?= $view->path('program_web_download', ['video_id' => $video['id'], 'quality' => 'lq']) ?>"
+                                   title="<?= $video['name'] . '_lq.mp4' ?>"
+                                   rel="nofollow">
+                                    Nízká kvalita <?= $video['size_lq'] ? '('.formatBytes($video['size_lq']).')' : ''; ?>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                <?php } ?>
+
+                <div class="clearfix"></div>
+                <div class="row mt-4 mb-5">
+                    <div class="col-12 col-lg-3 d-none d-lg-block">
+                        <?php
+                            if (!empty($show['image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $show['image'])) {
+                                $image = $show['image'];
+                            } else {
+                                $image = '/data/program/show/!default-show.png';
+                            }
+                        ?>
+                        <img class="img-fluid" src="<?= $view->asset($image) ?>" alt="<?= $show['title'] ?>"/>
+                    </div>
+                    <div class="col-12 col-lg-9">
+                        <div class="post-content">
+                            <h2>
+                                <a href="<?= $view->path('program_show_video_' . $show['id'], ['url' => $show['url'], 'program_url' => $program['url']]) ?>">
+                                    <?= $program['title'] ?>
+                                </a>
+                            </h2>
+                            <?php if ((bool)$show['show_datetime']) { ?>
+                                <div class="post-meta">
+                                    <span>
+                                        <i class="far fa-calendar-alt"></i>
+                                        <?php
+                                        try {
+                                            $date = new DateTime($program['time']);
+                                            $today = new DateTime();
+                                            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                echo 'Dnes,';
+                                            } else {
+                                                $yesterday = new DateTime();
+                                                $yesterday->modify('-1 day');
+                                                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                    echo 'Včera,';
+                                                } else {
+                                                    $dateFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, 'dd. MMMM yyyy,');
+                                                    echo $dateFormatter->format($date);
+                                                }
+                                            }
+                                            $timeFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, ' HH:mm');
+                                            echo $timeFormatter->format($date);
+                                        } catch (Exception $e) {
+                                            echo 'NaN';
+                                        }
+                                        ?>
+                                    </span>
+                                </div>
+                            <?php }
+                            $print_description = $program['short_description'];
+                            $description = $program['short_description'];
+                            $ms = '';
+                            if (str_contains($description, PHP_EOL)) {
+                                $tmpDescription = '<ul class="ul_shows">' . "\n";
+                                foreach (explode(PHP_EOL, $description) as $row) {
+                                    $tmpDescription .= '<li><span>' . $row . '</span></li>' . "\n";
+                                }
+                                $tmpDescription .= '</ul>';
+                                $description = $tmpDescription;
+                                $ms = 'ms-2';
+                            }
+                            ?>
+                            <div class="mb-0 <?= $ms ?>">
+                                <?= $description ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php if ($program['overwrite']) { ?>
+                    <div class="divider my-3">
+                        <i class="fas fa-info"></i>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text" id="overwrite">
+                            <?= $program['overwrite'] ?>
+                        </div>
+                    </div>
+
+                    <div id="social_buttons">
+                        <div class="row">
+                            <div class="col-md-12 mt-4 mb-3">
+                                <!-- AddToAny BEGIN -->
+                                <div class="a2a_kit a2a_kit_size_32 a2a_default_style float-start">
+                                    <a class="a2a_dd ps-0" href="https://www.addtoany.com/share"></a>
+                                    <a class="a2a_button_facebook"></a>
+                                    <a class="a2a_button_linkedin"></a>
+                                    <a class="a2a_button_x"></a>
+                                </div>
+                                <script>
+                                    var a2a_config = a2a_config || {};
+                                    a2a_config.locale = "cs";
+                                </script>
+                                <script async src="https://static.addtoany.com/menu/page.js"></script>
+                                <!-- AddToAny END -->
+
+                                <div class="mt-1">
+                                    &nbsp;&nbsp;<a class="text-decoration-none" href="javascript:void(0);" onclick="printPageArea('printableArea')">
+                                        <span class="bg-secondary bg-hover-144b7b" style="padding: 7px 9px 5px 9px; margin-left: 2px; cursor: pointer;" title="Vytisknout článek"><i class="text-4 fa-solid fa-print text-light"></i></span>
+                                        <span class="hide-xs ms-1" style="cursor: pointer;">Vytisknout článek</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php if ($video && (bool)$show['download']) { ?>
+                        <div class="row">
+                            <div class="col-md-12 mb-5">
+                                <div class="btn-group">
+                                    <a class="btn btn-secondary btn-xs"
+                                       href="<?= $view->path('program_web_download', ['video_id' => $video['id'], 'quality' => 'hq']) ?>"
+                                       title="<?= $video['name'] ?>"
+                                       rel="nofollow">
+                                        <i class="fa fa-fw fa-video"></i>&nbsp;
+                                        Stáhnout video
+                                    </a>
+                                    <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">
+                                            Stáhnout video
+                                        </span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton1">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               href="<?= $view->path('program_web_download', ['video_id' => $video['id'], 'quality' => 'hq']) ?>"
+                                               title="<?= $video['name'] . '_hq.mp4' ?>"
+                                               rel="nofollow">
+                                                Vysoká kvalita <?= $video['size_hq'] ? '('.formatBytes($video['size_hq']).')' : ''; ?>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               href="<?= $view->path('program_web_download', ['video_id' => $video['id'], 'quality' => 'lq']) ?>"
+                                               title="<?= $video['name'] . '_lq.mp4' ?>"
+                                               rel="nofollow">
+                                                Nízká kvalita <?= $video['size_lq'] ? '('.formatBytes($video['size_lq']).')' : ''; ?>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+                    </div>
+
+                <?php } ?>
+            </article>
+            <!-- Mohlo by vás také zajímat -->
+            <?= $view->include('program/partial/interested-shows') ?>
+            <!-- Dnešní premiéry -->
+            <?php //= $view->include('program/partial/todays-premieres') ?>
+        </div>
+
+        <div class="col-md-5 align-self-start p-relative">
+            <!-- Nejsledovanější pořady -->
+            <?php //= $view->include('program/partial/most-watched-shows') ?>
+            <aside class="section-best-news px-3 py-2" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 40}}">
+                <?php // REKLAMA ?>
+                <!-- reklama nad nejčtenějšími články -->
+                <?= $view->include('ads/article/right/top') ?>
+
+                <!-- Nejčtenější články -->
+                <?php //= $view->include('news/partial/most-read-articles') ?>
+
+
+
+                <?php // REKLAMA ?>
+                <!-- Banner square na 1 rok pro Beskydský expres, 16.1.2026 změnit zpátky na include ads/article/right/bottom -->
+                <?php
+                $currentDate = new DateTime();
+                $checkDate = new DateTime('2026-01-16');
+                if ($show['title'] === 'Beskydský expres' && $currentDate < $checkDate) {
+                    echo    '<div class="row">
+                                <div class="col-md-12">
+                                    <div class="reklama">
+                                        Reklama
+                                    </div>
+                                    <div style="margin: 0 auto;">
+                                        <a class="d-block text-center" href="https://www.rumasportshop.cz/" title="Reklama" target="_blank">
+                                            <img class="img-fluid" src="' . $view->asset('img/web/poster/banner-beskydsky-expres-cervenec.jpeg') . '" alt="Reklama" />
+                                        </a>
+                                        <div class="banner-pixel">
+                                            <img src="https://www.rumasport.cz/aff/pixel_polar.php?partner=polar&campaign=polarBeExpres">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>';
+                } else {
+                    echo $view->include('ads/article/right/bottom');
+                }
+                ?>
+                <?php //= $view->include('ads/article/right/bottom') ?>
+                <!-- END Banner square na 1 rok pro Beskydský expres, 16.1.2026 změnit zpátky na include ads/article/right/bottom -->
+
+
+
+                <div style="height:30px;"></div>
+
+                <!-- PR články -->
+                <?= $view->include('news/partial/pr') ?>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<div id="printableArea" class="d-none">
+    <div style="font-family:Poppins,Arial,sans-serif;">
+        <div style="margin-bottom:20px;">
+            <img src="/img/web/logo.svg" width="100" />
+        </div>
+        <div style="font-size:22px;margin-bottom:10px;">
+            Pořad: <b><?= $program['title'] ?></b>
+        </div>
+        <div style="font-size:28px;line-height:34px;font-weight:600;margin-bottom:10px;">
+            <?php if (!str_contains($print_description, PHP_EOL)) { ?>
+                <?= $print_description ?>
+            <?php } ?>
+        </div>
+        <div style="margin-bottom:20px;">
+            <?php
+            try {
+                $printDateFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, 'dd. MMMM yyyy,');
+                $printTimeFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, ' HH:mm');
+                echo $printDateFormatter->format($date);
+                echo $printTimeFormatter->format($date);
+            } catch (Exception $e) {
+            }
+            ?>
+        </div>
+        <div style="margin-bottom:30px;">
+            <img src="<?= $poster ?>" width="500" />
+        </div>
+        <div style="margin-bottom:50px;">
+            <?= $program['overwrite'] ?>
+        </div>
+        <div style="margin-bottom:15px; font-style: italic;">
+            Zdroj: <?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . explode('?', $_SERVER['REQUEST_URI'], 2)[0]; ?>
+        </div>
+    </div>
+</div>

@@ -796,12 +796,12 @@ final class ShowWriteController
 		foreach ($routes as $row) {
 			$yaml .= 'program_show_' . $row['id'] . ":\n";
 			$yaml .= '  path: /porady/' . $row['url'] . "\n";
-			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowController::index\n";
+			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowController::show\n";
 			$yaml .= "\n";
 
 			$yaml .= 'program_show_video_' . $row['id'] . ":\n";
 			$yaml .= '  path: /porady/' . $row['url'] . '/{program_url}' . "\n";
-			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowController::index\n";
+			$yaml .= "  controller: App\\Program\\Controller\\Web\\ShowController::video\n";
 			$yaml .= "  requirements:\n";
 			$yaml .= "    program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'\n";
 			$yaml .= "\n";

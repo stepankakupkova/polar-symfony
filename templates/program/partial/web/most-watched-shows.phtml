@@ -1,0 +1,33 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+?>
+
+<?php if ($mostWatchedShows) { ?>
+    <div class="featured-box featured-box-primary featured-box-effect-2 my-0 d-none d-lg-block">
+        <div class="box-content box-content-border-bottom">
+            <h3 class="font-weight-normal text-5 line-height-3 text-primary mt-2 mb-4">Nejsledovanější pořady</h3>
+            <ol class="list list-secondary list-ordened list-ordened-style-3 text-start ps-0">
+                <?php foreach ($mostWatchedShows as $video) { ?>
+                    <li class="pe-5-5 position-relative">
+                        <a href="<?= $video['url'] ?>" title="<?= $video['title'] ?>">
+                            <?= $video['title'] ?>
+                        </a>
+                        <span class="position-absolute end-0">
+                            <small class="text-color-dark">
+                                <?php
+                                    try {
+                                        $date = new DateTime($video['time']);
+                                        $fmt = new IntlDateFormatter('cs_CZ', IntlDateFormatter::NONE, IntlDateFormatter::NONE, null, null, 'dd. MM.');
+                                        echo $fmt->format($date);
+                                    } catch (Exception $e) {
+                                        echo 'NaN';
+                                    }
+                                ?>
+                            </small>
+                        </span>
+                    </li>
+                <?php } ?>
+            </ol>
+        </div>
+    </div>
+<?php } ?>

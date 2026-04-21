@@ -370,4 +370,162 @@ final class ShowRepository
 
 		return $data;
 	}
+
+	public function fetchTimesForWeb(int $show_id): string
+	{
+		$data = "";
+
+		$rows = $this->connection->createQueryBuilder()
+			->select('*')
+			->from($this->tableShowsTimes)
+			->where('show_id = :show_id')
+			->setParameter('show_id', $show_id)
+			->orderBy('FIELD(day, "PO", "UT", "ST", "CT", "PA", "SO", "NE", "PREM", "REPR")')
+			->addOrderBy('time', 'ASC')
+			->fetchAllAssociative();
+
+		$dataTmp = [];
+		$days = [
+			'PO' => 'Pondělí',
+			'UT' => 'Úterý',
+			'ST' => 'Středa',
+			'CT' => 'Čtvrtek',
+			'PA' => 'Pátek',
+			'SO' => 'Sobota',
+			'NE' => 'Neděle',
+			'PREM' => 'Premiéra',
+			'REPR' => 'Repríza',
+		];
+
+		foreach ($rows as $time) {
+			$dataTmp[$time['day']][] = [
+				'id' => $time['id'],
+				'time' => $time['time'],
+				'premiere' => $time['premiere'],
+			];
+			$data = '<div class="row pt-2">';
+			if ($dataTmp) {
+				foreach ($dataTmp as $day => $items) {
+					$data .= '<div class="col-sm-2 col-xs-3"><strong>' . $days[$day] . '</strong></div>';
+					$data .= '<div class="col-sm-10 col-xs-9">';
+					foreach ($items as $item) {
+						if ($item['premiere']) {
+							$data .= '<strong class="text-color-primary">' . $item['time'] . '</strong>, ';
+						} else {
+							$data .= $item['time'] . ', ';
+						}
+					}
+					$data = mb_substr($data, 0, -2, 'UTF-8');
+					$data .= '</div>';
+				}
+			} else {
+				$data .= '<div class="col-md-12"><strong>Tento pořad momentálně není v TV POLAR vysílán.</strong></div>';
+			}
+			$data .= '</div>';
+		}
+		return $data;
+	}
+
+	public function fetchAllByCategories(string $search): ?array
+	{
+		/*if ($search !== '') {
+            $search2 = mb_strtolower($search, 'UTF-8');
+            $searchAr = explode(' ', $search2);
+            $search2 = '';
+            foreach ($searchAr as $item) {
+                // zakázat hledání krátkých slov
+                if (mb_strlen($item, 'UTF-8') < 3) {
+                    continue;
+                }
+                $search2 .= '+' . $item;
+            }
+        }*/
+
+		$categories = $this->connection->createQueryBuilder()
+			->select('id AS category_id', 'title AS category_title', 'url AS category_url')
+			->from($this->tableShowsCategories)
+			->orderBy('rank', 'ASC')
+			->fetchAllAssociative();
+
+		$data = [];
+		foreach ($categories as $value) {
+			$qb = $this->connection->createQueryBuilder()
+				->select('*, ' . $this->connection->quote('ne') . ' AS special')
+				->from($this->table)
+				->where('category_id = :cat_id')
+				->andWhere('show_in_archive = 1')
+				->andWhere('status = 1')
+				->setParameter('cat_id', $value['category_id'])
+				->orderBy('`order`', 'ASC');
+
+			if ($search !== '') {
+				$qb->andWhere('LOWER(CONVERT(title USING utf8)) LIKE :search')
+					->setParameter('search', '%' . mb_strtolower($search, 'UTF-8') . '%');
+			}
+
+			$resultSet2 = $qb->fetchAllAssociative();
+
+			/* doplnění z tabulky mimořádných pořadů */
+			$qb2 = $this->connection->createQueryBuilder()
+				->select('*, ' . $this->connection->quote('ano') . ' AS special')
+				->from('special_shows')
+				->where('category_id = :cat_id')
+				->andWhere('status = 1')
+				->setParameter('cat_id', $value['category_id'])
+				->orderBy('`order`', 'ASC');
+
+			if ($search !== '') {
+				$qb2->andWhere('LOWER(CONVERT(title USING utf8)) LIKE :search')
+					->setParameter('search', '%' . mb_strtolower($search, 'UTF-8') . '%');
+			}
+
+			$resultSet3 = $qb2->fetchAllAssociative();
+			/**/
+
+			$output = array_merge($resultSet2, $resultSet3);
+
+			foreach ($output as $item) {
+				$data[$value['category_id']]['category_id'] = $value['category_id'];
+				$data[$value['category_id']]['category_title'] = $value['category_title'];
+				$data[$value['category_id']]['category_url'] = $value['category_url'];
+				$data[$value['category_id']]['shows'][] = $item;
+			}
+		}
+
+		/* doplnění Hosté ve studiu */
+		$data[1]['shows'][] = [
+			'id' => '99',
+			'title' => 'Hosté ve studiu',
+			'short_description' => 'Zde najdete rozhovory se všemi osobnostmi a představiteli z MS kraje, kteří kdy byli pozváni do studia TV POLAR',
+			'image' => 'data/program/show/hoste/small.png',
+			'thumb' => 'data/program/show/hoste/small.png',
+			'special' => 'hoste'
+		];
+		/**/
+
+		return $data;
+	}
+
+	public function fetchForAutocomplete(): array
+	{
+		$resultSet = $resultSet2 = [];
+
+		$resultSet = $this->connection->createQueryBuilder()
+			->select('url', 'title', $this->connection->quote('ne') . ' AS special')
+			->from($this->table)
+			->where('show_in_archive = 1')
+			->andWhere('status = 1')
+			->orderBy('`order`', 'ASC')
+			->fetchAllAssociative();
+
+		/* doplnění z tabulky mimořádných pořadů */
+		$resultSet2 = $this->connection->createQueryBuilder()
+			->select('url', 'title', $this->connection->quote('ano') . ' AS special')
+			->from('special_shows')
+			->where('status = 1')
+			->orderBy('`order`', 'ASC')
+			->fetchAllAssociative();
+
+		return array_merge($resultSet, $resultSet2);
+	}
 }

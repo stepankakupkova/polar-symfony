@@ -278,4 +278,33 @@ final class VideoexRepository
 	{
 		$this->connection->delete($this->tableParts, ['id' => $part_id]);
 	}
+
+	public function getPaginatorByShow(int $show_id, int $page, int $limit): array
+	{
+		$offset = ($page - 1) * $limit;
+
+		return $this->connection->createQueryBuilder()
+			->select('special_videos.id', 'special_videos.show_id', 'special_videos.name', 'special_videos.title',
+				'special_videos.url', 'special_videos.path', 'special_videos.time', 'special_videos.duration_sec'
+			)
+			->from('special_videos')
+			->leftJoin('special_videos', 'special_shows', 'special_shows', 'special_shows.id = special_videos.show_id')
+			->where('special_shows.id = :show_id')
+			->setParameter('show_id', $show_id)
+			->orderBy('special_videos.time', 'DESC')
+			->setFirstResult($offset)
+			->setMaxResults($limit)
+			->fetchAllAssociative();
+	}
+
+	public function getCountByShow(int $show_id): int
+	{
+		return (int) $this->connection->createQueryBuilder()
+			->select('COUNT(*)')
+			->from('special_videos')
+			->leftJoin('special_videos', 'special_shows', 'special_shows', 'special_shows.id = special_videos.show_id')
+			->where('special_shows.id = :show_id')
+			->setParameter('show_id', $show_id)
+			->fetchOne();
+	}
 }
