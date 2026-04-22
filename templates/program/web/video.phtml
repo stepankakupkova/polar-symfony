@@ -444,7 +444,7 @@ $view->setBreadcrumbs([
                 <?php } ?>
             </article>
             <!-- Mohlo by vás také zajímat -->
-            <?= $view->include('program/partial/interested-shows') ?>
+            <?= $view->include('program/web/partial/interested-shows', ['newVideos' => $newVideos]) ?>
             <!-- Dnešní premiéry -->
             <?php //= $view->include('program/partial/todays-premieres') ?>
         </div>
@@ -455,7 +455,7 @@ $view->setBreadcrumbs([
             <aside class="section-best-news px-3 py-2" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 40}}">
                 <?php // REKLAMA ?>
                 <!-- reklama nad nejčtenějšími články -->
-                <?= $view->include('ads/article/right/top') ?>
+                <?= $view->include('banner/partial/ads/article-right-top') ?>
 
                 <!-- Nejčtenější články -->
                 <?php //= $view->include('news/partial/most-read-articles') ?>
@@ -484,10 +484,10 @@ $view->setBreadcrumbs([
                                 </div>
                             </div>';
                 } else {
-                    echo $view->include('ads/article/right/bottom');
+                    echo $view->include('banner/partial/ads/article-right-bottom');
                 }
                 ?>
-                <?php //= $view->include('ads/article/right/bottom') ?>
+                <?php //= $view->include('banner/partial/ads/article-right-bottom') ?>
                 <!-- END Banner square na 1 rok pro Beskydský expres, 16.1.2026 změnit zpátky na include ads/article/right/bottom -->
 
 
@@ -495,7 +495,7 @@ $view->setBreadcrumbs([
                 <div style="height:30px;"></div>
 
                 <!-- PR články -->
-                <?= $view->include('news/partial/pr') ?>
+                <?= $view->include('news/partial/pr', ['pr' => $pr]) ?>
             </aside>
         </div>
     </div>

@@ -1,0 +1,93 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+?>
+
+<?php if ($newVideos) { ?>
+    <div class="divider my-3">
+        <i class="fas fa-thumbs-up"></i>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>
+                Mohlo by Vás také zajímat
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <?php foreach ($newVideos as $newVideo) { ?>
+            <div class="col-xs-12 col-sm-12 col-md-4">
+                <div class="row">
+                    <article class="post">
+                        <div class="col-xs-5 col-sm-5 col-md-12">
+                            <div class="mb-2">
+                                <a class="mb-1" href="<?= $newVideo['url'] ?>" title="">
+                                    <span class="thumb-info thumb-info-lighten">
+                                        <span class="thumb-info-wrapper">
+                                            <?php
+                                            if ($newVideo['image']) {
+                                                $image = $newVideo['image'];
+                                            } else {
+                                                $image = '/data/program/show/!default-show.png';
+                                            }
+                                            ?>
+                                            <img src="<?= $image ?>" class="img-fluid" alt="<?= $newVideo['title'] ?>">
+                                            <span class="thumb-info-action">
+                                                <span class="thumb-info-action-icon">
+                                                    <i class="fas fa-play"></i>
+                                                    <span class="player_duration"><?= $newVideo['duration'] ? gmdate("i:s", $newVideo['duration']) : ''; ?></span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xs-7 col-sm-7 col-md-12 fix-mar fix-mar-tab mb-2">
+                            <div class="post-meta hidden-xs">
+                                <span>
+                                    <?php
+                                        try {
+                                            $date = new DateTime($newVideo['time']);
+                                            $today = new DateTime();
+                                            if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                echo 'Dnes,';
+                                            } else {
+                                                $yesterday = new DateTime();
+                                                $yesterday->modify('-1 day');
+                                                if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+                                                    echo 'Včera,';
+                                                } else {
+                                                    $formatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, 'dd. MMMM yyyy,');
+                                                    echo $formatter->format($date);
+                                                }
+                                            }
+                                            $timeFormatter = new IntlDateFormatter('cs_CZ', IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, ' HH:mm');
+                                            echo $timeFormatter->format($date);
+                                        } catch (Exception $e) {
+                                            echo 'NaN';
+                                        }
+                                    ?>
+                                </span>
+                                <a href="<?= $newVideo['url'] ?>" class="pull-right"></a>
+                            </div>
+                            <h4>
+                                <a href="<?= $newVideo['url'] ?>" title="<?= $newVideo['title'] ?>">
+                                    <?= $newVideo['title'] ?>
+                                </a>
+                            </h4>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+<?php } ?>

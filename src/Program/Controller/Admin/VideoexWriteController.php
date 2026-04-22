@@ -106,7 +106,7 @@ final class VideoexWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/videoex/edit', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/videoex/edit', [
 			'pageTitle' => 'Mimořádná videa',
 			'video' => $video,
 			'shows' => $shows,

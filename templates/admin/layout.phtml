@@ -145,7 +145,7 @@ $identity = $identity ?? null;
                                 $programPaths = [
                                     $view->path('admin_program_list'),
                                     $view->path('admin_program_video_list'),
-                                    $view->path('admin_program_show'),
+                                    $view->path('admin_program_show_list'),
                                     $view->path('admin_program_newton'),
                                 ];
                                 $isProgramActive = array_filter($programPaths, fn($p) => str_starts_with($currentPath, $p));
@@ -166,8 +166,8 @@ $identity = $identity ?? null;
                                             <span>Videa</span>
                                         </a>
                                     </li>
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_program_show')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_program_show') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_program_show_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_program_show_list') ?>">
                                             <span>Pořady</span>
                                         </a>
                                     </li>

@@ -33,7 +33,7 @@ final class VideoListController
 	{
 		$setting = $settingRepository->fetchSetting();
 
-		return new Response($renderer->renderWithAdminLayout('program/video/list', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/video/list', [
 			'pageTitle' => 'Videa',
 			'setting' => $setting,
 		]));

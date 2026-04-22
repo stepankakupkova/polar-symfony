@@ -57,7 +57,7 @@ final class ShowexWriteController
 			$post = $request->request->all();
 
 			if (isset($post['cancel'])) {
-				return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 			}
 
 			try {
@@ -138,7 +138,7 @@ final class ShowexWriteController
 					'file' => __FILE__,
 				]);
 
-				return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 			} catch (Exception $e) {
 				// Log
 				$logger->error('PROGRAM - Add extraordinary shows', [
@@ -150,7 +150,7 @@ final class ShowexWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/showex/add', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/showex/add', [
 			'pageTitle' => 'Mimořádné pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'setting' => $setting,
@@ -177,11 +177,11 @@ final class ShowexWriteController
 		try {
 			$show = $showexRepository->findPostBy('id', $show_id);
 		} catch (Exception) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 		}
 
 		if (!$show) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 		}
 
 		$setting = $settingRepository->fetchSetting();
@@ -191,7 +191,7 @@ final class ShowexWriteController
 			$post = $request->request->all();
 
 			if (isset($post['cancel'])) {
-				return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 			}
 
 			try {
@@ -231,7 +231,7 @@ final class ShowexWriteController
 					'file' => __FILE__,
 				]);
 
-				return new RedirectResponse($urlGenerator->generate('admin_program_showex'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 			} catch (Exception $e) {
 				// Log
 				$logger->error('PROGRAM - Edit extraordinary shows', [
@@ -243,7 +243,7 @@ final class ShowexWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/showex/edit', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/showex/edit', [
 			'pageTitle' => 'Mimořádné pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'show' => $show,

@@ -47,7 +47,7 @@ return [
                 ['label' => 'Nabídka práce',        'url' => '/nabidka-prace',      'order' => 6],
                 ['label' => 'Kamery',               'url' => '/kamery',             'order' => 7],
                 ['label' => 'Komerční sdělení',     'url' => '/zpravy/pr-clanky',   'order' => 8],
-                ['label' => 'TV program',           'url' => '/tv-program',         'order' => 9],
+                ['label' => 'TV program',           'url' => '/program',         'order' => 9],
             ],
         ],
     ],

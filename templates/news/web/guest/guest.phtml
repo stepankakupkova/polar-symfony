@@ -7,10 +7,8 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
-$guest = $this->guest;
-$show = $this->show;
-$newVideos = $this->newVideos;
-$todayPremieres = $this->todayPremieres ?? null;
+$guest = $guest ?? [];
+$show = $show ?? null;
 
 // HeadTitle
 $view->setTitle($guest['title'] . ' | Hosté ve studiu');
@@ -20,7 +18,7 @@ $view->addMeta('description', $guest['title']);
 $view->addMeta('keywords', $guest['anotation']);
 
 // META pro Facebook
-$currentUrl = $this->currentUrl ?? '';
+$currentUrl = $currentUrl ?? '';
 $view->addOgMeta('og:title', $guest['title'] . ' | Hosté ve studiu | POLAR');
 $view->addOgMeta('og:description', $guest['anotation']);
 $view->addOgMeta('og:url', $currentUrl);
@@ -41,6 +39,12 @@ $view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/plugin/silver
 $view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
 $view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
 $view->addBodyScript($view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/silvermine-videojs-quality-selector.min.js'));
+
+$view->setBreadcrumbs([
+    ['label' => 'Pořady', 'url' => $view->path('program_web_shows')],
+    ['label' => 'Hosté ve studiu', 'url' => $view->path('news_guests')],
+    ['label' => $guest['title']],
+]);
 
 // Ticker + Crawl JS
 $view->addInlineScript(

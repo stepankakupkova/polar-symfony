@@ -40,13 +40,13 @@ $view->addInlineScript(
     '$("#btblShow").on("post-body.bs.table", function (e, data) {
         $(".btblBtnDeleteShow").unbind("click").bind("click", function() {
             var id = $(this).data("video-id");
-            $.post("' . $view->path('admin_program_showex_json_get_show') . '",
+            $.post("' . $view->path('admin_program_show_json_get_show') . '",
                 {
                     id: id
                 },
                 function(json) {
                     if (json.success) {
-                        $("#modalDanger .card-title").html("Odstranit mimořádný pořad");
+                        $("#modalDanger .card-title").html("Odstranit pořad");
                         $("#modalDanger .modal-text h4").html("Opravdu chcete smazat pořad?<br><strong>\"" + json.show.title + "\"</strong>" );
                         $("#modalDanger .modal-text p").html("Všechny závislosti budou odstraněny. Tuto akci nelze vrátit zpět!");
                         var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
@@ -67,7 +67,7 @@ $view->addInlineScript(
                                 open: function() {
                                     btnConfirm.unbind("click").click(function(e){
                                         e.preventDefault();
-                                        $.post("' . $view->path('admin_program_showex_json_delete_show') . '",
+                                        $.post("' . $view->path('admin_program_show_json_delete_show') . '",
                                             {
                                                 id: id
                                             },
@@ -125,7 +125,7 @@ $view->addInlineScript(
 // Řazení pořadů
 $view->addInlineScript(
     '$("#btblShow").on("reorder-row.bs.table", function (e, data) {
-        $.post("' . $view->path('admin_program_showex_json_set_order') . '",
+        $.post("' . $view->path('admin_program_show_json_set_order') . '",
             {
                 data: data
             },
@@ -148,13 +148,13 @@ $view->addInlineScript(
 ?>
 <div class="tabs">
     <ul class="nav nav-tabs nav-justified">
-        <li class="nav-item">
-            <a class="nav-link" href="<?= $view->path('admin_program_show') ?>">
+        <li class="nav-item active">
+            <a class="nav-link" href="#shows" data-toggle="tab">
                 Pořady
             </a>
         </li>
-        <li class="nav-item active">
-            <a class="nav-link" href="#shows" data-toggle="tab">
+        <li class="nav-item">
+            <a class="nav-link" href="<?= $view->path('admin_program_showex_list') ?>">
                 Mimořádné pořady
             </a>
         </li>
@@ -162,7 +162,7 @@ $view->addInlineScript(
     <div class="tab-content">
         <div id="shows" class="tab-pane active">
             <div id="toolbar" class="btn-group">
-                <a href="<?= $view->path('admin_program_showex_add') ?>" class="btn btn-primary">
+                <a href="<?= $view->path('admin_program_show_add') ?>" class="btn btn-primary">
                     <i class="fa fa-fw fa-plus"></i>
                     <span class="hidden-sm hidden-xs">
                         Přidat pořad
@@ -170,9 +170,9 @@ $view->addInlineScript(
                 </a>
             </div>
             <table id="btblShow"
-                   data-url="<?= $view->path('admin_program_showex_json_get_list') ?>"
+                   data-url="<?= $view->path('admin_program_show_json_get_list') ?>"
                    data-toggle="table"
-                   data-page-list="[25, 50, 100, 200]"
+                   data-page-list="[25, 50, 100, 200, 500]"
                    data-page-size="200"
                    data-show-search-button="true"
                    data-show-search-clear-button="true"
@@ -180,7 +180,7 @@ $view->addInlineScript(
                    data-sort-name="order"
                    data-sort-order="asc"
                    data-toolbar="#toolbar"
-                   data-cookie-id-table="USER-<?= $identity->getUserIdentifier() ?>-showexTable"
+                   data-cookie-id-table="USER-<?= $identity->getUserIdentifier() ?>-showTable2"
                    data-mobile-responsive="true"
                    data-use-row-attr-func="true"
                    data-reorderable-rows="true"
@@ -197,14 +197,14 @@ $view->addInlineScript(
                     </th>
                     <th data-field="id"
                         class="text-nowrap width-nowrap"
-                        data-sortable="true"
+                        data-sortable="false"
                         data-visible="false">
                         ID
                     </th>
                     <th data-field="order"
                         class="text-nowrap width-nowrap cur-rank rank"
                         data-formatter="rankFormatter"
-                        data-sortable="true"
+                        data-sortable="false"
                         data-align="center">
                         <i class="fa fa-sort" data-toggle="tooltip" data-placement="right" title="Pořadí"></i>
                         <span class="d-sm-none">
@@ -222,22 +222,67 @@ $view->addInlineScript(
                     </th>
                     <th data-field="category_name"
                         class="width-nowrap"
-                        data-sortable="true"
+                        data-sortable="false"
                         data-align="center">
                         Kategorie
                     </th>
                     <th data-field="title"
                         class="text-truncate"
-                        data-sortable="true">
+                        data-sortable="false">
                         Pořad
                     </th>
                     <th data-field="status"
                         class="width-nowrap p-0"
                         data-formatter="enableFormatter"
                         data-align="center">
-                        <i class="fa fa-eye" data-toggle="tooltip" data-placement="right" title="Status"></i>
+                        <i class="fa fa-eye" data-toggle="tooltip" data-placement="right" title="Stav"></i>
                         <span class="d-sm-none">
-                            Status
+                            Stav
+                        </span>
+                    </th>
+                    <th data-field="show_in_archive"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                        <i class="fa fa-archive" data-toggle="tooltip" data-placement="right" title="Zobrazit v archivu"></i>
+                        <span class="d-sm-none">
+                            Zobrazit v archivu
+                        </span>
+                    </th>
+                    <th data-field="video_parts"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                        <i class="fa fa-film" data-toggle="tooltip" data-placement="right" title="Využití částí videa"></i>
+                        <span class="d-sm-none">
+                        Využití částí videa
+                    </span>
+                    </th>
+                    <th data-field="show_datetime"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                        <i class="fa fa-clock" data-toggle="tooltip" data-placement="right" title="Zobrazit datum a čas"></i>
+                        <span class="d-sm-none">
+                            Zobrazit datum a čas
+                        </span>
+                    </th>
+                    <th data-field="download"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                        <i class="fa fa-download" data-toggle="tooltip" data-placement="right" title="Povolit stahování"></i>
+                        <span class="d-sm-none">
+                            Povolit stahování
+                        </span>
+                    </th>
+                    <th data-field="newton"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                        <i class="fa fa-upload" data-toggle="tooltip" data-placement="right" title="Export pro Newton"></i>
+                        <span class="d-sm-none">
+                            Export pro Newton
                         </span>
                     </th>
                 </tr>
@@ -246,11 +291,11 @@ $view->addInlineScript(
 
             <script>
                 function optionsFormatter(value, row) {
-                    let url = "<?= $view->path('admin_program_videoex_list') ?>/upravit";
+                    let url = "<?= $view->path('admin_program_show_list') ?>/upravit";
                     let data = '';
                     data += '<div class="btn-group pb-sm-0 pb-2">';
                     data += '<a href="' + url + "/" + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ';
-                    data += '<button data-video-id="' + row.id + '" class="btblBtnDeleteShow btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>';
+                    data += '<button data-video-id="' + row.id + '" class="btblBtnDeleteShow btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Odstranit</span></button>';
                     data += '</div>';
                     return data;
                 }
@@ -276,12 +321,12 @@ $view->addInlineScript(
                         case true:
                             icon = 'fa fa-fw fa-lg fa-check-circle';
                             color = 'text-success';
-                            text = 'Aktivní';
+                            text = 'Povoleno';
                             break;
                         case false:
                             icon = 'fa fa-fw fa-lg fa-times-circle';
                             color = 'text-danger';
-                            text = 'Neaktivní';
+                            text = 'Zakázáno';
                             break;
                     }
                     return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';

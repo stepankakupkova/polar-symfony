@@ -1,3 +1,43 @@
 # Auto-generated Program Showex routes - DO NOT EDIT MANUALLY
-# Generated on demand from Program admin
+# Generated: 2026-04-22 06:24:19
+
+program_showex_6:
+  path: /mimoradne/filmy
+  controller: App\Program\Controller\Web\ShowexController::showex
+
+program_showex_video_6:
+  path: /mimoradne/filmy/{video_url}
+  controller: App\Program\Controller\Web\ShowexController::videoex
+  requirements:
+    video_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
+
+program_showex_5:
+  path: /mimoradne/ostravske-zastupitelstvo
+  controller: App\Program\Controller\Web\ShowexController::showex
+
+program_showex_video_5:
+  path: /mimoradne/ostravske-zastupitelstvo/{video_url}
+  controller: App\Program\Controller\Web\ShowexController::videoex
+  requirements:
+    video_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
+
+program_showex_2:
+  path: /mimoradne/novojicinske-zastupitelstvo
+  controller: App\Program\Controller\Web\ShowexController::showex
+
+program_showex_video_2:
+  path: /mimoradne/novojicinske-zastupitelstvo/{video_url}
+  controller: App\Program\Controller\Web\ShowexController::videoex
+  requirements:
+    video_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
+
+program_showex_1:
+  path: /mimoradne/opavske-zastupitelstvo
+  controller: App\Program\Controller\Web\ShowexController::showex
+
+program_showex_video_1:
+  path: /mimoradne/opavske-zastupitelstvo/{video_url}
+  controller: App\Program\Controller\Web\ShowexController::videoex
+  requirements:
+    video_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 

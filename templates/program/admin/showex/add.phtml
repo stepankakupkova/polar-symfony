@@ -34,7 +34,7 @@ $view->addInlineScript(
             $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
             $("#image .progress").addClass("d-none");
             $("#image .image-outer-container img").attr("src", "/" + data.result.url);
-            $("input[name=image]").val("/" + data.result.url);
+            $("input[name=image]").val(data.result.url);
             if (data.result.error) {
                 new PNotify({
                     title: "Obrázek pořadu",
@@ -81,12 +81,12 @@ $view->addInlineScript(
             <div class="mb-4">
                 <div class="image-outer-container d-inline-flex">
                     <div class="image-inner-container bg-primary">
-                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $view->asset('data/program/show/!default-show.png') . '?ver=' . date('YmdHis') ?>" alt="">
+                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $view->asset('data/mimoradne/show/!default-show.png') . '?ver=' . date('YmdHis') ?>" alt="">
                         <span class="image-button bg-<?= $schemeOpposite ?>">
                             <i class="fa fa-camera text-color-<?= $scheme ?>"></i>
                         </span>
                     </div>
-                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_program_show_json_upload_image') ?>" accept="image/*">
+                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_program_showex_json_upload_image') ?>" accept="image/*">
                 </div>
             </div>
             <div class="progress mb-3 d-none">
@@ -105,10 +105,10 @@ $view->addInlineScript(
                     </span>
                 </div>
                 <h2 class="card-title">
-                    Přidat pořad
+                    Přidat mimořádný pořad
                 </h2>
             </header>
-            <?= $view->include('program/show/showForm', [
+            <?= $view->include('program/admin/showex/showexForm', [
                 'setting' => $setting,
                 'categories' => $categories,
                 'show' => null,

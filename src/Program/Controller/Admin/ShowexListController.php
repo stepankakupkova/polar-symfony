@@ -28,7 +28,7 @@ class ShowexListController extends AbstractController
 		PhtmlRenderer $renderer,
 	): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('program/showex/list', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/showex/list', [
 			'pageTitle' => 'Mimořádné pořady',
 		]));
 	}

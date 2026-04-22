@@ -137,7 +137,7 @@ final class ProgramWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/program/add', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/program/add', [
 			'pageTitle' => 'Program',
 			'form' => $form,
 			'errors' => $errors,
@@ -274,7 +274,7 @@ final class ProgramWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/program/edit', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/program/edit', [
 			'pageTitle' => 'Program',
 			'form' => $form,
 			'errors' => $errors,
@@ -350,7 +350,7 @@ final class ProgramWriteController
 	{
 		$setting = $settingRepository->fetchSetting();
 
-		return new Response($renderer->renderWithAdminLayout('program/program/newton', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/program/newton', [
 			'pageTitle' => 'Newton',
 			'setting' => $setting,
 		]));

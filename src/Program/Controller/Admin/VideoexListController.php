@@ -32,7 +32,7 @@ final class VideoexListController
 	{
 		$setting = $settingRepository->fetchSetting();
 
-		return new Response($renderer->renderWithAdminLayout('program/videoex/list', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/videoex/list', [
 			'pageTitle' => 'Mimořádná videa',
 			'setting' => $setting,
 		]));

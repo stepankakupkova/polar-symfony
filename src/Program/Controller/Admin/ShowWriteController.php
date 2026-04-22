@@ -57,7 +57,7 @@ final class ShowWriteController
 			$post = $request->request->all();
 
 			if (isset($post['cancel'])) {
-				return new RedirectResponse($urlGenerator->generate('admin_program_show'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 			}
 
 			try {
@@ -143,7 +143,7 @@ final class ShowWriteController
 					'file' => __FILE__,
 				]);
 
-				return new RedirectResponse($urlGenerator->generate('admin_program_show'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 			} catch (Exception $e) {
 				// Log
 				$logger->error('PROGRAM - Add show', [
@@ -155,7 +155,7 @@ final class ShowWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/show/add', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/show/add', [
 			'pageTitle' => 'Pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'setting' => $setting,
@@ -182,11 +182,11 @@ final class ShowWriteController
 		try {
 			$show = $showRepository->findPostBy('id', $show_id);
 		} catch (Exception) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_show'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 		}
 
 		if (!$show) {
-			return new RedirectResponse($urlGenerator->generate('admin_program_show'));
+			return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 		}
 
 		$setting = $settingRepository->fetchSetting();
@@ -196,7 +196,7 @@ final class ShowWriteController
 			$post = $request->request->all();
 
 			if (isset($post['cancel'])) {
-				return new RedirectResponse($urlGenerator->generate('admin_program_show'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 			}
 
 			try {
@@ -241,7 +241,7 @@ final class ShowWriteController
 					'file' => __FILE__,
 				]);
 
-				return new RedirectResponse($urlGenerator->generate('admin_program_show'));
+				return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 			} catch (Exception $e) {
 				// Log
 				$logger->error('PROGRAM - Edit show', [
@@ -253,7 +253,7 @@ final class ShowWriteController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/show/edit', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/show/edit', [
 			'pageTitle' => 'Pořady',
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'show' => $show,

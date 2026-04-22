@@ -12,7 +12,7 @@
 <div class="row">
     <div class="col-lg-6">
         <div class="row">
-            <?= $view->include('program/dashboard/widget', [
+            <?= $view->include('program/admin/dashboard/widget', [
                 'countProgram' => $countProgram,
                 'countProgramPremiere' => $countProgramPremiere,
                 'countVideo' => $countVideo,
@@ -81,7 +81,7 @@
                 </h2>
             </header>
             <div class="card-body">
-                <?= $view->include('program/changelog') ?>
+                <?= $view->include('program/admin/changelog') ?>
             </div>
         </section>
     </div>

@@ -203,7 +203,7 @@ admin_program_videoex_json_create_preview:
   methods: POST
 
 # Show - Admin
-admin_program_show:
+admin_program_show_list:
   path: /admin/program/porady/seznam
   controller: App\Program\Controller\Admin\ShowListController::list
 
@@ -280,7 +280,7 @@ admin_program_show_json_redactor_file_upload:
   methods: POST
 
 # Showex - List
-admin_program_showex:
+admin_program_showex_list:
   path: /admin/program/mimoradne-porady/seznam
   controller: App\Program\Controller\Admin\ShowexListController::list
 

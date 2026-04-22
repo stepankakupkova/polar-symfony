@@ -111,7 +111,7 @@ $view->setBreadcrumbs([
                                     <div class="row mb-3">
                                         <div class="col-lg-5">
                                             <div class="post-image mt-2">
-                                                <a href="<?= $view->path('program_show_video_' . $item['show_id'], ['url' => $show['url'], 'program_url' => $item['url']]) ?>">
+                                                <a href="<?= $view->path('program_show_video_' . $item['show_id'], ['program_url' => $item['url']]) ?>">
                                                     <span class="thumb-info thumb-info-lighten">
                                                         <span class="thumb-info-wrapper">
                                                             <?php
@@ -136,7 +136,7 @@ $view->setBreadcrumbs([
                                         <div class="col-lg-7">
                                             <div class="post-content">
                                                 <h2 class="font-weight-semibold pt-4 pt-lg-0 text-5 line-height-4 mb-2">
-                                                    <a href="<?= $view->path('program_show_video_' . $item['show_id'], ['url' => $show['url'], 'program_url' => $item['url']]) ?>">
+                                                    <a href="<?= $view->path('program_show_video_' . $item['show_id'], ['program_url' => $item['url']]) ?>">
                                                         <?= $item['title'] ?>
                                                     </a>
                                                 </h2>
@@ -215,7 +215,7 @@ $view->setBreadcrumbs([
             <aside class="section-best-news px-3 py-2" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 40}}">
                 <?php // REKLAMA ?>
                 <!-- reklama nad nejčtenějšími články -->
-                <?= $view->include('ads/article/right/top') ?>
+                <?= $view->include('banner/partial/ads/article-right-top') ?>
 
                 <!-- Nejčtenější články -->
                 <?php //= $view->include('news/partial/most-read-articles') ?>
@@ -244,7 +244,7 @@ $view->setBreadcrumbs([
                                 </div>
                             </div>';
                 } else {
-                    echo $view->include('ads/article/right/bottom');
+                    echo $view->include('banner/partial/ads/article-right-bottom');
                 }
                 ?>
                 <!-- END Banner square na 1 rok pro Beskydský expres, 16.1.2026 změnit zpátky na include ads/article/right/bottom -->
@@ -254,7 +254,7 @@ $view->setBreadcrumbs([
                 <div style="height:30px;"></div>
 
                 <!-- PR články -->
-                <?= $view->include('news/partial/pr') ?>
+                <?= $view->include('news/partial/pr', ['pr' => $pr]) ?>
             </aside>
         </div>
     </div>

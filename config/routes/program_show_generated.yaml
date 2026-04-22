@@ -3,991 +3,991 @@
 
 program_show_1:
   path: /porady/regionalni-zpravy
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_1:
   path: /porady/regionalni-zpravy/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_13:
   path: /porady/host-dne
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_13:
   path: /porady/host-dne/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_168:
   path: /porady/sportovec-roku-ms-kraje-2025
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_168:
   path: /porady/sportovec-roku-ms-kraje-2025/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_11:
   path: /porady/magazin-tv-medicina
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_11:
   path: /porady/magazin-tv-medicina/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_12:
   path: /porady/eko-magazin
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_12:
   path: /porady/eko-magazin/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_14:
   path: /porady/sportovni-studio
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_14:
   path: /porady/sportovni-studio/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_67:
   path: /porady/magazin-112
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_67:
   path: /porady/magazin-112/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_78:
   path: /porady/dopravni-revue
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_78:
   path: /porady/dopravni-revue/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_40:
   path: /porady/studuj-u-nas
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_40:
   path: /porady/studuj-u-nas/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_90:
   path: /porady/leta-bezi
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_90:
   path: /porady/leta-bezi/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_105:
   path: /porady/kulturni-okenko
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_105:
   path: /porady/kulturni-okenko/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_69:
   path: /porady/kam-vyrazit
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_69:
   path: /porady/kam-vyrazit/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_118:
   path: /porady/dejme-detem-rodinu
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_118:
   path: /porady/dejme-detem-rodinu/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_162:
   path: /porady/ostrava-plus
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_162:
   path: /porady/ostrava-plus/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_154:
   path: /porady/remeslo-ma-respekt
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_154:
   path: /porady/remeslo-ma-respekt/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_155:
   path: /porady/moravskoslezsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_155:
   path: /porady/moravskoslezsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_56:
   path: /porady/ostravske-minuty
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_56:
   path: /porady/ostravske-minuty/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_61:
   path: /porady/expres-ostrava-jih
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_61:
   path: /porady/expres-ostrava-jih/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_107:
   path: /porady/expres-ostrava-poruba
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_107:
   path: /porady/expres-ostrava-poruba/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_109:
   path: /porady/slezskoostravsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_109:
   path: /porady/slezskoostravsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_8:
   path: /porady/karvinsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_8:
   path: /porady/karvinsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_2:
   path: /porady/havirovsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_2:
   path: /porady/havirovsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_127:
   path: /porady/havirovske-otazky
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_127:
   path: /porady/havirovske-otazky/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_7:
   path: /porady/frydeckomistecky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_7:
   path: /porady/frydeckomistecky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_9:
   path: /porady/novojicinsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_9:
   path: /porady/novojicinsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_27:
   path: /porady/opavsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_27:
   path: /porady/opavsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_16:
   path: /porady/stonavsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_16:
   path: /porady/stonavsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_102:
   path: /porady/expres_studenky
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_102:
   path: /porady/expres_studenky/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_85:
   path: /porady/jesenicky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_85:
   path: /porady/jesenicky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_86:
   path: /porady/beskydsky-expres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_86:
   path: /porady/beskydsky-expres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_74:
   path: /porady/centrum-ostravy
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_74:
   path: /porady/centrum-ostravy/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_64:
   path: /porady/bruntalsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_64:
   path: /porady/bruntalsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_82:
   path: /porady/frydlantsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_82:
   path: /porady/frydlantsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_114:
   path: /porady/miniexpres-horni-suche
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_114:
   path: /porady/miniexpres-horni-suche/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_130:
   path: /porady/orlovsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_130:
   path: /porady/orlovsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_55:
   path: /porady/marianskohorsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_55:
   path: /porady/marianskohorsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_88:
   path: /porady/palkovicky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_88:
   path: /porady/palkovicky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_100:
   path: /porady/rychvaldsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_100:
   path: /porady/rychvaldsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_160:
   path: /porady/fulnecky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_160:
   path: /porady/fulnecky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_125:
   path: /porady/vitkovicky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_125:
   path: /porady/vitkovicky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_158:
   path: /porady/odersky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_158:
   path: /porady/odersky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_57:
   path: /porady/terlicky_miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_57:
   path: /porady/terlicky_miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_98:
   path: /porady/celadensky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_98:
   path: /porady/celadensky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_66:
   path: /porady/albrechticky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_66:
   path: /porady/albrechticky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_103:
   path: /porady/jablunkovsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_103:
   path: /porady/jablunkovsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_163:
   path: /porady/bilovecky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_163:
   path: /porady/bilovecky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_164:
   path: /porady/detmarovicky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_164:
   path: /porady/detmarovicky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_113:
   path: /porady/nosovicky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_113:
   path: /porady/nosovicky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_165:
   path: /porady/dobersky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_165:
   path: /porady/dobersky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_167:
   path: /porady/miniexpres-basky
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_167:
   path: /porady/miniexpres-basky/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_166:
   path: /porady/paskovsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_166:
   path: /porady/paskovsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_129:
   path: /porady/svinovsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_129:
   path: /porady/svinovsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_128:
   path: /porady/miniexpres-dolni-lutyne
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_128:
   path: /porady/miniexpres-dolni-lutyne/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_150:
   path: /porady/janovicky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_150:
   path: /porady/janovicky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_152:
   path: /porady/miniexpres-navsi
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_152:
   path: /porady/miniexpres-navsi/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_77:
   path: /porady/chytry-region
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_77:
   path: /porady/chytry-region/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_124:
   path: /porady/manazeri-v-akci
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_124:
   path: /porady/manazeri-v-akci/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_126:
   path: /porady/auto-moto-kolo
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_126:
   path: /porady/auto-moto-kolo/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_161:
   path: /porady/volebni-studio-2025
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_161:
   path: /porady/volebni-studio-2025/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_153:
   path: /porady/volebni-studio-2024
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_153:
   path: /porady/volebni-studio-2024/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_123:
   path: /porady/volebni-studio-2022
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_123:
   path: /porady/volebni-studio-2022/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_119:
   path: /porady/parlamentni-volebni-studio
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_119:
   path: /porady/parlamentni-volebni-studio/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_111:
   path: /porady/volebni-studio
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_111:
   path: /porady/volebni-studio/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_96:
   path: /porady/predstavujeme-senatory
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_96:
   path: /porady/predstavujeme-senatory/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_5:
   path: /porady/malujeme-pohadku
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_5:
   path: /porady/malujeme-pohadku/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_23:
   path: /porady/baby-english
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_23:
   path: /porady/baby-english/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_42:
   path: /porady/oci-nasi-divociny
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_42:
   path: /porady/oci-nasi-divociny/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_39:
   path: /porady/zpivame-a-tancime-s-misou
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_39:
   path: /porady/zpivame-a-tancime-s-misou/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_117:
   path: /porady/energie-a-kraj
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_117:
   path: /porady/energie-a-kraj/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_157:
   path: /porady/moravskoslezska-sestra-2025
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_157:
   path: /porady/moravskoslezska-sestra-2025/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_169:
   path: /porady/blizko-vode
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_169:
   path: /porady/blizko-vode/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_159:
   path: /porady/spolecenska-odpovednost-2024
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_159:
   path: /porady/spolecenska-odpovednost-2024/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_156:
   path: /porady/sportovec-roku-ms-kraje-2024
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_156:
   path: /porady/sportovec-roku-ms-kraje-2024/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_132:
   path: /porady/transformace-kraje
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_132:
   path: /porady/transformace-kraje/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_79:
   path: /porady/moravskoslezska-sestra
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_79:
   path: /porady/moravskoslezska-sestra/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_151:
   path: /porady/sportovni-studio-hokej
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_151:
   path: /porady/sportovni-studio-hokej/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_122:
   path: /porady/sportovec-roku-ms-kraje-2023
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_122:
   path: /porady/sportovec-roku-ms-kraje-2023/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_91:
   path: /porady/spolecenska-odpovednost
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_91:
   path: /porady/spolecenska-odpovednost/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_4:
   path: /porady/jak-smakuje-moravskoslezsko
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_4:
   path: /porady/jak-smakuje-moravskoslezsko/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_10:
   path: /porady/sberatele
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_10:
   path: /porady/sberatele/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_3:
   path: /porady/kdo-byl-kdo
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_3:
   path: /porady/kdo-byl-kdo/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_29:
   path: /porady/nabidka-prace
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_29:
   path: /porady/nabidka-prace/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_65:
   path: /porady/starosti-starostu
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_65:
   path: /porady/starosti-starostu/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_68:
   path: /porady/legendy-moravskoslezskeho-kraje
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_68:
   path: /porady/legendy-moravskoslezskeho-kraje/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_97:
   path: /porady/sportovec-roku-ms-kraje-2018
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_97:
   path: /porady/sportovec-roku-ms-kraje-2018/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_75:
   path: /porady/zit-normalne
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_75:
   path: /porady/zit-normalne/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_81:
   path: /porady/kutilove
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_81:
   path: /porady/kutilove/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_99:
   path: /porady/fan-tv-revue
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_99:
   path: /porady/fan-tv-revue/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_101:
   path: /porady/miss-babca-a-ostravsky-stramak
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_101:
   path: /porady/miss-babca-a-ostravsky-stramak/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_104:
   path: /porady/sportovec-roku-ms-kraje-2019
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_104:
   path: /porady/sportovec-roku-ms-kraje-2019/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_108:
   path: /porady/vzpominky-na-konec-valky
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_108:
   path: /porady/vzpominky-na-konec-valky/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_110:
   path: /porady/diskuzni-forum
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_110:
   path: /porady/diskuzni-forum/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_112:
   path: /porady/dny-nato-2020
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_112:
   path: /porady/dny-nato-2020/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_115:
   path: /porady/vanoce-s-permonikem
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_115:
   path: /porady/vanoce-s-permonikem/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_116:
   path: /porady/region-pro-sebe
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_116:
   path: /porady/region-pro-sebe/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_120:
   path: /porady/sportovec-dvacetileti-ms-kraje-2000-2020
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_120:
   path: /porady/sportovec-dvacetileti-ms-kraje-2000-2020/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_121:
   path: /porady/podekovani-zdravotnikum-msk
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_121:
   path: /porady/podekovani-zdravotnikum-msk/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_131:
   path: /porady/svet-z-blizka
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_131:
   path: /porady/svet-z-blizka/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
 program_show_170:
   path: /porady/senovsky-miniexpres
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::show
 
 program_show_video_170:
   path: /porady/senovsky-miniexpres/{program_url}
-  controller: App\Program\Controller\Web\ShowController::index
+  controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 

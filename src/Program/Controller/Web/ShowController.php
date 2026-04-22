@@ -50,7 +50,6 @@ final class ShowController
 	}
 
 	public function show(
-		string $url,
 		Request $request,
 		PhtmlRenderer $renderer,
 		ShowRepository $showRepository,
@@ -59,6 +58,10 @@ final class ShowController
 		UrlGeneratorInterface $urlGenerator,
 	): Response
 	{
+		// Route je statická (např. /porady/regionalni-zpravy), nemá {url} parametr.
+		// $url odvozujeme z 2. segmentu path: /porady/{url}
+		$segments = explode('/', trim($request->getPathInfo(), '/'));
+		$url = $segments[1] ?? '';
 		if (!$url) {
 			return new RedirectResponse($urlGenerator->generate('program_web_shows'));
 		}
@@ -95,7 +98,6 @@ final class ShowController
 	}
 
 	public function video(
-		string $url,
 		string $program_url,
 		Request $request,
 		PhtmlRenderer $renderer,
@@ -107,6 +109,10 @@ final class ShowController
 		string $LIGHT_URL,
 	): Response
 	{
+		// Route je statická (např. /porady/regionalni-zpravy/{program_url}), nemá {url} parametr.
+		// $url odvozujeme z 2. segmentu path: /porady/{url}/{program_url}
+		$segments = explode('/', trim($request->getPathInfo(), '/'));
+		$url = $segments[1] ?? '';
 		if (!$url) {
 			return new RedirectResponse($urlGenerator->generate('program_web_shows'));
 		}
@@ -124,7 +130,7 @@ final class ShowController
 			if ($program && $program['video_id']) {
 				$video = $videoRepository->findPostBy('id', $program['video_id']);
 			} else {
-				return new RedirectResponse($urlGenerator->generate('program_show_' . $show['id'], ['url' => $show['url']]));
+				return new RedirectResponse($urlGenerator->generate('program_show_' . $show['id']));
 			}
 
 			$newVideos = $videoRepository->getNewVideosForWeb(3);

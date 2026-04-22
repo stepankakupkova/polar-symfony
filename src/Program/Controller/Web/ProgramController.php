@@ -134,7 +134,7 @@ final class ProgramController
 							$time->format('H:i') .
 							'</span>' .
 							'&nbsp;&nbsp;<i class="fa fa-angle-right"></i>&nbsp;&nbsp;' .
-							'<a class="title" href="' . $urlGenerator->generate('program_show_' . $item['show_id'], ['url' => $item['show_url'], 'program_url' => $item['url']]) . '" title="' . $item['title'] . '">' .
+							'<a class="title" href="' . $urlGenerator->generate('program_show_' . $item['show_id']) . '" title="' . $item['title'] . '">' .
 							$item['title'] .
 							(($item['premiere']) ? ' (P)' : '') .
 							'</a>' .
@@ -177,7 +177,7 @@ final class ProgramController
 			} else {
 				$content =
 					'<div class="alert alert-warning" role="alert">' .
-					'The program not found.' .
+					'Program nebyl nalezen.' .
 					'</div>';
 			}
 		} catch (Exception $e) {

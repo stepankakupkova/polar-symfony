@@ -32,7 +32,7 @@ final class SettingController
 		PhtmlRenderer $renderer,
 	): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('program/setting/index', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/setting/index', [
 			'pageTitle' => 'Setting | Program',
 		]));
 	}
@@ -113,7 +113,7 @@ final class SettingController
 			}
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/setting/setting', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/setting/setting', [
 			'pageTitle' => 'Setting | Program',
 			'setting' => $setting,
 		]));

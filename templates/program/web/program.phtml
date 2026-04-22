@@ -13,6 +13,10 @@ $view->addOgMeta('og:image:width', '1920');
 $view->addOgMeta('og:image:height', '1080');
 
 $view->addHeadLink('stylesheet', $view->asset('vendor/web/magnific-popup/css/magnific-popup.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/bootstrap-datepicker/css/bootstrap-datepicker3.min.css'));
+
+$view->addBodyScript($view->asset('vendor/web/bootstrap-datepicker/js/bootstrap-datepicker.min.js'));
+$view->addBodyScript($view->asset('vendor/web/bootstrap-datepicker/js/locale/cs_CZ.min.js'));
 
 $view->addInlineScript(
     '$(".datepicker_cal").datepicker({
@@ -120,7 +124,7 @@ $view->addInlineScript(
                 </div>
             </div>
             <!-- Nejsledovanější pořady -->
-            <?= $view->include('program/partial/web/most-watched-shows', ['mostWatchedShows' => $mostWatchedShows]) ?>
+            <?= $view->include('program/web/partial/most-watched-shows', ['mostWatchedShows' => $mostWatchedShows]) ?>
         </div>
     </div>
 </div>

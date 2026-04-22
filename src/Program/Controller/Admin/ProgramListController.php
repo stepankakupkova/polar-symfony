@@ -25,7 +25,7 @@ final class ProgramListController
 		ShowRepository $showRepository,
 	): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('program/program/index', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/program/index', [
 			'pageTitle' => 'Program',
 			'countProgram' => $programRepository->getCount(),
 			'countProgramPremiere' => $programRepository->getCount(true),
@@ -40,7 +40,7 @@ final class ProgramListController
 		Security $security,
 	): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('program/program/list', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/program/list', [
 			'pageTitle' => 'Program',
 		]));
 	}

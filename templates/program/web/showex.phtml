@@ -175,18 +175,18 @@ $view->setBreadcrumbs([
             <aside class="section-best-news px-3 py-2" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 40}}">
                 <?php // REKLAMA ?>
                 <!-- reklama nad nejčtenějšími články -->
-                <?= $view->include('ads/article/right/top') ?>
+                <?= $view->include('banner/partial/ads/article-right-top') ?>
 
                 <!-- Nejčtenější články -->
                 <?php //= $view->include('news/partial/most-read-articles') ?>
 
                 <?php // REKLAMA ?>
                 <!-- reklama pod nejčtenějšími články -->
-                <?= $view->include('ads/article/right/bottom') ?>
+                <?= $view->include('banner/partial/ads/article-right-bottom') ?>
                 <div style="height:30px;"></div>
 
                 <!-- PR články -->
-                <?= $view->include('news/partial/pr') ?>
+                <?= $view->include('news/partial/pr', ['pr' => $pr]) ?>
             </aside>
         </div>
     </div>

@@ -62,7 +62,7 @@ final class VideoWriteController
 			return new RedirectResponse($urlGenerator->generate('admin_program_video_list'));
 		}
 
-		return new Response($renderer->renderWithAdminLayout('program/video/edit', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/video/edit', [
 			'pageTitle' => 'Videa',
 			'video' => $video,
 			'PUBLIC_PATH' => $this->PUBLIC_PATH,

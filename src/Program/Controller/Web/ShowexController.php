@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class ShowexController
 {
 	public function showex(
-		string $url,
 		Request $request,
 		PhtmlRenderer $renderer,
 		ShowexRepository $showexRepository,
@@ -25,6 +24,11 @@ final class ShowexController
 		UrlGeneratorInterface $urlGenerator,
 	): Response
 	{
+		// Route je statická (např. /mimoradne/ostravske-zastupitelstvo), nemá {url} parametr.
+		// $url odvozujeme z 2. segmentu path: /mimoradne/{url}
+		$segments = explode('/', trim($request->getPathInfo(), '/'));
+		$url = $segments[1] ?? '';
+
 		if (!$url) {
 			return new RedirectResponse($urlGenerator->generate('program_web_shows'));
 		}
@@ -58,8 +62,8 @@ final class ShowexController
 	}
 
 	public function videoex(
-		string $url,
 		string $video_url,
+		Request $request,
 		PhtmlRenderer $renderer,
 		ShowexRepository $showexRepository,
 		VideoexRepository $videoexRepository,
@@ -69,6 +73,11 @@ final class ShowexController
 		string $LIGHT_URL,
 	): Response
 	{
+		// Route je statická (např. /mimoradne/ostravske-zastupitelstvo/{video_url}), nemá {url} parametr.
+		// $url odvozujeme z 2. segmentu path: /mimoradne/{url}/{video_url}
+		$segments = explode('/', trim($request->getPathInfo(), '/'));
+		$url = $segments[1] ?? '';
+
 		if (!$url) {
 			return new RedirectResponse($urlGenerator->generate('program_web_shows'));
 		}
@@ -86,7 +95,7 @@ final class ShowexController
 			if ($video) {
 				$parts = $videoexRepository->findPartsBy('video_id', (int)$video['id']);
 			} else {
-				return new RedirectResponse($urlGenerator->generate('program_showex_' . $show['id'], ['url' => $show['url']]));
+				return new RedirectResponse($urlGenerator->generate('program_showex_' . $show['id']));
 			}
 
 			$newVideos = $videoRepository->getNewVideosForWeb(3);

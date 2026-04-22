@@ -30,7 +30,7 @@ final class ShowListController
 		PhtmlRenderer $renderer,
 	): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('program/show/list', [
+		return new Response($renderer->renderWithAdminLayout('program/admin/show/list', [
 			'pageTitle' => 'Pořady',
 		]));
 	}

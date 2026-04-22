@@ -8,6 +8,9 @@
  */
 
 /** @var \App\Application\View\ViewHelper $view */
+/** @var array|null $shows */
+/** @var string $query */
+/** @var array|null $showsForAutocomplete */
 
 $showsForAutocomplete_json = json_encode($showsForAutocomplete);
 
@@ -114,11 +117,11 @@ $view->setBreadcrumbs([
                 <?php
                 foreach ($category['shows'] as $show) {
                     if ($show['special'] === 'ano') {
-                        $href = $view->path('program_showex_' . $show['id'], ['url' => $show['url']]);
+                        $href = $view->path('program_showex_' . $show['id']);
                     } else if ($show['special'] === 'hoste') {
-                        $href = $view->path('application_guests');
+                        $href = $view->path('news_guests');
                     } else {
-                        $href = $view->path('program_show_' . $show['id'], ['url' => $show['url']]);
+                        $href = $view->path('program_show_' . $show['id']);
                     }
                     ?>
                     <div class="col-6 col-sm-4 col-lg-3 mb-2 mb-md-4 px-1 px-md-3-5">
@@ -149,7 +152,7 @@ $view->setBreadcrumbs([
 
                 <?php if ($i === 3) { ?>
                     <?php // REKLAMA ?>
-                    <?= $view->include('ads/article') ?>
+                    <?= $view->include('banner/partial/ads/article') ?>
                 <?php } ?>
                 <?php $i++; ?>
             <?php } ?>

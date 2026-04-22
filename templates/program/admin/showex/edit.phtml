@@ -7,6 +7,11 @@
  * @license https://rogr.cz/license/eula EULA License
  */
 
+$srcImage = $view->asset('data/mimoradne/show/!default-show.png') . '?ver=' . date('YmdHis');
+if (!empty($show['image'])) {
+    $srcImage = $view->asset($show['image']);
+}
+
 $view->addHeadLink('stylesheet', $view->asset('vendor/admin/file-upload/css/file-upload.css'));
 
 $view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
@@ -17,7 +22,7 @@ $view->addBodyScript($view->asset('vendor/admin/file-upload/js/file-upload.js'))
 $view->addInlineScript(
     '$("#fileupload").fileupload({
         formData: {
-            show_id: null
+            show_id: ' . $show['id'] . '
         },
         dropZone: "#image",
         dataType: "json",
@@ -67,6 +72,44 @@ $view->addInlineScript(
         $("#fileupload").click();
     });'
 );
+
+// Smazání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .delete-button").click(function(e){
+        $.post("' . $view->path('admin_program_showex_json_set_default_image') . '",
+            {
+                show_id: ' . $show['id'] . ',
+                field: "image"
+            },
+            function(json) {
+                if (json.success) {
+                    var notice = new PNotify({
+                        title: "Úspěch",
+                        text: "Obrázek pořadu byl nastaven na výchozí",
+                        type: "success",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                    $("input[name=image]").val(json.url);
+                    $("#image .image-outer-container img").attr("src", "/" + json.url);
+                } else {
+                    var notice = new PNotify({
+                        title: "Chyba",
+                        text: "Nelze nastavit obrázek pořadu na výchozí",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                }
+            },
+            "json"
+        );
+    });'
+);
 ?>
 
 <div class="row">
@@ -81,7 +124,10 @@ $view->addInlineScript(
             <div class="mb-4">
                 <div class="image-outer-container d-inline-flex">
                     <div class="image-inner-container bg-primary">
-                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $view->asset('data/mimoradne/show/!default-show.png') . '?ver=' . date('YmdHis') ?>" alt="">
+                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $srcImage ?>" alt="">
+                        <span class="delete-button bg-danger">
+                            <i class="fa fa-trash-alt text-color-light"></i>
+                        </span>
                         <span class="image-button bg-<?= $schemeOpposite ?>">
                             <i class="fa fa-camera text-color-<?= $scheme ?>"></i>
                         </span>
@@ -105,14 +151,14 @@ $view->addInlineScript(
                     </span>
                 </div>
                 <h2 class="card-title">
-                    Přidat mimořádný pořad
+                    Upravit mimořádný pořad
                 </h2>
             </header>
-            <?= $view->include('program/showex/showexForm', [
+            <?= $view->include('program/admin/showex/showexForm', [
                 'setting' => $setting,
                 'categories' => $categories,
-                'show' => null,
-                'show_id' => null,
+                'show' => $show,
+                'show_id' => $show['id'],
             ]) ?>
         </section>
     </div>
