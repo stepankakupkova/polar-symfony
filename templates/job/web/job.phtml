@@ -1,0 +1,496 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent(string $text, ?string $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    $textTmp = $text;
+    if ($transliterator) {
+        $textTmp = $transliterator->transliterate($text);
+        $textTmp = preg_replace('/[^a-z0-9]+/', '-', $textTmp);
+        $textTmp = strtolower($textTmp);
+        if ($replace) {
+            $textTmp = str_replace(' ', $replace, $textTmp);
+        }
+    }
+
+    return $textTmp;
+}
+
+$job = $job ?? null;
+$joboffersManual = $joboffersManual ?? [];
+$city_url = $city_url ?? '';
+$cityName = $cityName ?? '';
+$pr = $pr ?? null;
+$locale = $locale ?? 'cs_CZ';
+
+if (!$cityName) {
+    $cityMap = [
+        'ostrava' => 'Ostravsko',
+        'karvina' => 'Karvinsko',
+        'frydek-mistek' => 'Frýdeckomístecko',
+        'opava' => 'Opavsko',
+        'novy-jicin' => 'Novojíčínsko',
+        'bruntal' => 'Bruntálsko',
+    ];
+    $cityName = $cityMap[$city_url] ?? '';
+}
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+
+// JobPosting pro JSON-LD
+if ($job) {
+    $orgUrl = $job['urlAdresa'] ?? '';
+    if ($orgUrl && !preg_match('#^https?://#i', $orgUrl)) {
+        $orgUrl = 'https://' . ltrim($orgUrl, '/');
+    }
+    $hiringOrganization = [
+        '@type' => 'Organization',
+        'name' => $job['mistoVykonuPrace_pracoviste_nazev'],
+    ];
+    if ($orgUrl) {
+        $hiringOrganization['sameAs'] = $orgUrl;
+    }
+    $employmentType = match ($job['pracovnepravni_vztahy']) {
+        'Pracovní poměr - plný úvazek' => 'FULL_TIME',
+        'Pracovní poměr - zkrácený úvazek' => 'PART_TIME',
+        'Dohoda o pracovní činnosti' => 'CONTRACTOR',
+        'Dohoda o provedení práce' => 'CONTRACTOR',
+        'Služební poměr' => 'OTHER',
+        default => 'OTHER',
+    };
+    $salaryValue = [
+        '@type' => 'QuantitativeValue',
+        'minValue' => (int) $job['mesicniMzdaOd'],
+        'unitText' => 'MONTH',
+    ];
+    if ((int) $job['mesicniMzdaDo'] > 0) {
+        $salaryValue['maxValue'] = (int) $job['mesicniMzdaDo'];
+    }
+    $data = [
+        '@context' => 'https://schema.org/',
+        '@type' => 'JobPosting',
+        'title' => $job['profese'],
+        'description' => '<p>' . trim($job['upresnujiciInformace']) . '</p>',
+        'datePosted' => (new DateTime($job['datumZmeny']))->format('Y-m-d'),
+        'validThrough' => (new DateTime($job['datumZmeny']))->modify('+30 days')->format('c'),
+        'employmentType' => $employmentType,
+        'jobStartDate' => (new DateTime($job['terminZahajeniPracovnihoPomeru']))->format('Y-m-d'),
+        'workHours' => $job['smennost'],
+        'baseSalary' => [
+            '@type' => 'MonetaryAmount',
+            'currency' => 'CZK',
+            'value' => $salaryValue,
+        ],
+        'educationRequirements' => $job['minPozadovaneVzdelani'],
+        'hiringOrganization' => $hiringOrganization,
+        'jobLocation' => [
+            '@type' => 'Place',
+            'address' => [
+                '@type' => 'PostalAddress',
+                'addressLocality' => $job['obec'],
+                'addressCountry' => 'CZ',
+            ],
+        ],
+    ];
+}
+
+$view->setBreadcrumbs([
+    ['label' => 'Nabídka práce', 'url' => $view->path('job_list')],
+    ['label' => $cityName, 'url' => $view->path('job_city_list', ['city_url' => $city_url])],
+    ['label' => $job['profese'] ?? ''],
+]);
+?>
+<?php if ($job) { ?>
+<script type="application/ld+json">
+    <?= json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+</script>
+
+<?php
+$breadcrumbs = $view->getBreadcrumbs();
+$breadcrumbItems = [];
+foreach ($breadcrumbs as $i => $crumb) {
+    $item = [
+        '@type' => 'ListItem',
+        'position' => $i + 1,
+        'name' => $crumb['label'],
+    ];
+    if (!empty($crumb['url'])) {
+        $item['item'] = $crumb['url'];
+    } elseif ($i === array_key_last($breadcrumbs)) {
+        $item['item'] = $view->path('job_city_detail', [
+            'city_url' => $city_url,
+            'job_id' => $job['referencniCislo'],
+            'job_url' => removeAccent($job['profese'], '-'),
+        ]);
+    }
+    $breadcrumbItems[] = $item;
+}
+?>
+<script type="application/ld+json">
+    <?= json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $breadcrumbItems], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+</script>
+<?php } ?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1 job-detail">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8 mb-5">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+            <?php if ($job) { ?>
+                <section class="section section-light section-no-border m-0 p-0">
+                    <div class="px-4">
+                        <div class="row">
+                            <div class="col">
+                                <h1 class="text-6 text-color-secondary line-height-4 font-weight-semibold mb-4">
+                                    <?= $job['profese'] ?>
+                                </h1>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-placework.jpg" alt="">-->
+                                        <i class="fas fa-map-marker-alt pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Místo práce
+                                            </dt>
+                                            <dd>
+                                                <?= $job['obec'] ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-stylework.jpg" alt="">-->
+                                        <i class="fas fa-file-contract pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Druh pracovního poměru
+                                            </dt>
+                                            <dd>
+                                                <?php
+                                                    if ($job['pracovnepravni_vztahy']) {
+                                                        foreach ($job['pracovnepravni_vztahy'] as $item) {
+                                                            echo $item['nazev'] . '<br>';
+                                                        }
+                                                    } else {
+                                                        echo '<i class="text-muted">nezadáno</i>';
+                                                    }
+                                                ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-timework.jpg" alt="">-->
+                                        <i class="fas fa-calendar-alt pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Doba zaměstnání
+                                            </dt>
+                                            <dd>
+                                                <?php
+                                                    try {
+                                                        echo 'od ' . $view->dateFormat(new DateTime($job['terminZahajeniPracovnihoPomeru']), IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                                    } catch (Exception $e) {
+                                                        echo 'od <i class="text-muted">nezadáno</i>';
+                                                    }
+                                                    if ($job['terminUkonceniPracovnihoPomeru']) {
+                                                        try {
+                                                            echo ' do ' . $view->dateFormat(new DateTime($job['terminUkonceniPracovnihoPomeru']), IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+                                                        } catch (Exception $e) {
+                                                            echo 'do <i class="text-muted">nezadáno</i>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-smennost.jpg" alt="">-->
+                                        <i class="fas fa-business-time pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Směnnost
+                                            </dt>
+                                            <dd>
+                                                <?php
+                                                    if ($job['smennost']) {
+                                                        echo $job['smennost'];
+                                                    } else {
+                                                        echo '<i class="text-muted">nezadáno</i>';
+                                                    }
+                                                ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-moneywork.jpg" alt="">-->
+                                        <i class="fas fa-coins pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Nabízený plat
+                                            </dt>
+                                            <dd>
+                                                <?php
+                                                    if ($job['mesicniMzdaOd'] > 0) {
+                                                        echo 'od ' . $view->numberFormat($job['mesicniMzdaOd']);
+                                                    }
+                                                    if ($job['mesicniMzdaDo'] > 0) {
+                                                        echo ' do ' . $view->numberFormat($job['mesicniMzdaDo']);
+                                                    }
+                                                    if ($job['typMzdy']) {
+                                                        echo ' ' . $job['typMzdy'];
+                                                    }
+                                                ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-vzdelani.jpg" alt="">-->
+                                        <i class="fas fa-graduation-cap pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Minimální stupeň vzdělání
+                                            </dt>
+                                            <dd>
+                                                <?php
+                                                    if ($job['minPozadovaneVzdelani']) {
+                                                        echo $job['minPozadovaneVzdelani'];
+                                                    } else {
+                                                        echo '<i class="text-muted">nezadáno</i>';
+                                                    }
+                                                ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="featured-box featured-box-primary featured-box-text-start">
+                    <div class="box-content text-start">
+                        <h3 class="font-weight-normal text-transform-none text-4">
+                            Detail o pracovní pozici
+                        </h3>
+                        <p>
+                            <?php
+                                if ($job['upresnujiciInformace']) {
+                                    echo $job['upresnujiciInformace'];
+                                } else {
+                                    echo '<i class="text-muted">nezadáno</i>';
+                                }
+                            ?>
+                        </p>
+                        <div class="row">
+                            <?php if ($job['pocetMist']) { ?>
+                                <div class="col-sm-6 match-height">
+                                    <h4 class="text-color-secondary">
+                                        Počet míst
+                                    </h4>
+                                    <p>
+                                        <?= $job['pocetMist'] ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                            <?php if ($job['dovednosti']) { ?>
+                                <div class="col-sm-6 match-height">
+                                    <h4 class="text-color-secondary">
+                                        Požadované dovednosti
+                                    </h4>
+                                    <p>
+                                        <?php
+                                            foreach ($job['dovednosti'] as $item) {
+                                                echo $item['nazev'] . ' <small class="text-muted">' . $item['popis'] . '</small><br>';
+                                            }
+                                        ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                            <?php if ($job['jazyky']) { ?>
+                                <div class="col-sm-6 match-height">
+                                    <h4 class="text-color-secondary">
+                                        Požadované jazyky
+                                    </h4>
+                                    <p>
+                                        <?php
+                                            foreach ($job['jazyky'] as $item) {
+                                                echo $item['nazev'] . ' <small class="text-muted">' . $item['popis'] . '</small><br>';
+                                            }
+                                        ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                            <?php if ($job['vyhody']) { ?>
+                                <div class="col-sm-6 match-height">
+                                    <h4 class="text-color-secondary">
+                                        Výhody
+                                    </h4>
+                                    <p>
+                                        <?php
+                                            foreach ($job['vyhody'] as $item) {
+                                                echo $item['nazev'] . ' <small class="text-muted">' . $item['popis'] . '</small><br>';
+                                            }
+                                        ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                            <?php if ($job['vhodnosti']) { ?>
+                                <div class="col-sm-6 match-height">
+                                    <h4 class="text-color-secondary">
+                                        Vhodnosti
+                                    </h4>
+                                    <p>
+                                        <?php
+                                            foreach ($job['vhodnosti'] as $item) {
+                                                echo $item['nazev'] . ' <small class="text-muted">' . $item['popis'] . '</small><br>';
+                                            }
+                                        ?>
+                                    </p>
+                                </div>
+                            <?php } ?>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 class="text-color-secondary">
+                                    Zaměstnavatel
+                                </h4>
+                                <p>
+                                    <?= $job['mistoVykonuPrace_pracoviste_nazev'] ?>
+                                    <br>
+                                    <?= $job['zamestnavatel_ico'] ? ('IČ: ' . $job['zamestnavatel_ico'] . '<br>') : '' ?>
+                                    <?= $job['mistoVykonuPrace_pracoviste_adresa_ulice'] . ' ' . $job['mistoVykonuPrace_pracoviste_adresa_cisloDomovni'] . (($job['mistoVykonuPrace_pracoviste_adresa_cisloOrientacni']) ? (' / ' . $job['mistoVykonuPrace_pracoviste_adresa_cisloOrientacni']) : '') ?>
+                                    <br>
+                                    <?= $job['mistoVykonuPrace_pracoviste_adresa_obec'] . (($job['mistoVykonuPrace_pracoviste_adresa_castObce']) ? (' - ' . $job['mistoVykonuPrace_pracoviste_adresa_castObce']) : '') . (($job['mistoVykonuPrace_pracoviste_adresa_psc']) ? (', ' . $job['mistoVykonuPrace_pracoviste_adresa_psc']) : '') ?>
+                                </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <h4 class="text-color-secondary">
+                                    Kontaktní osoba
+                                </h4>
+                                <p>
+                                    <?= (($job['prvniKontaktSeZamestnavatelem_titulPredJmenem']) ? ($job['prvniKontaktSeZamestnavatelem_titulPredJmenem'] . ' ') : '') . $job['prvniKontaktSeZamestnavatelem_jmenoKontaktniOsoby'] . ' ' . $job['prvniKontaktSeZamestnavatelem_prijmeniKontaktniOsoby'] . (($job['prvniKontaktSeZamestnavatelem_titulZaJmenem']) ? (' ' . $job['prvniKontaktSeZamestnavatelem_titulZaJmenem']) : '') ?>
+                                    <br>
+                                    <?= $job['prvniKontaktSeZamestnavatelem_poziceVeSpolecnosti'] ?>
+                                    <br>
+                                    <?= (($job['prvniKontaktSeZamestnavatelem_kontaktniTelefon']) ? ('tel.: ' . $job['prvniKontaktSeZamestnavatelem_kontaktniTelefon'] . '<br>') : '') ?>
+                                    <?= (($job['prvniKontaktSeZamestnavatelem_kontaktniEmail']) ? ('email.: <a href="mailto:' . $job['prvniKontaktSeZamestnavatelem_kontaktniEmail'] . '">' . $job['prvniKontaktSeZamestnavatelem_kontaktniEmail'] . '</a><br>') : '') ?>
+                                    <?= (($job['prvniKontaktSeZamestnavatelem_mistoKontaktu']) ? ('místo: ' . $job['prvniKontaktSeZamestnavatelem_mistoKontaktu']) : '') ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    Poslední změna:
+                    <?php
+                        try {
+                            echo $view->dateFormat(new DateTime($job['datumZmeny']), IntlDateFormatter::LONG, IntlDateFormatter::MEDIUM, $locale);
+                        } catch (Exception $e) {
+                            echo 'do <i class="text-muted">nezadáno</i>';
+                        }
+                    ?>
+                    <br />
+                    Zdroj:
+                    <a href="https://www.uradprace.cz" title="Úřad práce České republiky - krajská pobočka v Ostravě" target="_blank">
+                        https://www.uradprace.cz
+                    </a>.
+                    TV Polar nezodpovídá za obsah.
+                </p>
+            <?php } else { ?>
+                <div class="alert alert-warning alert-lg">
+                    <strong>
+                        Tato pracovní nabídka už není aktuální.
+                    </strong>
+                </div>
+            <?php } ?>
+        </div>
+        <div class="col-lg-4">
+
+            <?php if ($joboffersManual) { ?>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h2 class="text-primary text-4-5 mb-3">
+                            Doporučujeme
+                        </h2>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <?php foreach ($joboffersManual as $joboffer) { ?>
+                                    <p class="bg-fcf8e3 px-3 py-2">
+                                        <a href="<?= $view->path('job_our_detail', ['job_id' => $joboffer['id'], 'job_url' => removeAccent($joboffer['title'], '-')]) ?>">
+                                            <strong>
+                                                <?= $joboffer['title'] ?>
+                                            </strong>
+                                            <br>
+                                            <?= $joboffer['company'] ?>
+                                        </a>
+                                    </p>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+
+            <?= $view->include('news/partial/pr', ['pr' => $pr]) ?>
+        </div>
+    </div>
+</div>

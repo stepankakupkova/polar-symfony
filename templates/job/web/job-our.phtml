@@ -1,0 +1,214 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$job = $job ?? null;
+$pr = $pr ?? null;
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+
+$view->setBreadcrumbs([
+    ['label' => 'Nabídka práce', 'url' => $view->path('job_list')],
+    ['label' => 'Doporučujeme'],
+    ['label' => $job['title'] ?? ''],
+]);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8 mb-5">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+            <?php if ($job) { ?>
+                <section class="section section-light section-no-border m-0 p-0">
+                    <div class="px-4">
+                        <div class="row">
+                            <div class="col">
+                                <h1 class="text-6 text-color-secondary line-height-4 font-weight-semibold mb-4">
+                                    <?= $job['title'] ?>
+                                </h1>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-placework.jpg" alt="">-->
+                                        <i class="fas fa-map-marker-alt pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Místo práce
+                                            </dt>
+                                            <dd>
+                                                <?= $job['place'] ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-stylework.jpg" alt="">-->
+                                        <i class="fas fa-file-contract pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Druh pracovního poměru
+                                            </dt>
+                                            <dd>
+                                                <?= $job['employment'] ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-timework.jpg" alt="">-->
+                                        <i class="fas fa-calendar-alt pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Doba zaměstnání
+                                            </dt>
+                                            <dd>
+                                                <?php
+                                                try {
+                                                    $date = $view->dateFormat(new DateTime($job['term']), IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale ?? 'cs_CZ');
+                                                } catch (Exception $e) {
+                                                    $date = '';
+                                                }
+                                                echo $date;
+                                                ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-smennost.jpg" alt="">-->
+                                        <i class="fas fa-business-time pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Směnnost
+                                            </dt>
+                                            <dd>
+                                                <?= $job['shift'] ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-moneywork.jpg" alt="">-->
+                                        <i class="fas fa-coins pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Nabízený plat
+                                            </dt>
+                                            <dd>
+                                                <?= $job['salary'] ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <!--<img class="pull-left me-2" src="/img/web/icons/icon-vzdelani.jpg" alt="">-->
+                                        <i class="fas fa-graduation-cap pull-left me-2 text-9 text-ccc d-flex justify-content-center align-items-center" style="width:59px; height:52px;"></i>
+                                        <dl>
+                                            <dt>
+                                                Minimální stupeň vzdělání
+                                            </dt>
+                                            <dd>
+                                                <?= $job['education'] ?>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="featured-box featured-box-primary featured-box-text-start">
+                    <div class="box-content text-start">
+                        <h3 class="font-weight-normal text-transform-none text-4">
+                            Detail o pracovní pozici
+                        </h3>
+                        <p>
+                            <?= $job['content'] ?>
+                        </p>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 class="text-color-secondary">
+                                    Zaměstnavatel
+                                </h4>
+                                <p>
+                                    <?= $job['company'] ?><br>
+                                    <?= $job['company_street'] ?><br>
+                                    <?= $job['company_city'] . ', ' . $job['company_postcode'] ?>
+                                </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <h4 class="text-color-secondary">
+                                    Kontaktní osoba
+                                </h4>
+                                <p>
+                                    <?= $job['person'] ?>
+                                    <br>
+                                    <?= ($job['phone'] ? ('tel.: ' . $job['phone'] . '<br>') : '') ?>
+                                    <?= ($job['email'] ? ('email: <a href="mailto:' . $job['email'] . '">' . $job['email'] . '</a>') : '') ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php } else { ?>
+                <div class="alert alert-warning alert-lg">
+                    <strong>
+                        Tato pracovní nabídka už není aktuální.
+                    </strong>
+                </div>
+            <?php } ?>
+        </div>
+        <div class="col-lg-4">
+            <?= $view->include('news/partial/pr', ['pr' => $pr]) ?>
+        </div>
+    </div>
+</div>

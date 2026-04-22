@@ -41,6 +41,10 @@ services:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
 
+    App\Job\Repository\JobOurRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
     App\News\Repository\CrawlRepository:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'

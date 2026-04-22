@@ -2,6 +2,9 @@
 
 namespace App\Application\View;
 
+use DateTimeInterface;
+use IntlDateFormatter;
+use Locale;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ViewHelper
@@ -21,9 +24,16 @@ final class ViewHelper
 		private string $basePath,
 	) {}
 
-	public function path(string $route, array $params = []): string
+	public function path(string $route, array $params = [], array $options = []): string
 	{
-		return $this->urlGenerator->generate($route, $params);
+		$url = $this->urlGenerator->generate($route, $params);
+
+		$query = $options['query'] ?? [];
+		if (is_array($query) && $query !== []) {
+			$url .= (str_contains($url, '?') ? '&' : '?') . http_build_query($query);
+		}
+
+		return $url;
 	}
 
 	public function asset(string $path): string
@@ -39,6 +49,20 @@ final class ViewHelper
 	public function addInlineScript(string $script): void
 	{
 		$this->inlineScripts[] = $script;
+	}
+
+	public function numberFormat(int|float $number, int $decimals = 0, string $decimalSeparator = ',', string $thousandsSeparator = ' '): string
+	{
+		return number_format($number, $decimals, $decimalSeparator, $thousandsSeparator);
+	}
+
+	public function dateFormat(DateTimeInterface $date, int $dateType, int $timeType, ?string $locale = null, ?string $pattern = null): string
+	{
+		$formatter = new IntlDateFormatter($locale ?? Locale::getDefault(), $dateType, $timeType);
+		if ($pattern) {
+			$formatter->setPattern($pattern);
+		}
+		return $formatter->format($date) ?: '';
 	}
 
 	public function addHeadStyle(string $css): void

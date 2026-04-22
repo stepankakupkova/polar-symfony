@@ -50,3 +50,31 @@ admin_user_upload_image:
   path: /admin/users/json-write/upload-image
   controller: App\User\Controller\Admin\UserWriteController::uploadImage
   methods: [POST]
+
+# Job
+admin_job_index:
+  path: /admin/prace
+  controller: App\Job\Controller\Admin\JobListController::index
+
+admin_job_list:
+  path: /admin/prace/list
+  controller: App\Job\Controller\Admin\JobListController::list
+
+admin_job_json_list:
+  path: /admin/prace/json-list/get-list
+  controller: App\Job\Controller\Admin\JobListController::getList
+  methods: [GET]
+
+admin_job_json_list_ours:
+  path: /admin/prace/json-list/get-list-ours
+  controller: App\Job\Controller\Admin\JobListController::getListOurs
+  methods: [GET]
+
+admin_job_setting:
+  path: /admin/prace/nastaveni
+  controller: App\Job\Controller\Admin\SettingController::index
+
+admin_job_setting_write:
+  path: /admin/prace/nastaveni/ulozit
+  controller: App\Job\Controller\Admin\SettingController::setting
+  methods: [POST]

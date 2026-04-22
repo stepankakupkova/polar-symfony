@@ -1,0 +1,542 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$identity = $identity ?? null;
+$locale = Locale::getDefault();
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/extension/reorder-rows/css/reorder-rows.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/table-dnd/js/table-dnd.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
+?>
+<div class="tabs">
+    <ul class="nav nav-tabs nav-justified">
+        <li class="nav-item active">
+            <a class="nav-link" href="#jobsOurs" data-toggle="tab">
+                    Naše nabídky práce
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#jobs" data-toggle="tab">
+                    Nabídka práce
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div id="jobsOurs" class="tab-pane active">
+            <table id="btblJobsOurs"
+                   data-url="<?= $view->path('admin_job_json_list_ours') ?>"
+                   data-toggle="table"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-valign="middle"
+                   data-sort-name="updated_date"
+                   data-sort-order="desc"
+                   data-cookie-id-table="USER-<?= $identity ? $identity->getId() : '0' ?>-jobsOursTable"
+                   data-mobile-responsive="true"
+                   data-page-size="13">
+                <thead>
+                <tr>
+                    <th data-field="id"
+                        class="text-nowrap width-nowrap"
+                        data-sortable="true"
+                        data-visible="false">
+                            ID
+                    </th>
+                    <th data-field="export_tv"
+                        class="width-nowrap p-0"
+                        data-formatter="enableFormatter"
+                        data-align="center">
+                            <i class="fas fa-tv" data-toggle="tooltip" data-placement="right" title="Export do TV"></i>
+                        <span class="d-sm-none">
+                                Export do TV
+                        </span>
+                    </th>
+                    <th data-field="title"
+                        class="text-truncate"
+                        data-sortable="true">
+                            Název
+                    </th>
+                    <th data-field="place"
+                        class="text-truncate">
+                            Místo
+                    </th>
+                    <th data-field="salary">
+                            Nabízený plat
+                    </th>
+                    <th data-field="term"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="dateFormatter">
+                            Datum začátku
+                    </th>
+                    <th data-field="shift"
+                        class="text-nowrap width-nowrap">
+                            Směnnost
+                    </th>
+                    <th data-field="education"
+                        class="text-nowrap width-nowrap">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Minimální požadované vzdělání"></i>
+                    </th>
+                    <th data-field="employment"
+                        class="text-nowrap width-nowrap">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Pracovněprávní vztahy"></i>
+                    </th>
+                    <th data-field="company"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="companyFormatter">
+                            <i class="fa fa-fw fa-building" data-toggle="tooltip" data-placement="top" data-container="body" title="Zaměstnavatel"></i>
+                    </th>
+                    <th data-field="person"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="firstContactFormatter">
+                            <i class="fa fa-fw fa-phone" data-toggle="tooltip" data-placement="top" data-container="body" title="První kontakt"></i>
+                    </th>
+                    <th data-field="valid_date_from"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="dateFormatter">
+                            Platné datum od
+                    </th>
+                    <th data-field="valid_date_to"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="dateFormatter">
+                            Platné datum do
+                    </th>
+                    <th data-field="created_date"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="datetimeFormatter"
+                        data-visible="false">
+                            Vytvořeno
+                    </th>
+                    <th data-field="updated_date"
+                        class="text-nowrap width-nowrap"
+                        data-formatter="datetimeFormatter"
+                        data-visible="false">
+                            Aktualizováno
+                    </th>
+                    <th data-field="created_user"
+                        class="text-nowrap width-nowrap"
+                        data-visible="false">
+                            Vytvořil
+                    </th>
+                    <th data-field="updated_user"
+                        class="text-nowrap width-nowrap"
+                        data-visible="false">
+                            Aktualizoval
+                    </th>
+                </tr>
+                </thead>
+            </table>
+            <script>
+                function enableFormatter(value) {
+                    let icon = 'fa fa-fw fa-lg';
+                    let color = 'text-success';
+                    let text = '';
+                    switch (value) {
+                        case 1:
+                            icon = 'fa fa-fw fa-lg fa-check-circle';
+                            color = 'text-success';
+                                text = 'Povoleno';
+                            break;
+                        case 0:
+                            icon = 'fa fa-fw fa-lg fa-times-circle';
+                            color = 'text-danger';
+                                text = 'Zakázáno';
+                            break;
+                    }
+                    return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+                }
+                function companyFormatter(value, row) {
+                    return value + '<br>' + row.company_in + '<br>' + row.company_street + '<br>' + row.company_city + ', ' + row.company_postcode;
+                }
+                function firstContactFormatter(value, row) {
+                    let text = '';
+                    if (row.person !== null) {
+                        text += row.person + '<br>';
+                    }
+                    if (row.phone !== null) {
+                        text += row.phone + '<br>';
+                    }
+                    if (row.email !== null) {
+                        text += row.email;
+                    }
+                    return text;
+                }
+                function dateFormatter(value) {
+                    if (value) {
+                        return moment(value).format('LL');
+                    }
+                    return null;
+                }
+                function datetimeFormatter(value) {
+                    if (value) {
+                        return moment(value).format('LLLL');
+                    }
+                    return null;
+                }
+            </script>
+        </div>
+        <div id="jobs" class="tab-pane">
+            <table id="btblJobs"
+                   data-url="<?= $view->path('admin_job_json_list') ?>"
+                   data-toggle="table"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-valign="middle"
+                   data-sort-name="datumZmeny"
+                   data-sort-order="desc"
+                   data-cookie-id-table="USER-<?= $identity ? $identity->getId() : '0' ?>-jobsTable"
+                   data-mobile-responsive="true"
+                   data-page-size="10"
+                   data-detail-view="true"
+                   data-detail-formatter="detailFormatter">
+                <thead>
+                <tr>
+                    <th data-field="portalId"
+                        class="no-wrap"
+                        data-visible="false"
+                        data-sortable="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-id-card" data-toggle="tooltip" data-placement="top" data-container="body" title="Portál ID"></i>
+                    </th>
+                    <th data-field="referencniCislo"
+                        class="no-wrap"
+                        data-visible="false"
+                        data-sortable="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-id-card" data-toggle="tooltip" data-placement="top" data-container="body" title="Referenční číslo"></i>
+                    </th>
+                    <th data-field="pozadovanaProfese"
+                        data-formatter="profeseFormatter"
+                        data-visible="true"
+                        data-sortable="true"
+                        data-valign="middle">
+                            Požadovaná profese
+                    </th>
+                    <th data-field="mesicniMzdaOd"
+                        class="no-wrap"
+                        data-formatter="wageFormatter"
+                        data-visible="true"
+                        data-sortable="true"
+                        data-valign="middle">
+                            Mzda
+                    </th>
+                    <th data-field="pocetHodinTydne"
+                        class="no-wrap"
+                        data-formatter="floatFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-clock" data-toggle="tooltip" data-placement="top" data-container="body" title="Hodin týdně"></i>
+                    </th>
+                    <th data-field="pocetMist"
+                        class="no-wrap"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-user-plus" data-toggle="tooltip" data-placement="top" data-container="body" title="Počet pozic"></i>
+                    </th>
+                    <th data-field="terminZahajeniPracovnihoPomeru"
+                        class="no-wrap"
+                        data-formatter="terminFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-calendar" data-toggle="tooltip" data-placement="top" data-container="body" title="Termín pracovního poměru od/do"></i>
+                    </th>
+                    <th data-field="smennost"
+                        class="no-wrap"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-briefcase" data-toggle="tooltip" data-placement="top" data-container="body" title="Směnnost"></i>
+                    </th>
+                    <th data-field="zamestnaneckaKarta"
+                        class="no-wrap"
+                        data-formatter="boolFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-id-card" data-toggle="tooltip" data-placement="top" data-container="body" title="Karta zaměstnance"></i>
+                    </th>
+                    <th data-field="modraKarta"
+                        class="no-wrap"
+                        data-formatter="boolFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-id-card" data-toggle="tooltip" data-placement="top" data-container="body" title="Modrá karta"></i>
+                    </th>
+                    <th data-field="azylant"
+                        class="no-wrap"
+                        data-formatter="boolFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-user" data-toggle="tooltip" data-placement="top" data-container="body" title="Azylant"></i>
+                    </th>
+                    <th data-field="cizinecMimoEu"
+                        class="no-wrap"
+                        data-formatter="boolFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-user" data-toggle="tooltip" data-placement="top" data-container="body" title="Cizinec mimo EU"></i>
+                    </th>
+                    <th data-field="minPozadovaneVzdelani"
+                        class="no-wrap"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Minimální požadované vzdělání"></i>
+                    </th>
+                    <th data-field="dovednosti"
+                        class="no-wrap"
+                        data-formatter="arrayFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Požadované dovednosti"></i>
+                    </th>
+                    <th data-field="jazyky"
+                        class="no-wrap"
+                        data-formatter="arrayFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Požadované jazyky"></i>
+                    </th>
+                    <th data-field="vztahy"
+                        class="no-wrap"
+                        data-formatter="arrayFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Pracovněprávní vztahy"></i>
+                    </th>
+                    <th data-field="vhodnosti"
+                        class="no-wrap"
+                        data-formatter="arrayFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Pracovněprávní vztahy"></i>
+                    </th>
+                    <th data-field="vyhody"
+                        class="no-wrap"
+                        data-formatter="arrayFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-graduation-cap" data-toggle="tooltip" data-placement="top" data-container="body" title="Benefity"></i>
+                    </th>
+                    <th data-field="urlAdresa"
+                        class="no-wrap"
+                        data-formatter="linkFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-link" data-toggle="tooltip" data-placement="top" data-container="body" title="URL adresa"></i>
+                    </th>
+                    <th data-field="zamestnavatel_nazev"
+                        class="no-wrap"
+                        data-formatter="employerFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-building" data-toggle="tooltip" data-placement="top" data-container="body" title="Zaměstnavatel"></i>
+                    </th>
+                    <th data-field="mistoVykonuPrace_pracoviste_nazev"
+                        class="no-wrap"
+                        data-formatter="mistoFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-building" data-toggle="tooltip" data-placement="top" data-container="body" title="Místo práce"></i>
+                    </th>
+                    <th data-field="prvniKontaktSeZamestnavatelem_jmenoKontaktniOsoby"
+                        class="no-wrap"
+                        data-formatter="firstContactFormatter2"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-phone" data-toggle="tooltip" data-placement="top" data-container="body" title="První kontakt"></i>
+                    </th>
+                    <th data-field="kontaktniOsobaZamestnavatele_jmeno"
+                        class="no-wrap"
+                        data-formatter="contactFormatter"
+                        data-visible="true"
+                        data-valign="middle">
+                            <i class="fa fa-fw fa-envelope" data-toggle="tooltip" data-placement="top" data-container="body" title="Kontaktní osoba"></i>
+                    </th>
+                    <th data-field="datumVlozeni"
+                        class="no-wrap"
+                        data-formatter="datetimeFormatter"
+                        data-visible="true"
+                        data-sortable="true"
+                        data-valign="middle">
+                            Vytvořeno
+                    </th>
+                    <th data-field="datumZmeny"
+                        class="no-wrap"
+                        data-formatter="datetimeFormatter"
+                        data-visible="true"
+                        data-sortable="true"
+                        data-valign="middle">
+                            Aktualizováno
+                    </th>
+                </tr>
+                </thead>
+            </table>
+            <script>
+                function datetimeFormatter(value, row) {
+                    return moment(value).format('llll');
+                }
+                function dateFormatter(value, row) {
+                    if (value !== null && value !== undefined) {
+                        return moment(value).format('ll');
+                    }
+                }
+                function floatFormatter(value, row) {
+                    if (value !== null && value !== undefined) {
+                        return number_format(value, 1, ',', ' ');
+                    }
+                }
+                function boolFormatter(value, row) {
+                    if (value === 1) {
+                            return '<i class="fa fa-fw fa-check-circle text-success" data-toggle="tooltip" title="Ano"></i>';
+                    } else {
+                            return '<i class="fa fa-fw fa-times-circle text-danger" data-toggle="tooltip" title="Ne"></i>';
+                    }
+                }
+                function wageFormatter(value, row) {
+                    if (value && row.mesicniMzdaDo) {
+                        return number_format(value, 0, ',', ' ') + ' - ' + number_format(row.mesicniMzdaDo, 0, ',', ' ') + '<br><small class="text-muted">(' + row.typMzdy + ')</small>';
+                    } else {
+                        return number_format(value, 0, ',', ' ') + '<br><small class="text-muted">(' + row.typMzdy + ')</small>';
+                    }
+                }
+                function terminFormatter(value, row) {
+                    if (value && row.terminUkonceniPracovnihoPomeru) {
+                        return moment(value).format('ll') + '<br>' + moment(row.terminUkonceniPracovnihoPomeru).format('ll');
+                    } else {
+                        return moment(value).format('ll');
+                    }
+                }
+                function profeseFormatter(value, row) {
+                    if (value && row.upresnujiciInformace) {
+                        return value + '<br><small class="text-muted">(' + row.profeseCzIsco + ')</small>';
+                    } else {
+                        return value;
+                    }
+                }
+                function arrayFormatter(value, row) {
+                    if (value !== null && value !== undefined) {
+                        let text = '';
+                        value.forEach(function (item) {
+                            text += item + '<br>';
+                        });
+                        return text;
+                    } else {
+                        return null;
+                    }
+                }
+                function linkFormatter(value, row) {
+                    if (value !== null && value !== undefined) {
+                        return '<a href="' + value + '" target="_blank"><i class="fa fa-fw fa-external-link"></i></a>';
+                    } else {
+                        return null;
+                    }
+                }
+                function employerFormatter(value, row) {
+                    return value + '<br>' + row.zamestnavatel_ico;
+                }
+                function mistoFormatter(value, row) {
+                    let text = '';
+                    if (value !== null && value !== undefined) {
+                        text += value + '<br>';
+                    }
+                    if (row.mistoVykonuPrace_pracoviste_adresa_ulice !== null && row.mistoVykonuPrace_pracoviste_adresa_ulice !== undefined) {
+                        text += row.mistoVykonuPrace_pracoviste_adresa_ulice;
+                        if (row.mistoVykonuPrace_pracoviste_adresa_cisloDomovni !== null && row.mistoVykonuPrace_pracoviste_adresa_cisloDomovni !== undefined) {
+                            text += ' ' + row.mistoVykonuPrace_pracoviste_adresa_cisloDomovni;
+                        }
+                        if (row.mistoVykonuPrace_pracoviste_adresa_cisloOrientacni !== null && row.mistoVykonuPrace_pracoviste_adresa_cisloOrientacni !== undefined) {
+                            text += ' / ' + row.mistoVykonuPrace_pracoviste_adresa_cisloOrientacni;
+                        }
+                        text += '<br>';
+                    }
+                    if (row.mistoVykonuPrace_pracoviste_adresa_obec !== null) {
+                        text += row.mistoVykonuPrace_pracoviste_adresa_obec;
+                        if (row.mistoVykonuPrace_pracoviste_adresa_castObce !== null && row.mistoVykonuPrace_pracoviste_adresa_obec !== row.mistoVykonuPrace_pracoviste_adresa_castObce) {
+                            text += ' - ' + row.mistoVykonuPrace_pracoviste_adresa_castObce;
+                        }
+                    }
+                    if (row.mistoVykonuPrace_pracoviste_adresa_psc !== null) {
+                        text += ', ' + row.mistoVykonuPrace_pracoviste_adresa_psc.substr(0, 3) + ' ' + row.mistoVykonuPrace_pracoviste_adresa_psc.substr(3, 2);
+                    }
+                    text += '<br>';
+                    if (row.mistoVykonuPrace_pracoviste_adresa_okres !== null) {
+                        text += row.mistoVykonuPrace_pracoviste_adresa_okres + '<br>';
+                    }
+                    if (row.mistoVykonuPrace_pracoviste_adresa_kraj !== null) {
+                        text += row.mistoVykonuPrace_pracoviste_adresa_kraj + '<br>';
+                    }
+                    if (row.mistoVykonuPrace_pracoviste_telefon !== null) {
+                        text += row.mistoVykonuPrace_pracoviste_telefon + '<br>';
+                    }
+                    if (row.mistoVykonuPrace_pracoviste_email !== null) {
+                        text += row.mistoVykonuPrace_pracoviste_email;
+                    }
+                    return text;
+                }
+                function firstContactFormatter2(value, row) {
+                    let text = '';
+                    if (row.prvniKontaktSeZamestnavatelem_mistoKontaktu !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_mistoKontaktu + '<br>';
+                    }
+                    if (row.prvniKontaktSeZamestnavatelem_titulPredJmenem !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_titulPredJmenem + ' ';
+                    }
+                    if (row.prvniKontaktSeZamestnavatelem_jmenoKontaktniOsoby !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_jmenoKontaktniOsoby + ' ';
+                    }
+                    if (row.prvniKontaktSeZamestnavatelem_prijmeniKontaktniOsoby !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_prijmeniKontaktniOsoby;
+                    }
+                    if (row.prvniKontaktSeZamestnavatelem_titulZaJmenem !== null) {
+                        text += ' ' + row.prvniKontaktSeZamestnavatelem_titulZaJmenem;
+                    }
+                    text += '<br>';
+                    if (row.prvniKontaktSeZamestnavatelem_poziceVeSpolecnosti !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_poziceVeSpolecnosti + '<br>';
+                    }
+                    if (row.prvniKontaktSeZamestnavatelem_kontaktniTelefon !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_kontaktniTelefon + '<br>';
+                    }
+                    if (row.prvniKontaktSeZamestnavatelem_kontaktniEmail !== null) {
+                        text += row.prvniKontaktSeZamestnavatelem_kontaktniEmail + '<br>';
+                    }
+                    return text;
+                }
+                function contactFormatter(value, row) {
+                    let text = '';
+                    if (row.kontaktniOsobaZamestnavatele_titulPredJmenem !== null) {
+                        text += row.kontaktniOsobaZamestnavatele_titulPredJmenem + ' ';
+                    }
+                    if (row.kontaktniOsobaZamestnavatele_jmeno !== null) {
+                        text += row.kontaktniOsobaZamestnavatele_jmeno + ' ';
+                    }
+                    if (row.kontaktniOsobaZamestnavatele_prijmeni !== null) {
+                        text += row.kontaktniOsobaZamestnavatele_prijmeni;
+                    }
+                    if (row.kontaktniOsobaZamestnavatele_titulZaJmenem !== null) {
+                        text += ' ' + row.kontaktniOsobaZamestnavatele_titulZaJmenem;
+                    }
+                    text += '<br>';
+                    if (row.kontaktniOsobaZamestnavatele_poziceVeSpolecnosti !== null) {
+                        text += row.kontaktniOsobaZamestnavatele_poziceVeSpolecnosti + '<br>';
+                    }
+                    return text;
+                }
+                function detailFormatter(index, row) {
+                    let html = [];
+                    html.push('<p>' + (row.upresnujiciInformace !== null ? row.upresnujiciInformace : '') + '</p>');
+                    return html.join('');
+                }
+            </script>
+        </div>
+    </div>
+</div>

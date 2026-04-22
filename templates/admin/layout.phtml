@@ -178,6 +178,12 @@ $identity = $identity ?? null;
                                     </li>
                                 </ul>
                             </li>
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_job_index')) ? ' nav-active' : '' ?>">
+                                <a class="nav-link" href="<?= $view->path('admin_job_index') ?>">
+                                    <i class="fa fa-briefcase" aria-hidden="true"></i>
+                                    <span>Nabídka práce</span>
+                                </a>
+                            </li>
                         </ul>
                     </nav>
                     <hr class="separator"/>

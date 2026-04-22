@@ -1,0 +1,411 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent(string $text, ?string $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    $textTmp = $text;
+    if ($transliterator) {
+        $textTmp = $transliterator->transliterate($text);
+        $textTmp = preg_replace('/[^a-z0-9]+/', '-', $textTmp);
+        $textTmp = strtolower($textTmp);
+        if ($replace) {
+            $textTmp = str_replace(' ', $replace, $textTmp);
+        }
+    }
+    return $textTmp;
+}
+
+$jobs = $jobs ?? [];
+$jobsOur = $jobsOur ?? [];
+$page = $page ?? 1;
+$total = $total ?? 0;
+$limit = $limit ?? 10;
+$obory_cinnosti_vm = $obory_cinnosti_vm ?? [];
+$obor_cinnosti_vm = $obor_cinnosti_vm ?? null;
+$obor_cinnosti_vm_pos = $obor_cinnosti_vm_pos ?? 5;
+$pracovnepravni_vztah = $pracovnepravni_vztah ?? null;
+$pracovnepravni_vztahy = $pracovnepravni_vztahy ?? [];
+$vzdelani = $vzdelani ?? null;
+$vzdelani_pos = $vzdelani_pos ?? 5;
+$vzdelani_all = $vzdelani_all ?? [];
+$okresy_url = $okresy_url ?? [];
+$pr = $pr ?? null;
+
+// HeadTitle
+$view->setTitle('Nabídka práce');
+
+// HeadMeta
+$view->addMeta('description', 'Nabídek práce je dostatek, je potřeba ale hledat. TV Polar vám v hledání vhodného zaměstnání pomůže. V obsáhlém seznamu volných pracovních míst si určitě vyberete.');
+$view->addMeta('keywords', 'nabídka práce, brigády, volná pracovní místa, nabídka zaměstnání');
+
+// META pro Facebook
+$currentUrl = $currentUrl ?? '';
+$ogImage = 'https://' . ($_SERVER['SERVER_NAME'] ?? 'polar.cz') . '/img/web/layout/microformat.png';
+$view->addOgMeta('og:title', 'Nabídka práce | POLAR');
+$view->addOgMeta('og:description', 'Nabídek práce je dostatek, je potřeba ale hledat. TV Polar vám v hledání vhodného zaměstnání pomůže. V obsáhlém seznamu volných pracovních míst si určitě vyberete.');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', $ogImage);
+$view->addOgMeta('og:image:secure_url', $ogImage);
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+// JS
+$view->addInlineScript(
+    '$("#moreOboryCinnostiVm")
+        .on("hide.bs.collapse", function(){
+            $("#btnOboryCinnostiVm").html("Více oborů");
+        })
+        .on("show.bs.collapse", function(){
+            $("#btnOboryCinnostiVm").html("Méně oborů");
+        });'
+);
+$view->addInlineScript(
+    '$("#moreVzdelani")
+        .on("hide.bs.collapse", function(){
+            $("#btnVzdelani").html("Více vzdělání");
+        })
+        .on("show.bs.collapse", function(){
+            $("#btnVzdelani").html("Méně vzdělání");
+        });'
+);
+if ($obor_cinnosti_vm_pos > 5) {
+    $view->addInlineScript('$("#btnOboryCinnostiVm").html("Méně oborů");');
+}
+if ($vzdelani_pos > 5) {
+    $view->addInlineScript('$("#btnVzdelani").html("Méně vzdělání");');
+}
+$view->addInlineScript(
+    '// Ticker
+        getTickerData();
+        interval = startTicker();
+        // Crawl
+        getCrawlData();'
+);
+
+$view->setBreadcrumbs([
+    ['label' => 'Nabídka práce', 'url' => $view->path('job_list')],
+    ['label' => 'Moravskoslezský kraj'],
+]);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="featured-box featured-box-primary featured-box-text-start mt-1">
+                <div class="box-content text-start">
+                    <h3 class="font-weight-normal text-transform-none text-4">
+                        Výběr lokality
+                    </h3>
+                    <?= $view->include('job/web/partial/jobs-region', ['okresy_url' => $okresy_url]) ?>
+                </div>
+            </div>
+            <?php if ($obory_cinnosti_vm) { ?>
+                <div class="featured-box featured-box-primary featured-box-text-start">
+                    <div class="box-content text-start">
+                        <h3 class="font-weight-normal text-transform-none text-4">
+                            Obor
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li>
+                                <?php if (!$obor_cinnosti_vm) { ?>
+                                    Vše
+                                <?php } else { ?>
+                                    <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => '', 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => $vzdelani ? $vzdelani['url'] : '']]) ?>">
+                                        Vše
+                                    </a>
+                                <?php } ?>
+                            </li>
+                            <?php for ($i = 0; $i < ((count($obory_cinnosti_vm) > 5) ? 5 : count($obory_cinnosti_vm)); $i++) { ?>
+                                <li>
+                                    <?php if ($obor_cinnosti_vm && $obor_cinnosti_vm['kod'] === $obory_cinnosti_vm[$i]['kod']) { ?>
+                                        <?= $obory_cinnosti_vm[$i]['nazev'] ?>
+                                    <?php } else { ?>
+                                        <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obory_cinnosti_vm[$i]['url'], 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => $vzdelani ? $vzdelani['url'] : '']]) ?>">
+                                            <?= $obory_cinnosti_vm[$i]['nazev'] ?>
+                                        </a>
+                                    <?php } ?>
+                                </li>
+                            <?php } ?>
+                            <div id="moreOboryCinnostiVm" class="<?= $obor_cinnosti_vm_pos > 5 ? 'collapsed in' : 'collapse' ?>" style="-webkit-padding-start: 0; list-style: none; padding-left: 0;">
+                                <?php for ($i = 5, $iMax = count($obory_cinnosti_vm); $i < $iMax; $i++) { ?>
+                                    <?php if ($obor_cinnosti_vm && $obor_cinnosti_vm['kod'] === $obory_cinnosti_vm[$i]['kod']) { ?>
+                                        <?= $obory_cinnosti_vm[$i]['nazev'] ?>
+                                    <?php } else { ?>
+                                        <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obory_cinnosti_vm[$i]['url'], 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => $vzdelani ? $vzdelani['url'] : '']]) ?>">
+                                            <?= $obory_cinnosti_vm[$i]['nazev'] ?>
+                                        </a>
+                                    <?php } ?>
+                                <?php } ?>
+                            </div>
+                        </ul>
+                        <div id="btnOboryCinnostiVm" class="btn btn-primary w-100" data-bs-toggle="collapse" href="#moreOboryCinnostiVm">
+                            Více oborů
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+            <?php if ($pracovnepravni_vztahy) { ?>
+                <div class="featured-box featured-box-primary featured-box-text-start">
+                    <div class="box-content text-start">
+                        <h3 class="font-weight-normal text-transform-none text-4">
+                            Pracovněprávní vztah
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li>
+                                <?php if (!$pracovnepravni_vztah) { ?>
+                                    Vše
+                                <?php } else { ?>
+                                    <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obor_cinnosti_vm ? $obor_cinnosti_vm['url'] : '', 'p' => '', 'v' => $vzdelani ? $vzdelani['url'] : '']]) ?>">
+                                        Vše
+                                    </a>
+                                <?php } ?>
+                            </li>
+                            <?php for ($i = 0, $iMax = count($pracovnepravni_vztahy); $i < $iMax; $i++) { ?>
+                                <li>
+                                    <?php if ($pracovnepravni_vztah && $pracovnepravni_vztah['kod'] === $pracovnepravni_vztahy[$i]['kod']) { ?>
+                                        <?= $pracovnepravni_vztahy[$i]['nazev'] ?>
+                                    <?php } else { ?>
+                                        <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obor_cinnosti_vm ? $obor_cinnosti_vm['url'] : '', 'p' => $pracovnepravni_vztahy[$i]['url'], 'v' => $vzdelani ? $vzdelani['url'] : '']]) ?>">
+                                            <?= $pracovnepravni_vztahy[$i]['nazev'] ?>
+                                        </a>
+                                    <?php } ?>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </div>
+                </div>
+            <?php } ?>
+            <?php if ($vzdelani_all) { ?>
+                <div class="featured-box featured-box-primary featured-box-text-start">
+                    <div class="box-content text-start">
+                        <h3 class="font-weight-normal text-transform-none text-4">
+                            Vzdělání
+                        </h3>
+                        <ul class="list-unstyled">
+                            <li>
+                                <?php if (!$vzdelani) { ?>
+                                    Vše
+                                <?php } else { ?>
+                                    <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obor_cinnosti_vm ? $obor_cinnosti_vm['url'] : '', 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => '']]) ?>">
+                                        Vše
+                                    </a>
+                                <?php } ?>
+                            </li>
+                            <?php for ($i = 0; $i < ((count($vzdelani_all) > 5) ? 5 : count($vzdelani_all)); $i++) { ?>
+                                <li>
+                                    <?php if ($vzdelani && $vzdelani['kod'] === $vzdelani_all[$i]['kod']) { ?>
+                                        <?= $vzdelani_all[$i]['nazev'] ?>
+                                    <?php } else { ?>
+                                        <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obor_cinnosti_vm ? $obor_cinnosti_vm['url'] : '', 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => $vzdelani_all[$i]['url']]]) ?>">
+                                            <?= $vzdelani_all[$i]['nazev'] ?>
+                                        </a>
+                                    <?php } ?>
+                                </li>
+                            <?php } ?>
+                            <div id="moreVzdelani" class="<?= $vzdelani_pos > 5 ? 'collapsed in' : 'collapse' ?>" style="-webkit-padding-start: 0; list-style: none; padding-left: 0;">
+                                <?php for ($i = 5, $iMax = count($vzdelani_all); $i < $iMax; $i++) { ?>
+                                    <?php if ($vzdelani && $vzdelani['kod'] === $vzdelani_all[$i]['kod']) { ?>
+                                        <?= $vzdelani_all[$i]['nazev'] ?>
+                                    <?php } else { ?>
+                                        <a class="d-block" href="<?= $view->path('job_list', [], ['query' => ['o' => $obor_cinnosti_vm ? $obor_cinnosti_vm['url'] : '', 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => $vzdelani_all[$i]['url']]]) ?>">
+                                            <?= $vzdelani_all[$i]['nazev'] ?>
+                                        </a>
+                                    <?php } ?>
+                                <?php } ?>
+                            </div>
+                        </ul>
+                        <div id="btnVzdelani" class="btn btn-primary w-100" data-bs-toggle="collapse" href="#moreVzdelani">
+                            Více vzdělání
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+
+            <!-- banner dobraprace.cz -->
+            <div class="mb-4">
+                <?= $view->include('job/web/partial/banner-dobraprace-tv-polar') ?>
+            </div>
+
+        </div>
+        <div class="col-lg-5 mb-5">
+            <?php if ($jobsOur) { ?>
+                <div class="featured-box featured-box-primary featured-box-text-start featured-box-prace">
+                    <div class="box-content text-start p-3">
+                        <h3 class="font-weight-normal text-transform-none text-4">
+                            Doporučujeme
+                        </h3>
+                        <?php foreach ($jobsOur as $item) { ?>
+                            <div class="card border-0 border-radius-0 bg-transparent mb-2">
+                                <div class="card-body p-0">
+                                    <h4 class="card-title mb-1 text-4 font-weight-bold">
+                                        <a href="<?= $view->path('job_our_detail', ['job_id' => $item['id'], 'job_url' => removeAccent($item['title'], '-')]) ?>">
+                                            <?= $item['title'] ?>
+                                        </a>
+                                    </h4>
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-7 col-xs-8">
+                                            <p class="card-text text-muted">
+                                                <?= $item['company'] ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-9 col-sm-7 col-xs-8">
+                                            <p class="mb-0">
+                                                <?= $item['city'] ?>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-3 col-sm-5 col-xs-4">
+                                            <a class="btn btn-primary btn-modern btn-xs pull-right" href="<?= $view->path('job_our_detail', ['job_id' => $item['id'], 'job_url' => removeAccent($item['title'], '-')]) ?>">
+                                                Detail
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <p class="card-text">
+                                        <?php
+                                            try {
+                                                $date = (new DateTime($item['term']))->format('j. n. Y');
+                                            } catch (Exception $e) {
+                                                $date = 'NaN';
+                                            }
+                                        ?>
+                                        Nástup: od <?= $date ?>
+                                        <span class="pull-right">
+                                            <?= $item['salary'] ?>
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php } ?>
+            <h1 class="text-4-5 font-weight-semibold line-height-3 mb-3">
+                Nabídka práce a brigád
+            </h1>
+            <?php if ($jobs) { ?>
+                <?php foreach ($jobs as $item) { ?>
+                    <div class="card card-prace border-0 border-radius-0 bg-color-grey mb-3 transition-2ms">
+                    <!--<div class="card border-0 border-radius-0 bg-color-grey mb-3">-->
+                        <a href="<?= $view->path('job_city_detail', ['city_url' => $okresy_url[$item['kod']] ?? '', 'job_id' => $item['referencniCislo'], 'job_url' => removeAccent($item['profese'], '-')]) ?>">
+                            <div class="card-body p-2">
+                                <h4 class="card-title text-secondary mb-1 text-4 font-weight-bold">
+                                    <?= $item['profese'] ?>
+                                </h4>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-7 col-xs-8">
+                                        <p class="card-text text-muted">
+                                            <?= $item['mistoVykonuPrace_pracoviste_nazev'] ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9 col-sm-7 col-xs-8">
+                                        <p class="mb-0">
+                                            <?= $item['obec'] ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p class="card-text">
+                                    <?php
+                                        try {
+                                            $date = (new DateTime($item['terminZahajeniPracovnihoPomeru']))->format('j. n. Y');
+                                        } catch (Exception $e) {
+                                            $date = 'NaN';
+                                        }
+                                    ?>
+                                    Nástup: od <?= $date ?>
+                                    <span class="pull-right">
+                                        <?php
+                                            if ($item['mesicniMzdaOd'] > 0) {
+                                                echo 'od ' . number_format($item['mesicniMzdaOd'], 0, ',', ' ');
+                                            }
+                                            if ($item['mesicniMzdaDo'] > 0) {
+                                                echo ' do ' . number_format($item['mesicniMzdaDo'], 0, ',', ' ');
+                                            }
+                                            if ($item['typMzdy']) {
+                                                echo ' ' . $item['typMzdy'];
+                                            }
+                                        ?>
+                                    </span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                <?php } ?>
+                <div class="row">
+                    <div class="col">
+                        <?= $view->include('application/pagination/paginator', ['route' => 'job_list', 'page' => $page, 'total' => $total, 'limit' => $limit, 'query' => ['o' => $obor_cinnosti_vm ? $obor_cinnosti_vm['url'] : '', 'p' => $pracovnepravni_vztah ? $pracovnepravni_vztah['url'] : '', 'v' => $vzdelani ? $vzdelani['url'] : '']]) ?>
+                    </div>
+                </div>
+            <?php } else { ?>
+                <div class="alert alert-warning">
+                    V této kategorii nejsou momentálně žádné pracovní nabídky.
+                </div>
+            <?php } ?>
+        </div>
+        <div class="col-lg-4">
+            <?= $view->include('news/partial/pr', ['pr' => $pr]) ?>
+        </div>
+    </div>
+</div>

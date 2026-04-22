@@ -1,0 +1,207 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+
+<style>
+    #dpbm {
+        position: relative;
+        font-size: 16px;
+        width: 100%;
+        max-width: 650px;
+        border-right: 1px solid #142242;
+        border-left: 1px solid #142242;
+        border-top: 1px solid #142242;
+        overflow: hidden;
+    }
+    #dpbm .cleaner {
+        clear: both;
+        height: 0px;
+        font-size: 0px;
+
+    }
+
+    #dpbm .dpbm-content {
+        clear: both;
+    }
+
+    #dpbm .dpbm-heading {
+        background-color: #fff;
+        border-top: 4px solid #ff6600;
+        border-bottom: 4px solid #ff6600;
+        padding: 10px 10px;
+    }
+
+    #dpbm .dpbm-heading h2 {
+        float: left;
+        width: 170px;
+        font-size: 22px;
+        font-weight: normal;
+        line-height: 30px;
+        text-align: left;
+        display: inline-block;
+        color: #666;
+        clear: none;
+        padding-top: 6px;
+        margin: 0;
+        vertical-align: top;
+    }
+    #dpbm .dpbm-heading h2 span {
+        font-size: 21px;
+        font-weight: bold;
+        color: #444;
+    }
+    #dpbm h2 strong {
+        font-weight: bold;
+        font-size: 20px;
+    }
+    #dpbm .dpbm-heading a {
+        text-decoration: none;
+    }
+    #dpbm .dpbm-heading a:hover {
+        text-decoration: underline;
+    }
+    #dpbm .dpbm-logo {
+        float: right;
+        width: 75px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: right;
+    }
+    #dpbm .dpbm-footer {
+        color: #fff5ee;
+        text-align: left;
+        background-color: #142242;
+        margin: 0 auto;
+        padding: 5px 15px 30px 15px;
+
+    }
+    #dpbm .dpbm-footer a.dpbm-footer--main {
+        display: inline-block;
+        font-size: 18px;
+        line-height: 22px;
+        font-weight: bold;
+        color: #fff;
+        text-decoration: underline;
+        text-align: center;
+        padding: 10px 0;
+        -webkit-border-radius: 8px;
+        border-radius: 8px;
+    }
+
+    #dpbm .dpbm-footer a.dpbm-footer--other {
+        display: inline-block;
+        font-size: 16px;
+        line-height: 18px;
+        font-weight: bold;
+        color: #fff;
+        text-decoration: underline;
+        text-align: center;
+        -webkit-border-radius: 8px;
+        border-radius: 8px;
+    }
+
+    #dpbm .dpbm-footer a:hover {
+        text-decoration: underline;
+    }
+    #dpbm .dpbm-footer .dpbm-footer-left {
+        float: left;
+        width: 160px;
+    }
+    #dpbm .dpbm-footer .dpbm-footer-logo {
+        float: right;
+        width: 75px;
+        margin-top: 115px;
+        margin-bottom: 10px;
+        text-align: right;
+    }
+    #dpbm .dpbm-content a, #dpbm .dpbm-content a * {
+        text-decoration: none;
+    }
+    #dpbm .dpbm-content a:hover, #dpbm .dpbm-content a:hover span, #dpbm .dpbm-content a:hover span, #dpbm .dpbm-content a:hover div {
+        text-decoration: underline;
+    }
+    #dpbm .dpbm-item h2 {
+        color: #444;
+        font-size: 17px;
+        line-height: 22px;
+        margin: 0 0 3px 0;
+    }
+    #dpbm .dpbm-content ol {
+        list-style-type: decimal;
+        margin: 0 0 15px 10px;
+        padding: 15px 15px 0 20px;
+    }
+
+    #dpbm .dpbm-content ol li {
+        color: #444;
+        counter-increment: my-awesome-counter;
+        position: relative;
+        line-height: 1.2em;
+        margin: 0 0 16px 0;
+        padding-left: 10px;
+    }
+
+    #dpbm .dpbm-content ol li::before {
+        content: counter(my-awesome-counter);
+        color: #fff;
+        font-size: 13px;
+        font-weight: bold;
+        position: absolute;
+        --size: 22px;
+        left: -25px; /*calc(-1 * var(--size) - 10px);*/
+        line-height: var(--size);
+        width: var(--size);
+        height: var(--size);
+        top: 2px;
+        background: #ff6600;
+        text-align: center;
+    }
+    #dpbm .dpbm-content ol li a {
+        font-weight: bold;
+        color: #004672;
+    }
+</style>
+
+<div id="dpbm">
+	<div class="dpbm-heading">
+		<h2>
+			<a href="https://www.dobraprace.cz" target="_blank" rel="noopener">Hledat práci<br/>
+				<span>Dobrá práce.cz</span>
+			</a>
+		</h2>
+		<div class="dpbm-logo">
+			<a href="https://www.dobraprace.cz" target="_blank" rel="noopener">
+				<img src="https://app.dobraprace.cz/images/frontend/dobra-prace-logo-75x50.png" width="75" alt=""/>
+			</a>
+		</div>
+		<div class="cleaner">
+		</div>
+	</div>
+	<div class="dpbm-content">
+	</div>
+	<div class="dpbm-footer">
+		<a class="dpbm-footer--main" href="https://www.dobraprace.cz/nabidka-prace" target="_blank" rel="noopener">Zobrazit nabídky práce</a>
+		<br/>
+		<div class="dpbm-footer-left"> v regionech:<br/>
+			<a class="dpbm-footer--other" href="https://www.dobraprace.cz/nabidka-prace/mesto-ostrava" target="_blank" rel="noopener">Ostrava</a><br/>
+			<a class="dpbm-footer--other" href="https://www.dobraprace.cz/nabidka-prace/karvina" target="_blank" rel="noopener">Karviná</a><br/>
+			<a class="dpbm-footer--other" href="https://www.dobraprace.cz/nabidka-prace/frydek-mistek" target="_blank" rel="noopener">Frýdek-Místek</a><br/>
+			<a class="dpbm-footer--other" href="https://www.dobraprace.cz/nabidka-prace/opava" target="_blank" rel="noopener">Opava</a><br/>
+			<a class="dpbm-footer--other" href="https://www.dobraprace.cz/nabidka-prace/novy-jicin" target="_blank" rel="noopener">Nový Jičín</a><br/>
+			<a class="dpbm-footer--other" href="https://www.dobraprace.cz/nabidka-prace/bruntal" target="_blank" rel="noopener">Bruntál</a>
+		</div>
+		<div class="dpbm-footer-logo">
+			<a href="https://www.dobraprace.cz?utm_source=tvpolar&utm_medium=link&utm_campaign=tvpolar" target="_blank" rel="noopener">
+				<img src="https://app.dobraprace.cz/images/frontend/dobra-prace-logo-white-75x50.png" width="75" alt=""/>
+			</a>
+		</div>
+		<div class="cleaner">
+		</div>
+	</div>
+</div>

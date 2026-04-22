@@ -1,0 +1,24 @@
+<?php
+$okresy_url = $okresy_url ?? [];
+$city_url = $city_url ?? '';
+$okresy_labels = [
+	'ostrava' => 'Ostravsko',
+	'karvina' => 'Karvinsko',
+	'frydek-mistek' => 'Frýdeckomístecko',
+	'opava' => 'Opavsko',
+	'novy-jicin' => 'Novojičínsko',
+	'bruntal' => 'Bruntálsko',
+];
+?>
+<ul class="list-unstyled jobs-region">
+	<li class="<?= $city_url === '' ? 'active' : '' ?>">
+		<a class="<?= $city_url === '' ? 'active' : '' ?>" href="<?= $view->path('job_list') ?>" title="" target="">Moravskoslezský kraj</a>
+	</li>
+	<?php foreach ($okresy_url as $kod => $url) { ?>
+		<li class="<?= $city_url === $url ? 'active' : '' ?>">
+			<a class="<?= $city_url === $url ? 'active' : '' ?>" href="<?= $view->path('job_city_list', ['city_url' => $url]) ?>" title="" target="">
+				<?= $okresy_labels[$url] ?? ucfirst($url) ?>
+			</a>
+		</li>
+	<?php } ?>
+</ul>

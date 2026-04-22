@@ -1,0 +1,44 @@
+<?php
+$locale = Locale::getDefault();
+?>
+
+<h4 class="d-lg-none">
+    Nabídka práce
+</h4>
+<div class="timeline timeline-simple changelog">
+    <div class="scrollable visible-slider colored-slider" data-plugin-scrollable style="height: 425px;">
+        <div class="scrollable-content">
+            <div class="tm-body">
+                <ol class="tm-items">
+                    <?php $datetime = new DateTime('2021-01-01') ?>
+                    <div class="tm-title">
+                        <h5 class="m-0 pt-2 pb-2 text-uppercase">
+                            <?= $view->dateFormat($datetime, IntlDateFormatter::FULL, IntlDateFormatter::NONE, $locale, 'yyyy') ?>
+                        </h5>
+                    </div>
+                    <?php $datetime = new DateTime('2021-10-08') ?>
+                    <li>
+                        <div class="tm-box">
+                            <h4>
+                                    0.0.1
+                            </h4>
+                            –
+                            <span class="release-date">
+                                <?= $view->dateFormat($datetime, IntlDateFormatter::LONG, IntlDateFormatter::NONE) ?>
+                            </span>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <span class="badge badge-primary">
+                                            První vydání
+                                    </span>
+                                    -
+                                        První vydání
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>

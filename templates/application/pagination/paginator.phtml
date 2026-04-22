@@ -4,8 +4,10 @@
 /** @var int $total */
 /** @var int $limit */
 /** @var array $routeParams */
+/** @var array|null $query */
 
 $routeParams = $routeParams ?? [];
+$query       = $query ?? null;
 $pageCount   = (int) ceil($total / $limit);
 
 if ($pageCount <= 1) {
@@ -22,7 +24,11 @@ if ($rangeEnd - $rangeStart < 4) {
 }
 $pagesInRange = range($rangeStart, $rangeEnd);
 
-$urlFor = fn(int $p): string => $view->path($route, $routeParams + ['strana' => $p]);
+if ($query !== null) {
+    $urlFor = fn(int $p): string => $view->path($route, $routeParams, ['query' => $query + ['strana' => $p]]);
+} else {
+    $urlFor = fn(int $p): string => $view->path($route, $routeParams + ['strana' => $p]);
+}
 
 ?>
 <ul class="pagination">
