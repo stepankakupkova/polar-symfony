@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security;
+namespace App\Authorization\Identity;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * Načítá uživatele z tabulek authorization + user + authorization2role + authorization_role.
  * Ekvivalent polar AuthorizationAdapter::authenticate() — část načítání dat.
  */
-class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
+class AuthorizationProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
 	public function __construct(
 		private Connection $connection,
@@ -39,7 +39,7 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 
 	public function refreshUser(UserInterface $user): UserInterface
 	{
-		if (!$user instanceof User) {
+		if (!$user instanceof AuthorizationUser) {
 			throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
 		}
 
@@ -48,12 +48,12 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 
 	public function supportsClass(string $class): bool
 	{
-		return $class === User::class;
+		return $class === AuthorizationUser::class;
 	}
 
 	public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
 	{
-		if (!$user instanceof User) {
+		if (!$user instanceof AuthorizationUser) {
 			throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
 		}
 
@@ -66,7 +66,7 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 			->executeStatement();
 	}
 
-	private function buildUser(array $authorization): User
+	private function buildUser(array $authorization): AuthorizationUser
 	{
 		$authorizationId = (int) $authorization['id'];
 
@@ -87,7 +87,7 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 			->setParameter('authorizationId', $authorizationId)
 			->fetchAssociative();
 
-		$user = new User();
+		$user = new AuthorizationUser();
 		$user->setId($authorizationId);
 		$user->setUsername($authorization['username']);
 		$user->setPassword($authorization['password']);

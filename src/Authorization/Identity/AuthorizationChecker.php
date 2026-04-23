@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security;
+namespace App\Authorization\Identity;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
@@ -10,11 +10,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Kontroluje, zda je uživatel aktivní (polar: $authorization->isActive()).
  */
-class UserChecker implements UserCheckerInterface
+class AuthorizationChecker implements UserCheckerInterface
 {
 	public function checkPreAuth(UserInterface $user): void
 	{
-		if (!$user instanceof User) {
+		if (!$user instanceof AuthorizationUser) {
 			return;
 		}
 

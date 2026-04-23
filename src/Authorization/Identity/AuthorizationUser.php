@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security;
+namespace App\Authorization\Identity;
 
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Nahrazuje polar Identity objekt.
  * Kombinuje data z tabulek authorization + user.
  */
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class AuthorizationUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
 	private ?int $id = null;
 	private ?string $username = null;

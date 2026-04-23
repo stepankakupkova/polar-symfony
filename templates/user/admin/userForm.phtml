@@ -12,104 +12,92 @@ $errors = $errors ?? [];
 $isEdit = $isEdit ?? false;
 $currentRole = $currentRole ?? '';
 
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/bootstrap-select.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/locale/cs_CZ.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/ios7-switch/js/ios7-switch.min.js'));
+
 $roleOptions = [
-	'' => '-- Vyberte --',
-	'owner' => 'Majitel',
-	'admin' => 'Admin',
-	'member' => 'Uživatel',
+    '' => '-- Vyberte --',
+    'owner' => 'Majitel',
+    'admin' => 'Admin',
+    'member' => 'Uživatel',
 ];
 
 // Omezení role — ne-owner nevidí roli owner
 if (!in_array('owner', $identity->getRole(), true)) {
-	unset($roleOptions['owner']);
+    unset($roleOptions['owner']);
 }
 ?>
 
-<form action="" method="post" class="needs-validation" novalidate>
-	<?php if (!empty($errors['general'])) { ?>
-		<div class="alert alert-danger"><?= htmlspecialchars($errors['general']) ?></div>
-	<?php } ?>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label required" for="username">Email</label>
-		<div class="col-sm-9">
-			<input type="email" name="username" id="username" class="form-control<?= isset($errors['username']) ? ' is-invalid' : '' ?>" required maxlength="50" value="<?= htmlspecialchars($post['username'] ?? '') ?>">
-			<?php if (isset($errors['username'])) { ?>
-				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['username']) ?></div>
-			<?php } ?>
-		</div>
-	</div>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label<?= !$isEdit ? ' required' : '' ?>" for="password">Heslo</label>
-		<div class="col-sm-9">
-			<input type="password" name="password" id="password" class="form-control<?= isset($errors['password']) ? ' is-invalid' : '' ?>" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'ponechte prázdné pro zachování' : 'povinné' ?>">
-			<?php if (isset($errors['password'])) { ?>
-				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['password']) ?></div>
-			<?php } ?>
-		</div>
-	</div>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label<?= !$isEdit ? ' required' : '' ?>" for="password2">Heslo znovu</label>
-		<div class="col-sm-9">
-			<input type="password" name="password2" id="password2" class="form-control<?= isset($errors['password2']) ? ' is-invalid' : '' ?>" <?= !$isEdit ? 'required' : '' ?> maxlength="50">
-			<?php if (isset($errors['password2'])) { ?>
-				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['password2']) ?></div>
-			<?php } ?>
-		</div>
-	</div>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label required" for="role">Role</label>
-		<div class="col-sm-9">
-			<select name="role" id="role" class="form-control<?= isset($errors['role']) ? ' is-invalid' : '' ?>" required>
-				<?php foreach ($roleOptions as $value => $label) { ?>
-					<option value="<?= htmlspecialchars($value) ?>"<?= ($post['role'] ?? $currentRole) === $value ? ' selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-				<?php } ?>
-			</select>
-			<?php if (isset($errors['role'])) { ?>
-				<div class="invalid-feedback d-block"><?= htmlspecialchars($errors['role']) ?></div>
-			<?php } ?>
-		</div>
-	</div>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label" for="active">Aktivní</label>
-		<div class="col-sm-9">
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" name="active" id="active" class="custom-control-input" value="1"<?= !empty($post['active']) || (!$isEdit && !isset($post['active'])) ? ' checked' : '' ?>>
-				<label class="custom-control-label" for="active">Ano</label>
-			</div>
-		</div>
-	</div>
-
-	<hr>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label" for="first_name">Jméno</label>
-		<div class="col-sm-9">
-			<input type="text" name="first_name" id="first_name" class="form-control" maxlength="50" value="<?= htmlspecialchars($post['first_name'] ?? '') ?>">
-		</div>
-	</div>
-
-	<div class="form-group row">
-		<label class="col-sm-3 col-form-label" for="last_name">Příjmení</label>
-		<div class="col-sm-9">
-			<input type="text" name="last_name" id="last_name" class="form-control" maxlength="50" value="<?= htmlspecialchars($post['last_name'] ?? '') ?>">
-		</div>
-	</div>
-
-	<input type="hidden" name="image" id="image" value="<?= htmlspecialchars($post['image'] ?? 'data/user/!default-user.png') ?>">
-
-	<div class="row">
-		<div class="col-sm-9 offset-sm-3">
-			<button type="submit" name="submit" class="btn btn-primary">
-				<i class="fa fa-save"></i> <?= $isEdit ? 'Uložit' : 'Vytvořit' ?>
-			</button>
-			<button type="submit" name="cancel" class="btn btn-default">
-				Zrušit
-			</button>
-		</div>
-	</div>
+<form action="" method="post" id="frmUser" class="form-horizontal" novalidate>
+    <div class="card-body">
+        <?php if (!empty($errors['general'])) { ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($errors['general']) ?></div>
+        <?php } ?>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2 required" for="username">Uživatelské jméno</label>
+            <div class="col-sm-8<?= isset($errors['username']) ? ' has-danger' : '' ?>">
+                <input type="email" name="username" id="username" class="form-control" required maxlength="50" placeholder="povinné" value="<?= htmlspecialchars($post['username'] ?? '') ?>">
+                <?php if (isset($errors['username'])) { ?><small class="form-text text-danger"><?= htmlspecialchars($errors['username']) ?></small><?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2<?= !$isEdit ? ' required' : '' ?>" for="password">Heslo</label>
+            <div class="col-sm-8<?= isset($errors['password']) ? ' has-danger' : '' ?>">
+                <input type="password" name="password" id="password" class="form-control password" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'ponechte prázdné pro zachování' : 'povinné' ?>">
+                <small class="form-text text-muted">Min. 8 znaků, musí obsahovat velké písmeno, malé písmeno a číslici.</small>
+                <?php if (isset($errors['password'])) { ?><small class="form-text text-danger"><?= htmlspecialchars($errors['password']) ?></small><?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2<?= !$isEdit ? ' required' : '' ?>" for="password2">Heslo znovu</label>
+            <div class="col-sm-8<?= isset($errors['password2']) ? ' has-danger' : '' ?>">
+                <input type="password" name="password2" id="password2" class="form-control" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'optional' : 'povinné' ?>">
+                <?php if (isset($errors['password2'])) { ?><small class="form-text text-danger"><?= htmlspecialchars($errors['password2']) ?></small><?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2 required" for="role">Role</label>
+            <div class="col-sm-8<?= isset($errors['role']) ? ' has-danger' : '' ?>">
+                <select name="role" id="role" class="form-control selectpicker show-tick" required data-selected-text-format="count > 5" data-hide-disabled="true">
+                    <?php foreach ($roleOptions as $value => $label) { ?>
+                        <option value="<?= htmlspecialchars($value) ?>"<?= ($post['role'] ?? $currentRole) === $value ? ' selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                    <?php } ?>
+                </select>
+                <?php if (isset($errors['role'])) { ?><small class="form-text text-danger"><?= htmlspecialchars($errors['role']) ?></small><?php } ?>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2" for="active">Aktivní</label>
+            <div class="col-sm-8">
+                <div class="switch switch-primary">
+                    <input type="checkbox" id="active" name="active" value="1" data-plugin-ios-switch<?= !empty($post['active']) || (!$isEdit && !isset($post['active'])) ? ' checked' : '' ?>>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2" for="first_name">Jméno</label>
+            <div class="col-sm-8">
+                <input type="text" name="first_name" id="first_name" class="form-control" maxlength="50" placeholder="volitelné" value="<?= htmlspecialchars($post['first_name'] ?? '') ?>">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 control-label text-sm-right pt-2" for="last_name">Příjmení</label>
+            <div class="col-sm-8">
+                <input type="text" name="last_name" id="last_name" class="form-control" maxlength="50" placeholder="volitelné" value="<?= htmlspecialchars($post['last_name'] ?? '') ?>">
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="image" id="image" value="<?= htmlspecialchars($post['image'] ?? 'data/user/!default-user.png') ?>">
+    <footer class="card-footer text-right">
+        <button type="submit" name="submit" class="btn btn-primary">
+            Uložit
+        </button>
+        <button type="submit" name="cancel" class="btn btn-default" formnovalidate>
+            Storno
+        </button>
+    </footer>
 </form>

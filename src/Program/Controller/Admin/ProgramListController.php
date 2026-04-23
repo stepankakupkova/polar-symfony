@@ -6,7 +6,7 @@ use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\ShowRepository;
 use App\Program\Repository\VideoRepository;
-use App\Security\User;
+use App\Authorization\Identity\AuthorizationUser;
 use DateTime;
 use Exception;
 use Psr\Log\LoggerInterface;

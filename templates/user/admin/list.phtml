@@ -230,9 +230,10 @@ $view->addInlineScript(
 
     <script>
         function optionsFormatter(value, row) {
+            let url = "<?= $view->path('admin_user_index') ?>/upravit";
             let data = '<div class="btn-group pb-sm-0 pb-2">';
-            if (row.role.indexOf("owner") === -1 || "<?= in_array('owner', $identity->getRole(), true) ? 'true' : 'false' ?>" === "true") {
-                data += '<a href="<?= $view->path('admin_user_edit', ['id' => '']) ?>' + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +
+            if (row.role !== "owner" || "<?= in_array('owner', $identity->getRole(), true) ?>" === "true") {
+                data += '<a href="' + url + "/" + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +
                     '<button data-user-id="' + row.id + '" class="btblBtnDeleteUser btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>';
             }
             data += '</div>';
@@ -263,12 +264,12 @@ $view->addInlineScript(
             let color = 'text-success';
             let text = '';
             switch (value) {
-                case '1':
+                case 1:
                     icon = 'fa fa-fw fa-lg fa-check-circle';
                     color = 'text-success';
                     text = 'Aktivní';
                     break;
-                case '0':
+                case 0:
                     icon = 'fa fa-fw fa-lg fa-times-circle';
                     color = 'text-danger';
                     text = 'Neaktivní';

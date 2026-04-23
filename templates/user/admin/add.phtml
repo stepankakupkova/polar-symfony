@@ -6,31 +6,96 @@
  * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
  * @license https://rogr.cz/license/eula EULA License
  */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/file-upload/css/file-upload.css'));
+$view->addHeadStyle(
+	'.profile-image-outer-container {margin-top: auto; margin-bottom: auto; border-radius: 50%; position: relative; cursor: pointer;}
+	.profile-image-outer-container .profile-image-input {position: absolute; top: 0; height: 100%; opacity: 0; z-index: 3; cursor: pointer;}
+	.profile-image-outer-container .profile-image-inner-container {border-radius: 50%; padding: 5px;}
+	.profile-image-outer-container .profile-image-inner-container img {height: 200px; width: 200px; border-radius: 50%; border: 5px solid white;}
+	.profile-image-outer-container .profile-image-inner-container .profile-image-button {position: absolute; z-index: 2; bottom: 15px; right: 15px; width: 40px; height: 40px; text-align: center; border-radius: 50%; line-height: 38px; transition: ease all 0.1s;}
+	.profile-image-outer-container:hover .profile-image-button {transform: scale(1.1);}
+	html .border-color-light {border-color: #FFF !important;}
+	html .border-color-dark {border-color: #212529 !important;}'
+);
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/ui-widget.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/iframe-transport.js'));
+$view->addBodyScript($view->asset('vendor/admin/file-upload/js/file-upload.js'));
+$view->addInlineScript(
+	'$("#fileupload").fileupload({
+		formData: {
+			user_id: null
+		},
+		dropZone: "#avatar",
+		dataType: "json",
+		add: function (e, data) {
+			$("#avatar .progress").removeClass("d-none");
+			$("#avatar .progress .progress-bar").css("width", "0%");
+			data.submit();
+		},
+		progressall: function (e, data) {
+			var progress = parseInt(data.loaded / data.total * 100, 10);
+			$("#avatar .progress .progress-bar").css("width", progress + "%");
+		},
+		done: function (e, data) {
+			$("#avatar .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+			$("#avatar .progress").addClass("d-none");
+			$(".profile-image-outer-container img").attr("src", "/" + data.result.url);
+			$("input[name=image]").val(data.result.url);
+			if (data.result.error) {
+				new PNotify({ title: "Profilový obrázek", text: data.result.error, type: "error" });
+			} else {
+				new PNotify({ title: "Profilový obrázek", text: "Obrázek byl úspěšně nahrán", type: "success" });
+			}
+		},
+		fail: function (e, data) {
+			$("#avatar .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+			$("#avatar .progress").addClass("d-none");
+			new PNotify({ title: "Profilový obrázek", text: "Obrázek se nepodařilo nahrát", type: "error" });
+		}
+	});
+	$(".profile-image-button").click(function(e) {
+		$("#fileupload").click();
+	});'
+);
 ?>
 <div class="row">
-	<div class="col-lg-6">
-		<section class="card">
-			<header class="card-header">
-				<h2 class="card-title">Přidat uživatele</h2>
-			</header>
-			<div class="card-body">
-				<?= $view->include('user/admin/userForm', [
-					'post' => $post,
-					'errors' => $errors,
-					'identity' => $identity,
-					'isEdit' => false,
-				]) ?>
+	<div id="avatar" class="col-lg-3 mt-4 mt-lg-0">
+		<div class="d-flex justify-content-center mb-4">
+			<div class="profile-image-outer-container">
+				<div class="profile-image-inner-container bg-primary">
+					<img id="avatarPreview" class="border-color-<?= $scheme ?? 'dark' ?>" src="/<?= htmlspecialchars($post['image'] ?? 'data/user/!default-user.png') ?>" alt="">
+					<span class="profile-image-button bg-<?= ($scheme ?? 'dark') === 'dark' ? 'light' : 'dark' ?>">
+						<i class="fa fa-camera text-color-<?= $scheme ?? 'dark' ?>"></i>
+					</span>
+				</div>
+				<input id="fileupload" class="profile-image-input" type="file" name="file" data-url="<?= $view->path('admin_user_upload_image') ?>" accept="image/*">
 			</div>
-		</section>
+		</div>
+		<div class="progress d-none">
+			<div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0">
+				<span class="sr-only">0%</span>
+			</div>
+		</div>
 	</div>
-	<div class="col-lg-6">
-		<section class="card">
+	<div class="col-lg-9">
+		<section class="card card-primary">
 			<header class="card-header">
-				<h2 class="card-title">Obrázek</h2>
+				<div class="card-actions">
+					<span id="msgNotSaved" class="badge badge-danger d-none">
+						Neuloženo
+					</span>
+				</div>
+				<h2 class="card-title">
+					Přidat uživatele
+				</h2>
 			</header>
-			<div class="card-body text-center">
-				<img id="avatarPreview" src="/<?= htmlspecialchars($post['image'] ?? 'data/user/!default-user.png') ?>" class="rounded-circle" width="200" height="200" alt="">
-			</div>
+			<?= $view->include('user/admin/userForm', [
+				'post' => $post,
+				'errors' => $errors,
+				'identity' => $identity,
+				'isEdit' => false,
+			]) ?>
 		</section>
 	</div>
 </div>

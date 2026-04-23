@@ -3,7 +3,7 @@
 namespace App\Admin\Controller;
 
 use App\Application\View\PhtmlRenderer;
-use App\Security\User;
+use App\Authorization\Identity\AuthorizationUser;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;

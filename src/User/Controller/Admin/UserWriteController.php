@@ -6,7 +6,7 @@ use App\Application\Service\FlashMessenger;
 use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Authorization\Repository\AuthorizationRepository;
-use App\Security\User;
+use App\Authorization\Identity\AuthorizationUser;
 use App\User\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -304,7 +304,17 @@ final class UserWriteController
 			mkdir($this->PUBLIC_PATH . '/' . $folder, 0777, true);
 		}
 
-		$ext = $file->guessExtension() ?: 'jpg';
+		$allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+		if (!in_array($file->getMimeType(), $allowedMimes, true)) {
+			return new JsonResponse(['error' => 'Nepodporovaný typ souboru']);
+		}
+
+		$ext = match ($file->getMimeType()) {
+			'image/png' => 'png',
+			'image/gif' => 'gif',
+			'image/webp' => 'webp',
+			default => 'jpg',
+		};
 		$filename = 'avatar-' . date('YmdHis') . '_' . random_int(100, 999) . '.' . $ext;
 		$file->move($this->PUBLIC_PATH . '/' . $folder, $filename);
 		$imageFileName = $folder . $filename;
@@ -338,6 +348,14 @@ final class UserWriteController
 		}
 		if ($isNew && empty($post['password'])) {
 			$errors['password'] = 'Heslo je povinné';
+		}
+		if (!empty($post['password'])) {
+			$password = $post['password'];
+			if (strlen($password) < 8) {
+				$errors['password'] = 'Heslo musí mít alespoň 8 znaků';
+			} elseif (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+				$errors['password'] = 'Heslo musí obsahovat velké písmeno, malé písmeno a číslici';
+			}
 		}
 		if (!empty($post['password']) && !empty($post['password2']) && $post['password'] !== $post['password2']) {
 			$errors['password2'] = 'Hesla se neshodují';

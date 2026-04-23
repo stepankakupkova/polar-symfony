@@ -5,7 +5,7 @@ namespace App\Program\Controller\Admin;
 use App\Application\Service\FlashMessenger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\SettingRepository;
-use App\Security\User;
+use App\Authorization\Identity\AuthorizationUser;
 use Imagine\Gd\Font;
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;

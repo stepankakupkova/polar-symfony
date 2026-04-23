@@ -14,40 +14,40 @@ admin_json_write_set_scheme:
 
 # User
 admin_user_index:
-  path: /admin/users
+  path: /admin/uzivatele
   controller: App\User\Controller\Admin\UserListController::index
 
 admin_user_list:
-  path: /admin/users/list
+  path: /admin/uzivatele/seznam
   controller: App\User\Controller\Admin\UserListController::list
 
 admin_user_get_list:
-  path: /admin/users/json-list/get-list
+  path: /admin/uzivatele/json-list/get-list
   controller: App\User\Controller\Admin\UserListController::getList
   methods: [GET]
 
 admin_user_get_user:
-  path: /admin/users/json-list/get-user
+  path: /admin/uzivatele/json-list/get-user
   controller: App\User\Controller\Admin\UserListController::getUser
   methods: [POST]
 
 admin_user_add:
-  path: /admin/users/add
+  path: /admin/uzivatele/pridat
   controller: App\User\Controller\Admin\UserWriteController::add
 
 admin_user_edit:
-  path: /admin/users/edit/{id}
+  path: /admin/uzivatele/upravit/{id}
   controller: App\User\Controller\Admin\UserWriteController::edit
   requirements:
     id: '\d+'
 
 admin_user_delete:
-  path: /admin/users/json-write/delete-user
+  path: /admin/uzivatele/json-write/smazat-uzivatele
   controller: App\User\Controller\Admin\UserWriteController::deleteUser
   methods: [POST]
 
 admin_user_upload_image:
-  path: /admin/users/json-write/upload-image
+  path: /admin/uzivatele/json-write/nahrat-obrazek
   controller: App\User\Controller\Admin\UserWriteController::uploadImage
   methods: [POST]
 
