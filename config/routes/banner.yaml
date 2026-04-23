@@ -2,3 +2,8 @@ banner_set_showed:
     path: /banner/set-showed
     controller: App\Banner\Controller\Web\BannerWriteController::setShowed
     methods: [POST]
+
+banner_set_clicked:
+    path: /banner/set-clicked
+    controller: App\Banner\Controller\Web\BannerWriteController::setClicked
+    methods: [POST]

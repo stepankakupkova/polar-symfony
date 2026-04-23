@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 $view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
 $view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css'));
@@ -325,7 +325,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
                                 <?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
                                 <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
                                 <?php $k = $k + 2; ?>
-                                <?= $view->include('banner/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+                                <?= $view->include('banner/web/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
                             <?php } ?>
 
                             <!-- 2., 3., 4. blok: 3x PR -->
@@ -336,7 +336,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
                             <?php } ?>
 
                             <?php if ($i === 12) { ?>
-                                <?= $view->include('banner/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+                                <?= $view->include('banner/web/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
                             <?php } ?>
                             <br class="d-none d-lg-inline" />
                         </aside>
@@ -352,12 +352,12 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
 
         <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
         <?php if ($i === 5) { ?>
-            <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+            <?= $view->include('banner/web/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
         <?php } ?>
 
         <?php // REKLAMA PRO MOBILY (druhá) ?>
         <?php if ($i === 12) { ?>
-            <?= $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
+            <?= $view->include('banner/web/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
         <?php } ?>
 
         <?php // Blok Kam vyrazit  ?>
@@ -374,7 +374,7 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
         <?php if ($i === 18) { ?>
             <?php // REKLAMA ?>
             <div class="container">
-                <?= $view->include('banner/partial/ads/article') ?>
+                <?= $view->include('banner/web/partial/ads/article') ?>
             </div>
             <?= $view->include('news/partial/block-camera', ['blockCamera' => $blockCamera]) ?>
         <?php } ?>

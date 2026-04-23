@@ -1,0 +1,378 @@
+<?php
+/*
+ * @project ferritenergy
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$identity = $identity ?? null;
+$locale = Locale::getDefault();
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/extension/reorder-rows/css/reorder-rows.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/table-dnd/js/table-dnd.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/' . $locale . '.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/mobile/js/mobile.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/reorder-rows/js/reorder-rows.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
+$view->addHeadStyle('table#btblBanner td p {margin-bottom: 0;}');
+?>
+
+<div class="tabs">
+    <ul class="nav nav-tabs border-bottom-0">
+    </ul>
+    <div class="tab-title">
+        <div class="tab-pane active">
+            <div id="toolbar" class="btn-group">
+                <a href="<?= $view->path('admin_banner_mobilesticky_add') ?>" class="btn btn-primary">
+                    <i class="fa fa-fw fa-plus"></i>
+                    <span class="hidden-sm hidden-xs">
+                        Přidat banner
+                    </span>
+                </a>
+            </div>
+            <table id="btblBanner"
+                   data-url="<?= $view->path('admin_banner_mobilesticky_get_list') ?>"
+                   data-toggle="table"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-page-size="15"
+                   data-valign="middle"
+                   data-sort-name="rank"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar"
+                   data-query-params="queryParams"
+                   data-cookie-id-table="USER-<?= $identity ? $identity->getId() : '0' ?>-mobilestickyTable"
+                   data-mobile-responsive="true"
+                   data-use-row-attr-func="true"
+                   data-reorderable-rows="true"
+                   data-drag-handle=">tbody>tr>td.rank">
+                <thead>
+                    <tr>
+                        <th class="text-nowrap width-nowrap"
+                            data-formatter="optionsFormatter"
+                            data-align="center">
+                            <i class="fa fa-cogs" data-toggle="tooltip" data-placement="right" title="Možnosti"></i>
+                            <span class="d-sm-none">
+                                Možnosti
+                            </span>
+                        </th>
+                        <th data-field="id"
+                            class="text-nowrap width-nowrap"
+                            data-sortable="true"
+                            data-visible="false">
+                            ID
+                        </th>
+                        <!--<th data-field="rank"
+                            class="text-nowrap width-nowrap text-center cur-rank rank"
+                            data-formatter="rankFormatter"
+                            data-sortable="true"
+                            data-align="center">
+                            <i class="fa fa-sort pb-sm-0 pb-2" data-toggle="tooltip" data-placement="right" title="Pořadí"></i>
+                            <span class="d-sm-none">
+                                Pořadí
+                            </span>
+                        </th>-->
+                        <th data-field="active"
+                            class="text-nowrap width-nowrap"
+                            data-formatter="activeFormatter"
+                            data-align="center">
+                            <i class="fa fa-toggle-on pb-sm-0 pb-2" data-toggle="tooltip" data-placement="right" title="Aktivní"></i>
+                            <span class="d-sm-none">
+                                Aktivní
+                            </span>
+                        </th>
+                        <th data-field="image"
+                            class="width-nowrap p-0"
+                            data-formatter="imageFormatter"
+                            data-align="center">
+                            <i class="fa fa-image" data-toggle="tooltip" data-placement="right" title="Obrázek"></i>
+                            <span class="d-sm-none">
+                                Obrázek
+                            </span>
+                        </th>
+                        <th data-field="title"
+                            class="no-wrap"
+                            data-visible="true"
+                            data-sortable="true">
+                            Název
+                        </th>
+                        <th data-field="link"
+                            class="text-truncate"
+                            data-sortable="true">
+                            Odkaz
+                        </th>
+                        <!--<th data-field="image_alt"
+                            class=""
+                            data-visible="false">
+                            ALT obrázku
+                        </th>-->
+                        <th data-field="public_from"
+                            class="text-truncate"
+                            data-formatter="datetimeFormatter"
+                            data-visible="true"
+                            data-sortable="true"
+                            data-align="center">
+                            Publikovat od
+                        </th>
+                        <th data-field="public_to"
+                            class="no-wrap"
+                            data-formatter="datetimeFormatter"
+                            data-visible="true"
+                            data-sortable="true"
+                            data-align="center">
+                            Publikovat do
+                        </th>
+                        <th data-field="showed"
+                            class="no-wrap"
+                            data-visible="true"
+                            data-sortable="true">
+                            Zobrazení
+                        </th>
+                        <th data-field="clicked"
+                            class="no-wrap"
+                            data-visible="true"
+                            data-sortable="true">
+                            Kliknutí
+                        </th>
+                        <th data-field="ctr"
+                            data-formatter="ctrFormatter"
+                            class="no-wrap"
+                            data-visible="true"
+                            data-sortable="true">
+                            CTR
+                        </th>
+                        <th data-field="created_date"
+                            class="text-nowrap width-nowrap"
+                            data-formatter="datetimeFormatter"
+                            data-sortable="true"
+                            data-visible="false">
+                            Datum vytvoření
+                        </th>
+                        <th data-field="updated_date"
+                            class="text-nowrap width-nowrap"
+                            data-formatter="datetimeFormatter"
+                            data-sortable="true"
+                            data-visible="false">
+                            Datum úpravy
+                        </th>
+                        <th data-field="created_user"
+                            class="text-nowrap width-nowrap"
+                            data-sortable="true"
+                            data-visible="false">
+                            Vytvořil
+                        </th>
+                        <th data-field="updated_user"
+                            class="text-nowrap width-nowrap"
+                            data-sortable="true"
+                            data-visible="false">
+                            Upravil
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+
+            <script>
+                function queryParams(params) {
+                    return params;
+                }
+
+                function optionsFormatter(value, row) {
+                    let url = "<?= $view->path('admin_banner_mobilesticky_list') ?>/upravit";
+                    let data = '';
+                    data += '<div class="btn-group pb-sm-0 pb-2">';
+                    data += '<a href="' + url + '/' + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ';
+                    data += '<button data-mobilesticky-id="' + row.id + '" class="btblBtnDeleteBanner btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i> <span class="d-none">Smazat</span></button>';
+                    data += '</div>';
+                    return data;
+                }
+
+                function imageFormatter(value) {
+                    if (value) {
+                        return '<a class="image-popup-no-margins cur-zoom-in" href="/' + value + '">' +
+                            '<img src="/' + value + '" height="47" alt="" />' +
+                            '</a>';
+                    }
+                    return null;
+                }
+
+                function rankFormatter(value) {
+                    return value + ' <i class="fa fa-fw fa-arrows-alt-v ml-1"></i>';
+                }
+
+                function activeFormatter(value) {
+                    let icon = 'fa fa-fw fa-lg';
+                    let color = 'text-success';
+                    let text = '';
+                    switch(value) {
+                        case '1':
+                            icon = 'fa fa-fw fa-lg fa-check-circle';
+                            color = 'text-success';
+                            text = 'Aktivní';
+                            break;
+                        case '0':
+                            icon = 'fa fa-fw fa-lg fa-times-circle';
+                            color = 'text-danger';
+                            text = 'Neaktivní';
+                            break;
+                    }
+                    return '<i class="' + icon + ' ' + color + '" data-toggle="tooltip" data-placement="right" title="' + text + '"></i>';
+                }
+
+                function dateFormatter(value) {
+                    if (value) {
+                        return moment(value).format('LL');
+                    }
+                    return null;
+                }
+
+                function datetimeFormatter(value, row) {
+                    if (value) {
+                        return moment(value).format('L') + " " + moment(value).format('LT');
+                    }
+                    return value;
+                }
+
+                function ctrFormatter(value, row) {
+                    if (row.showed === "0") {
+                        return 0;
+                    }
+                    return row.clicked / row.showed * 100;
+                }
+
+                // Zobrazení náhledu
+                $("#btblBanner").on("post-body.bs.table", function (e, data) {
+                    $(".image-popup-no-margins").magnificPopup({
+                        type: "image",
+                        image: {
+                            verticalFit: true
+                        },
+                        zoom: {
+                            enabled: true,
+                            duration: 300
+                        }
+                    });
+                });
+
+                // Smazání
+                $("#btblBanner").on("post-body.bs.table", function (e, data) {
+                    $(".btblBtnDeleteBanner").unbind("click").bind("click", function() {
+                        var id = $(this).data("mobilesticky-id");
+                        $.post("<?= $view->path('admin_banner_mobilesticky_get_banner') ?>",
+                            {
+                                id: id
+                            },
+                            function(json) {
+                                if (json.success) {
+                                    $("#modalDanger .card-title").html("Smazat banner");
+                                    $("#modalDanger .modal-text h4").html("Opravdu chcete smazat banner?<br><strong>\"" + json.mobilesticky.title + "\"</strong>");
+                                    $("#modalDanger .modal-text p").html("Všechny závislosti budou smazány. Tuto akci nelze vrátit zpět!");
+                                    var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+
+                                    $.magnificPopup.open({
+                                        items: {src: "#modalDanger"},
+                                        type: "inline",
+                                        fixedTitlePos: false,
+                                        fixedBgPos: true,
+                                        overflowY: "auto",
+                                        closeBtnInside: true,
+                                        preloader: false,
+                                        midClick: true,
+                                        removalDelay: 300,
+                                        mainClass: "my-mfp-slide-bottom",
+                                        modal: true,
+                                        callbacks: {
+                                            open: function() {
+                                                btnConfirm.unbind("click").click(function(e){
+                                                    e.preventDefault();
+                                                    $.post("<?= $view->path('admin_banner_mobilesticky_delete_banner') ?>",
+                                                        {
+                                                            id: id
+                                                        },
+                                                        function(json) {
+                                                            if (json.success) {
+                                                                var notice = new PNotify({
+                                                                    title: "Úspěch",
+                                                                    text: "Banner byl smazán!",
+                                                                    type: "success",
+                                                                    addclass: "click-2-close",
+                                                                    buttons: {
+                                                                        sticker: false
+                                                                    }
+                                                                });
+                                                                $("#btblBanner").bootstrapTable("refresh", {"silent": true});
+                                                            }else{
+                                                                var notice = new PNotify({
+                                                                    title: "Chyba",
+                                                                    text: "Nepodařilo se smazat banner!",
+                                                                    type: "error",
+                                                                    addclass: "click-2-close",
+                                                                    buttons: {
+                                                                        sticker: false
+                                                                    }
+                                                                });
+                                                            }
+                                                            $.magnificPopup.close();
+                                                        },
+                                                        "json"
+                                                    );
+                                                });
+                                            },
+                                            close: function() {
+
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    var notice = new PNotify({
+                                        title: "Chyba",
+                                        text: "Nepodařilo se načíst informace o banneru!",
+                                        type: "error",
+                                        addclass: "click-2-close",
+                                        buttons: {
+                                            sticker: false
+                                        }
+                                    });
+                                    $.magnificPopup.close();
+                                    $("#btblBanner").bootstrapTable("refresh", {"silent": true});
+                                }
+                            },
+                            "json"
+                        );
+                    });
+                });
+
+                // Řazení
+                $("#btblBanner").on("reorder-row.bs.table", function (e, data) {
+                    $.post("<?= $view->path('admin_banner_mobilesticky_set_sort') ?>",
+                        {
+                            data: data
+                        },
+                        function(json) {
+                            var notice = new PNotify({
+                                title: "Úspěch",
+                                text: "Pořadí bannerů bylo změněno!",
+                                type: "success",
+                                addclass: "click-2-close",
+                                buttons: {
+                                    sticker: false
+                                }
+                            });
+                            $("#btblBanner").bootstrapTable("refresh", {silent: true});
+                        },
+                        "json"
+                    );
+                });
+            </script>
+        </div>
+    </div>
+</div>
+
+
+<?= $view->include('admin/modal/danger') ?>
+<?= $view->include('admin/modal/warning') ?>

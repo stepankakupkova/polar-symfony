@@ -66,4 +66,19 @@ final class BannerRepository
 
 		return $affected > 0;
 	}
+
+	public function setClicked(string $type, int $id): bool
+	{
+		$allowed = ['leaderboard', 'rectangle', 'square', 'mobilesticky', 'mobilesquare1', 'mobilesquare2'];
+		if (!in_array($type, $allowed, true)) {
+			return false;
+		}
+
+		$affected = $this->connection->executeStatement(
+			'UPDATE banner_' . $type . ' SET clicked = clicked + 1 WHERE id = ?',
+			[$id],
+		);
+
+		return $affected > 0;
+	}
 }

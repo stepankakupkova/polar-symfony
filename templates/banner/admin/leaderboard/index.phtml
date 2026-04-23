@@ -1,0 +1,83 @@
+<?php
+/*
+ * @project ferritenergy
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="row">
+            <div class="col-sm">
+                <?= $view->include('banner/admin/partial/dashboard/widget', ['countBanner' => $countLeaderboard ?? 0, 'countBannerFuture' => $countLeaderboardActive ?? 0]) ?>
+            </div>
+            <div class="col-sm">
+                <section class="card card-featured-top card-featured-danger mb-4">
+                    <div class="card-body">
+                        <div class="widget-summary">
+                            <div class="widget-summary-col widget-summary-col-icon">
+                                <div class="summary-icon bg-danger hvr-grow">
+                                    <i class="fa fa-cogs"></i>
+                                </div>
+                            </div>
+                            <div class="widget-summary-col">
+                                <div class="summary">
+                                    <h4 class="title text-nowrap">
+                                        Nastavení
+                                    </h4>
+                                    <div class="info text-nowrap">
+                                        <strong class="amount">
+
+                                        </strong>
+                                        <span class="text-danger">
+
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="summary-footer">
+                                    <a href="#" class="text-muted text-uppercase">
+                                        <i class="fa fa-fw fa-ellipsis-v"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <section class="card mb-4">
+            <header class="card-header">
+                <div class="card-header-icon bg-primary">
+                    <i class="fa fa-newspaper"></i>
+                </div>
+            </header>
+            <div class="card-body text-center">
+                <h3 class="font-weight-semibold mt-3 text-center">
+                    Leaderboard
+                </h3>
+                <p class="text-center">
+                    0.0.6
+                </p>
+            </div>
+        </section>
+        <section class="card card-featured card-featured-primary mt-0">
+            <header class="card-header">
+                <div class="card-actions pull-right mb-0">
+                    <a href="#" class="card-action card-action-toggle" data-card-toggle></a>
+                    <a href="#" class="card-action card-action-dismiss" data-card-dismiss></a>
+                </div>
+                <h2 class="card-title">
+                    Historie změn
+                </h2>
+            </header>
+            <div class="card-body">
+                <?= $view->include('banner/admin/partial/changelog') ?>
+            </div>
+        </section>
+    </div>
+</div>

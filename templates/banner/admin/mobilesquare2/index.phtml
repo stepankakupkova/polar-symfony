@@ -1,6 +1,6 @@
 <?php
 /*
- * @project polar
+ * @project ferritenergy
  * @author Rostislav Greipel
  * @link https://rogr.cz
  * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
@@ -11,7 +11,9 @@
 <div class="row">
     <div class="col-lg-6">
         <div class="row">
-            <?= $view->include('job/admin/dashboard/widget', ['countJob' => $countJob ?? 0, 'countJobOurs' => $countJobOurs ?? 0]) ?>
+            <div class="col-sm">
+                <?= $view->include('banner/admin/partial/dashboard/widget', ['countBanner' => $countMobilesquare2 ?? 0, 'countBannerFuture' => $countMobilesquare2Active ?? 0]) ?>
+            </div>
             <div class="col-sm">
                 <section class="card card-featured-top card-featured-danger mb-4">
                     <div class="card-body">
@@ -36,7 +38,7 @@
                                     </div>
                                 </div>
                                 <div class="summary-footer">
-                                    <a href="<?= $view->path('admin_job_setting') ?>" class="text-muted text-uppercase">
+                                    <a href="#" class="text-muted text-uppercase">
                                         <i class="fa fa-fw fa-ellipsis-v"></i>
                                     </a>
                                 </div>
@@ -51,15 +53,15 @@
         <section class="card mb-4">
             <header class="card-header">
                 <div class="card-header-icon bg-primary">
-                    <i class="fa fa-truck"></i>
+                    <i class="fa fa-newspaper"></i>
                 </div>
             </header>
             <div class="card-body text-center">
                 <h3 class="font-weight-semibold mt-3 text-center">
-                    Nabídka práce
+                    Mobilesquare 2
                 </h3>
                 <p class="text-center">
-                    TV Polar
+                    0.0.6
                 </p>
             </div>
         </section>
@@ -74,7 +76,7 @@
                 </h2>
             </header>
             <div class="card-body">
-                <?= $view->include('job/admin/changelog') ?>
+                <?= $view->include('banner/admin/partial/changelog') ?>
             </div>
         </section>
     </div>

@@ -27,4 +27,18 @@ class BannerWriteController
 
         return new JsonResponse(['success' => $success]);
     }
+
+    public function setClicked(Request $request): JsonResponse
+    {
+        $type = (string) $request->request->get('type', '');
+        $id   = (int)    $request->request->get('id', 0);
+
+        if (!$type || !$id) {
+            return new JsonResponse(['success' => false]);
+        }
+
+        $success = $this->bannerRepository->setClicked($type, $id);
+
+        return new JsonResponse(['success' => $success]);
+    }
 }

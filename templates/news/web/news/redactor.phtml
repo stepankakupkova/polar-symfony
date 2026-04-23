@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /** @var \App\Application\View\ViewHelper $view */
 
     // Ticker + Crawl JS
@@ -229,7 +229,7 @@ $view->setBreadcrumbs([
 
                             <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
                             <?php if ($i === 4) { ?>
-                                <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+                                <?= $view->include('banner/web/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
                             <?php } ?>
 
                             <?php $i++; ?>
@@ -237,7 +237,7 @@ $view->setBreadcrumbs([
                         <?= $view->include('application/pagination/paginator', ['route' => 'news_redactor', 'routeParams' => ['redactor_url' => $redactor['url']], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
 
                         <?php // REKLAMA ?>
-                        <?= $view->include('banner/partial/ads/article') ?>
+                        <?= $view->include('banner/web/partial/ads/article') ?>
 
                     </div>
                 </div>
@@ -247,7 +247,7 @@ $view->setBreadcrumbs([
             <?php // PR ?>
             <?= $view->include('news/partial/pr-block', ['pr_block' => $pr]) ?>
             <?php // REKLAMA ?>
-            <br /><?= $view->include('banner/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+            <br /><?= $view->include('banner/web/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
         </div>
     </div>
 </div>

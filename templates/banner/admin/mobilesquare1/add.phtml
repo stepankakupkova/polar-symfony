@@ -1,0 +1,120 @@
+﻿<?php
+/*
+ * @project ferritenergy
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink('stylesheet', '/vendor/admin/file-upload/css/file-upload.css');
+$view->addBodyScript('/vendor/admin/file-upload/js/ui-widget.js');
+$view->addBodyScript('/vendor/admin/file-upload/js/iframe-transport.js');
+$view->addBodyScript('/vendor/admin/file-upload/js/file-upload.js');
+
+// Nahrání obrázku
+$view->addInlineScript(
+    '$("#fileupload").fileupload({
+        formData: {
+            mobilesquare1_id: null
+        },
+        dropZone: "#image",
+        dataType: "json",
+        add: function (e, data) {
+            $("#image .progress").removeClass("d-none");
+            $("#image .progress .progress-bar").css("width", "0%");
+            data.submit();
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $("#image .progress .progress-bar").css("width", progress + "%");
+        },
+        done: function (e, data) {
+            $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+            $("#image .progress").addClass("d-none");
+            $(".image-outer-container img").attr("src", "/" + data.result.url);
+            $("input[name=image]").val(data.result.url);
+            if (data.result.error) {
+                new PNotify({
+                    title: "Obrázek banneru",
+                    text: data.result.error,
+                    type: "error"
+                });
+            } else {
+                new PNotify({
+                    title: "Obrázek banneru",
+                    text: "Obrázek banneru byl úspěšně nahrán",
+                    type: "success"
+                });
+            }
+        },
+        fail: function (e, data) {
+            $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+            $("#image .progress").addClass("d-none");
+            new PNotify({
+                title: "Obrázek banneru",
+                text: "Obrázek banneru nebyl úspěšně nahrán",
+                type: "error"
+            });
+        }
+    });'
+);
+
+// Nahrání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .image-button").click(function(e){
+        $("#fileupload").click();
+    });'
+);
+?>
+
+<div class="row">
+    <div class="col-lg-3">
+        <div id="image">
+            <h3 class="mt-0">
+                Obrázek
+                <small class="pull-right text-muted">
+                    (480px x 480px)
+                </small>
+            </h3>
+            <div class="mb-4">
+                <div class="image-outer-container d-inline-flex">
+                    <div class="image-inner-container bg-primary">
+                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $view->asset('data/banner/mobilesquare1/!default-banner.png') . '?ver=' . date('YmdHis') ?>" alt="">
+                        <span class="image-button bg-<?= $schemeOpposite ?>">
+                            <i class="fa fa-camera text-color-<?= $scheme ?>"></i>
+                        </span>
+                    </div>
+                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_banner_mobilesquare1_upload_image') ?>" accept="image/*">
+                </div>
+            </div>
+            <div class="progress d-none">
+                <div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0">
+                    <span class="sr-only">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <section class="card card-primary">
+            <header class="card-header">
+                <div class="card-actions">
+                    <span id="msgNotSaved" class="badge badge-danger d-none">
+                        Neuloženo
+                    </span>
+                </div>
+                <h2 class="card-title">
+                    Přidat banner
+                </h2>
+            </header>
+            <?= $view->include('banner/admin/mobilesquare1/bannerForm', [
+                'view'              => $view,
+                'post'              => $post,
+                'errors'            => $errors,
+                'mobilesquare1_id'  => 0,
+                'submitLabel'       => 'Uložit',
+                'submitClass'       => 'btn-primary',
+            ]) ?>
+        </section>
+    </div>
+</div>

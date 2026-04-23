@@ -78,6 +78,8 @@ services:
     App\Banner\Controller\:
         resource: '../src/Banner/Controller/'
         tags: ['controller.service_arguments']
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Admin\Controller\:
         resource: '../src/Admin/Controller/'

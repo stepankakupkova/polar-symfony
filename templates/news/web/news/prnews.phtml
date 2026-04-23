@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
     // Ticker + Crawl JS
     $view->addInlineScript(
@@ -177,7 +177,7 @@
 
                             <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
                             <?php if ($i === 4) { ?>
-                                <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+                                <?= $view->include('banner/web/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
                             <?php } ?>
 
                             <?php $i++; ?>
@@ -185,7 +185,7 @@
                         <?= $view->include('application/pagination/paginator', ['route' => 'news_pr', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
 
                         <?php // REKLAMA ?>
-                        <?= $view->include('banner/partial/ads/article') ?>
+                        <?= $view->include('banner/web/partial/ads/article') ?>
 
                     </div>
                 </div>
@@ -195,7 +195,7 @@
             <?php // PR ?>
             <?= $view->include('news/partial/pr', ['pr' => $pr, 'bannerRectangle' => $bannerRectangle ?? null]) ?>
             <?php // REKLAMA ?>
-            <br /><?= $view->include('banner/partial/ads/article-right-bottom') ?>
+            <br /><?= $view->include('banner/web/partial/ads/article-right-bottom') ?>
         </div>
     </div>
 </div>

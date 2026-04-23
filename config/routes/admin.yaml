@@ -78,3 +78,303 @@ admin_job_setting_write:
   path: /admin/prace/nastaveni/ulozit
   controller: App\Job\Controller\Admin\SettingController::setting
   methods: [POST]
+
+# Banner
+admin_banner_index:
+  path: /admin/banner
+  controller: App\Banner\Controller\Admin\LeaderboardListController::index
+
+# Banner - Leaderboard
+admin_banner_leaderboard_index:
+  path: /admin/banner/leaderboard
+  controller: App\Banner\Controller\Admin\LeaderboardListController::index
+
+admin_banner_leaderboard_list:
+  path: /admin/banner/leaderboard/seznam
+  controller: App\Banner\Controller\Admin\LeaderboardListController::list
+
+admin_banner_leaderboard_add:
+  path: /admin/banner/leaderboard/seznam/pridat
+  controller: App\Banner\Controller\Admin\LeaderboardWriteController::add
+
+admin_banner_leaderboard_edit:
+  path: /admin/banner/leaderboard/seznam/upravit/{id}
+  controller: App\Banner\Controller\Admin\LeaderboardWriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_banner_leaderboard_get_list:
+  path: /admin/banner/leaderboard/json-list/get-list
+  controller: App\Banner\Controller\Admin\LeaderboardListController::getList
+  methods: [GET]
+
+admin_banner_leaderboard_get_banner:
+  path: /admin/banner/leaderboard/json-list/get-banner
+  controller: App\Banner\Controller\Admin\LeaderboardListController::getBanner
+  methods: [POST]
+
+admin_banner_leaderboard_delete_banner:
+  path: /admin/banner/leaderboard/json-write/smazat-banner
+  controller: App\Banner\Controller\Admin\LeaderboardWriteController::deleteBanner
+  methods: [POST]
+
+admin_banner_leaderboard_set_sort:
+  path: /admin/banner/leaderboard/json-write/set-sort
+  controller: App\Banner\Controller\Admin\LeaderboardWriteController::setSort
+  methods: [POST]
+
+admin_banner_leaderboard_upload_image:
+  path: /admin/banner/leaderboard/json-write/nahrat-obrazek
+  controller: App\Banner\Controller\Admin\LeaderboardWriteController::uploadImage
+  methods: [POST]
+
+admin_banner_leaderboard_set_default_image:
+  path: /admin/banner/leaderboard/json-write/set-default-image
+  controller: App\Banner\Controller\Admin\LeaderboardWriteController::setDefaultImage
+  methods: [POST]
+
+# Banner - Rectangle
+admin_banner_rectangle_index:
+  path: /admin/banner/rectangle
+  controller: App\Banner\Controller\Admin\RectangleListController::index
+
+admin_banner_rectangle_list:
+  path: /admin/banner/rectangle/seznam
+  controller: App\Banner\Controller\Admin\RectangleListController::list
+
+admin_banner_rectangle_add:
+  path: /admin/banner/rectangle/seznam/pridat
+  controller: App\Banner\Controller\Admin\RectangleWriteController::add
+
+admin_banner_rectangle_edit:
+  path: /admin/banner/rectangle/seznam/upravit/{id}
+  controller: App\Banner\Controller\Admin\RectangleWriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_banner_rectangle_get_list:
+  path: /admin/banner/rectangle/json-list/get-list
+  controller: App\Banner\Controller\Admin\RectangleListController::getList
+  methods: [GET]
+
+admin_banner_rectangle_get_banner:
+  path: /admin/banner/rectangle/json-list/get-banner
+  controller: App\Banner\Controller\Admin\RectangleListController::getBanner
+  methods: [POST]
+
+admin_banner_rectangle_delete_banner:
+  path: /admin/banner/rectangle/json-write/smazat-banner
+  controller: App\Banner\Controller\Admin\RectangleWriteController::deleteBanner
+  methods: [POST]
+
+admin_banner_rectangle_set_sort:
+  path: /admin/banner/rectangle/json-write/set-sort
+  controller: App\Banner\Controller\Admin\RectangleWriteController::setSort
+  methods: [POST]
+
+admin_banner_rectangle_upload_image:
+  path: /admin/banner/rectangle/json-write/nahrat-obrazek
+  controller: App\Banner\Controller\Admin\RectangleWriteController::uploadImage
+  methods: [POST]
+
+admin_banner_rectangle_set_default_image:
+  path: /admin/banner/rectangle/json-write/set-default-image
+  controller: App\Banner\Controller\Admin\RectangleWriteController::setDefaultImage
+  methods: [POST]
+
+# Banner - Square
+admin_banner_square_index:
+  path: /admin/banner/square
+  controller: App\Banner\Controller\Admin\SquareListController::index
+
+admin_banner_square_list:
+  path: /admin/banner/square/seznam
+  controller: App\Banner\Controller\Admin\SquareListController::list
+
+admin_banner_square_add:
+  path: /admin/banner/square/seznam/pridat
+  controller: App\Banner\Controller\Admin\SquareWriteController::add
+
+admin_banner_square_edit:
+  path: /admin/banner/square/seznam/upravit/{id}
+  controller: App\Banner\Controller\Admin\SquareWriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_banner_square_get_list:
+  path: /admin/banner/square/json-list/get-list
+  controller: App\Banner\Controller\Admin\SquareListController::getList
+  methods: [GET]
+
+admin_banner_square_get_banner:
+  path: /admin/banner/square/json-list/get-banner
+  controller: App\Banner\Controller\Admin\SquareListController::getBanner
+  methods: [POST]
+
+admin_banner_square_delete_banner:
+  path: /admin/banner/square/json-write/smazat-banner
+  controller: App\Banner\Controller\Admin\SquareWriteController::deleteBanner
+  methods: [POST]
+
+admin_banner_square_set_sort:
+  path: /admin/banner/square/json-write/set-sort
+  controller: App\Banner\Controller\Admin\SquareWriteController::setSort
+  methods: [POST]
+
+admin_banner_square_upload_image:
+  path: /admin/banner/square/json-write/nahrat-obrazek
+  controller: App\Banner\Controller\Admin\SquareWriteController::uploadImage
+  methods: [POST]
+
+admin_banner_square_set_default_image:
+  path: /admin/banner/square/json-write/set-default-image
+  controller: App\Banner\Controller\Admin\SquareWriteController::setDefaultImage
+  methods: [POST]
+
+# Banner - Mobilesticky
+admin_banner_mobilesticky_index:
+  path: /admin/banner/mobilesticky
+  controller: App\Banner\Controller\Admin\MobilestickyListController::index
+
+admin_banner_mobilesticky_list:
+  path: /admin/banner/mobilesticky/seznam
+  controller: App\Banner\Controller\Admin\MobilestickyListController::list
+
+admin_banner_mobilesticky_add:
+  path: /admin/banner/mobilesticky/seznam/pridat
+  controller: App\Banner\Controller\Admin\MobilestickyWriteController::add
+
+admin_banner_mobilesticky_edit:
+  path: /admin/banner/mobilesticky/seznam/upravit/{id}
+  controller: App\Banner\Controller\Admin\MobilestickyWriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_banner_mobilesticky_get_list:
+  path: /admin/banner/mobilesticky/json-list/get-list
+  controller: App\Banner\Controller\Admin\MobilestickyListController::getList
+  methods: [GET]
+
+admin_banner_mobilesticky_get_banner:
+  path: /admin/banner/mobilesticky/json-list/get-banner
+  controller: App\Banner\Controller\Admin\MobilestickyListController::getBanner
+  methods: [POST]
+
+admin_banner_mobilesticky_delete_banner:
+  path: /admin/banner/mobilesticky/json-write/smazat-banner
+  controller: App\Banner\Controller\Admin\MobilestickyWriteController::deleteBanner
+  methods: [POST]
+
+admin_banner_mobilesticky_set_sort:
+  path: /admin/banner/mobilesticky/json-write/set-sort
+  controller: App\Banner\Controller\Admin\MobilestickyWriteController::setSort
+  methods: [POST]
+
+admin_banner_mobilesticky_upload_image:
+  path: /admin/banner/mobilesticky/json-write/nahrat-obrazek
+  controller: App\Banner\Controller\Admin\MobilestickyWriteController::uploadImage
+  methods: [POST]
+
+admin_banner_mobilesticky_set_default_image:
+  path: /admin/banner/mobilesticky/json-write/set-default-image
+  controller: App\Banner\Controller\Admin\MobilestickyWriteController::setDefaultImage
+  methods: [POST]
+
+# Banner - Mobilesquare1
+admin_banner_mobilesquare1_index:
+  path: /admin/banner/mobilesquare1
+  controller: App\Banner\Controller\Admin\Mobilesquare1ListController::index
+
+admin_banner_mobilesquare1_list:
+  path: /admin/banner/mobilesquare1/seznam
+  controller: App\Banner\Controller\Admin\Mobilesquare1ListController::list
+
+admin_banner_mobilesquare1_add:
+  path: /admin/banner/mobilesquare1/seznam/pridat
+  controller: App\Banner\Controller\Admin\Mobilesquare1WriteController::add
+
+admin_banner_mobilesquare1_edit:
+  path: /admin/banner/mobilesquare1/seznam/upravit/{id}
+  controller: App\Banner\Controller\Admin\Mobilesquare1WriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_banner_mobilesquare1_get_list:
+  path: /admin/banner/mobilesquare1/json-list/get-list
+  controller: App\Banner\Controller\Admin\Mobilesquare1ListController::getList
+  methods: [GET]
+
+admin_banner_mobilesquare1_get_banner:
+  path: /admin/banner/mobilesquare1/json-list/get-banner
+  controller: App\Banner\Controller\Admin\Mobilesquare1ListController::getBanner
+  methods: [POST]
+
+admin_banner_mobilesquare1_delete_banner:
+  path: /admin/banner/mobilesquare1/json-write/smazat-banner
+  controller: App\Banner\Controller\Admin\Mobilesquare1WriteController::deleteBanner
+  methods: [POST]
+
+admin_banner_mobilesquare1_set_sort:
+  path: /admin/banner/mobilesquare1/json-write/set-sort
+  controller: App\Banner\Controller\Admin\Mobilesquare1WriteController::setSort
+  methods: [POST]
+
+admin_banner_mobilesquare1_upload_image:
+  path: /admin/banner/mobilesquare1/json-write/nahrat-obrazek
+  controller: App\Banner\Controller\Admin\Mobilesquare1WriteController::uploadImage
+  methods: [POST]
+
+admin_banner_mobilesquare1_set_default_image:
+  path: /admin/banner/mobilesquare1/json-write/set-default-image
+  controller: App\Banner\Controller\Admin\Mobilesquare1WriteController::setDefaultImage
+  methods: [POST]
+
+# Banner - Mobilesquare2
+admin_banner_mobilesquare2_index:
+  path: /admin/banner/mobilesquare2
+  controller: App\Banner\Controller\Admin\Mobilesquare2ListController::index
+
+admin_banner_mobilesquare2_list:
+  path: /admin/banner/mobilesquare2/seznam
+  controller: App\Banner\Controller\Admin\Mobilesquare2ListController::list
+
+admin_banner_mobilesquare2_add:
+  path: /admin/banner/mobilesquare2/seznam/pridat
+  controller: App\Banner\Controller\Admin\Mobilesquare2WriteController::add
+
+admin_banner_mobilesquare2_edit:
+  path: /admin/banner/mobilesquare2/seznam/upravit/{id}
+  controller: App\Banner\Controller\Admin\Mobilesquare2WriteController::edit
+  requirements:
+    id: '\d+'
+
+admin_banner_mobilesquare2_get_list:
+  path: /admin/banner/mobilesquare2/json-list/get-list
+  controller: App\Banner\Controller\Admin\Mobilesquare2ListController::getList
+  methods: [GET]
+
+admin_banner_mobilesquare2_get_banner:
+  path: /admin/banner/mobilesquare2/json-list/get-banner
+  controller: App\Banner\Controller\Admin\Mobilesquare2ListController::getBanner
+  methods: [POST]
+
+admin_banner_mobilesquare2_delete_banner:
+  path: /admin/banner/mobilesquare2/json-write/smazat-banner
+  controller: App\Banner\Controller\Admin\Mobilesquare2WriteController::deleteBanner
+  methods: [POST]
+
+admin_banner_mobilesquare2_set_sort:
+  path: /admin/banner/mobilesquare2/json-write/set-sort
+  controller: App\Banner\Controller\Admin\Mobilesquare2WriteController::setSort
+  methods: [POST]
+
+admin_banner_mobilesquare2_upload_image:
+  path: /admin/banner/mobilesquare2/json-write/nahrat-obrazek
+  controller: App\Banner\Controller\Admin\Mobilesquare2WriteController::uploadImage
+  methods: [POST]
+
+admin_banner_mobilesquare2_set_default_image:
+  path: /admin/banner/mobilesquare2/json-write/set-default-image
+  controller: App\Banner\Controller\Admin\Mobilesquare2WriteController::setDefaultImage
+  methods: [POST]
+

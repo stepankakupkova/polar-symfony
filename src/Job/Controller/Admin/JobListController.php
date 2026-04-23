@@ -18,7 +18,7 @@ final class JobListController
 		JobOurRepository $jobOurRepository,
 	): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('job/admin/job/index', [
+		return new Response($renderer->renderWithAdminLayout('job/admin/index', [
 			'pageTitle' => 'Jobs',
 			'countJob' => $jobRepository->getCount(),
 			'countJobOurs' => $jobOurRepository->getCount(),
@@ -27,7 +27,7 @@ final class JobListController
 
 	public function list(PhtmlRenderer $renderer): Response
 	{
-		return new Response($renderer->renderWithAdminLayout('job/admin/job/list', [
+		return new Response($renderer->renderWithAdminLayout('job/admin/list', [
 			'pageTitle' => 'Jobs',
 		]));
 	}

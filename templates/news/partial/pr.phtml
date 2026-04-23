@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 // Deaktivace komerčních článků pro seznam.cz
 $view->addInlineScript(
@@ -115,7 +115,7 @@ $view->addInlineScript(
             <?php } ?>
 
             <?php // REKLAMA ?>
-            <?= $view->include('banner/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+            <?= $view->include('banner/web/partial/ads/rectangle', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
             <br />
 
             <?php // Poslední část PR článků ?>

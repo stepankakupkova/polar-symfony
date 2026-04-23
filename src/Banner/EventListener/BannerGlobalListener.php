@@ -17,5 +17,9 @@ class BannerGlobalListener
     {
         $this->phtmlRenderer->addGlobal('bannerLeaderboard', $this->bannerRepository->getLeaderboard());
         $this->phtmlRenderer->addGlobal('bannerMobilesticky', $this->bannerRepository->getMobilesticky());
+        $this->phtmlRenderer->addGlobal('bannerRectangle', $this->bannerRepository->getRectangle());
+        $this->phtmlRenderer->addGlobal('bannerSquare', $this->bannerRepository->getSquare());
+        $this->phtmlRenderer->addGlobal('bannerMobilesquare1', $this->bannerRepository->getMobilesquare1());
+        $this->phtmlRenderer->addGlobal('bannerMobilesquare2', $this->bannerRepository->getMobilesquare2());
     }
 }

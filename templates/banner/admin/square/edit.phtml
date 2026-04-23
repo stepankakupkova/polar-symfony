@@ -1,0 +1,167 @@
+﻿<?php
+/*
+ * @project ferritenergy
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$srcImage = $view->asset('data/banner/square/!default-banner.png') . '?ver=' . date('YmdHis');
+$imageValue = $post['image'] ?? null;
+if ($imageValue) {
+    $srcImage = $view->asset($imageValue);
+}
+
+$view->addHeadLink('stylesheet', '/vendor/admin/file-upload/css/file-upload.css');
+$view->addBodyScript('/vendor/admin/file-upload/js/ui-widget.js');
+$view->addBodyScript('/vendor/admin/file-upload/js/iframe-transport.js');
+$view->addBodyScript('/vendor/admin/file-upload/js/file-upload.js');
+
+// Nahrání obrázku
+$view->addInlineScript(
+    '$("#fileupload").fileupload({
+        formData: {
+            square_id: ' . $id . '
+        },
+        dropZone: "#image",
+        dataType: "json",
+        add: function (e, data) {
+            $("#image .progress").removeClass("d-none");
+            $("#image .progress .progress-bar").css("width", "0%");
+            data.submit();
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $("#image .progress .progress-bar").css("width", progress + "%");
+        },
+        done: function (e, data) {
+            $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+            $("#image .progress").addClass("d-none");
+            $(".image-outer-container img").attr("src", "/" + data.result.url);
+            $("input[name=image]").val(data.result.url);
+            if (data.result.error) {
+                new PNotify({
+                    title: "Obrázek banneru",
+                    text: data.result.error,
+                    type: "error"
+                });
+            } else {
+                new PNotify({
+                    title: "Obrázek banneru",
+                    text: "Obrázek banneru byl úspěšně nahrán",
+                    type: "success"
+                });
+            }
+        },
+        fail: function (e, data) {
+            $("#image .progress .progress-bar").removeClass("progress-bar-striped progress-bar-animated active");
+            $("#image .progress").addClass("d-none");
+            new PNotify({
+                title: "Obrázek banneru",
+                text: "Obrázek banneru nebyl úspěšně nahrán",
+                type: "error"
+            });
+        }
+    });'
+);
+
+// Nahrání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .image-button").click(function(e){
+        $("#fileupload").click();
+    });'
+);
+
+// Smazání obrázku (klik na ikonu)
+$view->addInlineScript(
+    '$("#image .image-outer-container .image-inner-container .delete-button").click(function(e){
+        $.post("' . $view->path('admin_banner_square_set_default_image') . '",
+            {
+                square_id: ' . $id . ',
+                field: "image"
+            },
+            function(json) {
+                if (json.success) {
+                    var notice = new PNotify({
+                        title: "Úspěch",
+                        text: "Obrázek banneru byl nastaven na výchozí",
+                        type: "success",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                    $("input[name=image]").val(json.url);
+                    $(".image-outer-container img").attr("src", "/" + json.url);
+                } else {
+                    var notice = new PNotify({
+                        title: "Chyba",
+                        text: "Nelze nastavit obrázek banneru na výchozí",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: {
+                            sticker: false
+                        }
+                    });
+                }
+            }, 
+            "json"      
+        );
+    });'
+);
+?>
+
+<div class="row">
+    <div class="col-lg-3">
+        <div id="image">
+            <h3 class="mt-0">
+                Obrázek
+                <small class="pull-right text-muted">
+                    (300px x 300px, 300px x 600px)
+                </small>
+            </h3>
+            <div class="mb-4">
+                <div class="image-outer-container d-inline-flex">
+                    <div class="image-inner-container bg-primary">
+                        <img class="img-fluid border-color-<?= $scheme ?>" src="<?= $srcImage ?>" alt="">
+                        <span class="delete-button bg-danger">
+                            <i class="fa fa-trash-alt text-color-light"></i>
+                        </span>
+                        <span class="image-button bg-<?= $schemeOpposite ?>">
+                            <i class="fa fa-camera text-color-<?= $scheme ?>"></i>
+                        </span>
+                    </div>
+                    <input id="fileupload" class="image-input" type="file" name="file" data-url="<?= $view->path('admin_banner_square_upload_image') ?>" accept="image/*">
+                </div>
+            </div>
+            <div class="progress d-none">
+                <div class="progress-bar progress-bar-primary" role="progressbar" style="width: 0">
+                    <span class="sr-only">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <section class="card card-primary">
+            <header class="card-header">
+                <div class="card-actions">
+                    <span id="msgNotSaved" class="badge badge-danger d-none">
+                        Neuloženo
+                    </span>
+                </div>
+                <h2 class="card-title">
+                    Upravit banner
+                </h2>
+            </header>
+            <?= $view->include('banner/admin/square/bannerForm', [
+                'view'        => $view,
+                'post'        => $post,
+                'errors'      => $errors,
+                'square_id'   => $id,
+                'submitLabel' => 'Uložit',
+                'submitClass' => 'btn-primary',
+            ]) ?>
+        </section>
+    </div>
+</div>

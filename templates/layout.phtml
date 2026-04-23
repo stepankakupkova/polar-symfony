@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="cs" class="boxed">
 <head>
     <meta charset="utf-8">
@@ -80,7 +80,7 @@
 </head>
 
 <body>
-    <?= $view->include('banner/partial/ads/top', ['bannerLeaderboard' => $bannerLeaderboard ?? null]) ?>
+    <?= $view->include('banner/web/partial/ads/top', ['bannerLeaderboard' => $bannerLeaderboard ?? null]) ?>
     <div class="body border-top-0">
         <header id="header" class="header-no-border-bottom">
             <div class="header-body">
@@ -233,7 +233,7 @@
 
         <div role="main" class="main">
             <?= $content ?>
-            <?= $view->include('banner/partial/ads/layout-bottom') ?>
+            <?= $view->include('banner/web/partial/ads/layout-bottom') ?>
         </div>
 
         <footer class="bg-secondary pt-4 border-0" id="footer">
@@ -442,7 +442,7 @@
             }, isInViewportOffset);
         });
     </script>
-    <?= $view->include('banner/partial/ads/mobilesticky', ['bannerMobilesticky' => $bannerMobilesticky ?? null]) ?>
+    <?= $view->include('banner/web/partial/ads/mobilesticky', ['bannerMobilesticky' => $bannerMobilesticky ?? null]) ?>
     <!-- TODO: Google Analytics / GTM (gtag.js) — pouze pro production prostředí -->
     <?php if (($_SERVER['APP_ENV'] ?? 'dev') === 'production') { ?>
         <!-- Global site tag (gtag.js) - Google Analytics (řízeno consentmanager CMP) -->

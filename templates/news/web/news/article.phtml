@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /** @var \App\Application\View\ViewHelper $view */
 
 $view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
@@ -804,7 +804,7 @@ if ($hasOnlineNewsWidget) {
                 ?>
                 <?php // REKLAMA ?>
                 <!-- reklama pod playerem -->
-                <?= $view->include('banner/partial/ads/article') ?>
+                <?= $view->include('banner/web/partial/ads/article') ?>
 
                 <div class="sticky-container">
                     <div class="row">
@@ -829,13 +829,13 @@ if ($hasOnlineNewsWidget) {
                                         $article['text'] = mb_substr($article['text'], $pos + 4, null, 'UTF-8');
 
                                         if ((($i % 4) === 0)  && ($count !== $i)) {
-                                            echo $view->include('banner/partial/ads/article-paragraph', ['i' => $i]);
+                                            echo $view->include('banner/web/partial/ads/article-paragraph', ['i' => $i]);
                                         }
 
 
                                         if ($i === 1) { ?>
                                             <?php // REKLAMA PRO MOBILY (za prvním odstavcem pod videem) ?>
-                                            <?= $view->include('banner/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
+                                            <?= $view->include('banner/web/partial/ads/mobilesquare1', ['bannerMobilesquare1' => $bannerMobilesquare1 ?? null]) ?>
                                         <?php } ?>
 
                                     <?php } ?>
@@ -970,7 +970,7 @@ if ($hasOnlineNewsWidget) {
 
                             <?php // REKLAMA ?>
                             <!-- reklama pod obsahem článku -->
-                            <?= $view->include('banner/partial/ads/article-content', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+                            <?= $view->include('banner/web/partial/ads/article-content', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
 
                         </div>
                     </div>
@@ -978,7 +978,7 @@ if ($hasOnlineNewsWidget) {
                 <div id="showAd"></div>
                 <br />
                 <?php // REKLAMA PRO MOBILY (na konci článku) ?>
-                <?= $view->include('banner/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
+                <?= $view->include('banner/web/partial/ads/mobilesquare2', ['bannerMobilesquare2' => $bannerMobilesquare2 ?? null]) ?>
             </article>
         </div>
 
@@ -1023,7 +1023,7 @@ if ($hasOnlineNewsWidget) {
 
                 <?php // REKLAMA ?>
                 <!-- reklama nad PR -->
-                <?= $view->include('banner/partial/ads/article-right-top') ?>
+                <?= $view->include('banner/web/partial/ads/article-right-top') ?>
 
                 <!-- Nejčtenější články -->
                 <?php //= $view->include('news/partial/most-read-articles') ?>
@@ -1037,15 +1037,15 @@ if ($hasOnlineNewsWidget) {
                 <?php $k = $k + 2; ?>
                 
                 <?php // REKLAMA ?>
-                <?php //= $view->include('banner/partial/ads/rectangle') ?>
+                <?php //= $view->include('banner/web/partial/ads/rectangle') ?>
                 <br />
                 <?php // REKLAMA ?>
                 <!-- reklama pod PR -->
-                <?= $view->include('banner/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+                <?= $view->include('banner/web/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
 
                 <?php // REKLAMA ?>
                 <!-- reklama vedle dnešních premiér, od seznamu, zakomentováno, necháme pouze náš banner sticky -->
-                <?php //= $view->include('banner/partial/ads/article-right-bottom2') ?>
+                <?php //= $view->include('banner/web/partial/ads/article-right-bottom2') ?>
                 <br class="d-none d-lg-inline" />
             </aside>
         </div>
@@ -1087,7 +1087,7 @@ if ($hasOnlineNewsWidget) {
                 <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
                 <?php $k = $k + 3; ?>
                 <?php // REKLAMA ?>
-                <?= $view->include('banner/partial/ads/article-151875') ?>
+                <?= $view->include('banner/web/partial/ads/article-151875') ?>
                 <br class="d-none d-lg-inline" />
             </aside>
         </div>
@@ -1115,7 +1115,7 @@ if ($hasOnlineNewsWidget) {
                 <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
                 <?php $k = $k + 3; ?>
                 <?php // REKLAMA ?>
-                <?= $view->include('banner/partial/ads/article-151875') ?>
+                <?= $view->include('banner/web/partial/ads/article-151875') ?>
                 <br class="d-none d-lg-inline" />
             </aside>
         </div>
@@ -1142,7 +1142,7 @@ if ($hasOnlineNewsWidget) {
                 <?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
                 <?php $k = $k + 3; ?>
                 <?php // REKLAMA ?>
-                <?= $view->include('banner/partial/ads/article-151875') ?>
+                <?= $view->include('banner/web/partial/ads/article-151875') ?>
                 <br class="d-none d-lg-inline" />
             </aside>
         </div>

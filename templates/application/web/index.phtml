@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
  * @project polar
  * @author Rostislav Greipel
@@ -408,13 +408,13 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
 
                     <?php if ($i === 4) { ?>
                         <?php // REKLAMA PRO MOBILY (mezi 5. a 6. zprávou) ?>
-                        <?= $view->include('banner/partial/ads/mobilesquare1') ?>
+                        <?= $view->include('banner/web/partial/ads/mobilesquare1') ?>
                     <?php } ?>
                 <?php } ?>
             <?php } ?>
 
             <?php // REKLAMA ?>
-            <?= $view->include('banner/partial/ads/article') ?>
+            <?= $view->include('banner/web/partial/ads/article') ?>
         </div>
         <div class="col-12 col-lg-5 p-relative">
             <aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.container', 'padding': {'top': 63}}">
@@ -425,10 +425,10 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                 <?php // REKLAMA ?>
                 <?php //= $view->include('ads/banner/rectangle') ?>
                 <?php // REKLAMA ?>
-                <br class="d-none d-lg-inline" /><?= $view->include('banner/partial/ads/article-right-bottom') ?>
+                <br class="d-none d-lg-inline" /><?= $view->include('banner/web/partial/ads/article-right-bottom') ?>
                 <br class="d-none d-lg-inline" />
                 <?php // REKLAMA PRO MOBILY (druhá) ?>
-                <?= $view->include('banner/partial/ads/mobilesquare2') ?>
+                <?= $view->include('banner/web/partial/ads/mobilesquare2') ?>
             </aside>
         </div>
     </div>
