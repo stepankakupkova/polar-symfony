@@ -28,8 +28,6 @@ final class SquareRepository
         $qb = $this->connection->createQueryBuilder()
             ->select('*')
             ->from($this->table)
-            ->where('lang = :lang')
-            ->setParameter('lang', $params['lang'])
             ->orderBy($params['sort'] ?? 'rank', $params['order'] ?? 'asc');
 
         if (isset($params['limit'])) {
@@ -53,9 +51,7 @@ final class SquareRepository
     {
         $qb = $this->connection->createQueryBuilder()
             ->select('COUNT(*)')
-            ->from($this->table)
-            ->where('lang = :lang')
-            ->setParameter('lang', $params['lang']);
+            ->from($this->table);
 
         if (isset($params['search']) && $params['search'] !== '') {
             $qb->andWhere('MATCH (title, link) AGAINST (:search IN BOOLEAN MODE)')

@@ -8,7 +8,6 @@
  */
 
 $identity = $identity ?? null;
-$locale = Locale::getDefault();
 
 $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
 $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/extension/reorder-rows/css/reorder-rows.min.css'));
@@ -210,12 +209,12 @@ $view->addHeadStyle('table#btblBanner td p {margin-bottom: 0;}');
                     let color = 'text-success';
                     let text = '';
                     switch(value) {
-                        case '1':
+                        case 1:
                             icon = 'fa fa-fw fa-lg fa-check-circle';
                             color = 'text-success';
                             text = 'Aktivní';
                             break;
-                        case '0':
+                        case 0:
                             icon = 'fa fa-fw fa-lg fa-times-circle';
                             color = 'text-danger';
                             text = 'Neaktivní';

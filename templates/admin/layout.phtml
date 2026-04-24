@@ -184,6 +184,55 @@ $identity = $identity ?? null;
                                     <span>Nabídka práce</span>
                                 </a>
                             </li>
+                            <?php
+                                $bannerPaths = [
+                                    $view->path('admin_banner_leaderboard_index'),
+                                    $view->path('admin_banner_rectangle_index'),
+                                    $view->path('admin_banner_square_index'),
+                                    $view->path('admin_banner_mobilesticky_index'),
+                                    $view->path('admin_banner_mobilesquare1_index'),
+                                    $view->path('admin_banner_mobilesquare2_index'),
+                                ];
+                                $isBannerActive = array_filter($bannerPaths, fn($p) => str_starts_with($currentPath, $p));
+                            ?>
+                            <li class="nav-parent<?= $isBannerActive ? ' nav-expanded nav-active' : '' ?>">
+                                <a class="nav-link">
+                                    <i class="fas fa-dice-four" aria-hidden="true"></i>
+                                    <span>Bannery</span>
+                                </a>
+                                <ul class="nav nav-children">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_leaderboard_index')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_leaderboard_index') ?>">
+                                            <span>Leaderboard</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_rectangle_index')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_rectangle_index') ?>">
+                                            <span>Rectangle</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_square_index')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_square_index') ?>">
+                                            <span>Square</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesticky_index')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesticky_index') ?>">
+                                            <span>Mobile Sticky</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesquare1_index')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesquare1_index') ?>">
+                                            <span>Mobile Square 1</span>
+                                        </a>
+                                    </li>
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesquare2_index')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesquare2_index') ?>">
+                                            <span>Mobile Square 2</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         </ul>
                     </nav>
                     <hr class="separator"/>
