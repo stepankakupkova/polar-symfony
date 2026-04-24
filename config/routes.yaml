@@ -8,6 +8,9 @@ job:
 camera:
   resource: routes/camera.yaml
 
+rss:
+  resource: routes/rss.yaml
+
 banner:
   resource: routes/banner.yaml
 

@@ -20,6 +20,132 @@ $view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/reorde
 $view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
 $view->addBodyScript($view->asset('vendor/admin/moment/js/locale/' . $locale . '.min.js'));
 $view->addHeadStyle('table#btblBanner td p {margin-bottom: 0;}');
+
+$view->addInlineScript(
+    '// Zobrazení náhledu
+    $("#btblBanner").on("post-body.bs.table", function (e, data) {
+        $(".image-popup-no-margins").magnificPopup({
+            type: "image",
+            image: {
+                verticalFit: true
+            },
+            zoom: {
+                enabled: true,
+                duration: 300
+            }
+        });
+    });
+
+    // Smazání
+    $("#btblBanner").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnDeleteBanner").unbind("click").bind("click", function() {
+            var id = $(this).data("mobilesticky-id");
+            $.post("' . $view->path('admin_banner_mobilesticky_get_banner') . '",
+                {
+                    id: id
+                },
+                function(json) {
+                    if (json.success) {
+                        $("#modalDanger .card-title").html("Smazat banner");
+                        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat banner?<br><strong>\\"" + json.mobilesticky.title + "\\"</strong>");
+                        $("#modalDanger .modal-text p").html("Všechny závislosti budou smazány. Tuto akci nelze vrátit zpět!");
+                        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+
+                        $.magnificPopup.open({
+                            items: {src: "#modalDanger"},
+                            type: "inline",
+                            fixedTitlePos: false,
+                            fixedBgPos: true,
+                            overflowY: "auto",
+                            closeBtnInside: true,
+                            preloader: false,
+                            midClick: true,
+                            removalDelay: 300,
+                            mainClass: "my-mfp-slide-bottom",
+                            modal: true,
+                            callbacks: {
+                                open: function() {
+                                    btnConfirm.unbind("click").click(function(e){
+                                        e.preventDefault();
+                                        $.post("' . $view->path('admin_banner_mobilesticky_delete_banner') . '",
+                                            {
+                                                id: id
+                                            },
+                                            function(json) {
+                                                if (json.success) {
+                                                    var notice = new PNotify({
+                                                        title: "Úspěch",
+                                                        text: "Banner byl smazán!",
+                                                        type: "success",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                    $("#btblBanner").bootstrapTable("refresh", {"silent": true});
+                                                }else{
+                                                    var notice = new PNotify({
+                                                        title: "Chyba",
+                                                        text: "Nepodařilo se smazat banner!",
+                                                        type: "error",
+                                                        addclass: "click-2-close",
+                                                        buttons: {
+                                                            sticker: false
+                                                        }
+                                                    });
+                                                }
+                                                $.magnificPopup.close();
+                                            },
+                                            "json"
+                                        );
+                                    });
+                                },
+                                close: function() {
+
+                                }
+                            }
+                        });
+                    } else {
+                        var notice = new PNotify({
+                            title: "Chyba",
+                            text: "Nepodařilo se načíst informace o banneru!",
+                            type: "error",
+                            addclass: "click-2-close",
+                            buttons: {
+                                sticker: false
+                            }
+                        });
+                        $.magnificPopup.close();
+                        $("#btblBanner").bootstrapTable("refresh", {"silent": true});
+                    }
+                },
+                "json"
+            );
+        });
+    });
+
+    // Řazení
+    $("#btblBanner").on("reorder-row.bs.table", function (e, data) {
+        $.post("' . $view->path('admin_banner_mobilesticky_set_sort') . '",
+            {
+                data: data
+            },
+            function(json) {
+                var notice = new PNotify({
+                    title: "Úspěch",
+                    text: "Pořadí bannerů bylo změněno!",
+                    type: "success",
+                    addclass: "click-2-close",
+                    buttons: {
+                        sticker: false
+                    }
+                });
+                $("#btblBanner").bootstrapTable("refresh", {silent: true});
+            },
+            "json"
+        );
+    });'
+);
 ?>
 
 <div class="tabs">
@@ -244,129 +370,6 @@ $view->addHeadStyle('table#btblBanner td p {margin-bottom: 0;}');
                     return row.clicked / row.showed * 100;
                 }
 
-                // Zobrazení náhledu
-                $("#btblBanner").on("post-body.bs.table", function (e, data) {
-                    $(".image-popup-no-margins").magnificPopup({
-                        type: "image",
-                        image: {
-                            verticalFit: true
-                        },
-                        zoom: {
-                            enabled: true,
-                            duration: 300
-                        }
-                    });
-                });
-
-                // Smazání
-                $("#btblBanner").on("post-body.bs.table", function (e, data) {
-                    $(".btblBtnDeleteBanner").unbind("click").bind("click", function() {
-                        var id = $(this).data("mobilesticky-id");
-                        $.post("<?= $view->path('admin_banner_mobilesticky_get_banner') ?>",
-                            {
-                                id: id
-                            },
-                            function(json) {
-                                if (json.success) {
-                                    $("#modalDanger .card-title").html("Smazat banner");
-                                    $("#modalDanger .modal-text h4").html("Opravdu chcete smazat banner?<br><strong>\"" + json.mobilesticky.title + "\"</strong>");
-                                    $("#modalDanger .modal-text p").html("Všechny závislosti budou smazány. Tuto akci nelze vrátit zpět!");
-                                    var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
-
-                                    $.magnificPopup.open({
-                                        items: {src: "#modalDanger"},
-                                        type: "inline",
-                                        fixedTitlePos: false,
-                                        fixedBgPos: true,
-                                        overflowY: "auto",
-                                        closeBtnInside: true,
-                                        preloader: false,
-                                        midClick: true,
-                                        removalDelay: 300,
-                                        mainClass: "my-mfp-slide-bottom",
-                                        modal: true,
-                                        callbacks: {
-                                            open: function() {
-                                                btnConfirm.unbind("click").click(function(e){
-                                                    e.preventDefault();
-                                                    $.post("<?= $view->path('admin_banner_mobilesticky_delete_banner') ?>",
-                                                        {
-                                                            id: id
-                                                        },
-                                                        function(json) {
-                                                            if (json.success) {
-                                                                var notice = new PNotify({
-                                                                    title: "Úspěch",
-                                                                    text: "Banner byl smazán!",
-                                                                    type: "success",
-                                                                    addclass: "click-2-close",
-                                                                    buttons: {
-                                                                        sticker: false
-                                                                    }
-                                                                });
-                                                                $("#btblBanner").bootstrapTable("refresh", {"silent": true});
-                                                            }else{
-                                                                var notice = new PNotify({
-                                                                    title: "Chyba",
-                                                                    text: "Nepodařilo se smazat banner!",
-                                                                    type: "error",
-                                                                    addclass: "click-2-close",
-                                                                    buttons: {
-                                                                        sticker: false
-                                                                    }
-                                                                });
-                                                            }
-                                                            $.magnificPopup.close();
-                                                        },
-                                                        "json"
-                                                    );
-                                                });
-                                            },
-                                            close: function() {
-
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    var notice = new PNotify({
-                                        title: "Chyba",
-                                        text: "Nepodařilo se načíst informace o banneru!",
-                                        type: "error",
-                                        addclass: "click-2-close",
-                                        buttons: {
-                                            sticker: false
-                                        }
-                                    });
-                                    $.magnificPopup.close();
-                                    $("#btblBanner").bootstrapTable("refresh", {"silent": true});
-                                }
-                            },
-                            "json"
-                        );
-                    });
-                });
-
-                // Řazení
-                $("#btblBanner").on("reorder-row.bs.table", function (e, data) {
-                    $.post("<?= $view->path('admin_banner_mobilesticky_set_sort') ?>",
-                        {
-                            data: data
-                        },
-                        function(json) {
-                            var notice = new PNotify({
-                                title: "Úspěch",
-                                text: "Pořadí bannerů bylo změněno!",
-                                type: "success",
-                                addclass: "click-2-close",
-                                buttons: {
-                                    sticker: false
-                                }
-                            });
-                            $("#btblBanner").bootstrapTable("refresh", {silent: true});
-                        },
-                        "json"
-                    );
-                });
             </script>
         </div>
     </div>

@@ -1,0 +1,137 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink($view->asset('vendor/web/video-js/video-js.min.css'), 'stylesheet');
+$view->addHeadLink($view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'), 'stylesheet');
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+
+// Ticker + Crawl JS
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+$view->setTitle(htmlspecialchars($camera['title'] ?? '') . ' | Kamery');
+$view->addMeta('description', htmlspecialchars($camera['title'] ?? ''));
+$view->addMeta('keywords', htmlspecialchars($camera['description'] ?? ''));
+$view->addOgMeta('og:title', htmlspecialchars($camera['title'] ?? '') . ' | Kamery | POLAR');
+$view->addOgMeta('og:description', htmlspecialchars($camera['description'] ?? ''));
+$view->addOgMeta('og:url', $currentUrl ?? '');
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:image', ($schemeHost ?? '') . $view->asset('img/web/layout/microformat.png'));
+$view->addOgMeta('og:image:secure_url', ($schemeHost ?? '') . $view->asset('img/web/layout/microformat.png'));
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+    ['label' => 'Kamery', 'url' => $view->path('camera_list')],
+    ['label' => htmlspecialchars($camera['title'] ?? '')],
+]);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+    let player = videojs("player", {
+        controlBar: {
+            children: {
+                playToggle: true,
+                LiveDisplay: true,
+                volumePanel: {
+                    inline: true
+                },
+                fullscreenToggle: true
+            }
+        }
+    });
+    '
+);
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" class="mb-4">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <article class="post post-medium">
+                <p>
+                    <?= htmlspecialchars($camera['description'] ?? '') ?>
+                </p>
+
+                <div class="video-thumbnail ratio ratio-16x9" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                    <?php
+                    try {
+                        $stream = $camera['url_m3u8'];
+                        $thumb = "/data/camera/" . $camera['id'] . ".jpg";
+                        if (!file_exists($PUBLIC_PATH . $thumb)) {
+                            $thumb = "/data/camera/default.jpg";
+                        }
+                    ?>
+
+                        <meta itemprop="width" content="460">
+                        <meta itemprop="height" content="259">
+                        <meta itemprop="url" content="<?= 'https://' . $_SERVER['SERVER_NAME'] . $thumb ?>">
+
+                        <video id="player" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= htmlspecialchars($thumb) ?>"}'>
+                            <source data-engine="html5" type="application/x-mpegurl" src="<?= htmlspecialchars($camera['url_m3u8']) ?>">
+                            <p class="vjs-no-js">
+                                Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= htmlspecialchars($stream) ?>">video</a>.
+                            </p>
+                        </video>
+
+                    <?php } catch (\Exception) {
+                    }
+                    ?>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>

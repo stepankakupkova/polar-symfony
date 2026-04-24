@@ -1,0 +1,81 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="application-name" content="<?= $feed['description'];?>">
+		<meta name="author" content="Rostislav Greipel">
+		<meta name="robots" content="index,follow">
+		<meta name="googlebot" content="index,follow">
+		<title>RSS</title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,latin-ext&font-display=swap">
+		<link rel="stylesheet" href="<?= $view->asset('vendor/web/rss-readers/bootstrap/bootstrap.min.css?ver=0.1');?>">
+		<style>
+            .carousel-control {color: #990000; background-image: none !important; filter: none;}
+            .carousel-control:hover, .carousel-control:focus {color: #990000;}
+            .carousel-control .glyphicon {top: 25%;}
+            .carousel-indicators {bottom: 3px; margin-bottom: 0px;}
+            .carousel-indicators li {border-color: #990000;}
+            .carousel-indicators .active {background-color: #990000;}
+            .carousel-caption {color: #990000; position: relative; right: 0; left: 0; bottom: 0; padding: 5px 0px; font-size: 12px; line-height: 15px; text-shadow: none; text-align: left; min-height: 88px;}
+            .carousel-caption a {color: #990000;}
+            .carousel {max-width: 768px;}
+            .carousel-inner>.item:hover .carousel-caption a {text-decoration: underline;}
+            .date {color: #666; text-shadow: none; font-size: 11px;}
+            body {background-color: transparent; font-family: Arial, sans-serif;}
+        </style>
+		<script src="<?= $view->asset('vendor/web/rss-readers/jquery/jquery.min.js?ver=0.1');?>"></script>
+		<script src="<?= $view->asset('vendor/web/rss-readers/bootstrap/bootstrap.min.js?ver=0.1');?>"></script>
+	</head>
+	<body>
+		<?php if ($feed) {?>
+            <div id="carousel" class="carousel slide" data-ride="carousel">
+				<!-- Indicators -->
+				<!--<ol class="carousel-indicators">
+					<?php $active = true;?>
+					<?php $i = 0;?>
+        			<?php foreach ($feed['content'] as $entry) {?>
+        				<li data-target="#carousel" data-slide-to="<?= $i;?>"<?= ($active)?' class="active"':'';?>></li>
+        				<?php $active = false;?>
+        				<?php $i++;?>
+        			<?php }?>
+    			</ol>-->
+    			<!-- Wrapper for slides -->
+    			<div class="carousel-inner" role="listbox">
+    				<?php $active = true;?>
+        			<?php foreach ($feed['content'] as $entry) {?>
+        				<div class="item<?= ($active)?' active':'';?>">
+                			<img src="<?= $entry['image'];?>" alt="<?= $entry['title'];?>">
+                			<div class="carousel-caption">
+                				<a href="<?= $entry['link'];?>" title="<?= $entry['title'];?>" target="_blank">
+                					<?= $entry['title'];?>
+                				</a>
+                				<div class="date"><?= $entry['dateModified'];?></div>
+                			</div>
+        				</div>
+        				<?php $active = false;?>
+        			<?php }?>
+    			</div>
+    			<!-- Controls -->
+    			<a class="left carousel-control" href="#carousel" role="button" data-slide="prev">
+					<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+					<span class="sr-only">Předchozí</span>
+                </a>
+                <a class="right carousel-control" href="#carousel" role="button" data-slide="next">
+					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					<span class="sr-only">Další</span>
+				</a>
+			</div>
+		<?php }?>
+	</body>
+</html>

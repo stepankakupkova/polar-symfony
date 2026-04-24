@@ -1,0 +1,114 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+<!DOCTYPE html>
+<html lang="cs">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="application-name" content="MSK">
+		<meta name="author" content="Rostislav Greipel">
+		<meta name="robots" content="index,follow">
+		<meta name="googlebot" content="index,follow">
+		<title>RSS</title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,latin-ext&font-display=swap">
+		<link rel="stylesheet" href="<?= $view->asset('vendor/web/rss-readers/bootstrap/bootstrap.min.css?ver=0.1');?>">
+		<style>
+            body {font-family: "Open Sans"}
+            .container {width: 307px; padding-right: 0px; padding-left: 0px;}
+            .row {margin-right: 0px; margin-left: 0px}
+            .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {padding-right: 0px; padding-left: 0px}
+            section.shows {background-color: #004189; padding: 10px 0px;}
+            section.shows ul {-webkit-padding-start: 10px; -moz-padding-start: 10px; -khtml-padding-start: 10px; -o-padding-start: 10px; padding-start: 10px; margin-top: 15px; margin-bottom: 15px; list-style-position: inside;}
+            section.shows ul li {color: #ffffff;}
+            section.shows ul li a {color: #ffffff; font-weight: 700; font-size: 12px;}
+            .carousel-control {color: #ffffff;}
+            .carousel-control:hover, .carousel-control:focus {color: #ffffff;}
+            .carousel-control.left,
+            .carousel-control.right {background-image: none; filter: none;}
+            .carousel-control .icon-prev,
+            .carousel-control .icon-next,
+            .carousel-control .glyphicon-chevron-left,
+            .carousel-control .glyphicon-chevron-right {top: 38%;}
+            .carousel-indicators {bottom: 3px; margin-bottom: 0px;}
+            .carousel-indicators li {border-color: #ffffff;}
+            .carousel-indicators .active {background-color: #ffffff;}
+            .carousel-caption {background-color: #007BBF; position: relative; right: 0; left: 0; bottom: 0; padding: 5px 10px; text-align: left; text-shadow: none; font-size: 15px; line-height: 18px; height: 86px;}
+            .carousel-caption a {color: #ffffff;}
+            .carousel {max-width: 100%;}
+            .carousel-inner .item .date {position: absolute; top: 149px; background-color: #004189; color: #ffffff; font-weight: 700; font-size: 14px; padding: 2px 10px;}
+            .carousel-inner>.item:hover .carousel-caption a {text-decoration: underline;}
+        </style>
+		<script src="<?= $view->asset('vendor/web/rss-readers/jquery/jquery.min.js?ver=0.1');?>"></script>
+		<script src="<?= $view->asset('vendor/web/rss-readers/bootstrap/bootstrap.min.js?ver=0.1');?>"></script>
+	</head>
+	<body>
+		<div class="container">
+    		<section class="shows">
+    			<div class="row">
+    				<div class="col-xs-7">
+    					<ul>
+    						<li><a href="https://polar.cz/porady/magazin-112" title="Magazín 112" target="_blank">Magazín 112</a></li>
+    						<li><a href="https://polar.cz/porady/nas-kraj-neni-na-okraji" title="Náš kraj není na okraji" target="_blank">Náš kraj není na okraji</a></li>
+    						<li><a href="https://polar.cz/porady/eko-magazin" title="Ekomagazín" target="_blank">Eko magazín</a></li>
+
+    					</ul>
+    				</div>
+    				<div class="col-xs-5">
+    					<ul>
+							<li><a href="https://polar.cz/porady/studuj-u-nas" title="Študuj u nás" target="_blank">Študuj u nás</a></li>
+    						<li><a href="https://polar.cz/porady/magazin-tv-medicina" title="TV Medicína" target="_blank">TV Medicína</a></li>
+    						<li><a href="https://polar.cz/porady/legendy-moravskoslezskeho-kraje" title="Legendy MSK" target="_blank">Legendy MSK</a></li>
+    						<!-- <li><a href="" title="Víte, že..." target="_blank">Víte, že...</a></li> -->
+    					</ul>
+    				</div>
+    			</div>
+    		</section>
+
+    		<?php if ($shows) {?>
+    			<div class="row">
+    				<div class="col-xs-12">
+            			<div id="carousel" class="carousel slide" data-ride="carousel">
+            				<div class="carousel-inner" role="listbox">
+                				<?php $active = true;?>
+                    			<?php foreach ($shows as $entry) {?>
+                    				<div class="item<?= ($active)?' active':'';?>">
+                    					<a href="https://polar.cz/porady/<?= $entry['url'];?>/<?= $entry['program_url'];?>" title="<?= $entry['title'];?>" target="_blank">
+                            				<img class="img-responsive" src="https://polar.cz/public/<?= $entry['image'];?>" alt="<?= $entry['title'];?>">
+                            			</a>
+                            			<span class="date">
+                            				<?php $date = new DateTime($entry['time']);?>
+                            				<?= $date->format('d.m.Y');?>
+                            			</span>
+                            			<div class="carousel-caption">
+                            				<a href="https://polar.cz/porady/<?= $entry['url'];?>/<?= $entry['program_url'];?>" title="<?= $entry['title'];?>" target="_blank">
+                            					<?= $entry['short_description'];?>
+                            				</a>
+                            			</div>
+                    				</div>
+                    				<?php $active = false;?>
+                    			<?php }?>
+                			</div>
+                			<!-- Controls -->
+                			<a class="left carousel-control" href="#carousel" role="button" data-slide="prev">
+            					<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            					<span class="sr-only">Předchozí</span>
+                            </a>
+                            <a class="right carousel-control" href="#carousel" role="button" data-slide="next">
+            					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            					<span class="sr-only">Další</span>
+            				</a>
+            			</div>
+    				</div>
+    			</div>
+    		<?php }?>
+		</div>
+	</body>
+</html>

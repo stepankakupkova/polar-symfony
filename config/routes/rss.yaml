@@ -1,0 +1,59 @@
+rss_ostrava:
+  path: /rss/ostrava
+  controller: App\Rss\Controller\Web\RssController::ostrava
+
+rss_novy_jicin:
+  path: /rss/novy-jicin
+  controller: App\Rss\Controller\Web\RssController::novyJicin
+
+rss_stonava:
+  path: /rss/stonava
+  controller: App\Rss\Controller\Web\RssController::stonava
+
+rss_frydek_mistek:
+  path: /rss/frydek-mistek
+  controller: App\Rss\Controller\Web\RssController::frydekMistek
+
+rss_frydek_mistek2:
+  path: /rss/frydek-mistek2
+  controller: App\Rss\Controller\Web\RssController::frydekMistek2
+
+rss_havirov:
+  path: /rss/havirov
+  controller: App\Rss\Controller\Web\RssController::havirov
+
+rss_karvina:
+  path: /rss/karvina
+  controller: App\Rss\Controller\Web\RssController::karvina
+
+rss_krnov:
+  path: /rss/krnov
+  controller: App\Rss\Controller\Web\RssController::krnov
+
+rss_bruntal:
+  path: /rss/bruntal
+  controller: App\Rss\Controller\Web\RssController::bruntal
+
+rss_bruntal2:
+  path: /rss/bruntal2
+  controller: App\Rss\Controller\Web\RssController::bruntal2
+
+rss_opava:
+  path: /rss/opava
+  controller: App\Rss\Controller\Web\RssController::opava
+
+rss_orlova:
+  path: /rss/orlova
+  controller: App\Rss\Controller\Web\RssController::orlova
+
+rss_celadna:
+  path: /rss/celadna
+  controller: App\Rss\Controller\Web\RssController::celadna
+
+rss_studenka:
+  path: /rss/studenka
+  controller: App\Rss\Controller\Web\RssController::studenka
+
+rss_msk:
+  path: /rss/msk
+  controller: App\Rss\Controller\Web\RssController::msk

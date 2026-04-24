@@ -1,7 +1,60 @@
 camera_list:
   path: /kamery
-  controller: App\Camera\Controller\Web\CameraController::index
+  controller: App\Camera\Controller\Web\CameraController::cameras
 
 camera_detail:
   path: /kamery/{camera_id}/{camera_url}
-  controller: App\Camera\Controller\Web\CameraController::detail
+  controller: App\Camera\Controller\Web\CameraController::camera
+  requirements:
+    camera_id: '[0-9]+'
+    camera_url: '[a-zA-Z][a-zA-Z0-9_-]+'
+
+# Admin — Camera
+admin_camera:
+  path: /admin/kamery
+  controller: App\Camera\Controller\Admin\CameraListController::index
+
+admin_camera_list:
+  path: /admin/kamery/seznam
+  controller: App\Camera\Controller\Admin\CameraListController::list
+
+admin_camera_add:
+  path: /admin/kamery/seznam/pridat
+  controller: App\Camera\Controller\Admin\CameraWriteController::add
+  methods: [GET, POST]
+
+admin_camera_edit:
+  path: /admin/kamery/seznam/upravit/{id}
+  controller: App\Camera\Controller\Admin\CameraWriteController::edit
+  methods: [GET, POST]
+  requirements:
+    id: '\d+'
+
+admin_camera_json_list_get_list:
+  path: /admin/kamery/json-list/get-list
+  controller: App\Camera\Controller\Admin\CameraListController::getList
+
+admin_camera_json_list_get_camera:
+  path: /admin/kamery/json-list/get-camera
+  controller: App\Camera\Controller\Admin\CameraListController::getCamera
+  methods: [POST]
+
+admin_camera_json_write_delete:
+  path: /admin/kamery/json-write/delete-camera
+  controller: App\Camera\Controller\Admin\CameraWriteController::deleteCamera
+  methods: [POST]
+
+admin_camera_json_write_set_order:
+  path: /admin/kamery/json-write/set-order
+  controller: App\Camera\Controller\Admin\CameraWriteController::setOrder
+  methods: [POST]
+
+# Admin — Setting
+admin_camera_setting:
+  path: /admin/kamery/nastaveni
+  controller: App\Camera\Controller\Admin\SettingWriteController::setting
+  methods: [GET, POST]
+
+admin_camera_setting_index:
+  path: /admin/kamery/nastaveni/index
+  controller: App\Camera\Controller\Admin\SettingListController::index

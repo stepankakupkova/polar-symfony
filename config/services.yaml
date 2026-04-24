@@ -172,6 +172,7 @@ services:
             $globals:
                 HOURS_DELETE_LABELS: '%app.HOURS_DELETE_LABELS%'
                 GOOGLE_MAP_KEY: '%app.GOOGLE_MAP_KEY%'
+                PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Application\EventSubscriber\LayoutSubscriber:
         arguments:

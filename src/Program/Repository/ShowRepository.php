@@ -528,4 +528,23 @@ final class ShowRepository
 
 		return array_merge($resultSet, $resultSet2);
 	}
+
+	public function getShowsForRSS(): ?array
+	{
+		return $this->connection->createQueryBuilder()
+			->select('s.title', 's.url', 's.short_description', 's.image',
+					 'p.time', 'p.short_description AS program_short_description', 'p.url AS program_url')
+			->from('program_shows', 's')
+			->leftJoin('s', 'program2shows', 'ps', 's.id = ps.show_id')
+			->leftJoin('ps', 'program', 'p', 'p.id = ps.program_id')
+			->where('s.show_in_archive = 1')
+			->andWhere('s.status = 1')
+			->andWhere('s.id IN (12, 40, 11, 50, 67, 68)')// 12 - Eko magazín, 40 - Študuj u nás, 11 - Magazín TV Medicína, 50 - Náš kraj není na okraji, 67 - Magazín 112, 68 - Legendy Moravskoslezského kraje
+			->andWhere('p.premiere = 1')
+			->andWhere('p.time < NOW()')
+			->orderBy('p.time', 'DESC')
+			->setMaxResults(10)
+			->executeQuery()
+			->fetchAllAssociative() ?: null;
+	}
 }
