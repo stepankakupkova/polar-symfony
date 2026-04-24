@@ -1,0 +1,31 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+/** @var string|null $active  'zpravy'|'kandidati'|'kresla'|'poslanci'|'obec' */
+$active = $active ?? null;
+?>
+<nav class="">
+	<ul class="nav nav-pills w-100">
+		<li class="nav-item">
+			<a class="nav-link text-4<?= $active === 'index' ? ' active' : '' ?>" href="<?= $view->path('election_2025') ?>">Volební zprávy</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-4<?= $active === 'detail' ? ' active' : '' ?>" href="<?= $view->path('election_2025_detail', ['kstrana' => 22, 'strana_url' => 'ano-2011']) ?>">Kandidáti</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-4<?= $active === 'kresla' ? ' active' : '' ?>" href="<?= $view->path('election_2025_kresla') ?>">Rozdělení křesel</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-4<?= $active === 'poslanci' ? ' active' : '' ?>" href="<?= $view->path('election_2025_poslanci') ?>">Zvolení poslanci</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-4<?= $active === 'obec' ? ' active' : '' ?>" href="<?= $view->path('election_2025_obec', ['okres' => 8106]) ?>">Vaše obec</a>
+		</li>
+		<li class="nav-item dropdown">
+			<a class="dropdown-item dropdown-toggle d-flex align-items-center text-4 nav-link" href="#" data-bs-toggle="dropdown">Archiv</a>
+			<ul class="dropdown-menu">
+				<li><a class="dropdown-item" href="<?= $view->path('election_2024') ?>">Krajské volby 2024</a></li>
+				<li><a class="dropdown-item" href="<?= $view->path('election_2020_kresla') ?>">Krajské volby 2020</a></li>
+			</ul>
+		</li>
+	</ul>
+</nav>

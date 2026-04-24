@@ -1,0 +1,499 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+// HeadTitle
+$view->setTitle('Senát | Volby 2025');
+
+// HeadMeta
+$view->addMeta('description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro parlamentní volby 2025 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addMeta('keywords', 'volby 2025, parlamentní volby, politická strana, volební program, kandidátní listina');
+
+// META pro Facebook
+$currentUrl = $currentUrl ?? '';
+$view->addOgMeta('og:title', 'Volby | Televize POLAR');
+$view->addOgMeta('og:description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro parlamentní volby 2025 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:site_name', 'polar.cz');
+$view->addOgMeta('og:image', '/img/web/volby/microformat_2025.png');
+$view->addOgMeta('og:image:secure_url', '/img/web/volby/microformat_2025.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+    ['label' => 'Volby 2025', 'url' => $view->path('election_2025')],
+    ['label' => 'Senát'],
+]);
+
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Volební menu
+$view->addInlineScript(
+    '		
+    // Přidání třídy "open", aby správně fungovalo podbarvování položek v rámci menu/submenu
+	$(".elections_menu nav > ul.nav-pills").on("click", "li:not(.open) > a", function(){
+		$(this).parent().addClass("open");
+	});
+	$(".elections_menu nav > ul.nav-pills").on("click", "li.open > a", function(){
+		$(this).parent().removeClass("open");
+	});
+ 
+ 	// Napodobení hlavního menu - při hover vždy červená pouze jedna položka menu
+    $(".elections_menu nav ul.nav-pills li a:not(.active)").hover(function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#0f375a");
+	}, function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#900");
+	});
+    '
+);
+
+$view->addInlineScript('');
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" class="mb-3">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-2-3">
+                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+                    <a href="<?= $view->path('election_2025') ?>" title="Krajské volby 2025">
+                        <img src="/img/web/volby/volby_2025_logo.png" alt="Volby 2025" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-12 text-center">
+					<h2 class="text-secondary text-4-5 font-weight-normal">Volby do Poslanecké sněmovny <span class="text-nowrap">3. a 4. října 2025</span> - Moravskoslezský kraj</h2>
+                </div>
+            </div>
+
+			<div class="row mb-4-5 elections_menu y2025">
+				<div class="col-12">
+					<?= $view->include('election/web2025/partial/menu') ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<!--<div class="col-12 mb-5">
+			Výsledky pro tuto sekci zatím nejsou dostupné.<br /><br /><br /><br />
+		</div>-->
+
+
+		<div class="col-12">
+            <div class="row mb-5">
+
+                <div class="col-12">
+                    <h1 class="text-secondary text-4 text-md-5 line-height-6 font-weight-semibold">Kandidáti senátních voleb 2025, 1. a 2. kolo</h1>
+                </div>
+
+                <div class="col-md-4 mb-5">
+                    <h2 class="text-primary font-weight-semibold">Ostrava</h2>
+
+					<!--
+                    <div class="mb-5">
+						<?php
+						$show_id = '123';
+						$program_url = 'volebni-studio-05-10-2020-17-15';
+						$image = '/data/program/thumbs/volebni-studio-05-10-2020-17-15.jpg';
+						?>
+						<a href="<?= $view->path('program_show_video', ['show_id' => $show_id, 'program_url' => $program_url]) ?>">
+							<span class="thumb-info thumb-info-lighten">
+								<span class="thumb-info-wrapper">
+									<?php
+										if (!file_exists($PUBLIC_PATH . $image)) {
+											$image = '/data/program/show/!default-show.png';
+										}
+									?>
+									<img src="<?= $image ?>" class="img-fluid" alt="">
+									<span class="thumb-info-action">
+										<span class="thumb-info-action-icon">
+											<i class="fas fa-play"></i>
+										</span>
+									</span>
+								</span>
+							</span>
+						</a>
+                    </div>
+                    -->
+
+					<!--
+                    <div class="mb-4">
+                        <h2 class="text-primary font-weight-semibold">Výsledky 2. kola</h2>
+                    </div>
+
+                    <div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ondřej Šimetka, ODS
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                50 let, lékař
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">67,89%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="67.89" aria-valuemin="0" aria-valuemax="100" style="width: 67.89%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Zdeněk Jiříček, ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                51 let, ředitel příspěvkové organizace
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">32,10%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="32.10" aria-valuemin="0" aria-valuemax="100" style="width: 32.10%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+                    -->
+
+                    <hr class="solid mb-4-5" />
+
+					<div class="mb-4">
+                        <h2 class="text-primary font-weight-semibold">Výsledky 1. kola</h2>
+                    </div>
+
+                    <div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Bc. Bednář Martin, MBA, ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                49 let, starosta městského obvodu Ostrava-Jih
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">51,84%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="51.84" aria-valuemin="0" aria-valuemax="100" style="width: 51.84%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ing. Sulovský Leopold, Ostravak
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                70 let, senátor, podnikatel, horolezec
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">20,28%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="20.28" aria-valuemin="0" aria-valuemax="100" style="width: 20.28%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+				<div class="col-md-4 mb-5">
+                    <h2 class="text-primary font-weight-semibold">Karviná</h2>
+
+					<!--
+                    <div class="mb-5">
+						<?php
+						$show_id = '123';
+						$program_url = 'volebni-studio-05-10-2020-17-15';
+						$image = '/data/program/thumbs/volebni-studio-05-10-2020-17-15.jpg';
+						?>
+						<a href="<?= $view->path('program_show_video', ['show_id' => $show_id, 'program_url' => $program_url]) ?>">
+							<span class="thumb-info thumb-info-lighten">
+								<span class="thumb-info-wrapper">
+									<?php
+										if (!file_exists($PUBLIC_PATH . $image)) {
+											$image = '/data/program/show/!default-show.png';
+										}
+									?>
+									<img src="<?= $image ?>" class="img-fluid" alt="">
+									<span class="thumb-info-action">
+										<span class="thumb-info-action-icon">
+											<i class="fas fa-play"></i>
+										</span>
+									</span>
+								</span>
+							</span>
+						</a>
+                    </div>
+                    -->
+
+					<!--
+                    <div class="mb-4">
+                        <h2 class="text-primary font-weight-semibold">Výsledky 2. kola</h2>
+                    </div>
+
+                    <div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ondřej Feber, ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                68 let, starosta
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">67,89%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="67.89" aria-valuemin="0" aria-valuemax="100" style="width: 67.89%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Zdeněk Jiříček, ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                51 let, ředitel příspěvkové organizace
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">32,10%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="32.10" aria-valuemin="0" aria-valuemax="100" style="width: 32.10%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+                    -->
+
+                    <hr class="solid mb-4-5" />
+
+					<div class="mb-4">
+                        <h2 class="text-primary font-weight-semibold">Výsledky 1. kola</h2>
+                    </div>
+
+                    <div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ing. Vícha Petr, SOCDEM+ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                60 let, starosta města Bohumín
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">58,33%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="58.33" aria-valuemin="0" aria-valuemax="100" style="width: 58.33%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ing. Niemiec Bohuslav, KDU+ODS+TOP 09
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                42 let, náměstek primátora statutárního města Havířov
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">19,16%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="19.16" aria-valuemin="0" aria-valuemax="100" style="width: 19.16%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+				<div class="col-md-4 mb-5">
+                    <h2 class="text-primary font-weight-semibold">Opava</h2>
+
+					<!--
+                    <div class="mb-5">
+						<?php
+						$show_id = '123';
+						$program_url = 'volebni-studio-05-10-2020-17-15';
+						$image = '/data/program/thumbs/volebni-studio-05-10-2020-17-15.jpg';
+						?>
+						<a href="<?= $view->path('program_show_video', ['show_id' => $show_id, 'program_url' => $program_url]) ?>">
+							<span class="thumb-info thumb-info-lighten">
+								<span class="thumb-info-wrapper">
+									<?php
+										if (!file_exists($PUBLIC_PATH . $image)) {
+											$image = '/data/program/show/!default-show.png';
+										}
+									?>
+									<img src="<?= $image ?>" class="img-fluid" alt="">
+									<span class="thumb-info-action">
+										<span class="thumb-info-action-icon">
+											<i class="fas fa-play"></i>
+										</span>
+									</span>
+								</span>
+							</span>
+						</a>
+                    </div>
+                    -->
+
+                    <hr class="solid mb-4-5" />
+
+                    <div class="mb-4">
+                        <h2 class="text-primary font-weight-semibold">Výsledky 2. kola</h2>
+                    </div>
+
+                    <div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ing. Navrátil Tomáš, ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                41 let, primátor statutárního města Opava
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">63,68%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="63.68" aria-valuemin="0" aria-valuemax="100" style="width: 63.68%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Mgr. Pavera Herbert, KDU+ODS+TOP 09
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                66 let, starosta obce Bolatice, senátor Parlamentu ČR
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">36,31%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="36.31" aria-valuemin="0" aria-valuemax="100" style="width: 36.31%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="solid mb-4-5" />
+
+					<div class="mb-4">
+                        <h2 class="text-primary font-weight-semibold">Výsledky 1. kola</h2>
+                    </div>
+
+                    <div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Ing. Navrátil Tomáš, ANO
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                41 let, primátor statutárního města Opava
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">49,49%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="49.49" aria-valuemin="0" aria-valuemax="100" style="width: 49.49%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="progress-bars elections mb-5">
+                        <div class="progress-label clearfix">
+                            <h2 class="text-secondary text-4 font-weight-bold mb-1">
+                                Mgr. Pavera Herbert, KDU+ODS+TOP 09
+                            </h2>
+                            <h3 class="text-3 font-weight-regular mb-2">
+                                66 let, starosta obce Bolatice, senátor Parlamentu ČR
+                            </h3>
+                        </div>
+                        <div class="progress-label float-start line-height-2" style="width: 70px;">
+                            <span class="text-3 font-weight-bold">28,11%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" aria-valuenow="28.11" aria-valuemin="0" aria-valuemax="100" style="width: 28.11%; background-color: #990000;">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>

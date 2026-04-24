@@ -531,6 +531,40 @@ final class NewsRepository
 		return $result ?: null;
 	}
 
+	public function getPaginatorByTopic(array $articles_ids, int $page, int $limit): array
+	{
+		$offset = ($page - 1) * $limit;
+
+		return $this->connection->createQueryBuilder()
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->from('article')
+			->where('public = 1')
+			->andWhere('public_from <= NOW()')
+			->andWhere('public_to >= NOW()')
+			->andWhere('region_id IS NOT NULL')
+			->andWhere('article_id IN (:articleIds)')
+			->groupBy('article_id')
+			->orderBy('public_from', 'DESC')
+			->setFirstResult($offset)
+			->setMaxResults($limit)
+			->setParameter('articleIds', $articles_ids, \Doctrine\DBAL\ArrayParameterType::INTEGER)
+			->fetchAllAssociative();
+	}
+
+	public function getCountByTopic(array $articles_ids): int
+	{
+		return (int) $this->connection->createQueryBuilder()
+			->select('COUNT(DISTINCT article_id) AS total')
+			->from('article')
+			->where('public = 1')
+			->andWhere('public_from <= NOW()')
+			->andWhere('public_to >= NOW()')
+			->andWhere('region_id IS NOT NULL')
+			->andWhere('article_id IN (:articleIds)')
+			->setParameter('articleIds', $articles_ids, \Doctrine\DBAL\ArrayParameterType::INTEGER)
+			->fetchOne();
+	}
+
 	private function removeAccent(string $text, string $replace = ''): string
 	{
 		$transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);

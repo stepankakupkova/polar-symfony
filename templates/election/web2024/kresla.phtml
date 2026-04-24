@@ -1,0 +1,379 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+// HeadTitle
+$view->setTitle('Rozdělení křesel | Volby 2024');
+
+// HeadMeta
+$view->addMeta('description', 'Rozdělení mandátů v zastupitelstvu Moravskoslezského kraje po krajských volbách 2024.');
+$view->addMeta('keywords', 'volby 2024, krajské volby, křesla, mandáty, zastupitelstvo');
+
+// META pro Facebook
+$currentUrl = $currentUrl ?? '';
+$view->addOgMeta('og:title', 'Rozdělení křesel | Volby 2024 | Televize POLAR');
+$view->addOgMeta('og:description', 'Rozdělení mandátů v zastupitelstvu Moravskoslezského kraje po krajských volbách 2024.');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:site_name', 'polar.cz');
+$view->addOgMeta('og:image', '/img/web/volby/microformat_2024.png');
+$view->addOgMeta('og:image:secure_url', '/img/web/volby/microformat_2024.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+    ['label' => 'Volby 2024', 'url' => $view->path('election_2024')],
+    ['label' => 'Rozdělení křesel'],
+]);
+
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Volební menu
+$view->addInlineScript(
+    '		
+    // Přidání třídy "open", aby správně fungovalo podbarvování položek v rámci menu/submenu
+	$(".elections_menu nav > ul.nav-pills").on("click", "li:not(.open) > a", function(){
+		$(this).parent().addClass("open");
+	});
+	$(".elections_menu nav > ul.nav-pills").on("click", "li.open > a", function(){
+		$(this).parent().removeClass("open");
+	});
+ 
+ 	// Napodobení hlavního menu - při hover vždy červená pouze jedna položka menu
+    $(".elections_menu nav ul.nav-pills li a:not(.active)").hover(function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#0f375a");
+	}, function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#900");
+	});
+    '
+);
+
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent($text, $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    if ($transliterator) {
+        $text = $transliterator->transliterate($text);
+    }
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
+    }
+    return $text;
+}
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" class="mb-3">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-2-3">
+                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+                    <a href="<?= $view->path('election_2024') ?>" title="Krajské volby 2024">
+                        <img src="/img/web/volby/krajske_volby_2024_logo.png" alt="Volby 2024" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-12 text-center">
+					<h2 class="text-secondary text-4-5 font-weight-normal">Volby do zastupitelstva Moravskoslezského kraje <span class="text-nowrap">20. - 21.9.2024</span></h2>
+                </div>
+            </div>
+
+			<div class="row mb-4-5 elections_menu">
+				<div class="col-12">
+					<?= $view->include('election/web2024/partial/menu', ['active' => 'kresla']) ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+        <div class="col-lg-7">
+
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-center mb-5">
+                    <img src="/img/web/volby/volby_2024_kresla.png" class="img-fluid mb-4" />
+                </div>
+            </div>
+
+			<?php if ($elections_results) { ?>
+				<div class="row mb-3">
+					<div class="col-md-6">
+						<h2 class="text-5 text-primary font-weight-semibold">Moravskoslezský kraj</h2>
+					</div>
+					<!--<div class="col-md-2 col-xs-4">
+						<span class="font-size-xl text-weight-bold"><?php //= $elections_results['PLATNE_HLASY']; ?></span><br />
+						<div class="font-size-sm">Platné hlasy</div>
+					</div>-->
+					<div class="col-4 col-md-2 elections">
+						<div class="progress mb-1">
+							<div class="progress-bar" aria-valuenow="<?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%; background-color: #990000;">
+							</div>
+						</div>
+						<span class="text-4 font-weight-bold"><?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%</span><br />
+						<div class="text-2">Sečteno</div>
+					</div>
+					<div class="col-4 col-md-2 elections">
+						<div class="progress mb-1">
+							<div class="progress-bar" aria-valuenow="<?= $elections_results['UCAST_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['UCAST_PROC']; ?>%; background-color: #990000;">
+							</div>
+						</div>
+						<span class="text-4 font-weight-bold"><?= number_format($elections_results['UCAST_PROC'], 2, ',', ' '); ?>%</span><br />
+						<div class="text-2">Volební účast</div>
+					</div>
+					<div class="col-4 col-md-2 text-end">
+						<a class="btn btn-secondary" href="" title="Znovunačtení stránky"><i class="fa fa-refresh"></i></a>
+					</div>
+				</div>
+			<?php } ?>
+
+            <?php if ($elections) { ?>
+                <?php $line = true; ?>
+                <div class="row">
+                    <?php foreach ($elections as $value) { ?>
+                        <div class="col-12 mb-3">
+                            <?php if ((float)$value['PROC_HLASU'] < 5 && $line === true) { ?>
+                                <?php $line = false; ?>
+                                <hr class="solid" />
+                            <?php } ?>
+                            <div class="progress-bars elections mt-4">
+                                <div class="progress-label clearfix">
+                                    <h2 class="float-start">
+                                        <a href="<?= $view->path('election_2024_detail', ['kstrana' => $value['KSTRANA'], 'strana_url' => removeAccent($value['NAZEV_STRK'], '-')]) ?>" title="<?= $value['NAZEV_STRK'];?>" style="text-decoration:none;"><?= $value['NAZEV_STRK']; ?></a>
+                                    </h2>
+                                </div>
+								<div class="clearfix mb-1">
+									<div class="progress-label float-start line-height-2" style="width: 70px;">
+										<span class="text-4 font-weight-bold"><?= number_format($value['PROC_HLASU'], 2, ',', ' '); ?>%</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar" aria-valuenow="<?= $value['PROC_HLASU']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $value['PROC_HLASU']; ?>%; background-color: <?= $value['barva']; ?>;">
+										</div>
+									</div>
+								</div>
+								<div class="text-2"><b><?= (int)$value['MANDATY']; ?> mandátů,</b> <?= number_format($value['HLASY'], 0, ',', ' '); ?> hlasů</div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            <?php } else { ?>
+                <div class="col-xs-12 mb-xl">
+                    Výsledky pro tuto sekci zatím nejsou dostupné.<br /><br /><br /><br />
+                </div>
+            <?php } ?>
+        </div>
+
+		<div class="col-lg-5">
+			<?php if ($articles) { ?>
+				<h2 class="text-primary mb-4">Volební zpravodajství</h2>
+				<?php foreach ($articles as $key => $item) { ?>
+
+					<?php
+						if ($item['region_url'] && $item['city_url']) {
+							$region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+							if ($item['city_url'] === 'cely-ms-kraj') {
+								$region_city_url = $view->path('news');
+							}
+						}
+
+						try {
+							$today = new DateTime();
+							$dateUpdate = new DateTime($item['updated_date']);
+							if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+								$dayUpdate = 'Dnes';
+							} else {
+								$yesterday = new DateTime();
+								$yesterday->modify('-1 day');
+								if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+									$dayUpdate = 'Včera';
+								} else {
+									$dayUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+								}
+							}
+							$timeUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+							$today = new DateTime();
+							$date = new DateTime($item['public_from']);
+							if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+								if ($item['label']) {
+									$day = 'dnes';
+								} else {
+									$day = 'Dnes';
+								}
+							} else {
+								$yesterday = new DateTime();
+								$yesterday->modify('-1 day');
+								if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+									if ($item['label']) {
+										$day = 'včera';
+									} else {
+										$day = 'Včera';
+									}
+								} else {
+									$day = $view->dateFormat($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+								}
+							}
+							$time = $view->dateFormat($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+						} catch (Exception $e) {
+							$day = 'NaN';
+							$time = 'NaN';
+							$dayUpdate = 'NaN';
+							$timeUpdate = 'NaN';
+						}
+					?>
+
+					<div class="row mb-4-5">
+						<?php if ($item['picture']) { ?>
+							<div class="col-5 pe-2 pe-md-3">
+								<div class="">
+									<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+										<span class="thumb-info thumb-info-lighten">
+											<span class="thumb-info-wrapper">
+												<img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+												<?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+													<span class="thumb-info-action">
+														<span class="thumb-info-action-icon">
+															<i class="fas fa-play"></i>
+															<span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+														</span>
+													</span>
+												<?php } ?>
+											</span>
+										</span>
+									</a>
+								</div>
+							</div>
+							<div class="col-7 ps-1 pe-3">
+								<h2 class="line-height-md-2 mb-1 mb-md-2">
+									<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+										<?= $item['title'] ?>
+									</a>
+								</h2>
+								<div class="text-1 text-tertiary line-height-7 mb-1">
+									<?php
+										$now_minus_x = new DateTime();
+										$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+										if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+											echo $item['label'];
+											echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+										} else {
+											echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+										}
+									?>
+									<span>
+										<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+									</span>
+									<span>
+										<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+									--></span><!--
+									--><span><!--
+										--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
+									</span>
+								</div>
+								<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+									<?php //= $item['anotation']; ?>
+								</p>-->
+							</div>
+						<?php } else { ?>
+							<div class="col-12">
+								<div class="">
+									<h2 class="line-height-md-2 mb-1 mb-md-22">
+										<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+											<?= $item['title'] ?>
+										</a>
+									</h2>
+									<div class="text-1 text-tertiary line-height-7 mb-1">
+										<?php
+											$now_minus_x = new DateTime();
+											$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+											if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+												echo $item['label'];
+												echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+											} else {
+												echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+											}
+										?>
+										<span>
+											<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+										</span>
+										<span>
+											<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+										--></span><!--
+										--><span><!--
+											--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
+										</span>
+									</div>
+									<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+										<?php //= $item['anotation']; ?>
+									</p>-->
+								</div>
+							</div>
+						<?php } ?>
+					</div>
+				<?php } ?>
+				<div class="row">
+					<div class="col-12">
+						<?= $view->include('application/pagination/paginator', ['route' => 'election_2024_kresla', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+					</div>
+				</div>
+			<?php } ?>
+		</div>
+	</div>
+</div>

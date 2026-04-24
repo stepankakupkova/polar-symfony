@@ -1,0 +1,143 @@
+# Web — Volby 2025
+election_2025:
+  path: /volby
+  controller: App\Election\Controller\Web\Web2025Controller::index
+
+election_2025_detail:
+  path: /volby/strana/{kstrana}/{strana_url}
+  controller: App\Election\Controller\Web\Web2025Controller::detail
+  requirements:
+    kstrana: '[0-9]+'
+    strana_url: '[a-zA-Z][a-zA-Z0-9_-]+'
+
+election_2025_poslanci:
+  path: /volby/poslanci
+  controller: App\Election\Controller\Web\Web2025Controller::poslanci
+
+election_2025_kresla:
+  path: /volby/kresla
+  controller: App\Election\Controller\Web\Web2025Controller::kresla
+
+election_2025_obec:
+  path: /volby/okres/{okres}
+  controller: App\Election\Controller\Web\Web2025Controller::obec
+  defaults:
+    obec: null
+  requirements:
+    okres: '[0-9]+'
+
+election_2025_obec_detail:
+  path: /volby/okres/{okres}/obec/{obec}
+  controller: App\Election\Controller\Web\Web2025Controller::obec
+  requirements:
+    okres: '[0-9]+'
+    obec: '[0-9]+'
+
+election_2025_senat:
+  path: /volby/senat
+  controller: App\Election\Controller\Web\Web2025Controller::senat
+
+# Web — Volby 2024
+election_2024:
+  path: /volby-2024
+  controller: App\Election\Controller\Web\Web2024Controller::index
+
+election_2024_detail:
+  path: /volby-2024/strana/{kstrana}/{strana_url}
+  controller: App\Election\Controller\Web\Web2024Controller::detail
+  requirements:
+    kstrana: '[0-9]+'
+    strana_url: '[a-zA-Z][a-zA-Z0-9_-]+'
+
+election_2024_zastupitele:
+  path: /volby-2024/zastupitele
+  controller: App\Election\Controller\Web\Web2024Controller::zastupitele
+
+election_2024_kresla:
+  path: /volby-2024/kresla
+  controller: App\Election\Controller\Web\Web2024Controller::kresla
+
+election_2024_obec:
+  path: /volby-2024/okres/{okres}
+  controller: App\Election\Controller\Web\Web2024Controller::obec
+  defaults:
+    obec: null
+  requirements:
+    okres: '[0-9]+'
+
+election_2024_obec_detail:
+  path: /volby-2024/okres/{okres}/obec/{obec}
+  controller: App\Election\Controller\Web\Web2024Controller::obec
+  requirements:
+    okres: '[0-9]+'
+    obec: '[0-9]+'
+
+election_2024_senat:
+  path: /volby-2024/senat
+  controller: App\Election\Controller\Web\Web2024Controller::senat
+
+# Web — Volby 2020
+election_2020_kresla:
+  path: /volby-2020/kresla
+  controller: App\Election\Controller\Web\Web2020Controller::kresla
+
+election_2020:
+  path: /volby-2020
+  controller: App\Election\Controller\Web\Web2020Controller::index
+
+# Admin — Elections 2025
+admin_election:
+  path: /admin/volby
+  controller: App\Election\Controller\Admin\ElectionListController::index
+
+admin_election_list:
+  path: /admin/volby/seznam
+  controller: App\Election\Controller\Admin\ElectionListController::list
+
+admin_election_add:
+  path: /admin/volby/seznam/pridat
+  controller: App\Election\Controller\Admin\ElectionWriteController::add
+  methods: [GET, POST]
+
+admin_election_edit:
+  path: /admin/volby/seznam/upravit/{id}
+  controller: App\Election\Controller\Admin\ElectionWriteController::edit
+  methods: [GET, POST]
+  requirements:
+    id: '\d+'
+
+admin_election_json_list_get_list:
+  path: /admin/volby/json-list/get-list
+  controller: App\Election\Controller\Admin\ElectionListController::getList
+
+admin_election_json_list_get_election:
+  path: /admin/volby/json-list/get-election
+  controller: App\Election\Controller\Admin\ElectionListController::getElection
+  methods: [POST]
+
+admin_election_json_write_delete_election:
+  path: /admin/volby/json-write/delete-election
+  controller: App\Election\Controller\Admin\ElectionWriteController::deleteElection
+  methods: [POST]
+
+admin_election_json_write_set_order:
+  path: /admin/volby/json-write/set-order
+  controller: App\Election\Controller\Admin\ElectionWriteController::setOrder
+  methods: [POST]
+
+admin_election_setting:
+  path: /admin/volby/nastaveni
+  controller: App\Election\Controller\Admin\SettingWriteController::setting
+  methods: [GET, POST]
+
+admin_election_setting_json_list:
+  path: /admin/volby/nastaveni/json-list/{action}
+  controller: App\Election\Controller\Admin\SettingWriteController::jsonList
+  requirements:
+    action: '[a-zA-Z][a-zA-Z0-9_-]+'
+
+admin_election_setting_json_write:
+  path: /admin/volby/nastaveni/json-write/{action}
+  controller: App\Election\Controller\Admin\SettingWriteController::jsonWrite
+  requirements:
+    action: '[a-zA-Z][a-zA-Z0-9_-]+'

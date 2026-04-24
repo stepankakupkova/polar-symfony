@@ -1,0 +1,543 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+// HeadTitle
+$view->setTitle(isset($election['ZKRATKAK8']) ? $election['ZKRATKAK8'] . ' | Kandidáti | Volby 2025' : 'Volby 2025');
+
+// HeadMeta
+$view->addMeta('description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro parlamentní volby 2025 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addMeta('keywords', 'volby 2025, parlamentní volby, politická strana, volební program, kandidátní listina');
+
+// META pro Facebook
+$currentUrl = $this->currentUrl ?? '';
+$view->addOgMeta('og:title', 'Volby | Televize POLAR');
+$view->addOgMeta('og:description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro parlamentní volby 2025 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:site_name', 'polar.cz');
+$view->addOgMeta('og:image', '/img/web/volby/microformat_2025.png');
+$view->addOgMeta('og:image:secure_url', '/img/web/volby/microformat_2025.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+    ['label' => 'Volby 2025', 'url' => $view->path('election_2025')],
+    ['label' => isset($election['ZKRATKAK8']) ? $election['ZKRATKAK8'] . ' | Kandidáti' : 'Kandidáti'],
+]);
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/quality-selector.css?ver=9'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/silvermine-videojs-quality-selector.min.js'));
+
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Volební menu
+$view->addInlineScript(
+    '		
+    // Přidání třídy "open", aby správně fungovalo podbarvování položek v rámci menu/submenu
+	$(".elections_menu nav > ul.nav-pills").on("click", "li:not(.open) > a", function(){
+		$(this).parent().addClass("open");
+	});
+	$(".elections_menu nav > ul.nav-pills").on("click", "li.open > a", function(){
+		$(this).parent().removeClass("open");
+	});
+ 
+ 	// Napodobení hlavního menu - při hover vždy červená pouze jedna položka menu
+    $(".elections_menu nav ul.nav-pills li a:not(.active)").hover(function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#0f375a");
+	}, function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#900");
+	});
+    '
+);
+
+$view->addInlineScript(
+    '
+    if ($(window).width() > 992) {
+        let player = videojs("player", {
+			controlBar: {
+				children: {
+					playToggle: true,
+					progressControl: true,
+					currentTimeDisplay: true,
+					timeDivider: true,
+					durationDisplay: true,
+					volumePanel: {
+						inline: true
+					},
+					fullscreenToggle: true,
+                	qualitySelector: true,
+				}
+			},
+        	playsinline: true,
+		});
+    }
+    '
+);
+
+$view->addInlineScript('');
+
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent($text, $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    if ($transliterator) {
+        $text = $transliterator->transliterate($text);
+    }
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
+    }
+    return $text;
+}
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" class="mb-3">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-2-3">
+                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+                    <a href="<?= $view->path('election_2025') ?>" title="Krajské volby 2025">
+                        <img src="/img/web/volby/volby_2025_logo.png" alt="Volby 2025" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-12 text-center">
+					<h2 class="text-secondary text-4-5 font-weight-normal">Volby do Poslanecké sněmovny <span class="text-nowrap">3. a 4. října 2025</span> - Moravskoslezský kraj</h2>
+                </div>
+            </div>
+
+			<div class="row mb-4-5 elections_menu y2025">
+				<div class="col-12">
+					<?= $view->include('election/web2025/partial/menu', ['active' => 'detail']) ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+        <div class="col-lg-7">
+			<div class="row">
+				<div class="col-12">
+					<div class="row">
+						<div class="col-12 mb-5">
+							<ul class="nav nav-pills election-detail-nav">
+							<?php foreach ($strany as $value) { ?>
+								<li class="<?= ((int)$kstrana === (int)$value['KSTRANA']) ? 'active' : '' ?>">
+									<a href="<?= $view->path('election_2025_detail', ['kstrana' => $value['KSTRANA'], 'strana_url' => removeAccent($value['NAZEV_STRK'], '-')]) ?>" title="<?= $value['NAZEV_STRK'] ?>">
+										<?= $value['ZKRATKAK8']; ?>
+									</a>
+								</li>
+							<?php } ?>
+							</ul>
+						</div>
+					</div>
+
+					<?php if ($election) { ?>
+
+						<div class="row">
+
+							<?php if ($studio) { ?>
+								<!-- mobil -->
+								<div class="col-12 mb-5 d-lg-none">
+									<h2 class="text-primary mb-4">Volební studio Polar</h2>
+									<?php
+										$video_lq = $LIGHT_URL . 'porady/publikovano/' . $studio['path'] . '/' . $studio['name'] . '_lq.mp4';
+										$poster = '/data/program/thumbs/' . $studio['name'] . '.jpg';
+									?>
+									<div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+										<meta itemprop="width" content="715">
+										<meta itemprop="height" content="402">
+										<meta itemprop="url" content="https://polar.cz<?= $poster ?>">
+										<video id="playerStudio" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $poster ?>"}'>
+											<source src="<?= $video_lq ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
+											<p class="vjs-no-js">
+												Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video_lq ?>">video</a>.
+											</p>
+										</video>
+									</div>
+								</div>
+							<?php } ?>
+
+							<div class="col-12 mb-3">
+								<div class="row mb-4">
+									<div class="col-md-9">
+										<h2 class="text-6 text-primary line-height-2 mb-0">
+											<?= $election['NAZEV_STRK'];?>
+										</h2>
+									</div>
+									<div class="col-md-3 justify-content-end text-nowrap">
+										<h4 class="text-4 mb-1"><?= $election['MANDATY']; ?> mandátů</h4>
+										<h4 class="text-4 mb-1"><?= number_format($election['PROC_HLASU'], 2, ',', ' '); ?>% hlasů</h4>
+									</div>
+								</div>
+
+								<!-- desktop -->
+								<div class="row d-none d-lg-flex border-bottom border-color-bbb mb-3">
+									<div class="col-1">
+										<span class="text-color-grey">Pořadí</span>
+									</div>
+									<div class="col-6">
+										<span class="text-color-grey">Zvolený zastupitel</span>
+									</div>
+									<div class="col-3 text-center">
+										<span class="text-color-grey">Preferenční hlasy</span>
+									</div>
+									<!--<div class="col-sm-1 center">
+										<span class="text-color-grey">Počet hlasů %</span>
+									</div>-->
+									<div class="col-1 text-center">
+										<span class="text-color-grey">Mandát</span>
+									</div>
+								</div>
+
+								<?php foreach ($election['psrk'] as $psrk) { ?>
+									<!-- desktop -->
+									<div class="row d-none d-lg-flex mb-3">
+										<div class="col-sm-1">
+											&nbsp;&nbsp;<?= $psrk['PORCISLO']; ?>.
+										</div>
+										<div class="col-sm-6">
+											<h6 class="font-weight-bold text-secondary mb-0"><?= $psrk['TITULPRED']; ?> <?= $psrk['JMENO']; ?> <?= $psrk['PRIJMENI']; ?> <?= $psrk['TITULZA']; ?></h6>
+											<?= $psrk['VEK']; ?> let, <?= $psrk['POVOLANI']; ?>, <?= $psrk['BYDLISTEN']; ?>
+										</div>
+										<div class="col-sm-3 text-center">
+											<b><?= $psrk['HLASY'] ? number_format($psrk['HLASY'], 0, ',', ' ') : "0"; ?></b> <!--prvni zmenit na HLASY, potom na POCHLASU -->
+										</div>
+										<!--<div class="col-sm-1 center">
+											<?php //= round($psrk['POCPROC'], 1); ?>%
+										</div>-->
+										<div class="col-sm-1 text-center">
+											<?php if ($psrk['MANDAT'] === "A") { ?>
+												<span class="text-primary">Ano</span>
+											<?php } ?>
+										</div>
+									</div>
+								<?php } ?>
+
+								<!-- mobil -->
+								<div class="row d-lg-none mb-3">
+									<div class="col-12">
+										<?php foreach ($election['psrk'] as $psrk) { ?>
+											<div class="row mb-3">
+												<div class="col-12">
+													<div class="row">
+														<div class="col-3 pe-1">
+															Pořadí:&nbsp;
+														</div>
+														<div class="col-9">
+															<b><?= $psrk['PORCISLO']; ?></b>
+														</div>
+													</div>
+												</div>
+												<div class="col-12">
+													<div class="row">
+														<div class="col-3 pe-1">
+															Kandidát:&nbsp;
+														</div>
+														<div class="col-9">
+															<span class="font-weight-bold text-secondary mb-0"><?= $psrk['TITULPRED']; ?> <?= $psrk['JMENO']; ?> <?= $psrk['PRIJMENI']; ?><?php if ($psrk['TITULZA'] != '') echo ' '.$psrk['TITULZA']; ?></span>,
+															<?= $psrk['VEK']; ?> let, <?= $psrk['POVOLANI']; ?>, <?= $psrk['BYDLISTEN']; ?>
+														</div>
+													</div>
+												</div>
+												<div class="col-12">
+													<div class="row">
+														<div class="col-3 text-nowrap pe-1">
+															Počet hlasů:&nbsp;
+														</div>
+														<div class="col-9">
+															<b><?= $psrk['HLASY'] ? number_format($psrk['HLASY'], 0, ',', ' ') : "0"; ?></b> <!--prvni zmenit na HLASY, potom na POCHLASU-->
+														</div>
+													</div>
+												</div>
+												<!--<div class="col-12">
+													Počet hlasů v procentech:&nbsp;
+													<b><?php //= round($psrk['POCPROC'], 1); ?>%</b>
+												</div>-->
+												<div class="col-12">
+													<div class="row">
+														<div class="col-3 pe-1">
+															Mandát:&nbsp;
+														</div>
+														<div class="col-9">
+															<?php if ($psrk['MANDAT'] === "A") { ?>
+																<span class="text-primary font-weight-bold">Ano</span>
+															<?php } ?>
+														</div>
+													</div>
+												</div>
+												<!-- do půlky září zjednodušený výpis -->
+												<!--<div class="col-12">
+													<b><?php //= $psrk['PORCISLO']; ?></b>,&nbsp;
+													<span class="font-weight-bold text-secondary mb-0"><?php //= $psrk['TITULPRED']; ?> <?php //= $psrk['JMENO']; ?> <?php //= $psrk['PRIJMENI']; ?><?php //if ($psrk['TITULZA'] != '') echo ' '.$psrk['TITULZA']; ?></span>,
+													<?php //= $psrk['VEK']; ?> let, <?php //= $psrk['POVOLANI']; ?>, <?php //= $psrk['BYDLISTEN']; ?>
+												</div>-->
+											</div>
+										<?php } ?>
+									</div>
+								</div>
+							</div>
+						</div>
+					<?php } ?>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-5 row-studio-sticky">
+			<?php if ($studio) { ?>
+				<!-- desktop -->
+				<div class="row">
+					<div class="col-12 d-none d-lg-block p-relative">
+						<aside data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.row-studio-sticky', 'padding': {'top': 63}}">
+							<h2 class="text-primary mb-4">Volební studio Polar</h2>
+							<?php
+								$video_lq = $LIGHT_URL . 'porady/publikovano/' . $studio['path'] . '/' . $studio['name'] . '_lq.mp4';
+								$video_hq = $LIGHT_URL . 'porady/publikovano/' . $studio['path'] . '/' . $studio['name'] . '_hq.mp4';
+								$poster = '/data/program/thumbs/' . $studio['name'] . '.jpg';
+							?>
+							<div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+								<meta itemprop="width" content="715">
+								<meta itemprop="height" content="402">
+								<meta itemprop="url" content="https://polar.cz<?= $poster ?>">
+								<video id="player" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $poster ?>"}'>
+									<source src="<?= $video_lq ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
+									<source src="<?= $video_hq ?>" type="video/mp4" label="vysoká HD 1080p" />
+									<p class="vjs-no-js">
+										Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video_lq ?>">video</a>.
+									</p>
+								</video>
+							</div>
+						</aside>
+					</div>
+				</div>
+
+			<?php } else { ?>
+
+				<!-- Volební zprávy -->
+				<?php if ($articles) { ?>
+					<!-- desktop -->
+					<div class="row">
+						<div class="col-12 d-none d-lg-block">
+							<h2 class="text-primary mb-4">Volební zpravodajství</h2>
+							<?php foreach ($articles as $key => $item) { ?>
+
+								<?php
+									if ($item['region_url'] && $item['city_url']) {
+										$region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+										if ($item['city_url'] === 'cely-ms-kraj') {
+											$region_city_url = $view->path('news');
+										}
+									}
+
+									try {
+										$today = new DateTime();
+										$dateUpdate = new DateTime($item['updated_date']);
+										if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+											$dayUpdate = 'Dnes';
+										} else {
+											$yesterday = new DateTime();
+											$yesterday->modify('-1 day');
+											if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+												$dayUpdate = 'Včera';
+											} else {
+												$dayUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+											}
+										}
+										$timeUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+										$today = new DateTime();
+										$date = new DateTime($item['public_from']);
+										if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+											if ($item['label']) {
+												$day = 'dnes';
+											} else {
+												$day = 'Dnes';
+											}
+										} else {
+											$yesterday = new DateTime();
+											$yesterday->modify('-1 day');
+											if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+												if ($item['label']) {
+													$day = 'včera';
+												} else {
+													$day = 'Včera';
+												}
+											} else {
+												$day = $view->dateFormat($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+											}
+										}
+										$time = $view->dateFormat($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+									} catch (Exception $e) {
+										$day = 'NaN';
+										$time = 'NaN';
+										$dayUpdate = 'NaN';
+										$timeUpdate = 'NaN';
+									}
+								?>
+
+								<div class="row mb-4-5">
+									<?php if ($item['picture']) { ?>
+										<div class="col-5 pe-2 pe-md-3">
+											<div class="">
+												<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+													<span class="thumb-info thumb-info-lighten">
+														<span class="thumb-info-wrapper">
+															<img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+															<?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+																<span class="thumb-info-action">
+																	<span class="thumb-info-action-icon">
+																		<i class="fas fa-play"></i>
+																		<span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+																	</span>
+																</span>
+															<?php } ?>
+														</span>
+													</span>
+												</a>
+											</div>
+										</div>
+										<div class="col-7 ps-1 pe-3">
+											<h2 class="line-height-md-2 mb-1 mb-md-2">
+												<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+													<?= $item['title'] ?>
+												</a>
+											</h2>
+											<div class="text-1 text-tertiary line-height-7 mb-1">
+												<?php
+													$now_minus_x = new DateTime();
+													$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+													if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+														echo $item['label'];
+														echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+													} else {
+														echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+													}
+												?>
+												<span>
+													<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+												</span>
+												<span>
+													<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+												--></span><!--
+												--><span><!--
+													--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
+												</span>
+											</div>
+											<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+												<?php //= $item['anotation']; ?>
+											</p>-->
+										</div>
+									<?php } else { ?>
+										<div class="col-12">
+											<div class="">
+												<h2 class="line-height-md-2 mb-1 mb-md-22">
+													<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+														<?= $item['title'] ?>
+													</a>
+												</h2>
+												<div class="text-1 text-tertiary line-height-7 mb-1">
+													<?php
+														$now_minus_x = new DateTime();
+														$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+														if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+															echo $item['label'];
+															echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+														} else {
+															echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+														}
+													?>
+													<span>
+														<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+													</span>
+													<span>
+														<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+													--></span><!--
+													--><span><!--
+															--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
+													</span>
+												</div>
+												<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+													<?php //= $item['anotation']; ?>
+												</p>-->
+											</div>
+										</div>
+									<?php } ?>
+								</div>
+							<?php } ?>
+							<div class="row">
+								<div class="col-12">
+									<?= $view->include('application/pagination/paginator', ['route' => 'election_2025_detail', 'routeParams' => ['kstrana' => $kstrana, 'strana_url' => removeAccent($election['NAZEV_STRK'] ?? '', '-')], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+								</div>
+							</div>
+						</div>
+					</div>
+				<?php } ?>
+				<!-- END Volební zprávy -->
+			<?php } ?>
+        </div>
+    </div>
+</div>

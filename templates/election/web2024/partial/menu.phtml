@@ -1,0 +1,35 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+/** @var string|null $active */
+$active = $active ?? null;
+?>
+<nav class="">
+    <ul class="nav nav-pills w-100">
+        <li class="">
+            <a class="nav-link text-4<?= ($active === 'index') ? ' active' : '' ?>" href="<?= $view->path('election_2024') ?>" title="Zprávy">Volební zprávy</a>
+        </li>
+        <li>
+            <a class="nav-link text-4<?= ($active === 'detail') ? ' active' : '' ?>" href="<?= $view->path('election_2024_detail', ['kstrana' => 39, 'strana_url' => 'ano-2011']) ?>" title="Kandidáti">Kandidáti</a>
+        </li>
+        <li>
+            <a class="nav-link text-4<?= ($active === 'kresla') ? ' active' : '' ?>" href="<?= $view->path('election_2024_kresla') ?>" title="Rozdělení křesel">Rozdělení křesel</a>
+        </li>
+        <li>
+            <a class="nav-link text-4<?= ($active === 'zastupitele') ? ' active' : '' ?>" href="<?= $view->path('election_2024_zastupitele') ?>" title="Zvolení zastupitelé">Zvolení zastupitelé</a>
+        </li>
+        <li>
+            <a class="nav-link text-4<?= ($active === 'obec') ? ' active' : '' ?>" href="<?= $view->path('election_2024_obec', ['okres' => 8106]) ?>" title="Vaše obec">Vaše obec</a>
+        </li>
+        <li>
+            <a class="nav-link text-4<?= ($active === 'senat') ? ' active' : '' ?>" href="<?= $view->path('election_2024_senat') ?>" title="Senát">Senát</a>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-item dropdown-toggle d-flex align-items-center text-4 nav-link" href="#" title="Archiv" target="">Archiv</a>
+            <ul class="dropdown-menu">
+                <li class="">
+                    <a class="dropdown-item text-2" href="<?= $view->path('election_2020') ?>" title="Výsledky 2020" target="">Výsledky 2020</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>

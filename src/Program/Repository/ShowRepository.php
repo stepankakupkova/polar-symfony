@@ -272,6 +272,26 @@ final class ShowRepository
 			->fetchAllAssociative();
 	}
 
+	public function fetchAllForNews(): ?array
+	{
+		$rows = $this->connection->createQueryBuilder()
+			->select('id', 'title')
+			->from($this->table)
+			->where('show_in_archive = 1')
+			->andWhere('status = 1')
+			->orderBy('`order`', 'ASC')
+			->fetchAllAssociative();
+
+		if (!$rows) {
+			return null;
+		}
+		$data = [];
+		foreach ($rows as $item) {
+			$data[$item['id']] = $item['title'];
+		}
+		return $data;
+	}
+
 	/**
 	 * @param int $show_id
 	 */

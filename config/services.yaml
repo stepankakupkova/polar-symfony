@@ -21,6 +21,11 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
+            $LIGHT_URL: '%app.LIGHT_URL%'
+            $LIGHT_PATH: '%app.LIGHT_PATH%'
+            $HOURS_DELETE_LABELS: '%app.HOURS_DELETE_LABELS%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -31,11 +36,7 @@ services:
     App\News\Repository\PlaykitRepository:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
-            $HOURS_DELETE_LABELS: '%app.HOURS_DELETE_LABELS%'
 
-    App\News\Repository\NewsRepository:
-        arguments:
-            $HOURS_DELETE_LABELS: '%app.HOURS_DELETE_LABELS%'
 
     App\Job\Repository\JobRepository:
         arguments:
@@ -59,9 +60,6 @@ services:
     App\News\Controller\:
         resource: '../src/News/Controller/'
         tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-            $LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Application\Controller\:
         resource: '../src/Application/Controller/'
@@ -78,8 +76,6 @@ services:
     App\Banner\Controller\:
         resource: '../src/Banner/Controller/'
         tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Admin\Controller\:
         resource: '../src/Admin/Controller/'
@@ -88,8 +84,6 @@ services:
     App\User\Controller\:
         resource: '../src/User/Controller/'
         tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Authorization\Controller\:
         resource: '../src/Authorization/Controller/'
@@ -98,72 +92,14 @@ services:
     App\Page\Controller\:
         resource: '../src/Page/Controller/'
         tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
 
     App\Program\Controller\Web\:
         resource: '../src/Program/Controller/Web/'
         tags: ['controller.service_arguments']
 
-    App\Program\Controller\Web\ShowController:
-        tags: ['controller.service_arguments']
-        bind:
-            $LIGHT_URL: '%app.LIGHT_URL%'
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-
-    App\Program\Controller\Web\ShowexController:
-        tags: ['controller.service_arguments']
-        bind:
-            $LIGHT_URL: '%app.LIGHT_URL%'
-
     App\Program\Controller\Admin\:
         resource: '../src/Program/Controller/Admin/'
         tags: ['controller.service_arguments']
-
-    App\Program\Controller\Admin\SettingController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-
-    App\Program\Controller\Admin\ShowListController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-
-    App\Program\Controller\Admin\ShowWriteController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-
-    App\Program\Controller\Admin\ShowexListController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-
-    App\Program\Controller\Admin\ShowexWriteController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-
-    App\Program\Controller\Admin\VideoWriteController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-            $LIGHT_PATH: '%app.LIGHT_PATH%'
-            $LIGHT_URL: '%app.LIGHT_URL%'
-
-    App\Program\Controller\Admin\ProgramWriteController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-            $LIGHT_URL: '%app.LIGHT_URL%'
-
-    App\Program\Controller\Admin\VideoexWriteController:
-        tags: ['controller.service_arguments']
-        bind:
-            $PUBLIC_PATH: '%app.PUBLIC_PATH%'
-            $LIGHT_PATH: '%app.LIGHT_PATH%'
-            $LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Application\View\PhtmlRenderer:
         arguments:
@@ -173,6 +109,7 @@ services:
                 HOURS_DELETE_LABELS: '%app.HOURS_DELETE_LABELS%'
                 GOOGLE_MAP_KEY: '%app.GOOGLE_MAP_KEY%'
                 PUBLIC_PATH: '%app.PUBLIC_PATH%'
+                LIGHT_URL: '%app.LIGHT_URL%'
 
     App\Application\EventSubscriber\LayoutSubscriber:
         arguments:
@@ -189,5 +126,21 @@ services:
     App\Banner\EventListener\BannerGlobalListener:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    App\Election\Controller\:
+        resource: '../src/Election/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Election\Repository\Election2025PlaykitRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    App\Election\Repository\Election2024PlaykitRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    App\Election\Repository\Election2020PlaykitRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
 
 

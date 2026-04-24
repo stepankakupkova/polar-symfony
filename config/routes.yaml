@@ -26,6 +26,9 @@ program_show_generated:
 program_showex_generated:
   resource: routes/program_showex_generated.yaml
 
+election:
+  resource: routes/election.yaml
+
 admin:
   resource: routes/admin.yaml
 

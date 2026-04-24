@@ -31,7 +31,6 @@ final class VideoexWriteController
 	public function __construct(
 		private string $PUBLIC_PATH,
 		private string $LIGHT_PATH,
-		private string $LIGHT_URL,
 		private Security $security,
 		private FlashMessenger $flashMessenger,
 	) {}
@@ -110,8 +109,6 @@ final class VideoexWriteController
 			'pageTitle' => 'Mimořádná videa',
 			'video' => $video,
 			'shows' => $shows,
-			'PUBLIC_PATH' => $this->PUBLIC_PATH,
-			'LIGHT_URL' => $this->LIGHT_URL,
 		]));
 	}
 

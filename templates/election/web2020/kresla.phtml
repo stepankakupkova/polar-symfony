@@ -1,0 +1,194 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+/** @var \App\Application\View\ViewHelper $view */
+
+// HeadTitle
+$view->setTitle('Archiv | Volby 2020 | Rozdělení křesel');
+
+// HeadMeta
+$view->addMeta('description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro krajské volby 2020 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addMeta('keywords', 'volby 2020, krajské volby, politická strana, volební program, kandidátní listina');
+
+// META pro Facebook
+$view->addOgMeta('og:title', 'Archiv | Volby 2020 | Rozdělení křesel | Televize POLAR');
+$view->addOgMeta('og:description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro krajské volby 2020 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:site_name', 'polar.cz');
+$view->addOgMeta('og:image', '/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:secure_url', '/img/web/layout/microformat.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+    ['label' => 'Volby 2020'],
+    ['label' => 'Rozdělení křesel'],
+]);
+
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Volební menu
+$view->addInlineScript(
+    '		
+    // Přidání třídy "open", aby správně fungovalo podbarvování položek v rámci menu/submenu
+	$(".elections_menu nav > ul.nav-pills").on("click", "li:not(.open) > a", function(){
+		$(this).parent().addClass("open");
+	});
+	$(".elections_menu nav > ul.nav-pills").on("click", "li.open > a", function(){
+		$(this).parent().removeClass("open");
+	});
+ 
+ 	// Napodobení hlavního menu - při hover vždy červená pouze jedna položka menu
+    $(".elections_menu nav ul.nav-pills li a:not(.active)").hover(function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#0f375a");
+	}, function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#900");
+	});
+    '
+);
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" class="mb-3">
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-2-3">
+                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+                    <a href="<?= $view->path('election_2020_kresla') ?>" title="Krajské volby 2020">
+                        <img src="/img/web/volby/krajske_volby_2020_logo.png" alt="Volby 2020" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-12 text-center">
+					<h2 class="text-secondary text-4-5 font-weight-normal">Volby do zastupitelstva Moravskoslezského kraje <span class="text-nowrap">2. - 3.10.2020</span></h2>
+                </div>
+            </div>
+		</div>
+	</div>
+
+	<div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-center mb-5">
+                    <img src="/img/web/volby/volby_2020_kresla.png" class="img-fluid mb-4" />
+                </div>
+            </div>
+
+			<?php if ($elections_results) { ?>
+				<div class="row mb-3">
+					<div class="col-md-6">
+						<h2 class="text-5 text-primary font-weight-semibold">Moravskoslezský kraj</h2>
+					</div>
+					<div class="col-md-2 col-xs-4">
+						<span class="font-size-xl text-weight-bold"><?= $elections_results['PLATNE_HLASY']; ?></span><br />
+						<div class="font-size-sm">Platné hlasy</div>
+					</div>
+					<div class="col-4 col-md-2 elections">
+						<div class="progress mb-1">
+							<div class="progress-bar" aria-valuenow="<?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%; background-color: #990000;">
+							</div>
+						</div>
+						<span class="text-4 font-weight-bold"><?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%</span><br />
+						<div class="text-2">Sečteno</div>
+					</div>
+					<div class="col-4 col-md-2 elections">
+						<div class="progress mb-1">
+							<div class="progress-bar" aria-valuenow="<?= $elections_results['UCAST_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['UCAST_PROC']; ?>%; background-color: #990000;">
+							</div>
+						</div>
+						<span class="text-4 font-weight-bold"><?= number_format($elections_results['UCAST_PROC'], 2, ',', ' '); ?>%</span><br />
+						<div class="text-2">Volební účast</div>
+					</div>
+				</div>
+			<?php } ?>
+
+            <?php if ($elections) { ?>
+                <?php $line = true; ?>
+                <div class="row">
+                    <?php foreach ($elections as $value) { ?>
+                        <div class="col-12 mb-3">
+                            <?php if ((float)$value['PROC_HLASU'] < 5 && $line === true) { ?>
+                                <?php $line = false; ?>
+                                <hr class="solid" />
+                            <?php } ?>
+                            <div class="progress-bars elections mt-4">
+                                <div class="progress-label clearfix">
+                                    <h2 class="float-start">
+                                        <?= $value['NAZEV_STRK']; ?>
+                                    </h2>
+                                </div>
+								<div class="clearfix mb-1">
+									<div class="progress-label float-start line-height-2" style="width: 70px;">
+										<span class="text-4 font-weight-bold"><?= number_format($value['PROC_HLASU'], 2, ',', ' '); ?>%</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar" aria-valuenow="<?= $value['PROC_HLASU']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $value['PROC_HLASU']; ?>%; background-color: <?= $value['barva']; ?>;">
+										</div>
+									</div>
+								</div>
+								<div class="text-2"><b><?= (int)$value['MANDATY']; ?> mandátů,</b> <?= number_format($value['HLASY'], 0, ',', ' '); ?> hlasů</div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            <?php } else { ?>
+                <div class="col-xs-12 mb-xl">
+                    Výsledky pro tuto sekci zatím nejsou dostupné.<br /><br /><br /><br />
+                </div>
+            <?php } ?>
+        </div>
+    </div>
+</div>
