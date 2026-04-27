@@ -99,7 +99,7 @@ class Election2025PlaykitRepository
     public function getResultsOkresyObceForWeb(string $nuts_okres, int|null $obec_id): ?array
     {
         $qb = $this->connection->createQueryBuilder()
-            ->select('p.*')
+            ->select('p.*', 'r.*')
             ->from('polar_electionsps2025_psrkl', 'p');
 
         if (!$obec_id) {    // pouze okres
@@ -261,23 +261,10 @@ class Election2025PlaykitRepository
      */
     public function fetchPsrklForBootstrapSelect(): ?array
     {
-        $rows = $this->connection->createQueryBuilder()
+        return $this->connection->createQueryBuilder()
             ->select('*')
             ->from('polar_electionsps2025_psrkl')
             ->orderBy('LOWER(ZKRATKAK8) COLLATE utf8_czech_ci', 'ASC')
             ->fetchAllAssociative();
-
-        $data = [];
-        $data[] = [
-            'value' => null,
-            'label' => null,
-        ];
-        foreach ($rows as $item) {
-            $data[] = [
-                'value' => $item['ZKRATKAK8'],
-                'label' => $item['ZKRATKAK8'],
-            ];
-        }
-        return $data;
     }
 }

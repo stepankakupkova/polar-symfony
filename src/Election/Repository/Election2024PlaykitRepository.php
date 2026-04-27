@@ -99,7 +99,7 @@ class Election2024PlaykitRepository
     public function getResultsOkresyObceForWeb(string $nuts_okres, int|null $obec_id): ?array
     {
         $qb = $this->connection->createQueryBuilder()
-            ->select('p.*')
+            ->select('p.*', 'r.*')
             ->from('polar_electionskz2024_kzrkl', 'p');
 
         if (!$obec_id) {    // pouze okres

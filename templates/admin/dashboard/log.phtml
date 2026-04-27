@@ -1,0 +1,80 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addInlineScript(
+    'var datetime = "' . date('Y-m-d 00:00:00') . '";
+    function getLog(){
+        $.post("' . $view->path('admin_log_json_dashboard') . '",
+            { datetime: datetime },
+            function(json) {
+                if (json.success === true) {
+                    datetime = json.datetime;
+                    if (json.data) {
+                        $("#log table tbody").prepend(json.data);
+                        $("#log table tbody [data-toggle=\'tooltip\']").tooltip();
+                        $("#log .scrollable").nanoScroller();
+                    }
+                } else {
+                    new PNotify({
+                        title: "Log",
+                        text: "Nepodařilo se načíst log!",
+                        type: "error",
+                        addclass: "click-2-close",
+                        buttons: { sticker: false }
+                    });
+                }
+            },
+            "json"
+        );
+        setTimeout(getLog, 60000);
+    }
+    getLog();'
+); ?>
+
+<section class="card card-featured card-featured-primary mt-0">
+    <header class="card-header">
+        <div class="card-actions pull-right mb-0">
+            <a href="<?= $view->path('admin_log') ?>" class="card-action btn btn-xs d-inline">
+                zobrazit vše
+            </a>
+            <a href="#" class="card-action card-action-toggle" data-card-toggle></a>
+        </div>
+        <h2 class="card-title">
+            Logy
+        </h2>
+    </header>
+    <div class="card-body" id="log">
+        <div class="scrollable visible-slider colored-slider" data-plugin-scrollable style="height: 516px;">
+            <div class="scrollable-content">
+                <table class="table table-responsive-md table-hover table-sm mb-0">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th class="text-center">
+                            <i class="fa fa-clock" data-toggle="tooltip" data-placement="top" title="Datum a čas"></i>
+                        </th>
+                        <th>
+                            Zpráva
+                        </th>
+                        <th>
+                            Popis
+                        </th>
+                        <th class="text-center">
+                            Uživatel
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

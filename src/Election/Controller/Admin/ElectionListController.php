@@ -27,7 +27,7 @@ final class ElectionListController
     public function index(): Response
     {
         return new Response($this->renderer->renderWithAdminLayout('election/admin/index', [
-            'pageTitle'     => 'Elections',
+            'pageTitle'     => 'Volby',
             'countElection' => $this->electionRepository->getCount(),
         ]));
     }
@@ -36,7 +36,7 @@ final class ElectionListController
     {
         // Flash messages zpracovány v šabloně přes session flash bag
         return new Response($this->renderer->renderWithAdminLayout('election/admin/list', [
-            'pageTitle' => 'Elections',
+            'pageTitle' => 'Volby',
         ]));
     }
 

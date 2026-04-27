@@ -67,13 +67,13 @@ $view->addInlineScript(
     $("#elections_okresy").val(' . (int)$okres_id . ');
 	$("#elections_okresy").change(function() {
 		var value = $(this).val();               
-		window.location.href = "' . $view->path('election_2024_obec', ['okres' => '__OKRES__']) . '".replace("__OKRES__", value);
+		window.location.href = "' . substr($view->path('election_2024_obec', ['okres' => $okres_id]), 0, -strlen((string)$okres_id)) . '" + value;
 	});
 	
 	$("#elections_obce").change(function() {
 		var value = $(this).val();  
 		if (value !== "null") {
-			window.location.href = "' . $view->path('election_2024_obec_detail', ['okres' => $okres_id, 'obec' => '__OBEC__']) . '".replace("__OBEC__", value);
+			window.location.href = "' . $view->path('election_2024_obec', ['okres' => $okres_id]) . '/obec/" + value;
 		} else {
 			window.location.href = "' . $view->path('election_2024_obec', ['okres' => $okres_id]) . '";
 		}      

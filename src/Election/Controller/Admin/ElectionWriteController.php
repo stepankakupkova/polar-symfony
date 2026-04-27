@@ -16,6 +16,7 @@ use App\Application\View\PhtmlRenderer;
 use App\Election\Repository\Election2025PlaykitRepository;
 use App\Election\Repository\ElectionCommand2025;
 use App\Election\Repository\ElectionRepository2025;
+use App\Program\Repository\VideoRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -29,6 +30,7 @@ final class ElectionWriteController
         private ElectionRepository2025 $electionRepository,
         private ElectionCommand2025 $electionCommand,
         private Election2025PlaykitRepository $electionPlaykitRepository,
+        private VideoRepository $videoRepository,
         private FlashMessenger $flashMessenger,
         private PhtmlRenderer $renderer,
         private UrlGeneratorInterface $urlGenerator,
@@ -38,6 +40,7 @@ final class ElectionWriteController
     public function add(Request $request): Response|RedirectResponse
     {
         $title_options = $this->electionPlaykitRepository->fetchPsrklForBootstrapSelect();
+        $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(161);
         $error = null;
 
         if ($request->isMethod('POST')) {
@@ -55,7 +58,7 @@ final class ElectionWriteController
                     'rank'        => (int) ($post['rank'] ?? 0),
                 ]);
 
-                $this->flashMessenger->addMessage('success', 'Elections', 'Election přidáno');
+                $this->flashMessenger->addMessage('success', 'Volby', 'Položka přidána');
 
                 // Log
                 $this->logger->notice('ELECTION - Add election', [
@@ -77,8 +80,9 @@ final class ElectionWriteController
         }
 
         return new Response($this->renderer->renderWithAdminLayout('election/admin/add', [
-            'pageTitle'     => 'Elections',
+            'pageTitle'     => 'Volby',
             'title_options' => $title_options,
+            'video_options' => $video_options,
             'error'         => $error,
         ]));
     }
@@ -96,6 +100,7 @@ final class ElectionWriteController
         }
 
         $title_options = $this->electionPlaykitRepository->fetchPsrklForBootstrapSelect();
+        $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(161);
         $error = null;
 
         if ($request->isMethod('POST')) {
@@ -114,8 +119,8 @@ final class ElectionWriteController
                     'rank'        => (int) ($post['rank'] ?? $election['rank']),
                 ]);
 
-                $this->flashMessenger->addMessage('success', 'Elections',
-                    'Elections <strong>"' . htmlspecialchars($election['title']) . '"</strong> upraveno');
+                $this->flashMessenger->addMessage('success', 'Volby',
+                    'Položka <strong>"' . htmlspecialchars($election['title']) . '"</strong> upravena');
 
                 // Log
                 $this->logger->notice('ELECTION - Edit election', [
@@ -137,9 +142,10 @@ final class ElectionWriteController
         }
 
         return new Response($this->renderer->renderWithAdminLayout('election/admin/edit', [
-            'pageTitle'     => 'Elections',
+            'pageTitle'     => 'Volby',
             'election'      => $election,
             'title_options' => $title_options,
+            'video_options' => $video_options,
             'error'         => $error,
         ]));
     }

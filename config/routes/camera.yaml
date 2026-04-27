@@ -49,12 +49,4 @@ admin_camera_json_write_set_order:
   controller: App\Camera\Controller\Admin\CameraWriteController::setOrder
   methods: [POST]
 
-# Admin — Setting
-admin_camera_setting:
-  path: /admin/kamery/nastaveni
-  controller: App\Camera\Controller\Admin\SettingWriteController::setting
-  methods: [GET, POST]
 
-admin_camera_setting_index:
-  path: /admin/kamery/nastaveni/index
-  controller: App\Camera\Controller\Admin\SettingListController::index

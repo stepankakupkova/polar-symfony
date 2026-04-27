@@ -5,14 +5,14 @@ $active = $active ?? null;
 ?>
 <nav class="">
     <ul class="nav nav-pills w-100">
+        <li>
+            <a class="nav-link text-4<?= ($active === 'kresla') ? ' active' : '' ?>" href="<?= $view->path('election_2024_kresla') ?>" title="Rozdělení křesel">Rozdělení křesel</a>
+        </li>
         <li class="">
             <a class="nav-link text-4<?= ($active === 'index') ? ' active' : '' ?>" href="<?= $view->path('election_2024') ?>" title="Zprávy">Volební zprávy</a>
         </li>
         <li>
             <a class="nav-link text-4<?= ($active === 'detail') ? ' active' : '' ?>" href="<?= $view->path('election_2024_detail', ['kstrana' => 39, 'strana_url' => 'ano-2011']) ?>" title="Kandidáti">Kandidáti</a>
-        </li>
-        <li>
-            <a class="nav-link text-4<?= ($active === 'kresla') ? ' active' : '' ?>" href="<?= $view->path('election_2024_kresla') ?>" title="Rozdělení křesel">Rozdělení křesel</a>
         </li>
         <li>
             <a class="nav-link text-4<?= ($active === 'zastupitele') ? ' active' : '' ?>" href="<?= $view->path('election_2024_zastupitele') ?>" title="Zvolení zastupitelé">Zvolení zastupitelé</a>

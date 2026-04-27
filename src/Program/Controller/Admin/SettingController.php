@@ -81,7 +81,7 @@ final class SettingController
 					$image->save($this->PUBLIC_PATH . '/' . $this->showImageDefault, ['png_compression_level' => 8]);
 					unset($image);
 
-					$this->flashMessenger->addMessage('success', 'Úspěšně uloženo', 'Settings saved');
+					$this->flashMessenger->addMessage('success', 'Úspěšně uloženo', 'Nastavení uloženo');
 
 					// Log
 					$logger->notice('PROGRAM - Edit settings', [

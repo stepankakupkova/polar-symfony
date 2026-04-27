@@ -1,0 +1,91 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+?>
+
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-list-alt"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">Program</h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount"><?= $view->numberFormat($countProgram) ?></strong>
+                            <span class="text-primary">(<?= $view->numberFormat($countProgramPremiere) ?> premiér)</span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <a href="<?= $view->path('admin_program_list') ?>" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-video"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">Videa</h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount"><?= $view->numberFormat($countVideo) ?></strong>
+                            <span class="text-primary"></span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <a href="<?= $view->path('admin_program_video_list') ?>" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="col-sm">
+    <section class="card card-featured-top card-featured-primary mb-4">
+        <div class="card-body">
+            <div class="widget-summary">
+                <div class="widget-summary-col widget-summary-col-icon">
+                    <div class="summary-icon bg-primary hvr-grow">
+                        <i class="fa fa-star"></i>
+                    </div>
+                </div>
+                <div class="widget-summary-col">
+                    <div class="summary">
+                        <h4 class="title text-nowrap">Pořady</h4>
+                        <div class="info text-nowrap">
+                            <strong class="amount"><?= $view->numberFormat($countShow) ?></strong>
+                            <span class="text-primary">(<?= $view->numberFormat($countShowActive) ?> aktivních)</span>
+                        </div>
+                    </div>
+                    <div class="summary-footer">
+                        <a href="<?= $view->path('admin_program_show_list') ?>" class="text-muted text-uppercase">
+                            <i class="fa fa-fw fa-ellipsis-v"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

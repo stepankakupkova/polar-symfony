@@ -28,7 +28,7 @@ $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css
                     <?php endif ?>
                 </div>
                 <h2 class="card-title">
-                    Upravit election
+                    Upravit položku
                 </h2>
             </header>
             <form action="<?= $view->path('admin_election_edit', ['id' => $election['id']]) ?>" method="post" id="frmElection" class="form-horizontal">
@@ -45,12 +45,12 @@ $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css
                         </label>
                         <div class="col-sm-9">
                             <select name="title" class="form-control selectpicker show-tick" required
-                                    data-hide-disabled="false" data-live-search="true" data-size="10">
+                                    data-style="btn-default" data-hide-disabled="false" data-live-search="true" data-size="10">
                                 <option value=""></option>
                                 <?php foreach ($title_options as $opt): ?>
                                     <option value="<?= htmlspecialchars($opt['ZKRATKAK8']) ?>"
                                         <?= ($election['title'] ?? '') === $opt['ZKRATKAK8'] ? ' selected' : '' ?>>
-                                        <?= htmlspecialchars($opt['NAZEV_STRK']) ?>
+                                        <?= htmlspecialchars($opt['ZKRATKAK8']) ?>
                                     </option>
                                 <?php endforeach ?>
                             </select>
@@ -70,8 +70,17 @@ $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css
                             Video
                         </label>
                         <div class="col-sm-9">
-                            <input type="number" name="video_id" value="<?= (int) ($election['video_id'] ?? 0) ?: '' ?>"
-                                   class="form-control" placeholder="volitelné">
+                            <select name="video_id" class="form-control selectpicker show-tick"
+                                    data-style="btn-default" data-hide-disabled="false" data-live-search="true" data-size="10">
+                                <option value=""></option>
+                                <?php foreach ($video_options as $opt): ?>
+                                    <?php if ($opt['value'] === null) continue; ?>
+                                    <option value="<?= (int) $opt['value'] ?>"
+                                        <?= ($election['video_id'] ?? null) == $opt['value'] ? ' selected' : '' ?>>
+                                        <?= htmlspecialchars($opt['label']) ?>
+                                    </option>
+                                <?php endforeach ?>
+                            </select>
                         </div>
                     </div>
                 </div>

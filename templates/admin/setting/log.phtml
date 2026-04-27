@@ -1,0 +1,340 @@
+<?php
+/*
+ * @project polar
+ * @author Rostislav Greipel
+ * @link https://rogr.cz
+ * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
+ * @license https://rogr.cz/license/eula EULA License
+ */
+
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-table/css/bootstrap-table.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/loading-btn/css/loading.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/admin/loading-btn/css/loading-btn.min.css'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/bootstrap-table.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/js/locale/cs-CZ.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/bootstrap-table/extension/cookie/js/cookie.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/moment.min.js'));
+$view->addBodyScript($view->asset('vendor/admin/moment/js/locale/cs.min.js'));
+?>
+
+<style>
+    section.content-body .tab-content {background: transparent; border: none; padding: 0px; box-shadow: none; -webkit-box-shadow: none;}
+</style>
+
+<script>
+    function optionsFormatter(value, row) {
+        let data = '<div class="btn-group">';
+        data += '<button data-id="' + row.id + '" class="btblBtnDelete ld-over-inverse btn btn-xs btn-danger"><i class="fa fa-trash-alt"></i><div class="ld ld-ring ld-spin"></div></button>';
+        data += '</div>';
+        return data;
+    }
+
+    function priorityFormatter(value) {
+        switch (value) {
+            case "EMERG":
+                return "<i class=\"fa fa-fw fa-lg fa-exclamation-circle text-danger\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Emergency\"></i>";
+            case "ALERT":
+                return "<i class=\"fa fa-fw fa-lg fa-exclamation-triangle text-danger\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Alert\"></i>";
+            case "CRIT":
+                return "<i class=\"fa fa-fw fa-lg fa-exclamation text-danger\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Critical\"></i>";
+            case "ERR":
+                return "<i class=\"fa fa-fw fa-lg fa-times-circle text-danger\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Error\"></i>";
+            case "WARN":
+                return "<i class=\"fa fa-fw fa-lg fa-exclamation-triangle text-warning\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Warning\"></i>";
+            case "NOTICE":
+                return "<i class=\"fa fa-fw fa-lg fa-info-circle text-info\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Notice\"></i>";
+            case "INFO":
+                return "<i class=\"fa fa-fw fa-lg fa-info text-info\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Informational\"></i>";
+            case "DEBUG":
+                return "<i class=\"fa fa-fw fa-lg fa-question-circle text-success\" data-toggle=\"tooltip\" data-placement=\"right\" title=\"Debug\"></i>";
+            default:
+                break;
+        }
+    }
+
+    function datetimeFormatter(value) {
+        if (value) {
+            return moment(value).format('lll');
+        }
+        return null;
+    }
+
+    function uriFormatter(value) {
+        if (value) {
+            return "<a href=\"" + value + "\" target=\"_blank\">" + value + "</a>";
+        }
+        return null;
+    }
+
+    function detailFormatter(index, row) {
+        let html = [];
+        html.push(
+            '<div class="container-fluid">' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">Soubor</div><div class="col">' + (row.file ? row.file : '-') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">Řádek</div><div class="col">' + (row.line ? row.line : '-') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">Trace</div><div class="col">' + (row.trace ? (row.trace.split("\n#")).join("<br>#") : '') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">xDebug</div><div class="col">' + (row.xdebug ? row.xdebug : '-') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">URL</div><div class="col">' + (row.uri ? ("<a href=\"" + row.uri + "\" target=\"_blank\">" + row.uri + "</a>") : '-') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">IP</div><div class="col">' + (row.ip ? row.ip : '-') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">Session ID</div><div class="col">' + (row.session_id ? row.session_id : '-') + '</div></div>' +
+            '<div class="row"><div class="col-12 col-xl-2 text-xl-right text-muted">Reference</div><div class="col">' + (row.reference ? row.reference : '-') + '</div></div>' +
+            '</div>'
+        );
+        return html.join('');
+    }
+</script>
+
+<?php $view->addInlineScript(<<<JS
+    $("section[role=main]").addClass("has-toolbar");
+
+    $("#btblLogAll, #btblLogError").on("post-body.bs.table", function (e, data) {
+        $(".btblBtnDelete").click(function() {
+            var btn = $(this).addClass("running");
+            var log_id = $(this).data("id");
+
+            $("#modalDanger .card-title").html("Smazat log");
+            $("#modalDanger .modal-text h4").html("Opravdu chcete smazat tento log?");
+            $("#modalDanger .modal-text p").html("Tuto akci nelze vrátit!");
+            var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+            btnConfirm.data("id", log_id);
+
+            $.magnificPopup.open({
+                items: {src: "#modalDanger"},
+                type: "inline",
+                fixedContentPos: false,
+                fixedBgPos: true,
+                overflowY: "auto",
+                closeBtnInside: true,
+                preloader: false,
+                midClick: true,
+                removalDelay: 300,
+                mainClass: "my-mfp-slide-bottom",
+                modal: true,
+                callbacks: {
+                    open: function() {
+                        btnConfirm.unbind("click").click(function(e){
+                            e.preventDefault();
+                            $.post("{$view->path('admin_log_json_delete')}",
+                                { log_id: log_id },
+                                function(json) {
+                                    if (json.success) {
+                                        new PNotify({ title: "Úspěch", text: "Log byl odstraněn", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
+                                        $("#btblLogAll").bootstrapTable("refresh", {"silent": true});
+                                        $("#btblLogError").bootstrapTable("refresh", {"silent": true});
+                                    } else {
+                                        new PNotify({ title: "Chyba", text: "Nepodařilo se smazat log", type: "error", addclass: "click-2-close", buttons: { sticker: false } });
+                                    }
+                                    $.magnificPopup.close();
+                                }, "json"
+                            );
+                        });
+                    },
+                    close: function() { btn.removeClass("running"); }
+                }
+            });
+        });
+    });
+
+    $("#btblBtnDeleteAll").click(function() {
+        var btn = $(this).addClass("running");
+        $("#modalDanger .card-title").html("Smazat všechny logy");
+        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat všechny logy?");
+        $("#modalDanger .modal-text p").html("Tuto akci nelze vrátit!");
+        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+
+        $.magnificPopup.open({
+            items: {src: "#modalDanger"},
+            type: "inline",
+            fixedContentPos: false,
+            fixedBgPos: true,
+            overflowY: "auto",
+            closeBtnInside: true,
+            preloader: false,
+            midClick: true,
+            removalDelay: 300,
+            mainClass: "my-mfp-slide-bottom",
+            modal: true,
+            callbacks: {
+                open: function() {
+                    btnConfirm.unbind("click").click(function(e){
+                        e.preventDefault();
+                        $.post("{$view->path('admin_log_json_delete_all')}",
+                            {},
+                            function(json) {
+                                if (json.success) {
+                                    new PNotify({ title: "Úspěch", text: "Logy byly odstraněny", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
+                                    $("#btblLogAll").bootstrapTable("refresh", {"silent": true});
+                                    $("#btblLogError").bootstrapTable("refresh", {"silent": true});
+                                } else {
+                                    new PNotify({ title: "Chyba", text: "Nepodařilo se smazat logy", type: "error", addclass: "click-2-close", buttons: { sticker: false } });
+                                }
+                                $.magnificPopup.close();
+                            }, "json"
+                        );
+                    });
+                },
+                close: function() { btn.removeClass("running"); }
+            }
+        });
+    });
+
+    $("#btblBtnDeleteError").click(function() {
+        var btn = $(this).addClass("running");
+        $("#modalDanger .card-title").html("Smazat chybové logy");
+        $("#modalDanger .modal-text h4").html("Opravdu chcete smazat chybové logy?");
+        $("#modalDanger .modal-text p").html("Tuto akci nelze vrátit!");
+        var btnConfirm = $("#modalDanger .card-footer button.modal-confirm");
+
+        $.magnificPopup.open({
+            items: {src: "#modalDanger"},
+            type: "inline",
+            fixedContentPos: false,
+            fixedBgPos: true,
+            overflowY: "auto",
+            closeBtnInside: true,
+            preloader: false,
+            midClick: true,
+            removalDelay: 300,
+            mainClass: "my-mfp-slide-bottom",
+            modal: true,
+            callbacks: {
+                open: function() {
+                    btnConfirm.unbind("click").click(function(e){
+                        e.preventDefault();
+                        $.post("{$view->path('admin_log_json_delete_all')}",
+                            { type: ["emerg", "alert", "crit", "err"] },
+                            function(json) {
+                                if (json.success) {
+                                    new PNotify({ title: "Úspěch", text: "Logy byly odstraněny", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
+                                    $("#btblLogAll").bootstrapTable("refresh", {"silent": true});
+                                    $("#btblLogError").bootstrapTable("refresh", {"silent": true});
+                                } else {
+                                    new PNotify({ title: "Chyba", text: "Nepodařilo se smazat logy", type: "error", addclass: "click-2-close", buttons: { sticker: false } });
+                                }
+                                $.magnificPopup.close();
+                            }, "json"
+                        );
+                    });
+                },
+                close: function() { btn.removeClass("running"); }
+            }
+        });
+    });
+JS); ?>
+
+<div class="inner-toolbar clearfix">
+    <ul>
+        <li class="right">
+            <ul class="nav nav-pills nav-pills-primary">
+                <li class="nav-item">
+                    <label>Typ</label>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#log-all" data-toggle="tab">Vše</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#log-error" data-toggle="tab">Chyby</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<section class="card">
+    <div class="card-body tab-content">
+
+        <div id="log-all" class="tab-pane active">
+            <div id="toolbar" class="btn-group">
+                <button id="btblBtnDeleteAll" class="btn btn-danger ld-over-inverse">
+                    <i class="fa fa-fw fa-trash-alt"></i>
+                    <span class="hidden-sm hidden-xs">Smazat vše</span>
+                    <span class="ld ld-ring ld-spin"></span>
+                </button>
+            </div>
+            <table id="btblLogAll"
+                   data-url="<?= $view->path('admin_log_json_list') ?>"
+                   data-toggle="table"
+                   data-sort-name="datetime"
+                   data-sort-order="desc"
+                   data-toolbar="#toolbar"
+                   data-detail-view="true"
+                   data-detail-formatter="detailFormatter"
+                   data-page-size="15"
+                   data-page-list="[15, 25, 50, 100]">
+                <thead>
+                <tr>
+                    <th class="width-nowrap" data-formatter="optionsFormatter" data-align="center" data-title-tooltip="Možnosti">
+                        <i class="fa fa-cogs"></i>
+                        <span class="btblLabel">Možnosti</span>
+                    </th>
+                    <th data-field="id" class="width-nowrap" data-sortable="true" data-visible="false">ID</th>
+                    <th data-field="priority" class="width-nowrap" data-formatter="priorityFormatter" data-align="center" data-title-tooltip="Priorita">
+                        <i class="fa fa-info-circle"></i>
+                        <span class="btblLabel">Priorita</span>
+                    </th>
+                    <th data-field="datetime" class="width-nowrap no-break" data-formatter="datetimeFormatter" data-sortable="true">Datum a čas</th>
+                    <th data-field="message" data-sortable="true">Zpráva</th>
+                    <th data-field="description" data-sortable="true">Popis</th>
+                    <th data-field="user" class="width-nowrap" data-sortable="true">Uživatel</th>
+                    <th data-field="file" data-visible="false">Soubor</th>
+                    <th data-field="line" class="width-nowrap" data-visible="false">Řádek</th>
+                    <th data-field="trace" data-visible="false">Trace</th>
+                    <th data-field="xdebug" class="width-nowrap d-none d-sm-table-cell" data-visible="false">xDebug</th>
+                    <th data-field="uri" class="width-nowrap d-none d-sm-table-cell" data-formatter="uriFormatter" data-visible="false">URL</th>
+                    <th data-field="ip" class="width-nowrap d-none d-sm-table-cell" data-visible="false">IP</th>
+                    <th data-field="session_id" class="width-nowrap d-none d-sm-table-cell" data-visible="false">Session ID</th>
+                    <th data-field="reference" class="width-nowrap d-none d-sm-table-cell" data-visible="false">Reference</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div id="log-error" class="tab-pane">
+            <div id="toolbar2" class="btn-group">
+                <button id="btblBtnDeleteError" class="btn btn-danger ld-over-inverse">
+                    <i class="fa fa-fw fa-trash-alt"></i>
+                    <span class="hidden-sm hidden-xs">Smazat vše</span>
+                    <span class="ld ld-ring ld-spin"></span>
+                </button>
+            </div>
+            <table id="btblLogError"
+                   data-url="<?= $view->path('admin_log_json_list') ?>?priority[]=emerg&priority[]=alert&priority[]=crit&priority[]=err"
+                   data-toggle="table"
+                   data-sort-name="datetime"
+                   data-sort-order="desc"
+                   data-toolbar="#toolbar2"
+                   data-detail-view="true"
+                   data-detail-formatter="detailFormatter"
+                   data-page-size="15"
+                   data-page-list="[15, 25, 50, 100]">
+                <thead>
+                <tr>
+                    <th class="width-nowrap" data-formatter="optionsFormatter" data-align="center" data-title-tooltip="Možnosti">
+                        <i class="fa fa-cogs"></i>
+                        <span class="btblLabel">Možnosti</span>
+                    </th>
+                    <th data-field="id" class="width-nowrap" data-sortable="true" data-visible="false">ID</th>
+                    <th data-field="priority" class="width-nowrap" data-formatter="priorityFormatter" data-align="center" data-title-tooltip="Priorita">
+                        <i class="fa fa-info-circle"></i>
+                        <span class="btblLabel">Priorita</span>
+                    </th>
+                    <th data-field="datetime" class="width-nowrap no-break" data-formatter="datetimeFormatter" data-sortable="true">Datum a čas</th>
+                    <th data-field="message" data-sortable="true">Zpráva</th>
+                    <th data-field="user" class="width-nowrap" data-sortable="true">Uživatel</th>
+                    <th data-field="file" data-visible="false">Soubor</th>
+                    <th data-field="line" class="width-nowrap" data-visible="false">Řádek</th>
+                    <th data-field="trace">Trace</th>
+                    <th data-field="xdebug" class="width-nowrap d-none d-sm-table-cell" data-visible="false">xDebug</th>
+                    <th data-field="uri" class="width-nowrap d-none d-sm-table-cell" data-formatter="uriFormatter" data-visible="false">URL</th>
+                    <th data-field="ip" class="width-nowrap d-none d-sm-table-cell" data-visible="false">IP</th>
+                    <th data-field="session_id" class="width-nowrap d-none d-sm-table-cell" data-visible="false">Session ID</th>
+                    <th data-field="reference" class="width-nowrap d-none d-sm-table-cell" data-visible="false">Reference</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
+    </div>
+</section>
+
+<?= $view->include('admin/modal/danger') ?>

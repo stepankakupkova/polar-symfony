@@ -85,7 +85,7 @@ election_2020:
   path: /volby-2020
   controller: App\Election\Controller\Web\Web2020Controller::index
 
-# Admin — Elections 2025
+# Admin — Volby 2025
 admin_election:
   path: /admin/volby
   controller: App\Election\Controller\Admin\ElectionListController::index
@@ -124,20 +124,3 @@ admin_election_json_write_set_order:
   path: /admin/volby/json-write/set-order
   controller: App\Election\Controller\Admin\ElectionWriteController::setOrder
   methods: [POST]
-
-admin_election_setting:
-  path: /admin/volby/nastaveni
-  controller: App\Election\Controller\Admin\SettingWriteController::setting
-  methods: [GET, POST]
-
-admin_election_setting_json_list:
-  path: /admin/volby/nastaveni/json-list/{action}
-  controller: App\Election\Controller\Admin\SettingWriteController::jsonList
-  requirements:
-    action: '[a-zA-Z][a-zA-Z0-9_-]+'
-
-admin_election_setting_json_write:
-  path: /admin/volby/nastaveni/json-write/{action}
-  controller: App\Election\Controller\Admin\SettingWriteController::jsonWrite
-  requirements:
-    action: '[a-zA-Z][a-zA-Z0-9_-]+'
