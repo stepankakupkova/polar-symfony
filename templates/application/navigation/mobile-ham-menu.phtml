@@ -3,6 +3,7 @@
  * Hamburger menu (mobily) — položky submenu ve 2 sloupcích
  * Prvních 5 položek vlevo, zbytek vpravo
  */
+/** @var \App\Application\View\ViewHelper $view */
 
 $nav = require dirname(__DIR__, 3) . '/config/navigation.php';
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

@@ -1,5 +1,6 @@
 <?php
 /** @var array|null $blockCamera */
+/** @var \App\Application\View\ViewHelper $view */
 
 $removeAccent = function (string $text, string $replace = ''): string {
     $transliterator = \Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', \Transliterator::FORWARD);

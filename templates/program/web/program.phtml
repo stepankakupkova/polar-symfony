@@ -51,16 +51,18 @@ $view->addInlineScript(
         getCrawlData();'
 );
 
+$view->setBreadcrumbs([
+    ['label' => 'Domů', 'url' => '/'],
+    ['label' => 'TV program'],
+]);
+
 ?>
 
 <section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
     <div class="container">
         <div class="row">
             <div class="col-md-12 align-self-center order-1">
-                <?= $view->setBreadcrumbs([
-                    ['label' => 'Domů', 'url' => '/'],
-                    ['label' => 'TV program'],
-                ]) ?>
+                <?= $view->include('application/navigation/breadcrumb') ?>
             </div>
         </div>
     </div>

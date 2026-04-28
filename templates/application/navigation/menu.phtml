@@ -4,6 +4,7 @@
  *
  * @param string $ulClass  'nav nav-pills' (desktop) nebo 'mobile-menu' (mobile scroll)
  */
+/** @var \App\Application\View\ViewHelper $view */
 
 $ulClass = $ulClass ?? 'nav nav-pills';
 $isMobile = str_contains($ulClass, 'mobile-menu');

@@ -1,5 +1,6 @@
 <?php
 /** @var array<array{label: string, url?: string}> $breadcrumbs */
+/** @var \App\Application\View\ViewHelper $view */
 $breadcrumbs = $view->getBreadcrumbs();
 if (!$breadcrumbs) { return; }
 

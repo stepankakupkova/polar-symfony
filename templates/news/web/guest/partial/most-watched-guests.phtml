@@ -4,6 +4,7 @@
  * @param string|null $replace
  * @return string
  */
+/** @var \App\Application\View\ViewHelper $view */
 function removeAccent(string $text, ?string $replace = null): string
 {
     $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);

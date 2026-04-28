@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
  * @project ferritenergy
  * @author Rostislav Greipel
@@ -6,6 +6,7 @@
  * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
  * @license https://rogr.cz/license/eula EULA License
  */
+/** @var \App\Application\View\ViewHelper $view */
 
 $srcImage = $view->asset('data/banner/mobilesquare1/!default-banner.png') . '?ver=' . date('YmdHis');
 $imageValue = $post['image'] ?? null;
