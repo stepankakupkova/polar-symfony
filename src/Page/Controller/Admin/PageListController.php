@@ -22,18 +22,6 @@ final class PageListController
 	/**
 	 * @return Response
 	 */
-	public function index(): Response
-	{
-		return new Response($this->renderer->renderWithAdminLayout('page/admin/index', [
-			'pageTitle' => 'Stránky',
-			'countPage' => $this->pageRepository->getCount(),
-			'countPageActive' => $this->pageRepository->getCount(true),
-		]));
-	}
-
-	/**
-	 * @return Response
-	 */
 	public function list(): Response
 	{
 		$lang = 'cs_CZ';

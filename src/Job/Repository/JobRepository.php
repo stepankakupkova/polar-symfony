@@ -248,25 +248,78 @@ final class JobRepository
 
 	public function getForWeb(int $id): ?array
 	{
-		return $this->connection->createQueryBuilder()
+		$job = $this->connection->createQueryBuilder()
 			->select(
 				'j.*',
 				'jo.nazev AS obec',
 				'profese_czisco.nazev AS profese',
 				'typy_mzdy.nazev AS typMzdy',
+				'smennosti.nazev AS smennost',
+				'vzdelani.nazev AS minPozadovaneVzdelani',
 				'jok.kod AS okres_kod',
 				'jok.nazev AS okres_nazev',
-				'z.nazev AS zamestnavatel_nazev',
 			)
 			->from('joboffer', 'j')
 			->leftJoin('j', 'joboffer_obce', 'jo', 'jo.kod = j.mistoVykonuPrace_obec')
 			->leftJoin('j', 'joboffer_profese_czisco', 'profese_czisco', 'profese_czisco.kod = j.profeseCzIsco')
 			->leftJoin('j', 'joboffer_typy_mzdy', 'typy_mzdy', 'typy_mzdy.kod = j.typMzdy')
+			->leftJoin('j', 'joboffer_smennosti', 'smennosti', 'smennosti.kod = j.smennost')
+			->leftJoin('j', 'joboffer_vzdelani', 'vzdelani', 'vzdelani.kod = j.minPozadovaneVzdelani')
 			->leftJoin('jo', 'joboffer_okresy', 'jok', 'jok.kod = jo.okres')
-			->leftJoin('j', 'joboffer_zamestnavatele', 'z', 'z.ico = j.zamestnavatelIco')
 			->where('j.referencniCislo = :id')
 			->setParameter('id', $id)
-			->fetchAssociative() ?: null;
+			->fetchAssociative();
+
+		if (!$job) {
+			return null;
+		}
+
+		// Pracovněprávní vztahy
+		$job['pracovnepravni_vztahy'] = $this->connection->createQueryBuilder()
+			->select('ppv.nazev')
+			->from('joboffer_pracovnepravni_vztahy', 'ppv')
+			->leftJoin('ppv', 'joboffer2pracovnepravni_vztahy', 'j2p', 'j2p.kod = ppv.kod')
+			->where('j2p.portalId = :portalId')
+			->setParameter('portalId', $job['portalId'])
+			->fetchAllAssociative() ?: null;
+
+		// Jazyky
+		$job['jazyky'] = $this->connection->createQueryBuilder()
+			->select('jaz.nazev', 'j2j.popis')
+			->from('joboffer_jazyky', 'jaz')
+			->leftJoin('jaz', 'joboffer2jazyky', 'j2j', 'j2j.kod = jaz.kod')
+			->where('j2j.portalId = :portalId')
+			->setParameter('portalId', $job['portalId'])
+			->fetchAllAssociative() ?: null;
+
+		// Dovednosti
+		$job['dovednosti'] = $this->connection->createQueryBuilder()
+			->select('d.nazev', 'j2d.popis')
+			->from('joboffer_dovednosti', 'd')
+			->leftJoin('d', 'joboffer2dovednosti', 'j2d', 'j2d.kod = d.kod')
+			->where('j2d.portalId = :portalId')
+			->setParameter('portalId', $job['portalId'])
+			->fetchAllAssociative() ?: null;
+
+		// Výhody
+		$job['vyhody'] = $this->connection->createQueryBuilder()
+			->select('v.nazev', 'j2v.popis')
+			->from('joboffer_vyhody_volneho_mista', 'v')
+			->leftJoin('v', 'joboffer2vyhody_volneho_mista', 'j2v', 'j2v.kod = v.kod')
+			->where('j2v.portalId = :portalId')
+			->setParameter('portalId', $job['portalId'])
+			->fetchAllAssociative() ?: null;
+
+		// Vhodnosti
+		$job['vhodnosti'] = $this->connection->createQueryBuilder()
+			->select('vh.nazev', 'j2vh.popis')
+			->from('joboffer_vhodnosti_pro_typ_zamestnance', 'vh')
+			->leftJoin('vh', 'joboffer2vhodnosti_pro_typ_zamestnance', 'j2vh', 'j2vh.kod = vh.kod')
+			->where('j2vh.portalId = :portalId')
+			->setParameter('portalId', $job['portalId'])
+			->fetchAllAssociative() ?: null;
+
+		return $job;
 	}
 
 	public function getAllOboryCinnostiVmForMenu(): array

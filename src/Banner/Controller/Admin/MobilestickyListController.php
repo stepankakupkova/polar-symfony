@@ -24,15 +24,6 @@ final class MobilestickyListController
         private PhtmlRenderer $renderer,
     ) {}
 
-    public function index(): Response
-    {
-        return new Response($this->renderer->renderWithAdminLayout('banner/admin/mobilesticky/index', [
-            'pageTitle'              => 'Mobile Sticky',
-            'countMobilesticky'      => $this->mobilestickyRepository->getCount(),
-            'countMobilestickyActive' => $this->mobilestickyRepository->getCount(true),
-        ]));
-    }
-
     public function list(): Response
     {
         // Flash messages jsou zpracovány automaticky přes PhtmlRenderer

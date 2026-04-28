@@ -24,14 +24,6 @@ final class ElectionListController
         private PhtmlRenderer $renderer,
     ) {}
 
-    public function index(): Response
-    {
-        return new Response($this->renderer->renderWithAdminLayout('election/admin/index', [
-            'pageTitle'     => 'Volby',
-            'countElection' => $this->electionRepository->getCount(),
-        ]));
-    }
-
     public function list(Request $request): Response
     {
         // Flash messages zpracovány v šabloně přes session flash bag

@@ -23,7 +23,6 @@ if (isset($og)) {
 }
 
 $view->setBreadcrumbs([
-    ['label' => 'Domů', 'url' => $view->path('app_home')],
     ['label' => 'Polar 2'],
 ]);
 
@@ -52,7 +51,7 @@ $view->addInlineScript(
     'window.addEventListener("load", function () {
         getProgram2();
         function getProgram2() {
-            $.post("' . $view->path('app_get_program2_for_web') . '",
+            $.post("' . $view->path('program_web_json_get_program2') . '",
                 {},
                 function(json) {
                     $("#program2").html(json.content);

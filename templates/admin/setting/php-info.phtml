@@ -1,5 +1,5 @@
 <?php
-$scheme = $view->getGlobal('scheme');
+$scheme = $scheme ?? 'dark';
 $schemeOpposite = $scheme === 'dark' ? 'light' : 'dark';
 
 $view->addHeadLink('<style>table tbody td.e {width: 1%; white-space: nowrap; text-align: left;} table tbody td.v {text-align: left;} html.dark table tr:hover {color: #cccccc;}</style>', 'style');

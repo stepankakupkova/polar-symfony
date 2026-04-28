@@ -17,15 +17,6 @@ final class UserListController
 		private PhtmlRenderer $renderer,
 	) {}
 
-	public function index(): Response
-	{
-		return new Response($this->renderer->renderWithAdminLayout('user/admin/index', [
-			'pageTitle' => 'Uživatelé',
-			'countUsers' => $this->userRepository->getCount(),
-			'countUsersActive' => $this->userRepository->getCount(true),
-		]));
-	}
-
 	public function list(): Response
 	{
 		return new Response($this->renderer->renderWithAdminLayout('user/admin/list', [

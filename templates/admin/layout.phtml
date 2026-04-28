@@ -166,32 +166,32 @@ $identity = $identity ?? null;
                                     </li>
                                 </ul>
                             </li>
-                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_camera')) ? ' nav-active' : '' ?>">
-                                <a class="nav-link" href="<?= $view->path('admin_camera') ?>">
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_camera_list')) ? ' nav-active' : '' ?>">
+                                <a class="nav-link" href="<?= $view->path('admin_camera_list') ?>">
                                     <i class="fa fa-fw fa-camera" aria-hidden="true"></i>
                                     <span>Kamery</span>
                                 </a>
                             </li>
-                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_election')) ? ' nav-active' : '' ?>">
-                                <a class="nav-link" href="<?= $view->path('admin_election') ?>">
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_election_list')) ? ' nav-active' : '' ?>">
+                                <a class="nav-link" href="<?= $view->path('admin_election_list') ?>">
                                     <i class="fa fa-fw fa-person-booth" aria-hidden="true"></i>
                                     <span>Volební studia 2025</span>
                                 </a>
                             </li>
-                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_job_index')) ? ' nav-active' : '' ?>">
-                                <a class="nav-link" href="<?= $view->path('admin_job_index') ?>">
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_job_list')) ? ' nav-active' : '' ?>">
+                                <a class="nav-link" href="<?= $view->path('admin_job_list') ?>">
                                     <i class="fa fa-fw fa-truck" aria-hidden="true"></i>
                                     <span>Nabídka práce</span>
                                 </a>
                             </li>
                             <?php
                                 $bannerPaths = [
-                                    $view->path('admin_banner_leaderboard_index'),
-                                    $view->path('admin_banner_rectangle_index'),
-                                    $view->path('admin_banner_square_index'),
-                                    $view->path('admin_banner_mobilesticky_index'),
-                                    $view->path('admin_banner_mobilesquare1_index'),
-                                    $view->path('admin_banner_mobilesquare2_index'),
+                                    $view->path('admin_banner_leaderboard_list'),
+                                    $view->path('admin_banner_rectangle_list'),
+                                    $view->path('admin_banner_square_list'),
+                                    $view->path('admin_banner_mobilesticky_list'),
+                                    $view->path('admin_banner_mobilesquare1_list'),
+                                    $view->path('admin_banner_mobilesquare2_list'),
                                 ];
                                 $isBannerActive = array_filter($bannerPaths, fn($p) => str_starts_with($currentPath, $p));
                             ?>
@@ -201,40 +201,40 @@ $identity = $identity ?? null;
                                     <span>Bannery</span>
                                 </a>
                                 <ul class="nav nav-children">
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_leaderboard_index')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_banner_leaderboard_index') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_leaderboard_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_leaderboard_list') ?>">
                                             <span>Leaderboard</span>
                                         </a>
                                     </li>
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_rectangle_index')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_banner_rectangle_index') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_rectangle_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_rectangle_list') ?>">
                                             <span>Rectangle</span>
                                         </a>
                                     </li>
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_square_index')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_banner_square_index') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_square_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_square_list') ?>">
                                             <span>Square</span>
                                         </a>
                                     </li>
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesticky_index')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesticky_index') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesticky_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesticky_list') ?>">
                                             <span>Mobile Sticky</span>
                                         </a>
                                     </li>
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesquare1_index')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesquare1_index') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesquare1_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesquare1_list') ?>">
                                             <span>Mobile Square 1</span>
                                         </a>
                                     </li>
-                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesquare2_index')) ? 'nav-active' : '' ?>">
-                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesquare2_index') ?>">
+                                    <li class="<?= str_starts_with($currentPath, $view->path('admin_banner_mobilesquare2_list')) ? 'nav-active' : '' ?>">
+                                        <a class="nav-link" href="<?= $view->path('admin_banner_mobilesquare2_list') ?>">
                                             <span>Mobile Square 2</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_page_index')) ? ' nav-active' : '' ?>">
-                                <a class="nav-link" href="<?= $view->path('admin_page_index') ?>">
+                            <li class="nav-item<?= str_starts_with($currentPath, $view->path('admin_page_list')) ? ' nav-active' : '' ?>">
+                                <a class="nav-link" href="<?= $view->path('admin_page_list') ?>">
                                     <i class="fa fa-fw fa-file-alt" aria-hidden="true"></i>
                                     <span>Stránky</span>
                                 </a>

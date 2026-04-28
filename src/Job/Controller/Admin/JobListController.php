@@ -12,23 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class JobListController
 {
-	public function index(
-		PhtmlRenderer $renderer,
-		JobRepository $jobRepository,
-		JobOurRepository $jobOurRepository,
-	): Response
-	{
-		return new Response($renderer->renderWithAdminLayout('job/admin/index', [
-			'pageTitle' => 'Jobs',
-			'countJob' => $jobRepository->getCount(),
-			'countJobOurs' => $jobOurRepository->getCount(),
-		]));
-	}
-
 	public function list(PhtmlRenderer $renderer): Response
 	{
 		return new Response($renderer->renderWithAdminLayout('job/admin/list', [
-			'pageTitle' => 'Jobs',
+			'pageTitle' => 'Nabídka práce',
 		]));
 	}
 

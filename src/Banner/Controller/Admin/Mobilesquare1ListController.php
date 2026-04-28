@@ -24,15 +24,6 @@ final class Mobilesquare1ListController
         private PhtmlRenderer $renderer,
     ) {}
 
-    public function index(): Response
-    {
-        return new Response($this->renderer->renderWithAdminLayout('banner/admin/mobilesquare1/index', [
-            'pageTitle'                => 'Mobile Square 1',
-            'countMobilesquare1'       => $this->mobilesquare1Repository->getCount(),
-            'countMobilesquare1Active' => $this->mobilesquare1Repository->getCount(true),
-        ]));
-    }
-
     public function list(): Response
     {
         // Flash messages jsou zpracovány automaticky přes PhtmlRenderer

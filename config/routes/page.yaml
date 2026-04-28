@@ -1,8 +1,4 @@
 # Page admin routes
-admin_page_index:
-  path: /admin/stranky
-  controller: App\Page\Controller\Admin\PageListController::index
-
 admin_page_list:
   path: /admin/stranky/seznam
   controller: App\Page\Controller\Admin\PageListController::list

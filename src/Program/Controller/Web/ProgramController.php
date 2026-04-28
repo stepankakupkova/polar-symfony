@@ -238,6 +238,7 @@ final class ProgramController
 		} catch (Exception $e) {
 			$success = false;
 			$message = $e->getMessage();
+			$reload = null;
 		}
 
 		return new JsonResponse([
@@ -294,6 +295,7 @@ final class ProgramController
 		} catch (Exception $e) {
 			$success = false;
 			$message = $e->getMessage();
+			$reload = null;
 		}
 
 		return new JsonResponse([

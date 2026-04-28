@@ -24,15 +24,6 @@ final class SquareListController
         private PhtmlRenderer $renderer,
     ) {}
 
-    public function index(): Response
-    {
-        return new Response($this->renderer->renderWithAdminLayout('banner/admin/square/index', [
-            'pageTitle'         => 'Square',
-            'countSquare'       => $this->squareRepository->getCount(),
-            'countSquareActive' => $this->squareRepository->getCount(true),
-        ]));
-    }
-
     public function list(): Response
     {
         // Flash messages jsou zpracovány automaticky přes PhtmlRenderer

@@ -24,14 +24,6 @@ final class CameraListController
         private PhtmlRenderer $renderer,
     ) {}
 
-    public function index(): Response
-    {
-        return new Response($this->renderer->renderWithAdminLayout('camera/admin/index', [
-            'pageTitle'   => 'Kamery',
-            'countCamera' => $this->cameraRepository->getCount(),
-        ]));
-    }
-
     public function list(): Response
     {
         return new Response($this->renderer->renderWithAdminLayout('camera/admin/list', [

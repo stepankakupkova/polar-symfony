@@ -24,15 +24,6 @@ final class RectangleListController
         private PhtmlRenderer $renderer,
     ) {}
 
-    public function index(): Response
-    {
-        return new Response($this->renderer->renderWithAdminLayout('banner/admin/rectangle/index', [
-            'pageTitle'              => 'Rectangle',
-            'countRectangle'         => $this->rectangleRepository->getCount(),
-            'countRectangleActive'   => $this->rectangleRepository->getCount(true),
-        ]));
-    }
-
     public function list(): Response
     {
         // Flash messages jsou zpracovány automaticky přes PhtmlRenderer

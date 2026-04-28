@@ -86,10 +86,6 @@ election_2020:
   controller: App\Election\Controller\Web\Web2020Controller::index
 
 # Admin — Volby 2025
-admin_election:
-  path: /admin/volby
-  controller: App\Election\Controller\Admin\ElectionListController::index
-
 admin_election_list:
   path: /admin/volby/seznam
   controller: App\Election\Controller\Admin\ElectionListController::list

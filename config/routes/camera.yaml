@@ -10,10 +10,6 @@ camera_detail:
     camera_url: '[a-zA-Z][a-zA-Z0-9_-]+'
 
 # Admin — Camera
-admin_camera:
-  path: /admin/kamery
-  controller: App\Camera\Controller\Admin\CameraListController::index
-
 admin_camera_list:
   path: /admin/kamery/seznam
   controller: App\Camera\Controller\Admin\CameraListController::list

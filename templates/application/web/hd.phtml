@@ -23,7 +23,6 @@ if (isset($og)) {
 }
 
 $view->setBreadcrumbs([
-    ['label' => 'Domů', 'url' => $view->path('app_home')],
     ['label' => 'HD vysílání'],
 ]);
 
@@ -52,7 +51,7 @@ $view->addInlineScript(
     'window.addEventListener("load", function () {
         getProgram();
         function getProgram() {
-            $.post("' . $view->path('app_get_program_for_hd') . '",
+            $.post("' . $view->path('program_web_json_get_program_hd') . '",
                 {},
                 function(json) {
                     $("#programHd").html(json.content);

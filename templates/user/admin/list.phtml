@@ -230,7 +230,7 @@ $view->addInlineScript(
 
     <script>
         function optionsFormatter(value, row) {
-            let url = "<?= $view->path('admin_user_index') ?>/upravit";
+            let url = "<?= $view->path('admin_user_list') ?>/upravit";
             let data = '<div class="btn-group pb-sm-0 pb-2">';
             if (row.role !== "owner" || "<?= in_array('owner', $identity->getRole(), true) ?>" === "true") {
                 data += '<a href="' + url + "/" + row.id + '" class="btn btn-sm btn-success"><i class="fa fa-edit"></i> <span class="d-none">Upravit</span></a> ' +

@@ -39,10 +39,6 @@ admin_log_json_delete_all:
   methods: [POST]
 
 # User
-admin_user_index:
-  path: /admin/uzivatele
-  controller: App\User\Controller\Admin\UserListController::index
-
 admin_user_list:
   path: /admin/uzivatele/seznam
   controller: App\User\Controller\Admin\UserListController::list
@@ -78,35 +74,23 @@ admin_user_upload_image:
   methods: [POST]
 
 # Job
-admin_job_index:
-  path: /admin/prace
-  controller: App\Job\Controller\Admin\JobListController::index
-
 admin_job_list:
-  path: /admin/prace/list
+  path: /admin/nabidka-prace/list
   controller: App\Job\Controller\Admin\JobListController::list
 
 admin_job_json_list:
-  path: /admin/prace/json-list/get-list
+  path: /admin/nabidka-prace/json-list/get-list
   controller: App\Job\Controller\Admin\JobListController::getList
   methods: [GET]
 
 admin_job_json_list_ours:
-  path: /admin/prace/json-list/get-list-ours
+  path: /admin/nabidka-prace/json-list/get-list-ours
   controller: App\Job\Controller\Admin\JobListController::getListOurs
   methods: [GET]
 
 
 # Banner
-admin_banner_index:
-  path: /admin/banner
-  controller: App\Banner\Controller\Admin\LeaderboardListController::index
-
 # Banner - Leaderboard
-admin_banner_leaderboard_index:
-  path: /admin/banner/leaderboard
-  controller: App\Banner\Controller\Admin\LeaderboardListController::index
-
 admin_banner_leaderboard_list:
   path: /admin/banner/leaderboard/seznam
   controller: App\Banner\Controller\Admin\LeaderboardListController::list
@@ -152,10 +136,6 @@ admin_banner_leaderboard_set_default_image:
   methods: [POST]
 
 # Banner - Rectangle
-admin_banner_rectangle_index:
-  path: /admin/banner/rectangle
-  controller: App\Banner\Controller\Admin\RectangleListController::index
-
 admin_banner_rectangle_list:
   path: /admin/banner/rectangle/seznam
   controller: App\Banner\Controller\Admin\RectangleListController::list
@@ -201,10 +181,6 @@ admin_banner_rectangle_set_default_image:
   methods: [POST]
 
 # Banner - Square
-admin_banner_square_index:
-  path: /admin/banner/square
-  controller: App\Banner\Controller\Admin\SquareListController::index
-
 admin_banner_square_list:
   path: /admin/banner/square/seznam
   controller: App\Banner\Controller\Admin\SquareListController::list
@@ -250,10 +226,6 @@ admin_banner_square_set_default_image:
   methods: [POST]
 
 # Banner - Mobilesticky
-admin_banner_mobilesticky_index:
-  path: /admin/banner/mobilesticky
-  controller: App\Banner\Controller\Admin\MobilestickyListController::index
-
 admin_banner_mobilesticky_list:
   path: /admin/banner/mobilesticky/seznam
   controller: App\Banner\Controller\Admin\MobilestickyListController::list
@@ -299,10 +271,6 @@ admin_banner_mobilesticky_set_default_image:
   methods: [POST]
 
 # Banner - Mobilesquare1
-admin_banner_mobilesquare1_index:
-  path: /admin/banner/mobilesquare1
-  controller: App\Banner\Controller\Admin\Mobilesquare1ListController::index
-
 admin_banner_mobilesquare1_list:
   path: /admin/banner/mobilesquare1/seznam
   controller: App\Banner\Controller\Admin\Mobilesquare1ListController::list
@@ -348,10 +316,6 @@ admin_banner_mobilesquare1_set_default_image:
   methods: [POST]
 
 # Banner - Mobilesquare2
-admin_banner_mobilesquare2_index:
-  path: /admin/banner/mobilesquare2
-  controller: App\Banner\Controller\Admin\Mobilesquare2ListController::index
-
 admin_banner_mobilesquare2_list:
   path: /admin/banner/mobilesquare2/seznam
   controller: App\Banner\Controller\Admin\Mobilesquare2ListController::list
