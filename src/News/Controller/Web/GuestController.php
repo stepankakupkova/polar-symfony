@@ -36,7 +36,6 @@ final class GuestController
 				$shows_arr[$show['id']] = $show['title'];
 			}
 		}
-		//var_dump($shows_arr);
 
 		// Paginator
 		$total = $guests ? count($guests) : 0;

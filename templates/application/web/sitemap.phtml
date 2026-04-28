@@ -24,21 +24,36 @@ $view->setBreadcrumbs([
 <div class="container py-2">
     <div class="row justify-content-between">
         <div class="col-lg-6">
-            <!-- TODO: Navigace sitemap - migrace z Laminas\Navigation -->
+            <?php
+            $nav = require dirname(__DIR__, 3) . '/config/navigation.php';
+            $newsNav = $nav['regions'];
+            ?>
             <ul class="nav nav-list flex-column mb-5">
-                <li><a href="<?= $view->path('app_home') ?>"><?= 'Domů' ?></a></li>
-                <li><a href="<?= $view->path('news') ?>">Zprávy</a></li>
-                <li><a href="<?= $view->path('app_hd') ?>">HD vysílání</a></li>
-                <li><a href="<?= $view->path('app_polar2') ?>">Polar 2</a></li>
-                <li><a href="<?= $view->path('app_rss') ?>">RSS</a></li>
-                <li><a href="<?= $view->path('app_sitemap') ?>">Mapa stránek</a></li>
-                <li><a href="<?= $view->path('app_sitemap_xml') ?>">sitemap.xml</a></li>
-                <li><a href="<?= $view->path('app_robots_txt') ?>">robots.txt</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= $view->path('app_home') ?>" title="Domů"><i class="fa fa-fw fa-home mr-1" aria-hidden="true"></i><img src="/img/web/layout/header/home.svg" alt=""></a></li>
+                <?php foreach ($newsNav as $region) { ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $region['url'] ?>" title="<?= $region['label'] ?>"><?= $region['label'] ?></a>
+                        <?php if (!empty($region['cities'])) { ?>
+                        <ul>
+                            <?php foreach ($region['cities'] as $city) { ?>
+                            <li class="nav-item"><a class="nav-link" href="<?= $city['url'] ?>" title="<?= $city['label'] ?>"><?= $city['label'] ?></a></li>
+                            <?php } ?>
+                        </ul>
+                        <?php } ?>
+                    </li>
+                <?php } ?>
+                <li class="nav-item"><a class="nav-link" href="<?= $view->path('app_sitemap') ?>" title="Sitemap">Sitemap</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= $view->path('app_sitemap_xml') ?>" title="sitemap.xml">sitemap.xml</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= $view->path('app_robots_txt') ?>" title="robots.txt">robots.txt</a></li>
             </ul>
         </div>
         <div class="col-lg-6">
             <h2><?= 'Ostatní' ?></h2>
-            <!-- TODO: Footer navigace - migrace z Laminas\Navigation -->
+            <ul class="list-unstyled">
+                <?php foreach ($nav['footer'] as $item) { ?>
+                    <li><a href="<?= $item['url'] ?>"<?= !empty($item['target']) ? ' target="' . $item['target'] . '"' : '' ?>><?= $item['label'] ?></a></li>
+                <?php } ?>
+            </ul>
         </div>
     </div>
 </div>

@@ -159,8 +159,7 @@ $view->setBreadcrumbs([
                             <span>
                                 <?php if (isset($shows[$item['show_id']])) { ?>
                                     pořad:
-                                    <?php // TODO: odkaz na detail pořadu (route neexistuje) ?>
-                                    <a href="#">
+                                    <a href="<?= $view->path('program_show_' . $item['show_id']) ?>">
                                         <?= $shows[$item['show_id']]; ?>
                                     </a>
                                 <?php } ?>

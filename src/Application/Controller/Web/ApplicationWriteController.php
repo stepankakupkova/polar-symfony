@@ -5,16 +5,18 @@ namespace App\Application\Controller\Web;
 use App\Application\Service\Logger;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 final class ApplicationWriteController
 {
 	public function __construct(
 		private Logger $logger,
+		private MailerInterface $mailer,
 	) {}
 
 	public function sendEmail(Request $request): JsonResponse
 	{
-		// TODO: az bude v projektu mailer, nahradit primy mail() za standardni sluzbu.
 		try {
 			$heading = htmlspecialchars(trim((string) $request->request->get('h1', '')), ENT_QUOTES, 'UTF-8');
 			if (mb_strlen($heading) > 255) {
@@ -74,21 +76,13 @@ final class ApplicationWriteController
 				}
 			}
 
-			$to = 'polar@polar.cz';
-			$subject = 'Divák hlásí chybu v článku na polar.cz';
-			$body = "URL: {$url}\nNadpis: {$heading}\n----------\n\n{$content}";
-			$headers = [
-				'MIME-Version: 1.0',
-				'Content-type: text/plain; charset=UTF-8',
-				'From: polar@polar.cz',
-			];
+			$email = (new Email())
+				->from('polar@polar.cz')
+				->to('polar@polar.cz')
+				->subject('Divák hlásí chybu v článku na polar.cz')
+				->text("URL: {$url}\nNadpis: {$heading}\n----------\n\n{$content}");
 
-			if (!@mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, implode("\r\n", $headers))) {
-				$this->logger->err('Odeslání chyby návštěvníkem - EMAIL ERROR', [
-					'trace' => 'mail() failed',
-				]);
-				return new JsonResponse(['success' => 'nok', 'message' => 'Odeslání e-mailu selhalo.']);
-			}
+			$this->mailer->send($email);
 
 			return new JsonResponse(['success' => 'ok', 'message' => null]);
 		} catch (\Throwable) {

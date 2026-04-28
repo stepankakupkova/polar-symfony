@@ -96,10 +96,21 @@
                             <div class="header-logo">
                                 <!-- H1 nadpis pro SEO -->
                                 <?php
-                                    // TODO: doplnit routes až budou implementovány: job_list, job_city_list, job_our_detail, job_city_detail,
-                                    //       news_region, news_region_city, news_redactor, app_hd, app_polar2, app_reklama, app_kontakt,
-                                    //       app_hbbtv, app_jak-naladit, election_*, program_*, show_*
-                                    $h1Routes = ['app_home', 'app_search', 'news', 'news_pr', 'news_triptip', 'camera_list', 'camera_detail'];
+                                    $h1Routes = [
+                                        'app_home', 'app_search',
+                                        'news', 'news_pr', 'news_triptip', 'news_region', 'news_region_city', 'news_redactor',
+                                        'camera_list', 'camera_detail',
+                                        'job_list', 'job_city_list', 'job_our_detail', 'job_city_detail',
+                                        'app_hd', 'app_polar2',
+                                        'page_13', 'page_14', 'page_20', 'page_25',    // reklama, jak-naladit, hbbtv, kontakt
+                                        'election_2025', 'election_2025_detail', 'election_2025_poslanci', 'election_2025_kresla',
+                                        'election_2025_obec', 'election_2025_obec_detail', 'election_2025_senat',
+                                        'election_2024', 'election_2024_detail', 'election_2024_zastupitele', 'election_2024_kresla',
+                                        'election_2024_obec', 'election_2024_obec_detail', 'election_2024_senat',
+                                        'election_2020_kresla', 'election_2020',
+                                        'program_web', 'program_web_shows',
+                                        'show_video',
+                                    ];
                                     $h1Display = in_array($routeName ?? '', $h1Routes, true);
                                     $h1Title = htmlspecialchars($view->getTitle());
                                 ?>
@@ -443,7 +454,6 @@
         });
     </script>
     <?= $view->include('banner/web/partial/ads/mobilesticky', ['bannerMobilesticky' => $bannerMobilesticky ?? null]) ?>
-    <!-- TODO: Google Analytics / GTM (gtag.js) — pouze pro production prostředí -->
     <?php if (($_SERVER['APP_ENV'] ?? 'dev') === 'production') { ?>
         <!-- Global site tag (gtag.js) - Google Analytics (řízeno consentmanager CMP) -->
         <script data-cmp-ab="1" async src="https://www.googletagmanager.com/gtag/js?id=<?= htmlspecialchars($GOOGLE_ANALYTICS_ID) ?>"></script>

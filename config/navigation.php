@@ -63,7 +63,7 @@ return [
         [
             'id'     => 'menuFooterGdpr',
             'label'  => 'GDPR',
-            'url'    => '/gdpr',
+            'url'    => '/data/docs/ochrana_osobnich_udaju_polar.pdf',
             'class'  => null,
             'target' => '_blank',
             'icon'   => null,
@@ -79,7 +79,7 @@ return [
         [
             'id'     => 'menuFooterSitemap',
             'label'  => 'Mapa stránek',
-            'url'    => '/sitemap',
+            'url'    => '/mapa-stranek',
             'class'  => null,
             'target' => null,
             'icon'   => 'fa fa-fw fa-sitemap',

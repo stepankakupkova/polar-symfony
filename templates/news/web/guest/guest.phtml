@@ -210,8 +210,7 @@ function formatBytes($size, $precision = 0){
                                 <div class="">
                                     <div class="float-start text-color-grey">Pořad:&nbsp;</div>
                                     <div class="">
-                                        <?php // TODO: odkaz na detail pořadu (route neexistuje) ?>
-                                        <a href="#" title="<?= $show['title']; ?>">
+                                        <a href="<?= $view->path('program_show_' . $show['id']) ?>" title="<?= $show['title']; ?>">
                                             <?= $show['title']; ?>
                                         </a>
                                     </div>
