@@ -1,11 +1,4 @@
 <?php
-/*
- * @project polar
- * @author Rostislav Greipel
- * @link https://rogr.cz
- * @copyright (c) 2011 - 2021 ROGR All Rights Reserved
- * @license https://rogr.cz/license/eula EULA License
- */
 
 declare(strict_types=1);
 
