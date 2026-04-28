@@ -130,7 +130,7 @@ $shows = $shows ?? [];
 function formatBytes($size, $precision = 0){
     $base = log($size, 1024);
     $suffixes = array('B', 'KB', 'MB', 'GB');
-    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)];
+    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[(int)floor($base)];
 }
 
 if (isset($article['sec_from'])) {

@@ -157,7 +157,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
 	</div>
 <?php // Speciál na HP (povodně, volby, aktuální velká témata) ?>
 <?php } else { ?>
-	<?= $view->include('news/partial/special-hp') ?>
+	<?= $view->include('news/partial/special-hp', ['special' => $special, 'specialArticlesIds' => $specialArticlesIds, 'specialOnlineArticleId' => $specialOnlineArticleId, 'specialOnlineArticleUrl' => $specialOnlineArticleUrl]) ?>
 <?php } ?>
 
 <?php //= $view->include('application/partial/volby2021') ?>
@@ -198,7 +198,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
 
 			<?php // Speciál na HP MOBILY (povodně, volby, akutální velká témata) ?>
 			<?php if ($special['active'] === '1') { ?>
-				<?= $view->include('news/partial/special-hp-mobile') ?>
+				<?= $view->include('news/partial/special-hp-mobile', ['special' => $special, 'specialArticlesIds' => $specialArticlesIds, 'specialOnlineArticleId' => $specialOnlineArticleId, 'specialOnlineArticleUrl' => $specialOnlineArticleUrl]) ?>
 			<?php } ?>
 
             <?php if ($newArticles) { ?>

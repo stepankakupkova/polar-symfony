@@ -189,7 +189,7 @@ $view->addInlineScript(
 function formatBytes($size, $precision = 0){
     $base = log($size, 1024);
     $suffixes = array('B', 'KB', 'MB', 'GB');
-    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[floor($base)];
+    return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[(int)floor($base)];
 }
 
 $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');
