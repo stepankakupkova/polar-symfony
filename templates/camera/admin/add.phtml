@@ -20,22 +20,22 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
         <section class="card card-primary">
             <header class="card-header">
                 <div class="card-actions">
-                    <?php if (!empty($errors)): ?>
+                    <?php if (!empty($errors)) { ?>
                         <span class="badge badge-danger">
                             Neuloženo
                         </span>
-                    <?php endif ?>
+                    <?php } ?>
                 </div>
                 <h2 class="card-title">
                     Přidat kameru
                 </h2>
             </header>
             <form action="<?= $view->path('admin_camera_add') ?>" method="post" id="frmCamera" class="form-horizontal">
-                <?php if (!empty($errors['general'])): ?>
+                <?php if (!empty($errors['general'])) { ?>
                     <div class="alert alert-danger mx-3 mt-3">
                         <?= htmlspecialchars($errors['general']) ?>
                     </div>
-                <?php endif ?>
+                <?php } ?>
                 <div class="card-body">
                     <div class="form-group row">
                         <label class="col-sm-3 control-label text-sm-right pt-2 required">
@@ -45,9 +45,9 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
                             <input type="text" name="title" value="<?= htmlspecialchars($post['title'] ?? '') ?>"
                                    class="form-control" placeholder="povinné" required maxlength="254"
                                    data-plugin-maxlength>
-                            <?php if (!empty($errors['title'])): ?>
+                            <?php if (!empty($errors['title'])) { ?>
                                 <small class="form-text text-danger"><?= htmlspecialchars($errors['title']) ?></small>
-                            <?php endif ?>
+                            <?php } ?>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -57,9 +57,9 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
                         <div class="col-sm-9<?= !empty($errors['description']) ? ' has-danger' : '' ?>">
                             <textarea name="description" class="form-control" rows="3" placeholder="volitelné"
                                       data-plugin-textarea-autosize><?= htmlspecialchars($post['description'] ?? '') ?></textarea>
-                            <?php if (!empty($errors['description'])): ?>
+                            <?php if (!empty($errors['description'])) { ?>
                                 <small class="form-text text-danger"><?= htmlspecialchars($errors['description']) ?></small>
-                            <?php endif ?>
+                            <?php } ?>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -70,9 +70,9 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
                             <input type="text" name="url_m3u8" value="<?= htmlspecialchars($post['url_m3u8'] ?? '') ?>"
                                    class="form-control" placeholder="povinné" required maxlength="254"
                                    data-plugin-maxlength>
-                            <?php if (!empty($errors['url_m3u8'])): ?>
+                            <?php if (!empty($errors['url_m3u8'])) { ?>
                                 <small class="form-text text-danger"><?= htmlspecialchars($errors['url_m3u8']) ?></small>
-                            <?php endif ?>
+                            <?php } ?>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -83,9 +83,9 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
                             <input type="text" name="url_mpd" value="<?= htmlspecialchars($post['url_mpd'] ?? '') ?>"
                                    class="form-control" placeholder="povinné" required maxlength="254"
                                    data-plugin-maxlength>
-                            <?php if (!empty($errors['url_mpd'])): ?>
+                            <?php if (!empty($errors['url_mpd'])) { ?>
                                 <small class="form-text text-danger"><?= htmlspecialchars($errors['url_mpd']) ?></small>
-                            <?php endif ?>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>

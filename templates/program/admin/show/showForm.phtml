@@ -186,9 +186,9 @@ $imageValue = $form['image'] ?? 'data/program/show/!default-show.png';
             <div class="col-sm-9">
                 <select name="category_id" class="form-control selectpicker show-tick" required>
                     <option value="">---</option>
-                    <?php foreach ($categories as $cat): ?>
+                    <?php foreach ($categories as $cat) { ?>
                         <option value="<?= $cat['value'] ?>"<?= (string)($form['category_id'] ?? '') === (string)$cat['value'] ? ' selected' : '' ?>><?= htmlspecialchars($cat['label']) ?></option>
-                    <?php endforeach ?>
+                    <?php } ?>
                 </select>
             </div>
         </div>

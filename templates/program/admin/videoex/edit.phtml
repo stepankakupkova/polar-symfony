@@ -515,9 +515,9 @@ $view->addInlineScript(
                         <label for="show_id" class="col-sm-3 control-label text-sm-right pt-2">Pořad</label>
                         <div class="col-sm-9">
                             <select name="show_id" id="show_id" class="form-control selectpicker show-tick" data-hide-disabled="false" data-live-search="true" data-size="10">
-                                <?php foreach ($shows as $show): ?>
+                                <?php foreach ($shows as $show) { ?>
                                     <option value="<?= $show['value'] ?>"<?= ((int)$video['show_id'] === (int)$show['value']) ? ' selected' : '' ?>><?= htmlspecialchars($show['label'] ?? '') ?></option>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </select>
                         </div>
                     </div>

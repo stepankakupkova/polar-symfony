@@ -115,7 +115,7 @@ $e = $errors ?? [];
                        data-plugin-datepicker
                        data-plugin-options='{ "container": ".content-body", "todayHighlight": true, "language": "<?= $localeShort ?>", "weekStart": 1, "format": "dd.mm.yyyy", "daysOfWeekHighlighted": [0,6] }'
                        value="<?= htmlspecialchars($form['date']) ?>">
-                <?php if (isset($e['date'])): ?><small class="form-text text-danger"><?= $e['date'] ?></small><?php endif ?>
+                <?php if (isset($e['date'])) { ?><small class="form-text text-danger"><?= $e['date'] ?></small><?php } ?>
             </div>
             <label class="col-sm-1 control-label text-sm-right pt-2 required">Čas</label>
             <div class="col-sm-4 col-md-3 col-lg-2<?= isset($e['time']) ? ' has-danger' : '' ?>">
@@ -123,7 +123,7 @@ $e = $errors ?? [];
                        data-plugin-timepicker
                        data-plugin-options='{ "showMeridian": false, "minuteStep": 1, "showSeconds": false }'
                        value="<?= htmlspecialchars($form['time']) ?>">
-                <?php if (isset($e['time'])): ?><small class="form-text text-danger"><?= $e['time'] ?></small><?php endif ?>
+                <?php if (isset($e['time'])) { ?><small class="form-text text-danger"><?= $e['time'] ?></small><?php } ?>
             </div>
         </div>
         <div class="form-group row">
@@ -132,7 +132,7 @@ $e = $errors ?? [];
                 <input type="text" name="title" class="form-control" placeholder="required" required
                        maxlength="254" data-plugin-maxlength data-rule-rangeLength="[0, 254]"
                        value="<?= htmlspecialchars($form['title']) ?>">
-                <?php if (isset($e['title'])): ?><small class="form-text text-danger"><?= $e['title'] ?></small><?php endif ?>
+                <?php if (isset($e['title'])) { ?><small class="form-text text-danger"><?= $e['title'] ?></small><?php } ?>
             </div>
         </div>
         <div class="form-group row">
@@ -148,7 +148,7 @@ $e = $errors ?? [];
                         </button>
                     </span>
                 </div>
-                <?php if (isset($e['url'])): ?><small class="form-text text-danger"><?= $e['url'] ?></small><?php endif ?>
+                <?php if (isset($e['url'])) { ?><small class="form-text text-danger"><?= $e['url'] ?></small><?php } ?>
             </div>
         </div>
         <div class="form-group row">
@@ -165,9 +165,9 @@ $e = $errors ?? [];
                 <select name="video_id" class="form-control selectpicker show-tick"
                         data-hide-disabled="false" data-live-search="true" data-size="10">
                     <option value="">---</option>
-                    <?php foreach ($videoOptions as $opt): ?>
+                    <?php foreach ($videoOptions as $opt) { ?>
                         <option value="<?= $opt['value'] ?>"<?= (string)$form['video_id'] === (string)$opt['value'] ? ' selected' : '' ?>><?= htmlspecialchars($opt['label']) ?></option>
-                    <?php endforeach ?>
+                    <?php } ?>
                 </select>
             </div>
         </div>
@@ -177,9 +177,9 @@ $e = $errors ?? [];
                 <select name="show_id" class="form-control selectpicker show-tick"
                         data-hide-disabled="false" data-live-search="true" data-size="10">
                     <option value="">---</option>
-                    <?php foreach ($showOptions as $opt): ?>
+                    <?php foreach ($showOptions as $opt) { ?>
                         <option value="<?= $opt['value'] ?>"<?= (string)$form['show_id'] === (string)$opt['value'] ? ' selected' : '' ?>><?= htmlspecialchars($opt['label']) ?></option>
-                    <?php endforeach ?>
+                    <?php } ?>
                 </select>
             </div>
         </div>
