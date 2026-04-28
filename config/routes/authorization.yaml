@@ -1,0 +1,11 @@
+authorization_reset:
+  path: /autorizace/zapomenute-heslo
+  controller: App\Authorization\Controller\Web\AuthorizationWriteController::reset
+  methods: [GET, POST]
+
+authorization_reset_password:
+  path: /autorizace/zapomenute-heslo/{hash}
+  controller: App\Authorization\Controller\Web\AuthorizationWriteController::resetPassword
+  methods: [GET, POST]
+  requirements:
+    hash: '[a-zA-Z0-9_-]+'

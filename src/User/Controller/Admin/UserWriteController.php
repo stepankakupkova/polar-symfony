@@ -6,6 +6,7 @@ use App\Application\Service\FlashMessenger;
 use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Authorization\Repository\AuthorizationRepository;
+use App\Authorization\Identity\AuthorizationProvider;
 use App\Authorization\Identity\AuthorizationUser;
 use App\User\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -22,6 +23,7 @@ final class UserWriteController
 		private Logger $logger,
 		private UserRepository $userRepository,
 		private AuthorizationRepository $authorizationRepository,
+		private AuthorizationProvider $authorizationProvider,
 		private PhtmlRenderer $renderer,
 		private Security $security,
 		private UrlGeneratorInterface $urlGenerator,
@@ -165,6 +167,13 @@ final class UserWriteController
 				}
 
 				$this->authorizationRepository->updatePost((int) $authorization['id'], $updateAuth);
+
+				// Pokud si přihlášený uživatel změnil vlastní heslo, obnoví token v session,
+				// aby ho Symfony nevyhodilo při dalším requestu (hash v DB != hash v session)
+				if (!empty($post['password']) && $identity->getId() === (int) $authorization['id']) {
+					$freshUser = $this->authorizationProvider->loadUserByIdentifier($post['username']);
+					$this->security->login($freshUser);
+				}
 
 				$image = $post['image'] ?? $user['image'];
 
@@ -357,7 +366,9 @@ final class UserWriteController
 				$errors['password'] = 'Heslo musí obsahovat velké písmeno, malé písmeno a číslici';
 			}
 		}
-		if (!empty($post['password']) && !empty($post['password2']) && $post['password'] !== $post['password2']) {
+		if (!empty($post['password']) && empty($post['password2'])) {
+			$errors['password2'] = 'Zadejte heslo znovu';
+		} elseif (!empty($post['password']) && $post['password'] !== $post['password2']) {
 			$errors['password2'] = 'Hesla se neshodují';
 		}
 		if (empty($post['role'])) {

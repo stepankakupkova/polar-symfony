@@ -32,6 +32,9 @@ election:
 admin:
   resource: routes/admin.yaml
 
+authorization:
+  resource: routes/authorization.yaml
+
 app_home:
   path: /
   controller: App\Application\Controller\Web\ApplicationController::index

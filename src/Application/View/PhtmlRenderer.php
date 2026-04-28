@@ -41,7 +41,7 @@ final class PhtmlRenderer
 		return (string) ob_get_clean();
 	}
 
-	public function renderWithLayout(string $template, array $params = [], string $layout = 'layout'): string
+	public function renderWithLayout(string $template, array $params = [], string $layout = 'application/layout'): string
 	{
 		$sharedView = new ViewHelper($this, $this->urlGenerator, $this->basePath);
 		$content = $this->render($template, $params, $sharedView);

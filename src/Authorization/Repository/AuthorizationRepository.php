@@ -99,4 +99,19 @@ final class AuthorizationRepository
 		$this->connection->delete('user', ['authorization_id' => $id]);
 		$this->connection->delete('authorization', ['id' => $id]);
 	}
+
+	public function setHash(int $id, string $hash): void
+	{
+		$this->connection->update('authorization', ['hash' => $hash], ['id' => $id]);
+	}
+
+	public function clearHash(int $id): void
+	{
+		$this->connection->update('authorization', ['hash' => null], ['id' => $id]);
+	}
+
+	public function updatePassword(int $id, string $passwordHash): void
+	{
+		$this->connection->update('authorization', ['password' => $passwordHash], ['id' => $id]);
+	}
 }

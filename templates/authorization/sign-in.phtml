@@ -48,27 +48,29 @@ $scheme = $scheme ?? 'dark';
                                 <form action="<?= $view->path('app_login') ?>" method="post" id="frmSignin" class="needs-validation">
                                     <div class="form-row">
                                         <div class="form-group col">
-                                            <label class="font-weight-bold text-2 required" for="email">Email</label>
+                                            <label class="font-weight-bold text-2 required" for="email">E-mail</label>
                                             <input type="email" name="email" id="email" class="form-control form-control-lg" placeholder="povinné" required maxlength="50" data-plugin-maxlength="true" data-rule-rangeLength="[8, 50]" value="<?= htmlspecialchars($lastUsername) ?>">
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col">
-                                            <a class="float-right" href="<?= $view->path('app_home') ?>">
-                                                Zapomenuté heslo?
-                                            </a>
                                             <label class="font-weight-bold text-2 required" for="password">Heslo</label>
                                             <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="povinné" required maxlength="50" data-plugin-maxlength="true" data-rule-rangeLength="[8, 50]">
                                         </div>
                                     </div>
                                     <div class="form-row">
-                                        <div class="form-group col-lg-6">
+                                        <div class="col-12 mb-2">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" name="remember_me" id="rememberMe" class="custom-control-input" checked>
                                                 <label class="custom-control-label text-2" for="rememberMe">Zapamatovat si mě</label>
                                             </div>
                                         </div>
-                                        <div class="form-group col-lg-6">
+                                        <div class="col-12 mb-3">
+                                            <a class="float-right" href="<?= $view->path('authorization_reset') ?>">
+                                                Zapomenuté heslo?
+                                            </a>
+                                        </div>
+                                        <div class="col-12">
                                             <button type="submit" class="btn btn-primary btn-modern float-right">
                                                 Přihlásit se
                                             </button>

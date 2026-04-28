@@ -1,0 +1,54 @@
+<?php
+/** @var \App\Application\View\ViewHelper $view */
+
+$scheme = $scheme ?? 'dark';
+?>
+
+<div class="container py-2">
+    <?php if ($message) { ?>
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="alert <?= $alert ?> alert-lg alert-dismissible mb-0" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Zavřít">
+                        <span aria-hidden="true">
+                            ×
+                        </span>
+                    </button>
+                    <?= $message ?>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+    <div class="row">
+        <div class="col">
+            <div class="featured-boxes">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="featured-box featured-box-primary manual text-left mt-5">
+                            <div class="box-content">
+                                <h4 class="color-primary font-weight-semibold text-4 text-uppercase mb-3">
+                                    Obnovení hesla
+                                </h4>
+                                <form action="<?= $view->path('authorization_reset') ?>" method="post" id="frmReset" class="needs-validation">
+                                    <div class="form-row">
+                                        <div class="form-group col">
+                                            <label class="font-weight-bold text-2 required" for="email">E-mail</label>
+                                            <input type="email" name="email" id="email" class="form-control form-control-lg" placeholder="povinné" required maxlength="50" value="<?= htmlspecialchars($email ?? '') ?>">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary btn-modern float-right">
+                                                Obnovit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

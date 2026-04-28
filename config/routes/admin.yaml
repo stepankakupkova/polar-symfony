@@ -54,11 +54,11 @@ admin_user_get_user:
   methods: [POST]
 
 admin_user_add:
-  path: /admin/uzivatele/pridat
+  path: /admin/uzivatele/seznam/pridat
   controller: App\User\Controller\Admin\UserWriteController::add
 
 admin_user_edit:
-  path: /admin/uzivatele/upravit/{id}
+  path: /admin/uzivatele/seznam/upravit/{id}
   controller: App\User\Controller\Admin\UserWriteController::edit
   requirements:
     id: '\d+'
