@@ -141,11 +141,34 @@ final class SquareWriteController
             return new RedirectResponse($this->urlGenerator->generate('admin_banner_square_list'));
         }
 
-        $post   = $square;
+        $fromDt = \DateTime::createFromFormat('Y-m-d H:i:s', $square['public_from'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $square['public_from'] ?? '');
+        $toDt   = \DateTime::createFromFormat('Y-m-d H:i:s', $square['public_to'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $square['public_to'] ?? '');
+
+        $form = [
+            'id'               => $square['id'],
+            'lang'             => $square['lang'],
+            'active'           => $square['active'],
+            'title'            => $square['title'],
+            'link'             => $square['link'],
+            'image_alt'        => $square['image_alt'],
+            'image'            => $square['image'],
+            'public_from'      => $fromDt ? $fromDt->format('d.m.Y') : '',
+            'public_from_time' => $fromDt ? $fromDt->format('H:i')   : '',
+            'public_to'        => $toDt   ? $toDt->format('d.m.Y')   : '',
+            'public_to_time'   => $toDt   ? $toDt->format('H:i')     : '',
+            'created_date'     => $square['created_date'],
+            'updated_date'     => $square['updated_date'],
+            'created_user'     => $square['created_user'],
+            'updated_user'     => $square['updated_user'],
+        ];
         $errors = [];
 
         if ($request->isMethod('POST')) {
             $post = $request->request->all();
+
+            $form = array_merge($form, $post);
 
             if (isset($post['cancel'])) {
                 return new RedirectResponse($this->urlGenerator->generate('admin_banner_square_list'));
@@ -210,7 +233,7 @@ final class SquareWriteController
         return new Response($this->renderer->renderWithAdminLayout('banner/admin/square/edit', [
             'pageTitle'    => 'Square',
             'id'           => $id,
-            'post'         => $post,
+            'post'         => $form,
             'square'       => $square,
             'errors'       => $errors,
             'imageDefault' => $this->imageDefault,

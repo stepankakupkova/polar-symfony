@@ -34,7 +34,8 @@ final class PhtmlRenderer
 
 		$view = $sharedView ?? new ViewHelper($this, $this->urlGenerator, $this->basePath);
 
-		extract($this->globals + $params, EXTR_SKIP);
+		$vars = $this->globals + $params;
+		extract($vars, EXTR_SKIP);
 
 		ob_start();
 		require $file;

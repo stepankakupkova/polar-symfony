@@ -75,8 +75,8 @@ final class VideoexWriteController
 
 				$this->flashMessenger->addMessage(
 					'success',
-					'Úspěšně',
-					'Mimoradne video <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraveno'
+					'Uloženo',
+					'Mimořádné video <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraveno'
 				);
 
 				// Log

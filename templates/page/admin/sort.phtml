@@ -1,7 +1,7 @@
 <?php
 /** @var \App\Application\View\ViewHelper $view */
 
-$locales = ['cs_CZ' => 'Čeština'];
+$lang = 'cs_CZ';
 
 $view->addBodyScript($view->asset('vendor/admin/nestable/js/nestable.min.js'));
 
@@ -27,7 +27,7 @@ $view->addInlineScript(
                         function(json) {
                             if (json.success) {
                                 var notice = new PNotify({
-                                    title: "Úspěch",
+                                    title: "Uloženo",
                                     text: "Stránky byly seřazeny!",
                                     type: "success",
                                     addclass: "click-2-close",
@@ -88,7 +88,7 @@ $view->addInlineScript(
                         function(json) {
                             if (json.success) {
                                 var notice = new PNotify({
-                                    title: "Úspěch",
+                                    title: "Uloženo",
                                     text: "Stránky byly seřazeny!",
                                     type: "success",
                                     addclass: "click-2-close",

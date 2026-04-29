@@ -41,14 +41,14 @@ if (!in_array('owner', $identity->getRole(), true)) {
             <label class="col-sm-4 control-label text-sm-right pt-2<?= !$isEdit ? ' required' : '' ?>" for="password">Heslo</label>
             <div class="col-sm-8<?= isset($errors['password']) ? ' has-danger' : '' ?>">
                 <input type="password" name="password" id="password" class="form-control password" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'ponechte prázdné pro zachování' : 'povinné' ?>">
-                <small class="form-text text-muted">Min. 8 znaků, musí obsahovat velké písmeno, malé písmeno a číslici.</small>
+                <small class="form-text">Min. 8 znaků, musí obsahovat velké písmeno, malé písmeno a číslici.</small>
                 <?php if (isset($errors['password'])) { ?><small class="form-text text-danger"><?= htmlspecialchars($errors['password']) ?></small><?php } ?>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-4 control-label text-sm-right pt-2<?= !$isEdit ? ' required' : '' ?>" for="password2">Heslo znovu</label>
             <div class="col-sm-8<?= isset($errors['password2']) ? ' has-danger' : '' ?>">
-                <input type="password" name="password2" id="password2" class="form-control" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'optional' : 'povinné' ?>">
+                <input type="password" name="password2" id="password2" class="form-control" <?= !$isEdit ? 'required' : '' ?> maxlength="50" placeholder="<?= $isEdit ? 'nepovinné' : 'povinné' ?>">
                 <?php if (isset($errors['password2'])) { ?><small class="form-text text-danger"><?= htmlspecialchars($errors['password2']) ?></small><?php } ?>
             </div>
         </div>
@@ -75,13 +75,13 @@ if (!in_array('owner', $identity->getRole(), true)) {
         <div class="form-group row">
             <label class="col-sm-4 control-label text-sm-right pt-2" for="first_name">Jméno</label>
             <div class="col-sm-8">
-                <input type="text" name="first_name" id="first_name" class="form-control" maxlength="50" placeholder="volitelné" value="<?= htmlspecialchars($post['first_name'] ?? '') ?>">
+                <input type="text" name="first_name" id="first_name" class="form-control" maxlength="50" placeholder="nepovinné" value="<?= htmlspecialchars($post['first_name'] ?? '') ?>">
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-4 control-label text-sm-right pt-2" for="last_name">Příjmení</label>
             <div class="col-sm-8">
-                <input type="text" name="last_name" id="last_name" class="form-control" maxlength="50" placeholder="volitelné" value="<?= htmlspecialchars($post['last_name'] ?? '') ?>">
+                <input type="text" name="last_name" id="last_name" class="form-control" maxlength="50" placeholder="nepovinné" value="<?= htmlspecialchars($post['last_name'] ?? '') ?>">
             </div>
         </div>
     </div>

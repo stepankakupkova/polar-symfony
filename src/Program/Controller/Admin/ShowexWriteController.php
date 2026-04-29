@@ -68,7 +68,7 @@ final class ShowexWriteController
 
 				$show_id = $showexRepository->insertPost($data);
 
-				// AdresĂˇĹ™
+				// Adresář
 				$folder = 'data/mimoradne/show/' . $show_id;
 				if (!is_dir($this->PUBLIC_PATH . '/' . $folder)) {
 					if (!mkdir($concurrentDirectory = $this->PUBLIC_PATH . '/' . $folder, 0777, true) && !is_dir($concurrentDirectory)) {
@@ -77,7 +77,7 @@ final class ShowexWriteController
 					chmod($this->PUBLIC_PATH . '/' . $folder, 0777);
 				}
 
-				// ObrĂˇzek
+				// Obrázek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$image = null;
@@ -115,13 +115,13 @@ final class ShowexWriteController
 					$showexRepository->updatePost($show_id, ['content' => $content]);
 				}
 
-				// VygenerovĂˇnĂ­ souboru config
+				// Vygenerování­ souboru config
 				$this->createConfig($showexRepository);
 
 				$this->flashMessenger->addMessage(
 					'success',
-					'Úspěšně',
-					'Mimoradny porad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> vytvoren'
+					'Uloženo',
+					'Mimořádný pořad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> vytvořen'
 				);
 
 				// Log
@@ -199,7 +199,7 @@ final class ShowexWriteController
 					'seo_description' => trim(strip_tags($post['seo_description'] ?? '')),
 				];
 
-				// ObrĂˇzek
+				// Obrázek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$data['image'] = null;
@@ -208,13 +208,13 @@ final class ShowexWriteController
 
 				$showexRepository->updatePost($show_id, $data);
 
-				// VygenerovĂˇnĂ­ souboru config
+				// Vygenerování­ souboru config
 				$this->createConfig($showexRepository);
 
 				$this->flashMessenger->addMessage(
 					'success',
-					'Úspěšně',
-					'Mimoradny porad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraven'
+					'Uloženo',
+					'Mimořádný pořad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraven'
 				);
 
 				// Log
@@ -277,7 +277,7 @@ final class ShowexWriteController
 					$rank++;
 				}
 
-				// VygenerovĂˇnĂ­ souboru config
+				// Vygenerování­ souboru config
 				$this->createConfig($showexRepository);
 
 				// Log
@@ -288,7 +288,7 @@ final class ShowexWriteController
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najĂ­t mimoĹ™ĂˇdnĂ˝ poĹ™ad';
+				$message = 'Nelze nají­t mimořádný pořad';
 
 				// Log
 				$logger->error('PROGRAM - Delete extraordinary shows', [
@@ -354,7 +354,7 @@ final class ShowexWriteController
 		$file = $request->files->get('file');
 		if (!$file) {
 			return new JsonResponse([
-				'error' => 'Ĺ˝ĂˇdnĂ© soubory k nahrĂˇnĂ­',
+				'error' => 'Žádné soubory k nahrání­',
 			]);
 		}
 
@@ -402,7 +402,7 @@ final class ShowexWriteController
 		if ($show_id && $show_id !== 'null') {
 			$show = $showexRepository->findPostBy('id', (int) $show_id);
 
-			// Smazat bĂ˝valĂ˝ obrĂˇzek
+			// Smazat bývalý obrázek
 			if ($show && $show['image'] && $show['image'] !== $this->imageDefault) {
 				@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 			}
@@ -417,7 +417,7 @@ final class ShowexWriteController
 			return new JsonResponse([
 				'name' => $file->getClientOriginalName(),
 				'url' => $imageFileName,
-				'error' => 'ObrĂˇzek je pĹ™Ă­liĹˇ velkĂ˝',
+				'error' => 'Obrázek je příliš velký',
 			]);
 		}
 
@@ -450,7 +450,7 @@ final class ShowexWriteController
 			if ($show) {
 				switch ($field) {
 					case 'image':
-						// Smazat bĂ˝valĂ˝ obrĂˇzek
+						// Smazat bývalý obrázek
 						if ($show['image'] && $show['image'] !== $this->imageDefault) {
 							@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 						}
@@ -470,7 +470,7 @@ final class ShowexWriteController
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najĂ­t mimoĹ™ĂˇdnĂ˝ poĹ™ad';
+				$message = 'Nelze nají­t mimořádný pořad';
 
 				// Log
 				$logger->error('PROGRAM - Set showex image', [

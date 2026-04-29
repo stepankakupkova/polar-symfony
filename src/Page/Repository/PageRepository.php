@@ -73,12 +73,17 @@ final class PageRepository
 			)
 			->from('page')
 			->where('lang = :lang')
-			->andWhere('parent = :parent')
 			->andWhere('header = :header')
 			->setParameter('lang', $lang)
-			->setParameter('parent', $parent)
 			->setParameter('header', $header ? 1 : 0)
 			->orderBy('rank', 'ASC');
+
+		if ($parent === null) {
+			$qb->andWhere('parent IS NULL');
+		} else {
+			$qb->andWhere('parent = :parent')
+				->setParameter('parent', $parent);
+		}
 
 		$rows = $qb->fetchAllAssociative();
 

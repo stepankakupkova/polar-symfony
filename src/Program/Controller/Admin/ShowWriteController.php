@@ -73,7 +73,7 @@ final class ShowWriteController
 
 				$show_id = $showRepository->insertPost($data);
 
-				// AdresĂˇĹ™
+				// Adresář
 				$folder = 'data/program/show/' . $show_id;
 				if (!is_dir($this->PUBLIC_PATH . '/' . $folder)) {
 					if (!mkdir($concurrentDirectory = $this->PUBLIC_PATH . '/' . $folder, 0777, true) && !is_dir($concurrentDirectory)) {
@@ -82,7 +82,7 @@ final class ShowWriteController
 					chmod($this->PUBLIC_PATH . '/' . $folder, 0777);
 				}
 
-				// ObrĂˇzek
+				// Obrázek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$image = null;
@@ -120,13 +120,13 @@ final class ShowWriteController
 					$showRepository->updatePost($show_id, ['content' => $content]);
 				}
 
-				// VygenerovĂˇnĂ­ souboru config
+				// Vygenerování­ souboru config
 				$this->createConfig($showRepository);
 
 				$this->flashMessenger->addMessage(
 					'success',
-					'Úspěšně',
-					'Porad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> vytvoren'
+					'Uloženo',
+					'Pořad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> vytvořen'
 				);
 
 				// Log
@@ -209,7 +209,7 @@ final class ShowWriteController
 					'seo_description' => trim(strip_tags($post['seo_description'] ?? '')),
 				];
 
-				// ObrĂˇzek
+				// Obrázek
 				$image = $post['image'] ?? null;
 				if ($image === $this->imageDefault) {
 					$data['image'] = null;
@@ -218,13 +218,13 @@ final class ShowWriteController
 
 				$showRepository->updatePost($show_id, $data);
 
-				// VygenerovĂˇnĂ­ souboru config
+				// Vygenerování­ souboru config
 				$this->createConfig($showRepository);
 
 				$this->flashMessenger->addMessage(
 					'success',
-					'Úspěšně',
-					'Porad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraven'
+					'Uloženo',
+					'Pořad <strong>&quot;' . htmlspecialchars($data['title']) . '&quot;</strong> upraven'
 				);
 
 				// Log
@@ -288,7 +288,7 @@ final class ShowWriteController
 					$rank++;
 				}
 
-				// VygenerovĂˇnĂ­ souboru config
+				// Vygenerování­ souboru config
 				$this->createConfig($showRepository);
 
 				// Log
@@ -299,7 +299,7 @@ final class ShowWriteController
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najĂ­t poĹ™ad';
+				$message = 'Nelze najít pořad';
 
 				// Log
 				$logger->error('PROGRAM - Delete show', [
@@ -404,7 +404,7 @@ final class ShowWriteController
 		$file = $request->files->get('file');
 		if (!$file) {
 			return new JsonResponse([
-				'error' => 'Ĺ˝ĂˇdnĂ© soubory k nahrĂˇnĂ­',
+				'error' => 'Žádné soubory k nahrání­',
 			]);
 		}
 
@@ -452,7 +452,7 @@ final class ShowWriteController
 		if ($show_id && $show_id !== 'null') {
 			$show = $showRepository->findPostBy('id', (int) $show_id);
 
-			// Smazat bĂ˝valĂ˝ obrĂˇzek
+			// Smazat bývalý obrázek
 			if ($show && $show['image'] && $show['image'] !== $this->imageDefault) {
 				@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 			}
@@ -467,7 +467,7 @@ final class ShowWriteController
 			return new JsonResponse([
 				'name' => $file->getClientOriginalName(),
 				'url' => $imageFileName,
-				'error' => 'ObrĂˇzek je pĹ™Ă­liĹˇ velkĂ˝',
+				'error' => 'Obrázek je příliš velký',
 			]);
 		}
 
@@ -500,7 +500,7 @@ final class ShowWriteController
 			if ($show) {
 				switch ($field) {
 					case 'image':
-						// Smazat bĂ˝valĂ˝ obrĂˇzek
+						// Smazat bývalý obrázek
 						if ($show['image'] && $show['image'] !== $this->imageDefault) {
 							@unlink($this->PUBLIC_PATH . '/' . $show['image']);
 						}
@@ -520,7 +520,7 @@ final class ShowWriteController
 				]);
 			} else {
 				$success = false;
-				$message = 'Nelze najĂ­t poĹ™ad';
+				$message = 'Nelze najít pořad';
 
 				// Log
 				$logger->error('PROGRAM - Set show image', [

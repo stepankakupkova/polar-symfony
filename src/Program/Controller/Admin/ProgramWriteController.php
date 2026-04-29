@@ -104,7 +104,7 @@ final class ProgramWriteController
 
 					$this->flashMessenger->addMessage(
 						'success',
-						'Úspěšné',
+						'Uloženo',
 						'Program <strong>&quot;' . htmlspecialchars($post['title']) . '&quot;</strong> vytvořen'
 					);
 
@@ -241,7 +241,7 @@ final class ProgramWriteController
 
 					$this->flashMessenger->addMessage(
 						'success',
-						'Úspěšné',
+						'Uloženo',
 						'Program <strong>&quot;' . htmlspecialchars($post['title']) . '&quot;</strong> upraven'
 					);
 

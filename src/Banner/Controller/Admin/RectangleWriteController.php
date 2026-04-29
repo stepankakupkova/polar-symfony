@@ -141,11 +141,34 @@ final class RectangleWriteController
             return new RedirectResponse($this->urlGenerator->generate('admin_banner_rectangle_list'));
         }
 
-        $post   = $rectangle;
+        $fromDt = \DateTime::createFromFormat('Y-m-d H:i:s', $rectangle['public_from'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $rectangle['public_from'] ?? '');
+        $toDt   = \DateTime::createFromFormat('Y-m-d H:i:s', $rectangle['public_to'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $rectangle['public_to'] ?? '');
+
+        $form = [
+            'id'               => $rectangle['id'],
+            'lang'             => $rectangle['lang'],
+            'active'           => $rectangle['active'],
+            'title'            => $rectangle['title'],
+            'link'             => $rectangle['link'],
+            'image_alt'        => $rectangle['image_alt'],
+            'image'            => $rectangle['image'],
+            'public_from'      => $fromDt ? $fromDt->format('d.m.Y') : '',
+            'public_from_time' => $fromDt ? $fromDt->format('H:i')   : '',
+            'public_to'        => $toDt   ? $toDt->format('d.m.Y')   : '',
+            'public_to_time'   => $toDt   ? $toDt->format('H:i')     : '',
+            'created_date'     => $rectangle['created_date'],
+            'updated_date'     => $rectangle['updated_date'],
+            'created_user'     => $rectangle['created_user'],
+            'updated_user'     => $rectangle['updated_user'],
+        ];
         $errors = [];
 
         if ($request->isMethod('POST')) {
             $post = $request->request->all();
+
+            $form = array_merge($form, $post);
 
             if (isset($post['cancel'])) {
                 return new RedirectResponse($this->urlGenerator->generate('admin_banner_rectangle_list'));
@@ -210,7 +233,7 @@ final class RectangleWriteController
         return new Response($this->renderer->renderWithAdminLayout('banner/admin/rectangle/edit', [
             'pageTitle'    => 'Rectangle',
             'id'           => $id,
-            'post'         => $post,
+            'post'         => $form,
             'rectangle'    => $rectangle,
             'errors'       => $errors,
             'imageDefault' => $this->imageDefault,

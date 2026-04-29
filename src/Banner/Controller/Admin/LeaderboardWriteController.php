@@ -141,11 +141,34 @@ final class LeaderboardWriteController
             return new RedirectResponse($this->urlGenerator->generate('admin_banner_leaderboard_list'));
         }
 
-        $post   = $leaderboard;
+        $fromDt = \DateTime::createFromFormat('Y-m-d H:i:s', $leaderboard['public_from'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $leaderboard['public_from'] ?? '');
+        $toDt   = \DateTime::createFromFormat('Y-m-d H:i:s', $leaderboard['public_to'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $leaderboard['public_to'] ?? '');
+
+        $form = [
+            'id'               => $leaderboard['id'],
+            'lang'             => $leaderboard['lang'],
+            'active'           => $leaderboard['active'],
+            'title'            => $leaderboard['title'],
+            'link'             => $leaderboard['link'],
+            'image_alt'        => $leaderboard['image_alt'],
+            'image'            => $leaderboard['image'],
+            'public_from'      => $fromDt ? $fromDt->format('d.m.Y') : '',
+            'public_from_time' => $fromDt ? $fromDt->format('H:i')   : '',
+            'public_to'        => $toDt   ? $toDt->format('d.m.Y')   : '',
+            'public_to_time'   => $toDt   ? $toDt->format('H:i')     : '',
+            'created_date'     => $leaderboard['created_date'],
+            'updated_date'     => $leaderboard['updated_date'],
+            'created_user'     => $leaderboard['created_user'],
+            'updated_user'     => $leaderboard['updated_user'],
+        ];
         $errors = [];
 
         if ($request->isMethod('POST')) {
             $post = $request->request->all();
+
+            $form = array_merge($form, $post);
 
             if (isset($post['cancel'])) {
                 return new RedirectResponse($this->urlGenerator->generate('admin_banner_leaderboard_list'));
@@ -210,7 +233,7 @@ final class LeaderboardWriteController
         return new Response($this->renderer->renderWithAdminLayout('banner/admin/leaderboard/edit', [
             'pageTitle'    => 'Leaderboard',
             'id'           => $id,
-            'post'         => $post,
+            'post'         => $form,
             'leaderboard'  => $leaderboard,
             'errors'       => $errors,
             'imageDefault' => $this->imageDefault,

@@ -141,11 +141,34 @@ final class Mobilesquare2WriteController
             return new RedirectResponse($this->urlGenerator->generate('admin_banner_mobilesquare2_list'));
         }
 
-        $post   = $mobilesquare2;
+        $fromDt = \DateTime::createFromFormat('Y-m-d H:i:s', $mobilesquare2['public_from'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $mobilesquare2['public_from'] ?? '');
+        $toDt   = \DateTime::createFromFormat('Y-m-d H:i:s', $mobilesquare2['public_to'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $mobilesquare2['public_to'] ?? '');
+
+        $form = [
+            'id'               => $mobilesquare2['id'],
+            'lang'             => $mobilesquare2['lang'],
+            'active'           => $mobilesquare2['active'],
+            'title'            => $mobilesquare2['title'],
+            'link'             => $mobilesquare2['link'],
+            'image_alt'        => $mobilesquare2['image_alt'],
+            'image'            => $mobilesquare2['image'],
+            'public_from'      => $fromDt ? $fromDt->format('d.m.Y') : '',
+            'public_from_time' => $fromDt ? $fromDt->format('H:i')   : '',
+            'public_to'        => $toDt   ? $toDt->format('d.m.Y')   : '',
+            'public_to_time'   => $toDt   ? $toDt->format('H:i')     : '',
+            'created_date'     => $mobilesquare2['created_date'],
+            'updated_date'     => $mobilesquare2['updated_date'],
+            'created_user'     => $mobilesquare2['created_user'],
+            'updated_user'     => $mobilesquare2['updated_user'],
+        ];
         $errors = [];
 
         if ($request->isMethod('POST')) {
             $post = $request->request->all();
+
+            $form = array_merge($form, $post);
 
             if (isset($post['cancel'])) {
                 return new RedirectResponse($this->urlGenerator->generate('admin_banner_mobilesquare2_list'));
@@ -210,7 +233,7 @@ final class Mobilesquare2WriteController
         return new Response($this->renderer->renderWithAdminLayout('banner/admin/mobilesquare2/edit', [
             'pageTitle'     => 'Mobile Square 2',
             'id'            => $id,
-            'post'          => $post,
+            'post'          => $form,
             'mobilesquare2' => $mobilesquare2,
             'errors'        => $errors,
             'imageDefault'  => $this->imageDefault,

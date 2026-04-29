@@ -112,7 +112,7 @@ $view->addBodyScript($view->asset('vendor/admin/moment/js/locale/cs.min.js'));
                                 { log_id: log_id },
                                 function(json) {
                                     if (json.success) {
-                                        new PNotify({ title: "Úspěch", text: "Log byl odstraněn", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
+                                        new PNotify({ title: "Uloženo", text: "Log byl odstraněn", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
                                         $("#btblLogAll").bootstrapTable("refresh", {"silent": true});
                                         $("#btblLogError").bootstrapTable("refresh", {"silent": true});
                                     } else {
@@ -156,7 +156,7 @@ $view->addBodyScript($view->asset('vendor/admin/moment/js/locale/cs.min.js'));
                             {},
                             function(json) {
                                 if (json.success) {
-                                    new PNotify({ title: "Úspěch", text: "Logy byly odstraněny", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
+                                    new PNotify({ title: "Uloženo", text: "Logy byly odstraněny", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
                                     $("#btblLogAll").bootstrapTable("refresh", {"silent": true});
                                     $("#btblLogError").bootstrapTable("refresh", {"silent": true});
                                 } else {
@@ -199,7 +199,7 @@ $view->addBodyScript($view->asset('vendor/admin/moment/js/locale/cs.min.js'));
                             { type: ["emerg", "alert", "crit", "err"] },
                             function(json) {
                                 if (json.success) {
-                                    new PNotify({ title: "Úspěch", text: "Logy byly odstraněny", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
+                                    new PNotify({ title: "Uloženo", text: "Logy byly odstraněny", type: "success", addclass: "click-2-close", buttons: { sticker: false } });
                                     $("#btblLogAll").bootstrapTable("refresh", {"silent": true});
                                     $("#btblLogError").bootstrapTable("refresh", {"silent": true});
                                 } else {

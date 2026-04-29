@@ -141,11 +141,34 @@ final class MobilestickyWriteController
             return new RedirectResponse($this->urlGenerator->generate('admin_banner_mobilesticky_list'));
         }
 
-        $post   = $mobilesticky;
+        $fromDt = \DateTime::createFromFormat('Y-m-d H:i:s', $mobilesticky['public_from'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $mobilesticky['public_from'] ?? '');
+        $toDt   = \DateTime::createFromFormat('Y-m-d H:i:s', $mobilesticky['public_to'] ?? '')
+            ?: \DateTime::createFromFormat('Y-m-d', $mobilesticky['public_to'] ?? '');
+
+        $form = [
+            'id'               => $mobilesticky['id'],
+            'lang'             => $mobilesticky['lang'],
+            'active'           => $mobilesticky['active'],
+            'title'            => $mobilesticky['title'],
+            'link'             => $mobilesticky['link'],
+            'image_alt'        => $mobilesticky['image_alt'],
+            'image'            => $mobilesticky['image'],
+            'public_from'      => $fromDt ? $fromDt->format('d.m.Y') : '',
+            'public_from_time' => $fromDt ? $fromDt->format('H:i')   : '',
+            'public_to'        => $toDt   ? $toDt->format('d.m.Y')   : '',
+            'public_to_time'   => $toDt   ? $toDt->format('H:i')     : '',
+            'created_date'     => $mobilesticky['created_date'],
+            'updated_date'     => $mobilesticky['updated_date'],
+            'created_user'     => $mobilesticky['created_user'],
+            'updated_user'     => $mobilesticky['updated_user'],
+        ];
         $errors = [];
 
         if ($request->isMethod('POST')) {
             $post = $request->request->all();
+
+            $form = array_merge($form, $post);
 
             if (isset($post['cancel'])) {
                 return new RedirectResponse($this->urlGenerator->generate('admin_banner_mobilesticky_list'));
@@ -210,7 +233,7 @@ final class MobilestickyWriteController
         return new Response($this->renderer->renderWithAdminLayout('banner/admin/mobilesticky/edit', [
             'pageTitle'    => 'Mobile Sticky',
             'id'           => $id,
-            'post'         => $post,
+            'post'          => $form,
             'mobilesticky' => $mobilesticky,
             'errors'       => $errors,
             'imageDefault' => $this->imageDefault,

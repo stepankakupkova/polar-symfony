@@ -104,15 +104,15 @@ $e = $errors ?? [];
         <div class="form-group row">
             <label class="col-sm-3 control-label text-sm-right pt-2 required">Datum</label>
             <div class="col-sm-4 col-md-3 col-lg-2<?= isset($e['date']) ? ' has-danger' : '' ?>">
-                <input type="text" name="date" class="form-control" placeholder="optional" required
+                <input type="text" name="date" class="form-control" placeholder="nepovinné" required
                        data-plugin-datepicker
-                       data-plugin-options='{ "container": ".content-body", "todayHighlight": true, "language": "<?= $localeShort ?>", "weekStart": 1, "format": "dd.mm.yyyy", "daysOfWeekHighlighted": [0,6] }'
+                       data-plugin-options='{ "container": ".content-body", "todayHighlight": true, "language": "cs-CZ", "weekStart": 1, "format": "dd.mm.yyyy", "daysOfWeekHighlighted": [0,6] }'
                        value="<?= htmlspecialchars($form['date']) ?>">
                 <?php if (isset($e['date'])) { ?><small class="form-text text-danger"><?= $e['date'] ?></small><?php } ?>
             </div>
             <label class="col-sm-1 control-label text-sm-right pt-2 required">Čas</label>
             <div class="col-sm-4 col-md-3 col-lg-2<?= isset($e['time']) ? ' has-danger' : '' ?>">
-                <input type="text" name="time" class="form-control" placeholder="optional" required
+                <input type="text" name="time" class="form-control" placeholder="nepovinné" required
                        data-plugin-timepicker
                        data-plugin-options='{ "showMeridian": false, "minuteStep": 1, "showSeconds": false }'
                        value="<?= htmlspecialchars($form['time']) ?>">
@@ -122,7 +122,7 @@ $e = $errors ?? [];
         <div class="form-group row">
             <label class="col-sm-3 control-label text-sm-right pt-2 required">Název</label>
             <div class="col-sm-9<?= isset($e['title']) ? ' has-danger' : '' ?>">
-                <input type="text" name="title" class="form-control" placeholder="required" required
+                <input type="text" name="title" class="form-control" placeholder="povinné" required
                        maxlength="254" data-plugin-maxlength data-rule-rangeLength="[0, 254]"
                        value="<?= htmlspecialchars($form['title']) ?>">
                 <?php if (isset($e['title'])) { ?><small class="form-text text-danger"><?= $e['title'] ?></small><?php } ?>
@@ -132,7 +132,7 @@ $e = $errors ?? [];
             <label class="col-sm-3 control-label text-sm-right pt-2 required">URL adresa</label>
             <div class="col-sm-9<?= isset($e['url']) ? ' has-danger' : '' ?>">
                 <div class="input-group">
-                    <input type="text" name="url" class="form-control" placeholder="required" required
+                    <input type="text" name="url" class="form-control" placeholder="povinné" required
                            maxlength="254" data-plugin-maxlength data-rule-rangeLength="[0, 254]"
                            value="<?= htmlspecialchars($form['url']) ?>">
                     <span class="input-group-append">
@@ -147,7 +147,7 @@ $e = $errors ?? [];
         <div class="form-group row">
             <label class="col-sm-3 control-label text-sm-right pt-2">Soubor</label>
             <div class="col-sm-9">
-                <input type="text" name="file" class="form-control" placeholder="optional"
+                <input type="text" name="file" class="form-control" placeholder="nepovinné"
                        maxlength="254" data-plugin-maxlength data-rule-rangeLength="[0, 254]"
                        value="<?= htmlspecialchars($form['file']) ?>">
             </div>
@@ -179,21 +179,21 @@ $e = $errors ?? [];
         <div class="form-group row">
             <label class="col-sm-3 control-label text-sm-right pt-2">Krátký popis</label>
             <div class="col-sm-9">
-                <textarea name="short_description" class="form-control" placeholder="optional"
+                <textarea name="short_description" class="form-control" placeholder="nepovinné"
                           rows="3" data-plugin-textarea-autosize><?= htmlspecialchars($form['short_description']) ?></textarea>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-3 control-label text-sm-right pt-2">Popis</label>
             <div class="col-sm-9">
-                <textarea name="description" class="form-control" placeholder="optional"
+                <textarea name="description" class="form-control" placeholder="nepovinné"
                           rows="5" data-plugin-textarea-autosize><?= htmlspecialchars($form['description']) ?></textarea>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-3 control-label text-sm-right pt-2">Přepis</label>
             <div class="col-sm-9">
-                <textarea name="overwrite" class="form-control redactor" placeholder="optional"
+                <textarea name="overwrite" class="form-control redactor" placeholder="nepovinné"
                           rows="10"><?= htmlspecialchars($form['overwrite']) ?></textarea>
             </div>
         </div>

@@ -48,7 +48,7 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
                             Popis
                         </label>
                         <div class="col-sm-9<?= !empty($errors['description']) ? ' has-danger' : '' ?>">
-                            <textarea name="description" class="form-control" rows="3" placeholder="volitelné"
+                            <textarea name="description" class="form-control" rows="3" placeholder="nepovinné"
                                       data-plugin-textarea-autosize><?= htmlspecialchars($post['description'] ?? '') ?></textarea>
                             <?php if (!empty($errors['description'])) { ?>
                                 <small class="form-text text-danger"><?= htmlspecialchars($errors['description']) ?></small>
