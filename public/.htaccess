@@ -1,12 +1,18 @@
 # public/.htaccess
 
+# vypnout auto-redirect adresáře s trailing slash (zabrání smyčce u /rss)
+DirectorySlash Off
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
     # pokud máš problém s 403/404, zkus odkomentovat:
     # RewriteBase /
 
-    # nepřepisuj existující soubory/složky
+    # /rss (bez lomítka i s lomítkem) vždy přes Symfony, i když existuje adresář
+    RewriteRule ^rss/?$ index.php [L]
+
+    # nepřepisuj existující soubory a složky (kromě /rss – to je výše)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
