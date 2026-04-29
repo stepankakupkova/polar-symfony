@@ -21,8 +21,22 @@ class LayoutSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['onRequest', 0],
+            KernelEvents::REQUEST => [
+                ['onRequestEarly', 64],  // před RouterListener (32) – locale musí být dostupné i při 404
+                ['onRequest', 0],        // route-závislé globals po routingu
+            ],
         ];
+    }
+
+    public function onRequestEarly(RequestEvent $event): void
+    {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
+        $this->renderer->addGlobal('locale', 'cs_CZ');
+        $this->renderer->addGlobal('localeShort', 'cs');
+        $this->renderer->addGlobal('GOOGLE_ANALYTICS_ID', $this->GOOGLE_ANALYTICS_ID);
     }
 
     public function onRequest(RequestEvent $event): void
@@ -34,8 +48,5 @@ class LayoutSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $this->renderer->addGlobal('routeName', $request->attributes->get('_route', ''));
         $this->renderer->addGlobal('footerNumbers', $this->settingRepository->fetchFooterNumbers());
-        $this->renderer->addGlobal('GOOGLE_ANALYTICS_ID', $this->GOOGLE_ANALYTICS_ID);
-        $this->renderer->addGlobal('locale', 'cs_CZ');
-        $this->renderer->addGlobal('localeShort', 'cs');
     }
 }

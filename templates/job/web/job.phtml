@@ -112,6 +112,9 @@ $view->setBreadcrumbs([
     ['label' => $cityName, 'url' => $view->path('job_city_list', ['city_url' => $city_url])],
     ['label' => $job['profese'] ?? ''],
 ]);
+
+$view->setTitle(($job['profese'] ?? '') . ' | ' . $cityName . ' | Nabídka práce');
+
 ?>
 <?php if ($job) { ?>
 <script type="application/ld+json">

@@ -221,7 +221,7 @@ try {
 }
 
 // --- Symfony: meta, OG, breadcrumbs ---
-$view->setTitle((string) ($article['title'] ?? ''));
+$view->setTitle((string) ($article['title'] ?? '') . ' | Komerční sdělení');
 $view->addMeta('description', (string) ($article['anotation'] ?? ''));
 $view->addMeta('keywords', (string) ($article['title'] ?? ''));
 $view->addOgMeta('og:title', ($article['title'] ?? '') . ' | POLAR');

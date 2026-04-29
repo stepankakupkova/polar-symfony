@@ -218,7 +218,7 @@ if (!empty($cityRank1['city_rank1_url']) && !empty($cityRank1['region_rank1_url'
 	$view->addHeadLink('canonical', $canonicalUrl);
 }
 
-$view->setTitle((string) ($article['title'] ?? ''));
+$view->setTitle((string) ($article['title'] ?? '') . ' | ' . ($article['city'] ?? $city['city'] ?? '') . ' | Zprávy');
 $view->addMeta('description', trim(($article['anotation'] ?? '') . ' ' . ($article['city'] ?? $city['city'] ?? '') . ', ' . ($region['region'] ?? '')));
 $view->addMeta('keywords', trim(($article['title'] ?? '') . ', ' . ($article['city'] ?? $city['city'] ?? '') . ', ' . ($region['region'] ?? '')));
 $view->addMeta('news_keywords', trim(($article['title'] ?? '') . ', ' . ($article['city'] ?? $city['city'] ?? '') . ', ' . ($region['region'] ?? '')));

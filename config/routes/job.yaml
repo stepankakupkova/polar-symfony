@@ -13,7 +13,7 @@ job_our_detail:
   controller: App\Job\Controller\Web\JobController::jobOur
 
 job_city_detail:
-  path: /prace/{city_url}/{job_id}/{job_url}
+  path: /nabidka-prace/{city_url}/{job_id}/{job_url}
   controller: App\Job\Controller\Web\JobController::job
   requirements:
     city_url: 'ostrava|karvina|frydek-mistek|opava|novy-jicin|bruntal'
