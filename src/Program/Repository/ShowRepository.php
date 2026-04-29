@@ -236,6 +236,11 @@ final class ShowRepository
 	 */
 	public function insertPost(array $data): int
 	{
+		// 'order' je rezervované slovo v MySQL/MariaDB, nutno escapovat
+		if (array_key_exists('order', $data)) {
+			$data['`order`'] = $data['order'];
+			unset($data['order']);
+		}
 		$this->connection->insert($this->table, $data);
 
 		return (int) $this->connection->lastInsertId();

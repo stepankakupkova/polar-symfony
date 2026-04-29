@@ -46,6 +46,9 @@ final class ShowWriteController
 		$setting = $settingRepository->fetchSetting();
 		$categories = $showRepository->fetchCategoryForBootstrapSelect();
 
+		$post = [];
+		$errors = [];
+
 		if ($request->isMethod('POST')) {
 			$post = $request->request->all();
 
@@ -138,6 +141,8 @@ final class ShowWriteController
 
 				return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 			} catch (Exception $e) {
+				$errors['general'] = $e->getMessage();
+
 				// Log
 				$logger->error('PROGRAM - Add show', [
 					'description' => 'ERROR',
@@ -153,6 +158,8 @@ final class ShowWriteController
 			'scheme' => $request->getSession()->get('scheme', 'dark'),
 			'setting' => $setting,
 			'categories' => $categories,
+			'post' => $post,
+			'errors' => $errors,
 		]));
 	}
 
