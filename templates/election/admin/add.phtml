@@ -1,10 +1,5 @@
 <?php
-
 /** @var \App\Application\View\ViewHelper $view */
-$view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
-$view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
-$view->addBodyScript($view->asset('vendor/admin/bootstrap-select/js/bootstrap-select.min.js'));
-$view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css/bootstrap-select.min.css'));
 ?>
 
 <div class="row">
@@ -25,66 +20,13 @@ $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css
                     Přidat položku
                 </h2>
             </header>
-            <form action="<?= $view->path('admin_election_add') ?>" method="post" id="frmElection" class="form-horizontal">
-                <?php if ($error) { ?>
-                    <div class="alert alert-danger mx-3 mt-3">
-                        <?= htmlspecialchars($error) ?>
-                    </div>
-                <?php } ?>
-                <input type="hidden" name="rank" value="0">
-                <div class="card-body">
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2 required">
-                            Title
-                        </label>
-                        <div class="col-sm-9">
-                            <select name="title" class="form-control selectpicker show-tick" required
-                                    data-style="btn-default" data-hide-disabled="false" data-live-search="true" data-size="10">
-                                <option value=""></option>
-                                <?php foreach ($title_options as $opt) { ?>
-                                    <option value="<?= htmlspecialchars($opt['ZKRATKAK8']) ?>">
-                                        <?= htmlspecialchars($opt['ZKRATKAK8']) ?>
-                                    </option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2">
-                            Description
-                        </label>
-                        <div class="col-sm-9">
-                            <textarea name="description" class="form-control" rows="3" placeholder="nepovinné"
-                                      data-plugin-textarea-autosize></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2">
-                            Video
-                        </label>
-                        <div class="col-sm-9">
-                            <select name="video_id" class="form-control selectpicker show-tick"
-                                    data-style="btn-default" data-hide-disabled="false" data-live-search="true" data-size="10">
-                                <option value=""></option>
-                                <?php foreach ($video_options as $opt) { ?>
-                                    <?php if ($opt['value'] === null) continue; ?>
-                                    <option value="<?= (int) $opt['value'] ?>">
-                                        <?= htmlspecialchars($opt['label']) ?>
-                                    </option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-sm-9 offset-sm-3">
-                            <button type="submit" class="btn btn-primary">Uložit</button>
-                            <button type="submit" name="cancel" class="btn btn-default" formnovalidate>Zrušit</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <?= $view->include('election/admin/electionForm', [
+                'formAction'    => $view->path('admin_election_add'),
+                'election'      => [],
+                'error'         => $error ?? null,
+                'title_options' => $title_options,
+                'video_options' => $video_options,
+            ]) ?>
         </section>
     </div>
 </div>

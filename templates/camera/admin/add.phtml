@@ -1,8 +1,5 @@
 <?php
 /** @var \App\Application\View\ViewHelper $view */
-
-$view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
-$view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
 ?>
 
 <div class="row">
@@ -23,74 +20,11 @@ $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
                     Přidat kameru
                 </h2>
             </header>
-            <form action="<?= $view->path('admin_camera_add') ?>" method="post" id="frmCamera" class="form-horizontal">
-                <?php if (!empty($errors['general'])) { ?>
-                    <div class="alert alert-danger mx-3 mt-3">
-                        <?= htmlspecialchars($errors['general']) ?>
-                    </div>
-                <?php } ?>
-                <div class="card-body">
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2 required">
-                            Titulek
-                        </label>
-                        <div class="col-sm-9<?= !empty($errors['title']) ? ' has-danger' : '' ?>">
-                            <input type="text" name="title" value="<?= htmlspecialchars($post['title'] ?? '') ?>"
-                                   class="form-control" placeholder="povinné" required maxlength="254"
-                                   data-plugin-maxlength>
-                            <?php if (!empty($errors['title'])) { ?>
-                                <small class="form-text text-danger"><?= htmlspecialchars($errors['title']) ?></small>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2">
-                            Popis
-                        </label>
-                        <div class="col-sm-9<?= !empty($errors['description']) ? ' has-danger' : '' ?>">
-                            <textarea name="description" class="form-control" rows="3" placeholder="nepovinné"
-                                      data-plugin-textarea-autosize><?= htmlspecialchars($post['description'] ?? '') ?></textarea>
-                            <?php if (!empty($errors['description'])) { ?>
-                                <small class="form-text text-danger"><?= htmlspecialchars($errors['description']) ?></small>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2 required">
-                            URL adresa M3U8
-                        </label>
-                        <div class="col-sm-9<?= !empty($errors['url_m3u8']) ? ' has-danger' : '' ?>">
-                            <input type="text" name="url_m3u8" value="<?= htmlspecialchars($post['url_m3u8'] ?? '') ?>"
-                                   class="form-control" placeholder="povinné" required maxlength="254"
-                                   data-plugin-maxlength>
-                            <?php if (!empty($errors['url_m3u8'])) { ?>
-                                <small class="form-text text-danger"><?= htmlspecialchars($errors['url_m3u8']) ?></small>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label text-sm-right pt-2 required">
-                            URL adresa MPD
-                        </label>
-                        <div class="col-sm-9<?= !empty($errors['url_mpd']) ? ' has-danger' : '' ?>">
-                            <input type="text" name="url_mpd" value="<?= htmlspecialchars($post['url_mpd'] ?? '') ?>"
-                                   class="form-control" placeholder="povinné" required maxlength="254"
-                                   data-plugin-maxlength>
-                            <?php if (!empty($errors['url_mpd'])) { ?>
-                                <small class="form-text text-danger"><?= htmlspecialchars($errors['url_mpd']) ?></small>
-                            <?php } ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-sm-9 offset-sm-3">
-                            <button type="submit" class="btn btn-primary">Uložit</button>
-                            <button type="submit" name="cancel" class="btn btn-default" formnovalidate>Zrušit</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <?= $view->include('camera/admin/cameraForm', [
+                'formAction' => $view->path('admin_camera_add'),
+                'post'       => $post,
+                'errors'     => $errors,
+            ]) ?>
         </section>
     </div>
 </div>
