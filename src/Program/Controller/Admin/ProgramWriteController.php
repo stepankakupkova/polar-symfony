@@ -356,7 +356,7 @@ final class ProgramWriteController
 		LoggerInterface $logger,
 	): Response|JsonResponse
 	{
-		$cron = $request->query->get('cron');
+		$cron = $request->query->get('cron') === 'true';
 		$message = null;
 
 		if (!$cron) {
