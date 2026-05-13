@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class VideoWriteController
@@ -145,167 +146,170 @@ final class VideoWriteController
 		$cron = $request->query->get('cron') === 'true';
 		$message = null;
 
-		if (!$cron) {
+		$headers = $cron ? [] : [
 			// Zakázání bufferování pro NGINX
-			header('X-Accel-Buffering: no');
+			'X-Accel-Buffering' => 'no',
 			// Zakázání bufferování pro APACHE
-			header("Content-Encoding: none");
+			'Content-Encoding' => 'none',
+		];
 
-			// JsPush-like progress
-			ob_implicit_flush(true);
-			if (ob_get_level()) {
-				ob_end_flush();
+		return new StreamedResponse(function() use ($videoRepository, $programRepository, $settingRepository, $logger, $identity, $cron, &$message) {
+			if (!$cron) {
+				// JsPush-like progress
+				ob_implicit_flush(true);
+				if (ob_get_level()) {
+					ob_end_flush();
+				}
 			}
-		}
 
-		try {
-			$dir = $this->LIGHT_PATH . 'porady/nepublikovano';
-			$files = [];
+			try {
+				$dir = $this->LIGHT_PATH . 'porady/nepublikovano';
+				$files = [];
 
-			$handle = opendir($dir);
-			if ($handle) {
-				while (false !== ($entry = readdir($handle))) {
-					if ($entry !== "." && $entry !== ".." && $entry !== ".DS_Store") {
-						$files[] = $entry;
+				$handle = opendir($dir);
+				if ($handle) {
+					while (false !== ($entry = readdir($handle))) {
+						if ($entry !== "." && $entry !== ".." && $entry !== ".DS_Store") {
+							$files[] = $entry;
+						}
+					}
+					closedir($handle);
+				}
+
+				sort($files);
+
+				$count = count($files) + 2;
+
+				if (!$cron) {
+					$this->pushProgress(0, $count + 2, 'Načítám...');
+				}
+
+				$data = [];
+				foreach ($files as $iValue) {
+					$file = $iValue;
+					if (mb_strtolower(substr($file, -7), 'UTF-8') === '_hq.mp4') {
+						$file = mb_substr($file, 0, -7, 'UTF-8');
+					} elseif (mb_strtolower(substr($file, -7), 'UTF-8') === '_lq.mp4') {
+						$file = mb_substr($file, 0, -7, 'UTF-8');
+					}
+
+					if (!in_array($file, $data, true)) {
+						$data[] = $file;
 					}
 				}
-				closedir($handle);
-			}
+				$ok = 0;
+				$nok = 0;
+				$sec = 55;
 
-			sort($files);
+				foreach ($data as $i => $iValue) {
+					$file = $iValue;
 
-			$count = count($files) + 2;
+					$lq = $hq = false;
 
-			if (!$cron) {
-				$this->pushProgress(0, $count + 2, 'Načítám...');
-			}
+					if (in_array($file . '_hq.mp4', $files, true)) {
+						$hq = true;
+					}
+					if (in_array($file . '_lq.mp4', $files, true)) {
+						$lq = true;
+					}
 
-			$data = [];
-			foreach ($files as $iValue) {
-				$file = $iValue;
-				if (mb_strtolower(substr($file, -7), 'UTF-8') === '_hq.mp4') {
-					$file = mb_substr($file, 0, -7, 'UTF-8');
-				} elseif (mb_strtolower(substr($file, -7), 'UTF-8') === '_lq.mp4') {
-					$file = mb_substr($file, 0, -7, 'UTF-8');
-				}
+					if (!$cron) {
+						$this->pushProgress(
+							$i + 1,
+							$count,
+							'Soubor: ' . $file . ' - ' .
+							((($lq === $hq) === true) ? '<i class="fa fa-fw fa-check-circle text-color-success"></i>' : '<i class="fa fa-fw fa-times-circle text-color-danger"></i>')
+						);
+					}
 
-				if (!in_array($file, $data, true)) {
-					$data[] = $file;
-				}
-			}
-			$ok = 0;
-			$nok = 0;
-			$sec = 55;
+					if (($lq === $hq) === true) {
+						$ok++;
 
-			foreach ($data as $i => $iValue) {
-				$file = $iValue;
+						$programs = $programRepository->findPostsBy('file', $file . '.mp4');
 
-				$lq = $hq = false;
+						if ($programs) {
+							$program = $programs[0];
+							$date = new DateTime($program['time']);
 
-				if (in_array($file . '_hq.mp4', $files, true)) {
-					$hq = true;
-				}
-				if (in_array($file . '_lq.mp4', $files, true)) {
-					$lq = true;
+							$dir = $this->LIGHT_PATH . 'porady/publikovano/' . $date->format('Y') . '/' . $date->format('m') . '/' . $date->format('d') . '/';
+							if (!file_exists($dir)) {
+								if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+									throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
+								}
+								chmod($dir, 0777);
+							}
+
+							rename($this->LIGHT_PATH . 'porady/nepublikovano/' . $file . '_hq.mp4', $dir . $file . '_hq.mp4');
+							rename($this->LIGHT_PATH . 'porady/nepublikovano/' . $file . '_lq.mp4', $dir . $file . '_lq.mp4');
+
+							$this->createPreview($dir . $file . '_hq.mp4', $sec, $logger, $identity);
+
+							$videoData = [
+								'name' => $file,
+								'path' => $date->format('Y') . '/' . $date->format('m') . '/' . $date->format('d'),
+								'lenght' => filesize($dir . $file . '_hq.mp4'),
+								'size_lq' => filesize($dir . $file . '_lq.mp4'),
+								'size_hq' => filesize($dir . $file . '_hq.mp4'),
+								'duration' => $this->getDurationFromLight($dir . $file . '_lq.mp4'),
+								'showed' => 0,
+							];
+
+							$newVideoId = $videoRepository->insertPost($videoData);
+
+							foreach ($programs as $program) {
+								$programRepository->updatePost($program['id'], ['video_id' => $newVideoId]);
+							}
+						}
+					} else {
+						$nok++;
+					}
 				}
 
 				if (!$cron) {
 					$this->pushProgress(
-						$i + 1,
 						$count,
-						'Soubor: ' . $file . ' - ' .
-						((($lq === $hq) === true) ? '<i class="fa fa-fw fa-check-circle text-color-success"></i>' : '<i class="fa fa-fw fa-times-circle text-color-danger"></i>')
+						$count,
+						'Dokončeno: ' . $ok . ' <i class="fa fa-fw fa-check-circle text-success"></i>, ' . $nok . ' <i class="fa fa-fw fa-times-circle text-danger"></i>'
 					);
 				}
 
-				if (($lq === $hq) === true) {
-					$ok++;
+				// Aktualizace datumu posledního načtení
+				$settingRepository->updateSetting(['video_update_date' => date('Y-m-d H:i:s')]);
 
-					$programs = $programRepository->findPostsBy('file', $file . '.mp4');
+				$success = true;
 
-					if ($programs) {
-						$program = $programs[0];
-						$date = new DateTime($program['time']);
+				// Log
+				$logger->notice('PROGRAM - Load videos', [
+					'description' => 'OK',
+					'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
+					'file' => __FILE__,
+				]);
+			} catch (Exception $e) {
+				$success = false;
+				$message = $e->getMessage();
 
-						$dir = $this->LIGHT_PATH . 'porady/publikovano/' . $date->format('Y') . '/' . $date->format('m') . '/' . $date->format('d') . '/';
-						if (!file_exists($dir)) {
-							if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
-								throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
-							}
-							chmod($dir, 0777);
-						}
-
-						rename($this->LIGHT_PATH . 'porady/nepublikovano/' . $file . '_hq.mp4', $dir . $file . '_hq.mp4');
-						rename($this->LIGHT_PATH . 'porady/nepublikovano/' . $file . '_lq.mp4', $dir . $file . '_lq.mp4');
-
-						$this->createPreview($dir . $file . '_hq.mp4', $sec, $logger, $identity);
-
-						$videoData = [
-							'name' => $file,
-							'path' => $date->format('Y') . '/' . $date->format('m') . '/' . $date->format('d'),
-							'lenght' => filesize($dir . $file . '_hq.mp4'),
-							'size_lq' => filesize($dir . $file . '_lq.mp4'),
-							'size_hq' => filesize($dir . $file . '_hq.mp4'),
-							'duration' => $this->getDurationFromLight($dir . $file . '_lq.mp4'),
-							'showed' => 0,
-						];
-
-						$newVideoId = $videoRepository->insertPost($videoData);
-
-						foreach ($programs as $program) {
-							$programRepository->updatePost($program['id'], ['video_id' => $newVideoId]);
-						}
-					}
-				} else {
-					$nok++;
+				if (!$cron) {
+					$this->pushProgress(100, 100, '<span class="text-danger">Nelze načíst videa</span>');
+					$this->pushProgress(100, 100, $e->getMessage());
 				}
+
+				$logger->error('PROGRAM - Load videos', [
+					'description' => 'ERROR',
+					'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
+					'file' => __FILE__,
+					'trace' => $e->getMessage(),
+				]);
 			}
 
 			if (!$cron) {
-				$this->pushProgress(
-					$count,
-					$count,
-					'Dokončeno: ' . $ok . ' <i class="fa fa-fw fa-check-circle text-success"></i>, ' . $nok . ' <i class="fa fa-fw fa-times-circle text-danger"></i>'
-				);
+				$this->pushFinish();
+			} else {
+				echo json_encode([
+					'success' => $success,
+					'message' => $message,
+				]);
 			}
-
-			// Aktualizace datumu posledního načtení
-			$settingRepository->updateSetting(['video_update_date' => date('Y-m-d H:i:s')]);
-
-			$success = true;
-
-			// Log
-			$logger->notice('PROGRAM - Load videos', [
-				'description' => 'OK',
-				'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
-				'file' => __FILE__,
-			]);
-		} catch (Exception $e) {
-			$success = false;
-			$message = $e->getMessage();
-
-			if (!$cron) {
-				$this->pushProgress(100, 100, '<span class="text-danger">Nelze načíst videa</span>');
-				$this->pushProgress(100, 100, $e->getMessage());
-			}
-
-			$logger->error('PROGRAM - Load videos', [
-				'description' => 'ERROR',
-				'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
-				'file' => __FILE__,
-				'trace' => $e->getMessage(),
-			]);
-		}
-
-		if (!$cron) {
-			$this->pushFinish();
-			return new Response('', 200);
-		}
-
-		return new JsonResponse([
-			'success' => $success,
-			'message' => $message,
-		]);
+		}, 200, $headers);
 	}
 
 	public function createPreviewAction(

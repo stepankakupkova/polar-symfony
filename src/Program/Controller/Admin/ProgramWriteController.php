@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ProgramWriteController
@@ -354,21 +355,25 @@ final class ProgramWriteController
 		ProgramRepository $programRepository,
 		SettingRepository $settingRepository,
 		LoggerInterface $logger,
-	): Response|JsonResponse
+	): Response
 	{
 		$cron = $request->query->get('cron') === 'true';
 		$message = null;
 
-		if (!$cron) {
+		$headers = $cron ? [] : [
 			// Zakázání bufferování pro NGINX
-			header('X-Accel-Buffering: no');
+			'X-Accel-Buffering' => 'no',
 			// Zakázání bufferování pro APACHE
-			header("Content-Encoding: none");
-			ob_implicit_flush(true);
-			if (ob_get_level()) {
-				ob_end_flush();
+			'Content-Encoding' => 'none',
+		];
+
+		return new StreamedResponse(function() use ($programRepository, $settingRepository, $logger, $cron, &$message) {
+			if (!$cron) {
+				ob_implicit_flush(true);
+				if (ob_get_level()) {
+					ob_end_flush();
+				}
 			}
-		}
 
 		/** @var mixed $identity */
 		$identity = $this->security->getUser();
@@ -451,14 +456,14 @@ final class ProgramWriteController
 		}
 
 		if (!$cron) {
-			$this->pushFinish();
-			return new Response('', 200);
-		}
-
-		return new JsonResponse([
-			'success' => $success,
-			'message' => $message,
-		]);
+				$this->pushFinish();
+			} else {
+				echo json_encode([
+					'success' => $success,
+					'message' => $message,
+				]);
+			}
+		}, 200, $headers);
 	}
 
 	/**
