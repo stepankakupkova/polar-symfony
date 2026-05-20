@@ -721,12 +721,7 @@ final class ShowexWriteController
 	private function createConfig(ShowexRepository $showexRepository): void
 	{
 		$configDir = dirname($this->PUBLIC_PATH) . '/config/';
-		$programDir = $configDir . 'program/';
 		$routesDir = $configDir . 'routes/';
-
-		if (!is_dir($programDir) && !mkdir($concurrentDirectory = $programDir, 0777, true) && !is_dir($concurrentDirectory)) {
-			throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-		}
 
 		if (!is_dir($routesDir) && !mkdir($concurrentDirectory = $routesDir, 0777, true) && !is_dir($concurrentDirectory)) {
 			throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
@@ -751,32 +746,6 @@ final class ShowexWriteController
 		}
 
 		file_put_contents($routesDir . 'program_showex_generated.yaml', $yaml);
-
-		$navigation = [
-			'submenu-dropdown' => [
-				'showex' => [
-					'pages' => [],
-				],
-			],
-		];
-
-		$shows = $showexRepository->fetchForConfig();
-		foreach ($shows as $show) {
-			$navigation['submenu-dropdown']['showex']['pages'][] = [
-				'id' => 'menuProgramShowexWeb-' . $show['id'],
-				'label' => $show['title'],
-				'route' => 'program_showex_' . $show['id'],
-				'visible' => 0,
-				'order' => $show['order'],
-			];
-		}
-
-		$content = "<?php\n\n";
-		$content .= "// Auto-generated Program Showex navigation - DO NOT EDIT MANUALLY\n";
-		$content .= "// Generated: " . date('Y-m-d H:i:s') . "\n\n";
-		$content .= 'return ' . $this->exportArray($navigation) . ";\n";
-
-		file_put_contents($programDir . 'showex_navigation.php', $content);
 	}
 
 	private function exportArray(array $array, int $indent = 0): string
