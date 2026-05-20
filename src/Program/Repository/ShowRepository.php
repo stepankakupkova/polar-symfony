@@ -317,7 +317,7 @@ final class ShowRepository
 			'show_id' => $show_id,
 			'day' => $day,
 			'time' => $value,
-			'premiere' => $premiere,
+			'premiere' => (int) $premiere,
 		]);
 	}
 
@@ -334,7 +334,7 @@ final class ShowRepository
 			'show_id' => $show_id,
 			'day' => $day,
 			'time' => $value,
-			'premiere' => $premiere,
+			'premiere' => (int) $premiere,
 		], ['id' => $id]);
 	}
 
