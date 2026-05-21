@@ -32,7 +32,7 @@ $view->addInlineScript(
 
         <?php foreach ($pr_block as $pr_item) { ?>
             <?php if ($pr_item) { ?>
-                <?php $pr_href = '/zpravy/pr-clanky/' . $pr_item['article_id'] . '/' . $pr_item['article_url']; ?>
+                <?php $pr_href = $view->path('news_pr_article', ['article_id' => $pr_item['article_id'], 'article_url' => $pr_item['article_url']]); ?>
                 <article class="">
                     <div class="row mb-custom-4-5">
                         <?php if ($pr_item['picture']) { ?>

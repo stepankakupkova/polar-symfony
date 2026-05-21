@@ -488,7 +488,7 @@ final class NewsController
 			// prohledáme všechny články na tyto tagy. V poli vzniknou duplicity, protože některé články mají více, než 1 tag stejný
 			$articles_ids[] = $this->playkitRepository->getArticlesByTopicsAndDate($topic_ids, $article['id']);
 			// sečteme tyto duplicity - potřebujeme články, které mají nejvíce stejných tagů, jako aktuální článek
-			$articles_ids_sort = array_count_values($articles_ids[0]);
+			$articles_ids_sort = array_count_values($articles_ids[0] ?? []);
 			// seřadíme pole podle počtu stejných tagů DESC
 			arsort($articles_ids_sort, SORT_NUMERIC);
 			// ořežeme na prvních x položek (podle toho, kolik článků bude ve výpise "K tématu")

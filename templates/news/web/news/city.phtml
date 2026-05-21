@@ -109,14 +109,14 @@ $dateFormat = function (DateTime $date, int $dateType, int $timeType) use ($loca
         <?php
                 $region_city_url = $view->path('news');
             if ($item['region_url'] && $item['city_url']) {
-                $region_city_url = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'];
+                $region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
                 if ($item['city_url'] === 'cely-ms-kraj') {
                     $region_city_url = $view->path('news');
                 }
             }
 
-            $article_href = '/zpravy/' . $item['region_url'] . '/' . $item['city_url'] . '/' . $item['article_id'] . '/' . $item['article_url'];
-            $redactor_href = '/zpravy/redaktor/' . $item['author_url'];
+            $article_href = $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]);
+            $redactor_href = $view->path('news_redactor', ['redactor_url' => $item['author_url']]);
 
             try {
                 $today = new DateTime();
