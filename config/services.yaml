@@ -9,9 +9,9 @@
 parameters:
     app.PUBLIC_PATH: '%kernel.project_dir%/public'
     app.HOURS_DELETE_LABELS: 24
-    app.LIGHT_URL: 'https://light.polar.cz/videa/polar/'
-    app.LIGHT_PATH_WITHOUT_HTTPS: '/data_webytv/dp/polar/'
-    app.LIGHT_URL_WITHOUT_HTTPS: 'http://plainvod.polar.cz/videa/polar/'
+    app.LIGHT_URL: '%env(LIGHT_URL)%'
+    app.LIGHT_PATH_WITHOUT_HTTPS: '%env(LIGHT_PATH_WITHOUT_HTTPS)%'
+    app.LIGHT_URL_WITHOUT_HTTPS: '%env(LIGHT_URL_WITHOUT_HTTPS)%'
     app.LIGHT_PATH: '%env(LIGHT_PATH)%'
     app.GOOGLE_ANALYTICS_ID: '%env(GOOGLE_ANALYTICS_ID)%'
     app.GOOGLE_MAP_KEY: '%env(GOOGLE_MAP_KEY)%'

@@ -789,13 +789,13 @@ final class NewsController
 
 		$video = $this->playkitRepository->getVideoById($video_id);
 
-		$fileUrl = $this->LIGHT_URL . 'zpravy/publikovano/' . $video['folder_light'] . '/' . $video['file'] . '_' . $quality . '.mp4';
+		$fileUrl = $this->LIGHT_URL . 'zpravy/publikovano/' . $video[0]['folder_light'] . '/' . $video[0]['file'] . '_' . $quality . '.mp4';
 
 		$response = new StreamedResponse(static function () use ($fileUrl): void {
 			readfile($fileUrl);
 		});
 		$response->headers->set('Content-Description', 'File Transfer');
-		$response->headers->set('Content-Disposition', 'attachment; filename="' . $video['file'] . '_' . $quality . '.mp4"');
+		$response->headers->set('Content-Disposition', 'attachment; filename="' . $video[0]['file'] . '_' . $quality . '.mp4"');
 		$response->headers->set('Content-Type', 'application/force-download');
 
 		return $response;

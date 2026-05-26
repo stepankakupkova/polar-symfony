@@ -13,7 +13,7 @@
     sspScript.addEventListener("load", function() {
         var htmlbannerMobilesticky = "";
         if (sssp.displaySeznamAds()) {
-            const configuration = [
+            /*const configuration = [
                 {
                     type: "mobile",
                     zoneId: 398205,
@@ -21,7 +21,18 @@
                     fromFeed: true
                 },
             ];
-            getSznAdPopUp(configuration);
+            getSznAdPopUp(configuration);*/
+            if (window.innerWidth <= 767) {
+                htmlbannerMobilesticky =
+                    "<div class=\"show-ad\" style=\"display: none;\">" +
+                        "<div id=\"ad7\" data-szn-ssp-ad='{\"zoneId\": 398205}'>" +
+                        "</div>" +
+                    "</div>";
+                if (CheckMobileAd()) {
+                    elbannerMobilesticky.insertAdjacentHTML("beforeend", htmlbannerMobilesticky);
+                }
+                DisplayMobileAd()
+            }
         } else {
             <?php if (isset($bannerMobilesticky)) { ?>
                 htmlbannerMobilesticky =
