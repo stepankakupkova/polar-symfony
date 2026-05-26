@@ -136,7 +136,7 @@ final class RssController
                 if ($limit !== null && $i > $limit) break;
 
                 // Enclosure (image)
-                $image = 'https://polar.cz/data/microformats/polar.jpg';
+                $image = 'https://polar.cz/img/web/layout/microformat.png';
                 if (isset($item->enclosure)) {
                     $attrs = $item->enclosure->attributes();
                     if (!empty($attrs['url'])) {
