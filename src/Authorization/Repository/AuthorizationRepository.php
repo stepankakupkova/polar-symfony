@@ -33,6 +33,8 @@ final class AuthorizationRepository
 		// Vytvořit záznam v user tabulce
 		$this->connection->insert('user', [
 			'authorization_id' => $authorizationId,
+			'created_user'     => $data['created_user'] ?? '',
+			'updated_user'     => $data['created_user'] ?? '',
 		]);
 
 		// Přiřadit roli

@@ -55,10 +55,11 @@ final class UserWriteController
 				$password = password_hash($post['password'], PASSWORD_BCRYPT);
 
 				$authorizationId = $this->authorizationRepository->insertPost([
-					'username' => $post['username'],
-					'password' => $password,
-					'active' => !empty($post['active']),
-					'role' => $post['role'] ?? '',
+					'username'     => $post['username'],
+					'password'     => $password,
+					'active'       => !empty($post['active']),
+					'role'         => $post['role'] ?? '',
+					'created_user' => $identity->getUserIdentifier(),
 				]);
 
 				$user = $this->userRepository->findPostBy('authorization_id', $authorizationId);
