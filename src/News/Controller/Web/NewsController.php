@@ -989,7 +989,7 @@ final class NewsController
 			$table->addRow();
 
 			// logo
-			$logoPath = $this->PUBLIC_PATH . '/img/web/logo-email.png';
+			$logoPath = $this->PUBLIC_PATH . '/img/web/logo_polar.png';
 			$cellLeft = $table->addCell(6500, ['valign' => 'top']);
 			if (is_file($logoPath)) {
 				$cellLeft->addImage($logoPath, ['height' => 40]);
