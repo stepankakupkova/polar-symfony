@@ -16,6 +16,7 @@ composer install --no-dev --optimize-autoloader
 
 **Nenahrávat / nepřepisovat:**
 - `.env.local` — na serveru je vlastní s produkčními hesly
+- `.vscode/` — lokální nastavení VS Code
 - `var/` (cache ani logy)
 - `composer.json`, `composer.lock`, `symfony.lock`, ... a další soubory v root
 
