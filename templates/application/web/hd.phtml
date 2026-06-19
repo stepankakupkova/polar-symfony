@@ -117,7 +117,8 @@ $view->addInlineScript(
     </div>
     <div class="row">
         <div class="col-12 col-lg-8 mb-4 mb-lg-2">
-            <div id="ticker" class="mb-0">
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="mb-0">
+                <h2 class="visually-hidden">Přehled zpráv</h2>
                 <div id="tickerIcon" class="">
                     <!--<i class="fa fa-fw fa-info text-light"></i>-->
                 </div>
@@ -143,7 +144,12 @@ $view->addInlineScript(
         </div>
         <div id="programContainer" class="col-12 col-lg-4 match-height">
             <div class="row mt-0 mb-3">
-                <div class="col-7 d-flex align-items-center">
+                <div class="col-6 d-flex align-items-center mb-1">
+                    <h2 class="mb-0">
+                        Program POLAR
+                    </h2>
+                </div>
+                <div class="col-6 d-flex align-items-center justify-content-end mb-1">
                     <button id="programday1" class="showProgram btn btn-primary btn-xs me-2">
                         Dnes
                     </button>
@@ -154,7 +160,7 @@ $view->addInlineScript(
                         Pozítří
                     </button>
                 </div>
-                <div class="col-5 d-flex align-items-center justify-content-end">
+                <div class="col-12 d-flex align-items-center justify-content-end">
                     <a class="text-2" href="<?= $view->path('program_web') ?>" title="TV program">
                         celý TV program
                         <i class="fas fa-chevron-right text-1"></i>

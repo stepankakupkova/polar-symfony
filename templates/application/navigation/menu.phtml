@@ -28,7 +28,8 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         <li class="<?= $hasDropdown ? 'dropdown' : '' ?>">
             <a class="<?= $hasDropdown ? 'dropdown-item dropdown-toggle ' : '' ?>d-flex align-items-center text-4 font-weight-normal bg-hover-primary text-hover-light text-no-uppercase nav-link text-light<?= $active ? ' active' : '' ?>"
                href="<?= htmlspecialchars($region['url']) ?>"
-               title="<?= htmlspecialchars($region['label']) ?>">
+               title="<?= htmlspecialchars($region['label']) ?>"
+               <?= $hasDropdown ? 'aria-haspopup="true" aria-expanded="false"' : '' ?>>
                 <?= htmlspecialchars($region['label']) ?>
             </a>
             <?php if ($hasDropdown) { ?>
@@ -37,7 +38,8 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
                         <li>
                             <a class="dropdown-item text-2<?= str_starts_with($currentPath, $city['url']) ? ' active' : '' ?>"
                                href="<?= htmlspecialchars($city['url']) ?>"
-                               title="<?= htmlspecialchars($city['label']) ?>">
+                               title="<?= htmlspecialchars($city['label']) ?>"
+                               tabindex="-1">
                                 <?= htmlspecialchars($city['label']) ?>
                             </a>
                         </li>

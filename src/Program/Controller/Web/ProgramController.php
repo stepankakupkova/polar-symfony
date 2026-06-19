@@ -72,14 +72,14 @@ final class ProgramController
 					'<div id="accordion" class="accordion accordion-modern-status accordion-modern-status-arrow">' .
 					'<div class="card card-default mt-1">' .
 					'<div class="card-header" id="collapse' . $i . 'Heading">' .
-					'<h3 class="card-title m-0">' .
+					'<h2 class="card-title m-0">' .
 					'<a class="accordion-toggle text-color-light ' . $collapsed . ' ' . $backgrounds[$i + 1] . ' px-3 py-2" data-bs-toggle="collapse" data-bs-target="#collapse' . $i . '"href="#collapse' . $i . '">' .
 					'<i class="fa fa-fw fa-clock"></i> ' .
 					$range->format('H:i') .
 					' - ' .
 					$range2->format('H:i') .
 					'</a>' .
-					'</h3>' .
+					'</h2>' .
 					'</div>' .
 					'<div id="collapse' . $i . '" class="collapse ' . $show . '" data-bs-parent="#accordion">' .
 					'<div class="card-body p-3">';
@@ -100,14 +100,14 @@ final class ProgramController
 						$content .=
 							'<div class="card card mt-1">' .
 							'<div class="card-header" id="collapse' . $i . 'Heading">' .
-							'<h3 class="card-title m-0">' .
+							'<h2 class="card-title m-0">' .
 							'<a class="accordion-toggle text-color-light ' . $collapsed . ' ' . $backgrounds[$i + 1] . ' px-3 py-2" data-bs-toggle="collapse" data-bs-target="#collapse' . $i . '"href="#collapse' . $i . '">' .
 							'<i class="fa fa-fw fa-clock"></i> ' .
 							$range->format('H:i') .
 							' - ' .
 							$range2->format('H:i') .
 							'</a>' .
-							'</h3>' .
+							'</h2>' .
 							'</div>' .
 							'<div id="collapse' . $i . '" class="collapse ' . $show . '" data-bs-parent="#accordion">' .
 							'<div class="card-body p-3">';
@@ -129,7 +129,7 @@ final class ProgramController
 					if ($item['video_name'] && $item['show_id'] && $item['show_url'] && ($time < $now)) {
 						$content .=
 							'<div class="col-12">' .
-							'<h4 class="text-4 font-weight-500 text-primary mb-0">' .
+							'<h3 class="text-4 font-weight-500 text-primary mb-1">' .
 							'<span class="time">' .
 							$time->format('H:i') .
 							'</span>' .
@@ -138,7 +138,7 @@ final class ProgramController
 							$item['title'] .
 							(($item['premiere']) ? ' (P)' : '') .
 							'</a>' .
-							'</h4>' .
+							'</h3>' .
 							'<p class="text-color-secondary mb-3">' .
 							$description .
 							'</p>' .
@@ -146,14 +146,14 @@ final class ProgramController
 					} else {
 						$content .=
 							'<div class="col-12">' .
-							'<h4 class="text-4 font-weight-500 text-primary mb-0">' .
+							'<h3 class="text-4 font-weight-500 text-primary mb-1">' .
 							'<span class="time">' .
 							$time->format('H:i') .
 							'</span>' .
 							'&nbsp;&nbsp;<i class="fa fa-angle-right"></i>&nbsp;&nbsp;' .
 							$item['title'] .
 							(($item['premiere']) ? ' (P)' : '') .
-							'</h4>' .
+							'</h3>' .
 							'<p class="text-color-secondary mb-3">' .
 							$description .
 							'</p>' .

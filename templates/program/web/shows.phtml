@@ -94,7 +94,7 @@ $view->setTitle('Pořady');
             <form class="searchShowsForm" action="<?= $view->path('program_web_shows') ?>" method="get">
                 <div class="simple-search input-group line-height-1">
                     <input id="autocomplete" class="form-control search" name="q" type="text" placeholder="Název pořadu" value="<?= $query ?>" minlength="3">
-                    <button class="btn btn-rounded" type="submit">
+                    <button class="btn btn-rounded" type="submit" aria-label="Hledat pořad">
                         <i class="fa fa-search header-nav-top-icon"></i>
                     </button>
                 </div>

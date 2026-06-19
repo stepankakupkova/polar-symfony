@@ -19,27 +19,52 @@ $view->addBodyScript($view->asset('vendor/web/bootstrap-datepicker/js/bootstrap-
 $view->addBodyScript($view->asset('vendor/web/bootstrap-datepicker/js/locale/cs_CZ.min.js'));
 
 $view->addInlineScript(
-    '$(".datepicker_cal").datepicker({
+    'function loadProgram(dateStr) {
+            $.post("' . $view->path('program_web_json_get_program') . '?date=" + dateStr,
+                function(json) {
+                    $("#program").html(json.content);
+                    $(".page-header h1 strong").html(moment(json.date).format("LL"));
+                },
+                "json"
+            );
+        }
+
+        $(".datepicker_cal").datepicker({
             language: "cs",
             todayHighlight: true,
             todayBtn: "linked",
             weekStart: 1,
+            format: "dd.mm.yyyy",
         }).on("changeDate", function(e){
             var date = new Date(e.date);
-            var d = date.getDate();
-            var m = date.getMonth()+1;
+            var d = String(date.getDate()).padStart(2, "0");
+            var m = String(date.getMonth() + 1).padStart(2, "0");
             var y = date.getFullYear();
-            if (d < 10) d= "0" + d
-            if (m < 10) m = "0" + m;
-            $.post("' . $view->path('program_web_json_get_program') . '?date=" + y + "-" + m + "-" + d,
-                function(json) {
-                    $("#program").html(json.content);
-                    $(".page-header h1 strong").html(moment(json.date).format("LL"));
-                }, 
-                "json"      
-            );
+            loadProgram(y + "-" + m + "-" + d);
         });
-        $(".datepicker_cal").datepicker("setDate", new Date());'
+        $(".datepicker_cal").datepicker("setDate", new Date());
+
+        // Keyboard focus indicator – přidáme třídu .kb-focused na aktuální den při pohybu šipkami
+        $(".datepicker_cal").on("keydown", function(e) {
+            var arrowKeys = [37, 38, 39, 40];
+            if ($.inArray(e.keyCode, arrowKeys) === -1) return;
+            var $input = $(this);
+            setTimeout(function() {
+                var dp = $input.data("datepicker");
+                if (!dp) return;
+                var vd = dp.viewDate;
+                if (!vd) return;
+                var $picker = $(".datepicker.dropdown-menu:visible");
+                $picker.find("td.day").removeClass("kb-focused");
+                $picker.find("td.day").each(function() {
+                    var day = parseInt($(this).text(), 10);
+                    if (!isNaN(day) && day === vd.getDate()
+                        && !$(this).hasClass("old") && !$(this).hasClass("new")) {
+                        $(this).addClass("kb-focused");
+                    }
+                });
+            }, 0);
+        });'
 );
 
 // Ticker + Crawl JS
@@ -85,7 +110,8 @@ $view->setBreadcrumbs([
     </div>
     <div class="row">
         <div class="col-12 col-lg-8 mb-4">
-            <div id="ticker" class="mb-4">
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="mb-4">
+                <h2 class="visually-hidden">Přehled zpráv</h2>
                 <div id="tickerIcon" class="">
                     <!--<i class="fa fa-fw fa-info text-light"></i>-->
                 </div>
@@ -107,8 +133,9 @@ $view->setBreadcrumbs([
                 <div class="featured-boxes featured-boxes-flat">
                     <div class="featured-box featured-box-secondary featured-box-effect-2">
                         <div class="box-content mt-4">
-                            <i class="icon-featured fa fa-calendar-alt d-none d-lg-inline-block"></i>
-                            <div class="datepicker_cal"></div>
+                            <i class="icon-featured fa fa-calendar-alt d-none d-lg-inline-block" aria-hidden="true"></i>
+                            <label for="datepicker-cal-mobile" class="visually-hidden">Vybrat datum programu</label>
+                            <input type="text" id="datepicker-cal-mobile" class="datepicker_cal form-control mt-2 d-lg-none" placeholder="dd.mm.rrrr" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -120,8 +147,9 @@ $view->setBreadcrumbs([
             <div class="featured-boxes featured-boxes-flat">
                 <div class="featured-box featured-box-secondary featured-box-effect-2">
                     <div class="box-content mt-4">
-                        <i class="icon-featured fa fa-calendar-alt d-none d-lg-inline-block"></i>
-                        <div class="datepicker_cal"></div>
+                        <i class="icon-featured fa fa-calendar-alt d-none d-lg-inline-block" aria-hidden="true"></i>
+                        <label for="datepicker-cal-desktop" class="visually-hidden">Vybrat datum programu</label>
+                        <input type="text" id="datepicker-cal-desktop" class="datepicker_cal form-control mt-2" placeholder="dd.mm.rrrr" autocomplete="off">
                     </div>
                 </div>
             </div>

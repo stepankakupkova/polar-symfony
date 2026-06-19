@@ -37,13 +37,13 @@ if ($query !== null) {
     <!-- Previous page link -->
     <?php if (isset($previous)) { ?>
         <li class="page-item">
-            <a class="page-link" href="<?= $urlFor($previous) ?>">
+            <a class="page-link" href="<?= $urlFor($previous) ?>" aria-label="Přejít na předchozí stránku">
                 <i class="fa fa-angle-double-left"></i>
             </a>
         </li>
     <?php } else { ?>
         <li class="page-item disabled">
-            <a class="page-link" href="#">
+            <a class="page-link" href="#" aria-label="Předchozí stránka" aria-disabled="true">
                 <i class="fa fa-angle-double-left"></i>
             </a>
         </li>
@@ -93,7 +93,7 @@ if ($query !== null) {
     <!-- Next page link -->
     <?php if (isset($next)) { ?>
         <li class="page-item">
-            <a class="page-link" href="<?= $urlFor($next) ?>">
+            <a class="page-link" href="<?= $urlFor($next) ?>" aria-label="Přejít na následující stránku">
                 <i class="fa fa-angle-double-right"></i>
             </a>
         </li>

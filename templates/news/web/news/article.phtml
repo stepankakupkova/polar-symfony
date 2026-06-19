@@ -54,7 +54,7 @@ $view->addInlineScript(
         });
         
         // odeslani chyby navstevnikem
-        $(".exclamation, .exclamation-text").click(function(e) {
+        $(".exclamation-wrapper").click(function(e) {
 			e.preventDefault();
 			$(".page-report-form").slideToggle(1000);
 		});
@@ -484,7 +484,8 @@ if ($hasOnlineNewsWidget) {
     </div>
     <div class="row sticky-square">
         <div class="col-12 col-lg-7">
-            <div id="ticker" class="mb-4">
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="mb-4">
+                <h2 class="visually-hidden">Přehled zpráv</h2>
                 <div id="tickerIcon" class="">
                     <!--<i class="fa fa-fw fa-info text-light"></i>-->
                 </div>
@@ -617,7 +618,7 @@ if ($hasOnlineNewsWidget) {
                                         <?php
                                             $first = false;
                                         ?>
-                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"src": "", "controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
+                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="<?= htmlspecialchars($video['description'] ?: $article['title']) ?>" data-setup='{"src": "", "controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
 											<source src="<?= $video['link_lq'] ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
 											<source src="<?= $video['link_hq'] ?>" type="video/mp4" label="vysoká HD 1080p" />
                                             <p class="vjs-no-js">
@@ -646,7 +647,7 @@ if ($hasOnlineNewsWidget) {
                                             Stáhnout video
                                         </a>
                                         <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                                aria-expanded="false" aria-label="Vybrat kvalitu videa">
                                             <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton2">
@@ -755,7 +756,7 @@ if ($hasOnlineNewsWidget) {
                                         <?php
                                             $first = false;
                                         ?>
-                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
+                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="<?= htmlspecialchars($video['description'] ?: $article['title']) ?>" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
 											<source src="<?= $video['link_lq'] ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
 											<source src="<?= $video['link_hq'] ?>" type="video/mp4" label="vysoká HD 1080p" />
                                             <p class="vjs-no-js">
@@ -776,7 +777,7 @@ if ($hasOnlineNewsWidget) {
                                             Stáhnout video
                                         </a>
                                         <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                                aria-expanded="false" aria-label="Vybrat kvalitu videa">
                                             <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton2">
@@ -809,7 +810,7 @@ if ($hasOnlineNewsWidget) {
                 <div class="sticky-container">
                     <div class="row">
                         <div class="col-md-12 mt-2">
-                            <div class="text" itemprop="articleBody">
+                            <div class="text" itemprop="articleBody" role="region" aria-label="Textový přepis reportáže">
                                 <?php //$print_text = $printableText; ?>
 								<?php
 								// Odstranění všech <div class="widget">...</div>
@@ -899,7 +900,7 @@ if ($hasOnlineNewsWidget) {
                                                     Stáhnout video
                                                 </a>
                                                 <button class="btn btn-secondary btn-xs dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
+                                                        aria-expanded="false" aria-label="Vybrat kvalitu videa">
                                                     <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton2">
@@ -930,9 +931,9 @@ if ($hasOnlineNewsWidget) {
 								<?php } ?>
 								<div class="row">
 									<div class="col-md-12 mb-2">
-										<div class="d-flex">
-											<span class="exclamation bg-secondary bg-hover-144b7b" style="padding: 4px 7px 2px 7px; cursor: pointer;" title="Nahlásit chybu v článku"><i class="fa fa-fw fa-exclamation-triangle text-color-light text-4"></i></span>
-											<span class="exclamation-text ms-2" style="padding-top: 3px; cursor: pointer;">Nahlásit chybu</span>
+										<div class="d-flex exclamation-wrapper" role="button" tabindex="0" aria-label="Nahlásit chybu v článku" style="cursor: pointer;">
+											<span class="exclamation bg-secondary bg-hover-144b7b" style="padding: 4px 7px 2px 7px;"><i class="fa fa-fw fa-exclamation-triangle text-color-light text-4"></i></span>
+											<span class="exclamation-text ms-2" style="padding-top: 3px;">Nahlásit chybu</span>
 										</div>
 
 										<div class="col-xs-12 page-report-form" style="display: none;">
@@ -990,7 +991,7 @@ if ($hasOnlineNewsWidget) {
                 <div class="row d-none d-lg-flex mb-4">
                     <div class="col-8">
                         <div id="video-container" class="ratio ratio-16x9">
-                            <video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
+                            <video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="Živé vysílání POLAR" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
                                 <source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
                                 <p class="vjs-no-js">
                                     Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.
@@ -1000,7 +1001,7 @@ if ($hasOnlineNewsWidget) {
                     </div>
                     <div class="col-4">
                         <?php if ($weather) { ?>
-                            <h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weather_region; ?></h3>
+                            <div class="text-primary font-weight-semibold text-3-4 mb-4">Počasí - <?= $weather_region; ?></div>
                             <?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
                             <?php foreach ($weather as $w) { ?>
                                 <div class="row text-secondary text-3-4 mb-2">
@@ -1064,11 +1065,11 @@ if ($hasOnlineNewsWidget) {
             <?php if ($newArticlesFirstHalf) { ?>
                 <div class="row">
                     <div class="col-12">
-                        <h3 class="text-5 text-primary mb-4">
+                        <h2 class="text-5 text-primary mb-4">
                             <a class="text-primary" href="<?= $view->path('news') ?>">
                                 Doporučujeme
                             </a>
-                        </h3>
+                        </h2>
                     </div>
                 </div>
             <?php } ?>

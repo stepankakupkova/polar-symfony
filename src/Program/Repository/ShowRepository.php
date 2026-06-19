@@ -435,7 +435,7 @@ final class ShowRepository
 					$data .= '<div class="col-sm-10 col-xs-9">';
 					foreach ($items as $item) {
 						if ($item['premiere']) {
-							$data .= '<strong class="text-color-primary">' . $item['time'] . '</strong>, ';
+						$data .= '<strong class="text-color-primary">' . $item['time'] . '*</strong>, ';
 						} else {
 							$data .= $item['time'] . ', ';
 						}

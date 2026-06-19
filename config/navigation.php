@@ -61,6 +61,14 @@ return [
             'icon'   => null,
         ],
         [
+            'id'     => 'menuFooterAccessibility',
+            'label'  => 'Prohlášení o přístupnosti',
+            'url'    => '/prohlaseni-o-pristupnosti',
+            'class'  => null,
+            'target' => null,
+            'icon'   => null,
+        ],
+        [
             'id'     => 'menuFooterGdpr',
             'label'  => 'GDPR',
             'url'    => '/data/docs/ochrana_osobnich_udaju_polar.pdf',

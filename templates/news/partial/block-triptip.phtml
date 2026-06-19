@@ -16,11 +16,11 @@ $region_title = (isset($region) && $region && $region['url'] !== 'moravskoslezsk
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                    <h2 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
                         <a class="text-primary" href="<?= $view->path('news_triptip') ?>">
                             Kam vyrazit<?= $region_title ?>
                         </a>
-                    </h3>
+                    </h2>
                     <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('news_triptip') ?>">
                         více&nbsp;<i class="fas fa-chevron-right text-1"></i>
                     </a>
@@ -56,11 +56,11 @@ $region_title = (isset($region) && $region && $region['url'] !== 'moravskoslezsk
                                         </div>
                                     </div>
                                     <div class="col-12">
-                                        <h2 class="mb-1">
+                                        <h3 class="h2-size mb-1">
                                             <a class="" href="<?= $blockTriptip[$i]['article_url'] ?>" title="<?= $blockTriptip[$i]['title'] ?>">
                                                 <?= $blockTriptip[$i]['title'] ?>
                                             </a>
-                                        </h2>
+                                        </h3>
                                         <div class="text-2 text-454647 font-weight-semibold line-height-5">
                                             <?php $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'd.M.'); ?>
                                             <span class="d-inline-flex">
@@ -101,11 +101,11 @@ $region_title = (isset($region) && $region && $region['url'] !== 'moravskoslezsk
                                 <div class="row mb-4">
                                     <div class="col-12">
                                         <div class="">
-                                            <h2 class="mb-1">
+                                            <h3 class="h2-size mb-1">
                                                 <a class="" href="<?= $blockTriptip[$i]['article_url'] ?>" title="<?= $blockTriptip[$i]['title'] ?>">
                                                     <?= $blockTriptip[$i]['title'] ?>
                                                 </a>
-                                            </h2>
+                                            </h3>
                                             <div class="text-2 text-454647 font-weight-semibold line-height-5">
                                                 <?php $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'd.M.'); ?>
                                                 <span class="d-inline-flex">

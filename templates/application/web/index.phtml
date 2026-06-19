@@ -179,7 +179,8 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
     </div>
     <div class="row">
         <div class="col-12 col-lg-7">
-            <div id="ticker" class="<?=($special['active'] === '1') ? 'mb-0 mb-lg-4' : 'mb-4'?>"> <!-- ticker-hp -->
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="<?=($special['active'] === '1') ? 'mb-0 mb-lg-4' : 'mb-4'?>"> <!-- ticker-hp -->
+                <h2 class="visually-hidden">Přehled zpráv</h2>
                 <div id="tickerIcon" class="">
                     <!--<i class="fa fa-fw fa-info text-light"></i>-->
                 </div>
@@ -205,7 +206,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                 <?php $k = 0; ?>
                 <h2 class="text-primary mt-2 mb-4">
                     Hlavní zprávy z MS kraje
-                    <small class="d-none d-lg-inline-block text-color-grey ms-2">
+                    <small class="d-none d-lg-inline-block text-tertiary ms-2">
                         <?= number_format($newsCount, 0, ',', ' ') ?>
                         reportáží
                     </small>
@@ -304,11 +305,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                 </div>
                             </div>
                             <div class="col-7 col-lg-6 ps-1 pe-3">
-                                <h2 class="mb-1 mb-md-2">
+                                <h3 class="h2-size mb-1 mb-md-2">
                                     <a class="" href="<?= $detail_url ?>" title="<?= $newArticles[$i]['title'] ?>">
                                         <?= $newArticles[$i]['title'] ?>
                                     </a>
-                                </h2>
+                                </h3>
                                 <div class="text-1 text-tertiary line-height-7 mb-1">
                                     <?php
                                         $now_minus_x = new DateTime();
@@ -351,11 +352,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                         <?php } else { ?>
                             <div class="col-12">
                                 <div class="">
-                                    <h2 class="mb-1 mb-md-2">
+                                    <h3 class="h2-size mb-1 mb-md-2">
                                         <a class="" href="<?= $detail_url ?>" title="<?= $newArticles[$i]['title'] ?>">
                                             <?= $newArticles[$i]['title'] ?>
                                         </a>
-                                    </h2>
+                                    </h3>
                                     <div class="text-1 text-tertiary line-height-7 mb-1">
                                         <?php
                                             $now_minus_x = new DateTime();
@@ -433,11 +434,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                    <h2 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
                         <a class="text-primary" href="<?= $view->path('show') ?>" title="Nejnovější pořady">
                             Nejnovější pořady
                         </a>
-                    </h3>
+                    </h2>
                     <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('show') ?>">
                         více&nbsp;<i class="fas fa-chevron-right text-1"></i>
                     </a>
@@ -477,11 +478,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <h2 class="mb-1">
+                                    <h3 class="h2-size mb-1">
                                         <a href="<?= $newVideos[$i]['url'] ?>" title="<?= $newVideos[$i]['title'] ?>">
                                             <?= $newVideos[$i]['title'] ?>
                                         </a>
-                                    </h2>
+                                    </h3>
                                     <div class="text-1 text-tertiary line-height-7 mb-1">
                                         <span>
                                             <?php
@@ -544,11 +545,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                             </div>
                         </div>
                         <div class="col-7 col-lg-6 ps-1 pe-3">
-                            <h2 class="mb-1">
+                            <h3 class="h2-size mb-1">
                                 <a href="<?= $newVideos[$i]['url'] ?>" title="<?= $newVideos[$i]['title'] ?>">
                                     <?= $newVideos[$i]['title'] ?>
                                 </a>
-                            </h2>
+                            </h3>
                             <div class="text-1 text-tertiary line-height-7 mb-1">
                                 <span>
                                     <?php
@@ -603,11 +604,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                 <div class="container">
                     <div class="row">
                         <div class="col-12">
-                            <h3 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
+                            <h2 class="text-5 text-primary d-inline-block line-height-3 my-3 my-md-4">
                                 <a class="text-primary" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>" title="<?= $region['title'] ?>">
                                     <?= $region['title'] ?>
                                 </a>
-                            </h3>
+                            </h2>
                             <a class="pull-right text-primary text-3 font-weight-semibold d-none d-sm-block mt-4" href="<?= $view->path('news_region', ['url' => $region['url']]) ?>">
                                 více&nbsp;<i class="fas fa-chevron-right text-1"></i>
                             </a>
@@ -699,11 +700,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <h2 class="mb-1">
+                                                <h3 class="h2-size mb-1">
                                                     <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
                                                         <?= $region['articles'][$i]['title'] ?>
                                                     </a>
-                                                </h2>
+                                                </h3>
                                                 <div class="text-1 text-tertiary line-height-7 mb-1">
                                                     <?php
                                                         $now_minus_x = new DateTime();
@@ -733,11 +734,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                         <div class="row mb-4">
                                             <div class="col-12">
                                                 <div class="">
-                                                    <h2 class="mb-1">
+                                                    <h3 class="h2-size mb-1">
                                                         <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
                                                             <?= $region['articles'][$i]['title'] ?>
                                                         </a>
-                                                    </h2>
+                                                    </h3>
                                                     <div class="text-1 text-tertiary line-height-7 mb-1">
                                                         <?php
                                                             $now_minus_x = new DateTime();
@@ -852,11 +853,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                         </div>
                                     </div>
                                     <div class="col-7 col-lg-6 ps-1 pe-3">
-                                        <h2 class="mb-1">
+                                        <h3 class="h2-size mb-1">
                                             <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
                                                 <?= $region['articles'][$i]['title'] ?>
                                             </a>
-                                        </h2>
+                                        </h3>
                                         <div class="text-1 text-tertiary line-height-7 mb-1">
                                             <?php
                                                 $now_minus_x = new DateTime();
@@ -885,11 +886,11 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                                 <?php } else { ?>
                                     <div class="col-12">
                                         <div class="">
-                                            <h2 class="mb-1">
+                                            <h3 class="h2-size mb-1">
                                                 <a class="" href="<?= $view->path('news_region_city_article', ['url' => $region['articles'][$i]['region_url'], 'city_url' => $region['articles'][$i]['city_url'], 'article_id' => $region['articles'][$i]['article_id'], 'article_url' => $region['articles'][$i]['article_url']]) ?>" title="<?= $region['articles'][$i]['title'] ?>">
                                                     <?= $region['articles'][$i]['title'] ?>
                                                 </a>
-                                            </h2>
+                                            </h3>
                                             <div class="text-1 text-tertiary line-height-7 mb-1">
                                                 <?php
                                                     $now_minus_x = new DateTime();

@@ -454,7 +454,7 @@ nav.header-nav-top > li > a.dropdown-toggle .fa-chevron-down {
         background-image: none;
         margin: 5px 0 5px 0;
     }
-    h4.heading-primary {
+    div.heading-primary {
         font-size: 20px !important;
         line-height: 26px !important;
         font-weight: 500 !important;
@@ -1091,6 +1091,12 @@ h3 {
     font-weight: 600;
     margin: 0 0 10px 0;
 }
+h3.h2-size {
+    line-height: 26px;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+}
 // Ořezání textu v bloku
 .block-truncate {
     max-height: 8rem;
@@ -1226,6 +1232,14 @@ h3 {
                         background: #f3f3f3;
                         &.active {
                             background: @primary;
+                        }
+                        &.focused,
+                        &.kb-focused,
+                        &:focus,
+                        &:focus-visible {
+                            background: darken(#f3f3f3, 12%) !important;
+                            outline: 3px solid @secondary !important;
+                            outline-offset: -3px !important;
                         }
                         &.new,
                         &.old {
@@ -2102,6 +2116,48 @@ button.sidenav-1.open .animated-icon2 span:nth-child(4) {
     }
 }
 
+/* PŘÍSTUPNOST — fokus klávesnice (WCAG 2.4.7 / 2.4.13) *****************************************/
+// Výchozí reset — prohlížeče mají různé výchozí outline styly, sjednotíme
+*:focus {
+    outline: none;
+}
+// Fokus pouze při klávesnicové navigaci (ne po kliknutí myší)
+*:focus-visible {
+    outline: 3px solid @primary !important;
+    outline-offset: 0 !important;
+    border-radius: 2px !important;
+}
+// Navigační menu — tmavé pozadí, světlý outline
+#header a:focus-visible,
+#header button:focus-visible,
+#header input:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+}
+// Formulářová pole
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid @primary;
+    outline-offset: 0;
+    box-shadow: 0 0 0 1px @primary;
+}
+// Tlačítka
+button:focus-visible,
+.btn:focus-visible,
+[role="button"]:focus-visible {
+    outline: 3px solid @primary;
+    outline-offset: 2px;
+}
+// Paginator
+.pagination a:focus-visible,
+.pagination .page-link:focus-visible {
+    outline: 3px solid @primary;
+    outline-offset: 2px;
+    z-index: 1;
+    position: relative;
+}
+/* END PŘÍSTUPNOST *****************************************/
 
 /*************************************************************************************************/
 /* FORM ******************************************************************************************/
@@ -2652,6 +2708,8 @@ body {
         }
     }
 }
+
+/*************************************************************************************************/
 // SKIN
 .ui-pnotify {
     .notification-primary {

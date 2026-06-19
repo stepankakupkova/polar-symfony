@@ -229,6 +229,12 @@ final class ApplicationController
 		return new Response($renderer->renderWithLayout('application/web/sitemap', []));
 	}
 
+	public function accessibility(
+		PhtmlRenderer $renderer,
+	): Response {
+		return new Response($renderer->renderWithLayout('application/web/accessibility', []));
+	}
+
 	public function sitemapXml(): Response
 	{
 		$file = __DIR__ . '/../../../../public/sitemap.xml';

@@ -135,6 +135,77 @@ $(function() {
         }
     }
 
+    /* Přístupnost - hlavní navigační menu — správa tabindex a klávesnice */
+    var $nav = $('#mainNav');
+    if ($nav.length) {
+
+        function openDropdown($toggle, $menu) {
+            $toggle.attr('aria-expanded', 'true');
+            $menu.find('a').removeAttr('tabindex');
+        }
+
+        function closeDropdown($toggle, $menu) {
+            $toggle.attr('aria-expanded', 'false');
+            $menu.find('a').attr('tabindex', '-1');
+        }
+
+        $nav.find('li.dropdown').each(function () {
+            var $li     = $(this);
+            var $toggle = $li.children('a[aria-haspopup]');
+            var $menu   = $li.children('ul.dropdown-menu');
+            if (!$toggle.length || !$menu.length) { return; }
+
+            // Otevření Enterem/Mezerou na toggle
+            $toggle.on('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if ($toggle.attr('aria-expanded') === 'true') {
+                        closeDropdown($toggle, $menu);
+                        $li.removeClass('open');
+                    } else {
+                        openDropdown($toggle, $menu);
+                        $li.addClass('open');
+                        $menu.find('a').first().focus();
+                    }
+                }
+            });
+
+            // Escape zavře dropdown
+            $li.on('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeDropdown($toggle, $menu);
+                    $li.removeClass('open');
+                    $toggle.focus();
+                }
+            });
+
+            // Šipky pro navigaci uvnitř submenu
+            $menu.on('keydown', function (e) {
+                var $items = $menu.find('a');
+                var idx    = $items.index($(document.activeElement));
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (idx < $items.length - 1) { $items.eq(idx + 1).focus(); }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (idx > 0) { $items.eq(idx - 1).focus(); } else { $toggle.focus(); }
+                }
+            });
+
+            // Zavření při přechodu focusu mimo dropdown
+            $li.on('focusout', function (e) {
+                if (!$li.is(e.relatedTarget) && $li.has(e.relatedTarget).length === 0) {
+                    closeDropdown($toggle, $menu);
+                    $li.removeClass('open');
+                }
+            });
+
+            // Hover — sync aria-expanded s vizuálním stavem
+            $li.on('mouseenter', function () { openDropdown($toggle, $menu); });
+            $li.on('mouseleave', function () { closeDropdown($toggle, $menu); });
+        });
+    }
+
     /* PLAYER živé vysílání - přepínání kvality SD v okýnku, HD na fullscreen */
     // Zkontrolujeme, zda existuje element s ID "player"
     const playerElement = $('#playerLiveSDHD');

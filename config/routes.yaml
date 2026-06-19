@@ -73,6 +73,10 @@ app_sitemap:
   path: /mapa-stranek
   controller: App\Application\Controller\Web\ApplicationController::sitemap
 
+app_accessibility:
+  path: /prohlaseni-o-pristupnosti
+  controller: App\Application\Controller\Web\ApplicationController::accessibility
+
 app_sitemap_xml:
   path: /sitemap.xml
   controller: App\Application\Controller\Web\ApplicationController::sitemapXml

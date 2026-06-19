@@ -132,7 +132,8 @@ function removeAccent($text, $replace = null): string
     </div>
     <div class="row">
         <div class="col-12">
-            <div id="ticker" class="mb-3">
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="mb-3">
+                <h2 class="visually-hidden">Přehled zpráv</h2>
                 <div id="tickerIcon" class="">
                     <!--<i class="fa fa-fw fa-info text-light"></i>-->
                 </div>
@@ -398,7 +399,7 @@ function removeAccent($text, $replace = null): string
 								</div>
 								<div class="col-4">
 									<?php if ($weather) { ?>
-										<h3 class="text-primary text-3-4 mb-4">Počasí - <?= $weather_region; ?></h3>
+										<div class="text-primary font-weight-semibold text-3-4 mb-4">Počasí - <?= $weather_region; ?></div>
 										<?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
 										<?php foreach ($weather as $weather_item) { ?>
 											<div class="row text-secondary text-3-4 mb-2">

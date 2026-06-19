@@ -6,19 +6,21 @@ if (!$breadcrumbs) { return; }
 
 $last = array_key_last($breadcrumbs);
 ?>
-<ul class="breadcrumb d-inline-block">
-    <li>
-        <a href="<?= $view->path('app_home') ?>" title="Domů">Domů</a>
-    </li>
-    <?php foreach ($breadcrumbs as $i => $crumb) { ?>
-        <?php if ($i === $last) { ?>
-            <li class="active">
-                <?= htmlspecialchars($crumb['label']) ?>
-            </li>
-        <?php } else { ?>
-            <li>
-                <a href="<?= htmlspecialchars($crumb['url'] ?? '#') ?>" title="<?= htmlspecialchars($crumb['label']) ?>"><?= htmlspecialchars($crumb['label']) ?></a>
-            </li>
+<nav aria-label="Nacházíte se zde">
+    <ul class="breadcrumb d-inline-block">
+        <li>
+            <a href="<?= $view->path('app_home') ?>" title="Domů">Domů</a>
+        </li>
+        <?php foreach ($breadcrumbs as $i => $crumb) { ?>
+            <?php if ($i === $last) { ?>
+                <li class="active">
+                    <?= htmlspecialchars($crumb['label']) ?>
+                </li>
+            <?php } else { ?>
+                <li>
+                    <a href="<?= htmlspecialchars($crumb['url'] ?? '#') ?>" title="<?= htmlspecialchars($crumb['label']) ?>"><?= htmlspecialchars($crumb['label']) ?></a>
+                </li>
+            <?php } ?>
         <?php } ?>
-    <?php } ?>
-</ul>
+    </ul>
+</nav>
