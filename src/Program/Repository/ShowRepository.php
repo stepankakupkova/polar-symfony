@@ -25,7 +25,7 @@ final class ShowRepository
 				'program_shows.image', 'program_shows.thumb',
 				'program_shows.status', 'program_shows.show_in_archive', 'program_shows.video_parts',
 				'program_shows.show_datetime', 'program_shows.download', 'program_shows.newton',
-				'program_shows.content', 'program_shows.seo_keywords', 'program_shows.seo_description',
+				'program_shows.content', 'program_shows.reports', 'program_shows.seo_keywords', 'program_shows.seo_description',
 				'program_shows.`order`',
 				'program_shows_categories.title AS category_name'
 			)
@@ -56,6 +56,7 @@ final class ShowRepository
 			$resultSet[$i]['show_datetime'] = (bool) $row['show_datetime'];
 			$resultSet[$i]['download'] = (bool) $row['download'];
 			$resultSet[$i]['newton'] = (bool) $row['newton'];
+			$resultSet[$i]['reports'] = (int) $row['reports'];
 			$resultSet[$i]['order'] = (int) $row['order'];
 		}
 
