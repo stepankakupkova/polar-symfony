@@ -107,10 +107,7 @@
                             </span>
                             <span>
                                 <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => removeAccent($newArticles[$i]['author'], '-')]) . '" title="' . $newArticles[$i]['author'] . '">' . $newArticles[$i]['author'] . '</a>'; ?><!--
-                            --></span><!--
-                            --><!--<span>
-                                <?php //= $newArticles[$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $newArticles[$i]['show_id']]) . '" title="' . $shows[$newArticles[$i]['show_id']] . '">' . $shows[$newArticles[$i]['show_id']] . '</a>' : ''; ?>
-                            </span>-->
+                            --></span>
                         <?php } else if ($newArticles[$i]['section'] === 2) { ?>
                             <span>
                                 <a href="<?= $view->path('news_pr') ?>" title="Komerční sdělení">
@@ -154,10 +151,7 @@
                                 </span>
                                 <span>
                                     <?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => removeAccent($newArticles[$i]['author'], '-')]) . '" title="' . $newArticles[$i]['author'] . '">' . $newArticles[$i]['author'] . '</a>'; ?><!--
-                                --></span><!--
-                                --><!--<span>
-                                    <?php //= $newArticles[$i]['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('show_detail', ['show_id' => $newArticles[$i]['show_id']]) . '" title="' . $shows[$newArticles[$i]['show_id']] . '">' . $shows[$newArticles[$i]['show_id']] . '</a>' : ''; ?>
-                                </span>-->
+                                --></span>
                             <?php } else if ($newArticles[$i]['section'] === 2) { ?>
                                 <span>
                                     <a href="<?= $view->path('news_pr') ?>" title="Komerční sdělení">
