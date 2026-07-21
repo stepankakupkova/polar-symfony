@@ -17,7 +17,7 @@ final class NewsRepository
 		$offset = ($page - 1) * $limit;
 
 		return $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('public = 1')
 			->andWhere('public_from <= NOW()')
@@ -190,7 +190,7 @@ final class NewsRepository
 	public function getArticle(int $articleId): ?array
 	{
 		$result = $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('article_id = :articleId')
 			->andWhere('public = 1')
@@ -263,7 +263,7 @@ final class NewsRepository
 	public function getArticlesByRegionId(int $regionId, int $limit, int $withoutArticleId): ?array
 	{
 		$result = $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('region_id = :regionId')
 			->andWhere('article_id != :withoutArticleId')
@@ -297,7 +297,7 @@ final class NewsRepository
 		$offset = ($page - 1) * $limit;
 
 		return $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('public = 1')
 			->andWhere('public_from <= NOW()')
@@ -317,7 +317,7 @@ final class NewsRepository
 		$offset = ($page - 1) * $limit;
 
 		return $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('public = 1')
 			->andWhere('public_from <= NOW()')
@@ -336,7 +336,7 @@ final class NewsRepository
 		$offset = ($page - 1) * $limit;
 
 		return $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('public = 1')
 			->andWhere('public_from <= NOW()')
@@ -357,7 +357,7 @@ final class NewsRepository
 		}
 
 		$rows = $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('article_id IN (:articleIds)')
 			->andWhere('public = 1')
@@ -536,7 +536,7 @@ final class NewsRepository
 		$offset = ($page - 1) * $limit;
 
 		return $this->connection->createQueryBuilder()
-			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url', 'show_id')
+			->select('id', 'article_id', 'article_url', 'title', 'anotation', 'text', 'public_from', 'updated_date', 'picture', 'duration', 'region_url', 'city_title', 'city_url', 'label', 'author', 'author_url')
 			->from('article')
 			->where('public = 1')
 			->andWhere('public_from <= NOW()')
