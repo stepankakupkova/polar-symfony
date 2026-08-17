@@ -1,5 +1,5 @@
 # Auto-generated Program Show routes - DO NOT EDIT MANUALLY
-# Generated: 2026-05-20 10:26:57
+# Generated: 2026-07-24 13:10:52
 
 program_show_1:
   path: /porady/regionalni-zpravy
@@ -711,6 +711,16 @@ program_show_video_169:
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
 
+program_show_171:
+  path: /porady/cena-plamen-lidskosti-2025
+  controller: App\Program\Controller\Web\ShowController::show
+
+program_show_video_171:
+  path: /porady/cena-plamen-lidskosti-2025/{program_url}
+  controller: App\Program\Controller\Web\ShowController::video
+  requirements:
+    program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
+
 program_show_159:
   path: /porady/spolecenska-odpovednost-2024
   controller: App\Program\Controller\Web\ShowController::show
@@ -987,6 +997,16 @@ program_show_170:
 
 program_show_video_170:
   path: /porady/senovsky-miniexpres/{program_url}
+  controller: App\Program\Controller\Web\ShowController::video
+  requirements:
+    program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'
+
+program_show_172:
+  path: /porady/tyden-v-regionech
+  controller: App\Program\Controller\Web\ShowController::show
+
+program_show_video_172:
+  path: /porady/tyden-v-regionech/{program_url}
   controller: App\Program\Controller\Web\ShowController::video
   requirements:
     program_url: '[a-zA-Z0-9][a-zA-Z0-9_-]+'

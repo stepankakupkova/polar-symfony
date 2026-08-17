@@ -16,16 +16,10 @@ if ($mobile) {
     $mobileItems = [
         [
             'id'    => 'zivePolar',
-            'label' => '<img src="/img/web/layout/header/zive-polar-small.svg" alt="Živě Polar">',
+            'label' => '<img src="/img/web/layout/header/zive-polar.svg" alt="Živě Polar">',
             'url'   => '/hd',
             'class' => '',
-        ],
-        [
-            'id'    => 'zivePolar2',
-            'label' => '<img src="/img/web/layout/header/zive-polar2-small.svg" alt="Živě Polar 2">',
-            'url'   => '/polar2',
-            'class' => 'hide-xs',
-        ],
+        ]
     ];
     $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     foreach ($mobileItems as $item) { ?>

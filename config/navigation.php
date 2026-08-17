@@ -15,13 +15,6 @@ return [
             'order'  => 1,
         ],
         [
-            'id'     => 'zive-polar2',
-            'label'  => '<img src="/img/web/layout/header/zive-polar2.svg" alt="Živě Polar 2" class="me-3">',
-            'url'    => '/polar2',
-            'class'  => '',
-            'order'  => 1,
-        ],
-        [
             'id'    => 'show',
             'label' => 'Pořady',
             'url'   => '/porady',
