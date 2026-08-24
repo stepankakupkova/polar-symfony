@@ -197,8 +197,9 @@ function formatBytes($size, $precision = 0){
                     </ul>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-sm-3 hidden-xs">
-                        <?php if ($show) { ?>
+                    
+                    <?php if ($show) { ?>
+                        <div class="col-sm-3 hidden-xs">
                             <?php
                                 if (file_exists(($_SERVER['DOCUMENT_ROOT'] ?? '') . '/' . $show['image'])) {
                                     $image = '/' . $show['image'];
@@ -243,8 +244,9 @@ function formatBytes($size, $precision = 0){
                                     </div>
                                 </div>
                             </div>
-                        <?php } ?>
-                    </div>
+                        </div>
+                    <?php } ?>
+                    
                     <div class="col-sm-9">
                         <div class="post-content">
                             <h2 class="text-secondary mb-2">

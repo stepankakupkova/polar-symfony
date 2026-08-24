@@ -144,11 +144,11 @@ $view->setBreadcrumbs([
                                 <?php $date = new DateTime($item['public_from']); ?>
                                 <?php $today = new DateTime(); ?>
                                 <?php if ($today->format('Y-m-d') == $date->format('Y-m-d')) { ?>
-                                    Dnes,
+                                    Dnes
                                 <?php } else { ?>
                                     <?php $today->modify('-1 day'); ?>
                                     <?php if ($today->format('Y-m-d') == $date->format('Y-m-d')) { ?>
-                                        Včera,
+                                        Včera
                                     <?php } else { ?>
                                         <?php
                                             $dateFormatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
@@ -159,7 +159,7 @@ $view->setBreadcrumbs([
                             </span>
                             <span>
                                 <?php if (isset($shows[$item['show_id']])) { ?>
-                                    pořad:
+                                    <br />pořad:
                                     <a href="<?= $view->path('program_show_' . $item['show_id']) ?>">
                                         <?= $shows[$item['show_id']]; ?>
                                     </a>
