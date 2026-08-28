@@ -101,6 +101,10 @@ services:
         resource: '../src/Program/Controller/Admin/'
         tags: ['controller.service_arguments']
 
+    App\Rss\Controller\Web\:
+        resource: '../src/Rss/Controller/Web/'
+        tags: ['controller.service_arguments']
+
     App\Application\View\PhtmlRenderer:
         arguments:
             $templatesDir: '%kernel.project_dir%/templates'
