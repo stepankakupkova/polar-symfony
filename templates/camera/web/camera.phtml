@@ -1,8 +1,8 @@
 <?php
 /** @var \App\Application\View\ViewHelper $view */
 
-$view->addHeadLink($view->asset('vendor/web/video-js/video-js.min.css'), 'stylesheet');
-$view->addHeadLink($view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'), 'stylesheet');
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
 $view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
 $view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
 
@@ -101,7 +101,7 @@ $view->addInlineScript(
                     <?= htmlspecialchars($camera['description'] ?? '') ?>
                 </p>
 
-                <div class="video-thumbnail ratio ratio-16x9" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
+                <div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
                     <?php
                     try {
                         $stream = $camera['url_m3u8'];

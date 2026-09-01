@@ -30,7 +30,7 @@ news_guests_guest:
   controller: App\News\Controller\Web\GuestController::guest
 
 news_video_download:
-  path: /zpravy/video-download/{video_id}/{quality}
+  path: /zpravy/download/{video_id}/{quality}
   controller: App\News\Controller\Web\NewsController::download
 
 news_overwrite_docx:
@@ -42,7 +42,7 @@ news_pr:
   controller: App\News\Controller\Web\NewsController::prnews
 
 news_pr_article:
-  path: /zpravy/pr-clanky/{article_id}/{article_url}
+  path: /zpravy/pr/{article_id}/{article_url}
   controller: App\News\Controller\Web\NewsController::articlePr
 
 news_triptip:
