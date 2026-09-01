@@ -64,7 +64,7 @@ final class GuestController
 		}
 
 		$show = null;
-		if ($guest['show_id'] && $guest['show_id'] != 999 && $guest['show_id'] != 1000) {
+		if ($guest['show_id'] && $guest['show_id'] != 999 && $guest['show_id'] != 1000 && $guest['show_id'] != 1001) {
 			$show = $this->showRepository->findPostBy('id', $guest['show_id']);
 		}
 
