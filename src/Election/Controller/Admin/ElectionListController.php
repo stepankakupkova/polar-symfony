@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Election\Controller\Admin;
 
 use App\Application\View\PhtmlRenderer;
-use App\Election\Repository\ElectionRepository2025;
+use App\Election\Repository\ElectionRepository2026;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class ElectionListController
 {
     public function __construct(
-        private ElectionRepository2025 $electionRepository,
+        private ElectionRepository2026 $electionRepository,
         private PhtmlRenderer $renderer,
     ) {}
 

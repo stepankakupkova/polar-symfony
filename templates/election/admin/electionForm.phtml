@@ -3,6 +3,9 @@
 
 $election = $election ?? [];
 $error    = $error ?? null;
+$title_value = isset($election['OSTRANA'], $election['VSTRANA'], $election['KODZASTUP'])
+    ? $election['OSTRANA'] . '-' . $election['VSTRANA'] . '-' . $election['KODZASTUP']
+    : null;
 
 $view->addBodyScript($view->asset('vendor/admin/bootstrap-maxlength/js/bootstrap-maxlength.min.js'));
 $view->addBodyScript($view->asset('vendor/admin/autosize/js/autosize.min.js'));
@@ -27,9 +30,10 @@ $view->addHeadLink('stylesheet', $view->asset('vendor/admin/bootstrap-select/css
                         data-style="btn-default" data-hide-disabled="false" data-live-search="true" data-size="10">
                     <option value=""></option>
                     <?php foreach ($title_options as $opt) { ?>
-                        <option value="<?= htmlspecialchars($opt['ZKRATKAK8']) ?>"
-                            <?= ($election['title'] ?? '') === $opt['ZKRATKAK8'] ? ' selected' : '' ?>>
-                            <?= htmlspecialchars($opt['ZKRATKAK8']) ?>
+                        <?php if ($opt['value'] === null) continue; ?>
+                        <option value="<?= htmlspecialchars($opt['value']) ?>"
+                            <?= $title_value === $opt['value'] ? ' selected' : '' ?>>
+                            <?= htmlspecialchars($opt['label']) ?>
                         </option>
                     <?php } ?>
                 </select>

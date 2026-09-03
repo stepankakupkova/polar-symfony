@@ -6,9 +6,9 @@ namespace App\Election\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
 use App\Application\View\PhtmlRenderer;
-use App\Election\Repository\Election2025PlaykitRepository;
-use App\Election\Repository\ElectionCommand2025;
-use App\Election\Repository\ElectionRepository2025;
+use App\Election\Repository\Election2026PlaykitRepository;
+use App\Election\Repository\ElectionCommand2026;
+use App\Election\Repository\ElectionRepository2026;
 use App\Program\Repository\VideoRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,9 +20,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class ElectionWriteController
 {
     public function __construct(
-        private ElectionRepository2025 $electionRepository,
-        private ElectionCommand2025 $electionCommand,
-        private Election2025PlaykitRepository $electionPlaykitRepository,
+        private ElectionRepository2026 $electionRepository,
+        private ElectionCommand2026 $electionCommand,
+        private Election2026PlaykitRepository $electionPlaykitRepository,
         private VideoRepository $videoRepository,
         private FlashMessenger $flashMessenger,
         private PhtmlRenderer $renderer,
@@ -32,7 +32,7 @@ final class ElectionWriteController
 
     public function add(Request $request): Response|RedirectResponse
     {
-        $title_options = $this->electionPlaykitRepository->fetchPsrklForBootstrapSelect();
+        $title_options = $this->electionPlaykitRepository->fetchKvrosForBootstrapSelect();
         $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(161);
         $error = null;
 
@@ -44,11 +44,23 @@ final class ElectionWriteController
             }
 
             try {
+                $strana = explode('-', $post['title']);
+                $OSTRANA = isset($strana[0]) ? (int) $strana[0] : 0;
+                $VSTRANA = isset($strana[1]) ? (int) $strana[1] : 0;
+                $KODZASTUP = isset($strana[2]) ? (int) $strana[2] : 0;
+                $kvros = $this->electionPlaykitRepository->findKvrosPost($OSTRANA, $VSTRANA, $KODZASTUP);
+                if (!$kvros) {
+                    throw new \RuntimeException('Vybraná kandidátka nebyla nalezena.');
+                }
+
                 $id = $this->electionCommand->insertPost([
-                    'title'       => $post['title'] ?? '',
+                    'title'       => $kvros['NAZEVCELK'],
                     'description' => $post['description'] ?? '',
                     'video_id'    => !empty($post['video_id']) ? (int) $post['video_id'] : null,
-                    'rank'        => (int) ($post['rank'] ?? 0),
+                    'OSTRANA'     => $OSTRANA,
+                    'VSTRANA'     => $VSTRANA,
+                    'KODZASTUP'   => $KODZASTUP,
+                    'rank'        => $this->electionRepository->getCount() + 1,
                 ]);
 
                 $this->flashMessenger->addMessage('success', 'Volby', 'Položka přidána');
@@ -92,7 +104,7 @@ final class ElectionWriteController
             return new RedirectResponse($this->urlGenerator->generate('admin_election_list'));
         }
 
-        $title_options = $this->electionPlaykitRepository->fetchPsrklForBootstrapSelect();
+        $title_options = $this->electionPlaykitRepository->fetchKvrosForBootstrapSelect();
         $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(161);
         $error = null;
 
@@ -104,11 +116,23 @@ final class ElectionWriteController
             }
 
             try {
+                $strana = explode('-', $post['title']);
+                $OSTRANA = isset($strana[0]) ? (int) $strana[0] : 0;
+                $VSTRANA = isset($strana[1]) ? (int) $strana[1] : 0;
+                $KODZASTUP = isset($strana[2]) ? (int) $strana[2] : 0;
+                $kvros = $this->electionPlaykitRepository->findKvrosPost($OSTRANA, $VSTRANA, $KODZASTUP);
+                if (!$kvros) {
+                    throw new \RuntimeException('Vybraná kandidátka nebyla nalezena.');
+                }
+
                 $this->electionCommand->updatePost([
                     'id'          => $id,
-                    'title'       => $post['title'] ?? $election['title'],
+                    'title'       => $kvros['NAZEVCELK'],
                     'description' => $post['description'] ?? $election['description'],
                     'video_id'    => !empty($post['video_id']) ? (int) $post['video_id'] : null,
+                    'OSTRANA'     => $OSTRANA,
+                    'VSTRANA'     => $VSTRANA,
+                    'KODZASTUP'   => $KODZASTUP,
                     'rank'        => (int) ($post['rank'] ?? $election['rank']),
                 ]);
 

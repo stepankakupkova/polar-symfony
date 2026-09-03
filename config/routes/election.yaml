@@ -1,25 +1,60 @@
+# Web — Volby 2026
+election_2026:
+  path: /volby
+  controller: App\Election\Controller\Web\Web2026Controller::index
+
+election_2026_kandidati:
+  path: /volby/kandidati/okres/{okres}
+  controller: App\Election\Controller\Web\Web2026Controller::kandidati
+  defaults:
+    obec: null
+  requirements:
+    okres: '[0-9]+'
+
+election_2026_kandidati_obec:
+  path: /volby/kandidati/okres/{okres}/obec/{obec}
+  controller: App\Election\Controller\Web\Web2026Controller::kandidati
+  requirements:
+    okres: '[0-9]+'
+    obec: '[0-9]+'
+
+election_2026_obec:
+  path: /volby/okres/{okres}
+  controller: App\Election\Controller\Web\Web2026Controller::obec
+  defaults:
+    obec: null
+  requirements:
+    okres: '[0-9]+'
+
+election_2026_obec_detail:
+  path: /volby/okres/{okres}/obec/{obec}
+  controller: App\Election\Controller\Web\Web2026Controller::obec
+  requirements:
+    okres: '[0-9]+'
+    obec: '[0-9]+'
+
 # Web — Volby 2025
 election_2025:
-  path: /volby
+  path: /volby-2025
   controller: App\Election\Controller\Web\Web2025Controller::index
 
 election_2025_detail:
-  path: /volby/strana/{kstrana}/{strana_url}
+  path: /volby-2025/strana/{kstrana}/{strana_url}
   controller: App\Election\Controller\Web\Web2025Controller::detail
   requirements:
     kstrana: '[0-9]+'
     strana_url: '[a-zA-Z][a-zA-Z0-9_-]+'
 
 election_2025_poslanci:
-  path: /volby/poslanci
+  path: /volby-2025/poslanci
   controller: App\Election\Controller\Web\Web2025Controller::poslanci
 
 election_2025_kresla:
-  path: /volby/kresla
+  path: /volby-2025/kresla
   controller: App\Election\Controller\Web\Web2025Controller::kresla
 
 election_2025_obec:
-  path: /volby/okres/{okres}
+  path: /volby-2025/okres/{okres}
   controller: App\Election\Controller\Web\Web2025Controller::obec
   defaults:
     obec: null
@@ -27,14 +62,14 @@ election_2025_obec:
     okres: '[0-9]+'
 
 election_2025_obec_detail:
-  path: /volby/okres/{okres}/obec/{obec}
+  path: /volby-2025/okres/{okres}/obec/{obec}
   controller: App\Election\Controller\Web\Web2025Controller::obec
   requirements:
     okres: '[0-9]+'
     obec: '[0-9]+'
 
 election_2025_senat:
-  path: /volby/senat
+  path: /volby-2025/senat
   controller: App\Election\Controller\Web\Web2025Controller::senat
 
 # Web — Volby 2024

@@ -135,7 +135,7 @@ services:
         resource: '../src/Election/Controller/'
         tags: ['controller.service_arguments']
 
-    App\Election\Repository\Election2025PlaykitRepository:
+    App\Election\Repository\Election2020PlaykitRepository:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
 
@@ -143,7 +143,11 @@ services:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
 
-    App\Election\Repository\Election2020PlaykitRepository:
+    App\Election\Repository\Election2025PlaykitRepository:
+        arguments:
+            $connection: '@doctrine.dbal.playkit_connection'
+
+    App\Election\Repository\Election2026PlaykitRepository:
         arguments:
             $connection: '@doctrine.dbal.playkit_connection'
 

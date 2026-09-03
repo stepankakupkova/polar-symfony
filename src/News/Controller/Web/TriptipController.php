@@ -157,7 +157,7 @@ final class TriptipController
 			$dateCal = new \DateTime($today->format('Y-m-d'));
 		}
 
-		$formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, null, null, 'dd.MM.');
+		$formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, null, null, 'd.M.');
 		$formatterMonth = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, null, null, 'EEE');
 		$dateCal->modify('-1 day');
 
@@ -192,8 +192,8 @@ final class TriptipController
 
 		$articles = $this->playkitRepository->getTriptips(30, 0, $date->format('Y-m-d'));
 
-		$dateFormatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, null, null, 'dd.MM.');
-		$timeFormatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::NONE, \IntlDateFormatter::SHORT);
+		$dateFormatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, null, null, 'd.M.');
+		$timeFormatter = new \IntlDateFormatter(\Locale::getDefault(),\IntlDateFormatter::NONE,\IntlDateFormatter::SHORT,null, null,'HH:mm');
 
 		$content =
 			'<section class="section-kamvyrazit">' .

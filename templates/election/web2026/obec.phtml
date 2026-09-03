@@ -1,0 +1,435 @@
+<?php
+
+/** @var \App\Application\View\ViewHelper $view */
+
+// HeadTitle
+$view->setTitle((isset($obec['NAZEVZAST']) ? $obec['NAZEVZAST'] . ' | ' : '') . $okres_title . ' | Volby 2026');
+
+// HeadMeta
+$view->addMeta('description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro komunální volby 2026 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addMeta('keywords', 'volby 2026, komunální volby, volby do zastupitelstev obcí, politická strana, volební program, kandidátní listina');
+
+// META pro Facebook
+$currentUrl = $currentUrl ?? '';
+$view->addOgMeta('og:title', 'Volby | Televize POLAR');
+$view->addOgMeta('og:description', 'Která politická strana získá Vaše sympatie? TV Polar Vám představí jednotlivé volební programy a kandidátní listiny politických stran pro komunální volby 2026 Moravskoslezského kraje. Pojďme k volbám, je to náš kraj!');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:site_name', 'polar.cz');
+$view->addOgMeta('og:image', '/img/web/volby/microformat_2026.png');
+$view->addOgMeta('og:image:secure_url', '/img/web/volby/microformat_2026.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+	['label' => 'Volby 2026', 'url' => $view->path('election_2026')],
+	['label' => isset($obec['NAZEVZAST']) ? $obec['NAZEVZAST'] . ' | ' . $okres_title : $okres_title],
+]);
+
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+// Volební menu
+$view->addInlineScript(
+    '		
+    // Přidání třídy "open", aby správně fungovalo podbarvování položek v rámci menu/submenu
+	$(".elections_menu nav > ul.nav-pills").on("click", "li:not(.open) > a", function(){
+		$(this).parent().addClass("open");
+	});
+	$(".elections_menu nav > ul.nav-pills").on("click", "li.open > a", function(){
+		$(this).parent().removeClass("open");
+	});
+ 
+ 	// Napodobení hlavního menu - při hover vždy červená pouze jedna položka menu
+    $(".elections_menu nav ul.nav-pills li a:not(.active)").hover(function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#0f375a");
+	}, function(){
+		$(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#900");
+	});
+    '
+);
+
+$view->addInlineScript(
+    '
+  	$("#elections_okresy").val(' . (int)$okres_id . ');
+	$("#elections_okresy").change(function() {
+		var value = $(this).val();               
+		window.location.href = $(this).find(":selected").data("url");
+	});
+	
+	$("#elections_obce").change(function() {
+		var value = $(this).val();  
+		if (value !== "null") {
+			window.location.href = $(this).find(":selected").data("url");
+		} else {
+			window.location.href = $(this).find(":selected").data("url");
+		}      
+		
+	});
+    '
+);
+
+if ($obec_id) {
+    $view->addInlineScript(
+        '
+      	$("#elections_obce").val(' . (int)$obec_id . ');
+        '
+    );
+}
+
+/**
+ * @param string $text
+ * @param string|null $replace
+ * @return string
+ */
+function removeAccent($text, $replace = null): string
+{
+    $transliterator = Transliterator::createFromRules(':: Any-Latin; :: NFD; :: [:Nonspacing Mark:] Remove; :: NFC; :: [:Punctuation:] Remove; :: Lower();', Transliterator::FORWARD);
+    if ($transliterator) {
+        $text = $transliterator->transliterate($text);
+    }
+    $text = preg_replace('/\p{C}+/u', '', $text);
+    if ($replace) {
+        $text = str_replace(' ', $replace, $text);
+    }
+    return $text;
+}
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">
+                    Mimořádná zpráva:
+                </div>
+                <div class="crawl-container">
+                    <div>
+                        Načítám...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="mb-3">
+                <h2 class="visually-hidden">Přehled zpráv</h2>
+                <div id="tickerIcon" class="">
+                    <!--<i class="fa fa-fw fa-info text-light"></i>-->
+                </div>
+                <div class="ticker-container">
+                    <ul>
+                        <div class="ticker-active">
+                            <li>
+                                <span>
+                                    Načítám...
+                                </span>
+                            </li>
+                        </div>
+                    </ul>>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-2-3">
+                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+					<a href="<?= $view->path('election_2026') ?>" title="Komunální volby 2026">
+						<img src="/img/web/volby/volby_2026_logo.png" alt="Volby 2026" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-12 text-center">
+					<h2 class="text-secondary text-4-5 font-weight-normal">Volby do zastupitelstev obcí <span class="text-nowrap">9. a 10. října 2026</span> - Moravskoslezský kraj</h2>
+                </div>
+            </div>
+
+			<div class="row mb-4-5 elections_menu y2025">
+				<div class="col-12">
+					<?= $view->include('election/web2026/partial/menu', ['active' => 'obec']) ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+        <div class="col-lg-7">
+
+            <div class="row mb-5">
+				<div class="col-12 mb-5">
+					<div class="row mb-2">
+						<div class="col-md-3">
+							<label for="elections_okresy" class="">vyberte okres:&nbsp;&nbsp;</label>
+						</div>
+						<div class="col-md-7">
+							<select name="elections_okresy" id="elections_okresy">
+								<option value="8101" data-url="<?= $view->path('election_2026_obec', ['okres' => 8101]) ?>">Bruntál</option>
+								<option value="8105" data-url="<?= $view->path('election_2026_obec', ['okres' => 8105]) ?>">Opava</option>
+								<option value="8104" data-url="<?= $view->path('election_2026_obec', ['okres' => 8104]) ?>">Nový Jičín</option>
+								<option value="8106" data-url="<?= $view->path('election_2026_obec', ['okres' => 8106]) ?>">Ostrava-město</option>
+								<option value="8103" data-url="<?= $view->path('election_2026_obec', ['okres' => 8103]) ?>">Karviná</option>
+								<option value="8102" data-url="<?= $view->path('election_2026_obec', ['okres' => 8102]) ?>">Frýdek-Místek</option>
+							</select>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-3">
+							<label for="elections_obce" class="">vyberte obec:&nbsp;&nbsp;</label>
+						</div>
+						<div class="col-md-7">
+							<select name="elections_obce" id="elections_obce">
+								<option value="null" data-url="<?= $view->path('election_2026_obec', ['okres' => $okres_id]) ?>"> --- </option>
+								<?php foreach ($obce as $value) { ?>
+									<option value="<?= (int)$value['KODZASTUP'] ?>" data-url="<?= $view->path('election_2026_obec_detail', ['okres' => $value['OKRES'], 'obec' => $value['KODZASTUP']]) ?>"><?= htmlspecialchars($value['NAZEVZAST']) ?></option>
+								<?php } ?>
+							</select>
+						</div>
+					</div>
+				</div>
+
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-md-6">
+
+							<?php if (isset($obec['NAZEVZAST'])) { ?>
+								<h2 class="text-primary"><?= htmlspecialchars($obec['NAZEVZAST']).'&nbsp&nbsp<span class="color-1e1e1e text-2">('.$okres_title.')</span>'; ?></h2>
+                            <?php } else { ?>
+                                <h2 class="text-primary"><?= $okres_title; ?></h2>
+                            <?php } ?>
+                        </div>
+
+                        <?php if ($elections_results) { ?>
+                            <div class="col-4 col-md-2">
+                                <span class="text-4 font-weight-bold"><?= number_format($elections_results['PLATNE_HLASY'], 0, ',', ' '); ?></span><br />
+                                <div class="text-2">Platné hlasy</div>
+                            </div>
+                            <div class="col-4 col-md-2 elections">
+                                <div class="progress mb-1">
+                                    <div class="progress-bar" aria-valuenow="<?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%; background-color: #990000;">
+                                    </div>
+                                </div>
+                                <span class="text-4 font-weight-bold"><?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%</span><br />
+                                <div class="text-2">Sečteno</div>
+                            </div>
+                            <div class="col-4 col-md-2 elections">
+                                <div class="progress mb-1">
+                                    <div class="progress-bar" aria-valuenow="<?= $elections_results['UCAST_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['UCAST_PROC']; ?>%; background-color: #990000;">
+                                    </div>
+                                </div>
+                                <span class="text-4 font-weight-bold"><?= number_format($elections_results['UCAST_PROC'], 2, ',', ' '); ?>%</span><br />
+                                <div class="text-2">Volební účast</div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+
+                <?php if ($elections) { ?>
+                    <?php foreach ($elections as $value) { ?>
+                        <div class="col-12 mb-3">
+                            <div class="progress-bars elections mt-4">
+                                <div class="progress-label clearfix">
+                                    <h2 class="float-start">
+										<?= htmlspecialchars($value['NAZEV_STRANY']); ?>
+                                    </h2>
+                                </div>
+								<div class="clearfix mb-1">
+									<div class="progress-label float-start line-height-2" style="width: 70px;">
+										<span class="text-4 font-weight-bold"><?= number_format((float)$value['VOLEBNI_STRANA_HLASY_PROC'], 2, ',', ' '); ?>%</span>
+									</div>
+									<div class="progress">
+										<div class="progress-bar" aria-valuenow="<?= $value['VOLEBNI_STRANA_HLASY_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $value['VOLEBNI_STRANA_HLASY_PROC']; ?>%; background-color: <?= $value['barva']; ?>;">
+										</div>
+									</div>
+								</div>
+								<div class="text-2"><?= number_format($value['VOLEBNI_STRANA_HLASY'], 0, ',', ' '); ?> hlasů</div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                <?php } else { ?>
+                    <div class="col-12 mb-3">
+                        Pro tuto obec zatím nejsou dostupné výsledky.<br /><br /><br /><br />
+                    </div>
+                <?php } ?>
+            </div>
+
+            <div class="row">
+                <div class="col-md-7 mb-5">
+                    <h4 class="text-4 text-primary mb-3">vyberte obec okresu <?= $okres_title;?>:</h4>
+                    <?php foreach ($obce as $value) { ?>
+						<h4 class="text-4 text-secondary mb-1"><a href="<?= $view->path('election_2026_obec_detail', ['okres' => $value['OKRES'], 'obec' => $value['KODZASTUP']]);?>"><?= htmlspecialchars($value['NAZEVZAST']);?></a></h4>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+			<?php if ($articles) { ?>
+				<h2 class="text-primary mb-4">Volební zpravodajství</h2>
+				<?php foreach ($articles as $key => $item) { ?>
+
+					<?php
+						if ($item['region_url'] && $item['city_url']) {
+							$region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+							if ($item['city_url'] === 'cely-ms-kraj') {
+								$region_city_url = $view->path('news');
+							}
+						}
+
+						try {
+							$today = new DateTime();
+							$dateUpdate = new DateTime($item['updated_date']);
+							if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+								$dayUpdate = 'Dnes';
+							} else {
+								$yesterday = new DateTime();
+								$yesterday->modify('-1 day');
+								if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+									$dayUpdate = 'Včera';
+								} else {
+									$dayUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+								}
+							}
+							$timeUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+							$today = new DateTime();
+							$date = new DateTime($item['public_from']);
+							if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+								if ($item['label']) {
+									$day = 'dnes';
+								} else {
+									$day = 'Dnes';
+								}
+							} else {
+								$yesterday = new DateTime();
+								$yesterday->modify('-1 day');
+								if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+									if ($item['label']) {
+										$day = 'včera';
+									} else {
+										$day = 'Včera';
+									}
+								} else {
+									$day = $view->dateFormat($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+								}
+							}
+							$time = $view->dateFormat($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+						} catch (Exception $e) {
+							$day = 'NaN';
+							$time = 'NaN';
+							$dayUpdate = 'NaN';
+							$timeUpdate = 'NaN';
+						}
+					?>
+
+					<div class="row mb-4-5">
+						<?php if ($item['picture']) { ?>
+							<div class="col-5 pe-2 pe-md-3">
+								<div class="">
+									<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+										<span class="thumb-info thumb-info-lighten">
+											<span class="thumb-info-wrapper">
+												<img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+												<?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+													<span class="thumb-info-action">
+														<span class="thumb-info-action-icon">
+															<i class="fas fa-play"></i>
+															<span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+														</span>
+													</span>
+												<?php } ?>
+											</span>
+										</span>
+									</a>
+								</div>
+							</div>
+							<div class="col-7 ps-1 pe-3">
+								<h2 class="line-height-md-2 mb-1 mb-md-2">
+									<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+										<?= $item['title'] ?>
+									</a>
+								</h2>
+								<div class="text-1 text-tertiary line-height-7 mb-1">
+									<?php
+										$now_minus_x = new DateTime();
+										$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+										if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+											echo $item['label'];
+											echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+										} else {
+											echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+										}
+									?>
+									<span>
+										<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+									</span>
+									<span>
+										<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+									--></span><!--
+									--><span><!--
+										--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
+									</span>
+								</div>
+								<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+									<?php //= $item['anotation']; ?>
+								</p>-->
+							</div>
+						<?php } else { ?>
+							<div class="col-12">
+								<div class="">
+									<h2 class="line-height-md-2 mb-1 mb-md-22">
+										<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+											<?= $item['title'] ?>
+										</a>
+									</h2>
+									<div class="text-1 text-tertiary line-height-7 mb-1">
+										<?php
+											$now_minus_x = new DateTime();
+											$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+											if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+												echo $item['label'];
+												echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+											} else {
+												echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+											}
+										?>
+										<span>
+											<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+										</span>
+										<span>
+											<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+										--></span><!--
+										--><span><!--
+											--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
+										</span>
+									</div>
+									<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+										<?php //= $item['anotation']; ?>
+									</p>-->
+								</div>
+							</div>
+						<?php } ?>
+					</div>
+				<?php } ?>
+				<div class="row">
+					<div class="col-12">
+						<?= $view->include('application/pagination/paginator', ['route' => 'election_2026_obec', 'routeParams' => ['okres' => $okres_id], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+					</div>
+				</div>
+			<?php } ?>
+		</div>
+    </div>
+</div>

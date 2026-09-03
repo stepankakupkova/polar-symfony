@@ -192,7 +192,7 @@ function formatBytes($size, $precision = 0){
     return round(1024 ** ($base - floor($base)), $precision) .' '. $suffixes[(int)floor($base)];
 }
 
-$formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');
+$formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'd.M.');
 $currencyFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 $currencyFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 
@@ -278,7 +278,7 @@ $view->setBreadcrumbs([
 					</h1>
 
 					<div class="text-secondary text-5 mb-3">
-						<?php $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'dd.MM.');?>
+						<?php $formatter = new IntlDateFormatter($locale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, 'd.M.');?>
 						<?php $dateFrom = new DateTime($article['term_from']);?>
 						<?php $today = new DateTime();?>
 						<?php if ($today->format('Y-m-d') == $dateFrom->format('Y-m-d')) {?>
