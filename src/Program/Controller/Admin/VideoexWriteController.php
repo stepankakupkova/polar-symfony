@@ -187,7 +187,7 @@ final class VideoexWriteController
 	): Response
 	{
 		$identity = $this->security->getUser();
-		$cron = $request->query->get('cron') === 'true';
+		$cron = $request->query->get('cron') === '1';
 		$message = null;
 
 		$headers = $cron ? [] : [

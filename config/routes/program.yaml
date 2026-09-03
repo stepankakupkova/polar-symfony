@@ -94,11 +94,6 @@ admin_program_newton:
   controller: App\Program\Controller\Admin\ProgramWriteController::newton
   methods: [GET]
 
-admin_program_json_export_shows:
-  path: /admin/program/json/export-shows
-  controller: App\Program\Controller\Admin\ProgramWriteController::exportShows
-  methods: [GET, POST]
-
 admin_program_json_write_export_shows:
   path: /admin/program/json-write/export-shows
   controller: App\Program\Controller\Admin\ProgramWriteController::exportShows

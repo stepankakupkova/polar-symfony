@@ -357,7 +357,7 @@ final class ProgramWriteController
 		LoggerInterface $logger,
 	): Response
 	{
-		$cron = $request->query->get('cron') === 'true';
+		$cron = $request->query->get('cron') === '1';
 		$message = null;
 
 		$headers = $cron ? [] : [
