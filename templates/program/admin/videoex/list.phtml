@@ -144,7 +144,7 @@ $view->addInlineScript(
         var iFrame = document.createElement("iframe");
         iFrame.className = "loadData";
         document.getElementsByTagName("body")[0].appendChild(iFrame);
-        iFrame.src = "' . $view->path('admin_program_videoex_json_load_videos') . '?cron=false";
+        iFrame.src = "' . $view->path('admin_program_videoex_json_load_videos') . '?cron=0";
     }
     function updateProgress(data){
         modal.find(".progress-bar").css("width", Math.round(data.percent) + "%");
@@ -189,7 +189,7 @@ $view->addInlineScript(
                             Načíst nová videa
                         </span>
                     </button>
-                    <a href="<?= $view->path('admin_program_videoex_json_load_videos') ?>?cron=true" class="btn btn-default" title="CRON"
+                    <a href="<?= $view->path('admin_program_videoex_json_load_videos') ?>?cron=1" class="btn btn-default" title="CRON"
                        target="_blank">
                         CRON
                     </a>
