@@ -438,7 +438,7 @@ final class ProgramWriteController
 				'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
 				'file' => __FILE__,
 			]);
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			$success = false;
 			$message = $e->getMessage();
 

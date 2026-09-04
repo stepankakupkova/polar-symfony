@@ -7,7 +7,7 @@ $view->addInlineScript(
 	btn.click(function(e){
 		e.preventDefault();
 		btn.button("loading");
-		modal.find(".card-title").html("Nacitani videi");
+		modal.find(".card-title").html("Newton export");
 		$.magnificPopup.open({
 			items: {src: "#modalProgress"},
 			closeOnBgClick: false,
@@ -25,7 +25,7 @@ $view->addInlineScript(
 		modal.find(".percent").html("");
 		modal.find(".timeTaken").html("0s celkem");
 		modal.find(".timeRemaining").html("0s zbyva");
-		modal.find(".modal-text .scrollable-content").html("Cekejte prosim...");
+		modal.find(".modal-text .scrollable-content").html("Čekejte prosím...");
 		modal.find(".btn-close").hide();
 		modal.find("button.modal-dismiss").attr("disabled", true);
 		var iFrame = document.createElement("iframe");
