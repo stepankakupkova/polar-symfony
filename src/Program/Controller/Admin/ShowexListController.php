@@ -7,7 +7,6 @@ namespace App\Program\Controller\Admin;
 use App\Application\Service\FlashMessenger;
 use App\Program\Repository\ShowexRepository;
 use App\Application\View\PhtmlRenderer;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

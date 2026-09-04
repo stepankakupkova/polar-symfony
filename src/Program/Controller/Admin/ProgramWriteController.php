@@ -3,6 +3,7 @@
 namespace App\Program\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\SettingRepository;
@@ -11,7 +12,6 @@ use App\Program\Repository\VideoRepository;
 use App\Program\Xml\SimpleXMLElementExtended;
 use DateTime;
 use Exception;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -35,7 +35,7 @@ final class ProgramWriteController
 		ProgramRepository $programRepository,
 		VideoRepository $videoRepository,
 		ShowRepository $showRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 		UrlGeneratorInterface $urlGenerator,
 	): Response
 	{
@@ -121,7 +121,7 @@ final class ProgramWriteController
 					$errors['_global'] = $e->getMessage();
 
 					// Log
-					$logger->error('PROGRAM - Add program', [
+					$logger->err('PROGRAM - Add program', [
 						'description' => 'ERROR',
 						'user' => $identity->getUserIdentifier(),
 						'file' => __FILE__,
@@ -146,7 +146,7 @@ final class ProgramWriteController
 		ProgramRepository $programRepository,
 		VideoRepository $videoRepository,
 		ShowRepository $showRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 		UrlGeneratorInterface $urlGenerator,
 	): Response
 	{
@@ -258,7 +258,7 @@ final class ProgramWriteController
 					$errors['_global'] = $e->getMessage();
 
 					// Log
-					$logger->error('PROGRAM - Edit program', [
+					$logger->err('PROGRAM - Edit program', [
 						'description' => 'ERROR',
 						'user' => $identity->getUserIdentifier(),
 						'file' => __FILE__,
@@ -281,7 +281,7 @@ final class ProgramWriteController
 	public function deleteProgram(
 		Request $request,
 		ProgramRepository $programRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -310,7 +310,7 @@ final class ProgramWriteController
 				$message = 'Nelze najít program';
 
 				// Log
-				$logger->error('PROGRAM - Delete program', [
+				$logger->err('PROGRAM - Delete program', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -322,7 +322,7 @@ final class ProgramWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Delete program', [
+			$logger->err('PROGRAM - Delete program', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
@@ -354,7 +354,7 @@ final class ProgramWriteController
 		Request $request,
 		ProgramRepository $programRepository,
 		SettingRepository $settingRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): Response
 	{
 		$cron = $request->query->get('cron') === '1';
@@ -447,7 +447,7 @@ final class ProgramWriteController
 				$this->pushProgress(100, 100, $e->getMessage());
 			}
 
-			$logger->error('PROGRAM - Newton - Export shows', [
+			$logger->err('PROGRAM - Newton - Export shows', [
 				'description' => 'ERROR',
 				'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
 				'file' => __FILE__,

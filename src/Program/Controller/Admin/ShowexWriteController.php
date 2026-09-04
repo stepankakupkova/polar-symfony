@@ -3,6 +3,7 @@
 namespace App\Program\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\SettingRepository;
@@ -13,7 +14,6 @@ use Imagine\Image\Box;
 use Imagine\Image\ManipulatorInterface;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +39,7 @@ final class ShowexWriteController
 		ShowexRepository $showexRepository,
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
-		LoggerInterface $logger,
+		Logger $logger,
 	): Response
 	{
 		$identity = $this->security->getUser();
@@ -134,7 +134,7 @@ final class ShowexWriteController
 				return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 			} catch (Exception $e) {
 				// Log
-				$logger->error('PROGRAM - Add extraordinary shows', [
+				$logger->err('PROGRAM - Add extraordinary shows', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -157,7 +157,7 @@ final class ShowexWriteController
 		ShowexRepository $showexRepository,
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
-		LoggerInterface $logger,
+		Logger $logger,
 	): Response
 	{
 		$identity = $this->security->getUser();
@@ -227,7 +227,7 @@ final class ShowexWriteController
 				return new RedirectResponse($urlGenerator->generate('admin_program_showex_list'));
 			} catch (Exception $e) {
 				// Log
-				$logger->error('PROGRAM - Edit extraordinary shows', [
+				$logger->err('PROGRAM - Edit extraordinary shows', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -249,7 +249,7 @@ final class ShowexWriteController
 		Request $request,
 		ShowexRepository $showexRepository,
 		ProgramRepository $programRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -291,7 +291,7 @@ final class ShowexWriteController
 				$message = 'Nelze nají­t mimořádný pořad';
 
 				// Log
-				$logger->error('PROGRAM - Delete extraordinary shows', [
+				$logger->err('PROGRAM - Delete extraordinary shows', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -303,7 +303,7 @@ final class ShowexWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Delete extraordinary shows', [
+			$logger->err('PROGRAM - Delete extraordinary shows', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
@@ -431,7 +431,7 @@ final class ShowexWriteController
 	public function setDefaultImage(
 		Request $request,
 		ShowexRepository $showexRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -473,7 +473,7 @@ final class ShowexWriteController
 				$message = 'Nelze nají­t mimořádný pořad';
 
 				// Log
-				$logger->error('PROGRAM - Set showex image', [
+				$logger->err('PROGRAM - Set showex image', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -485,7 +485,7 @@ final class ShowexWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Set showex image', [
+			$logger->err('PROGRAM - Set showex image', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,

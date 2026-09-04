@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Election\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Election\Repository\Election2026PlaykitRepository;
 use App\Election\Repository\ElectionCommand2026;
 use App\Election\Repository\ElectionRepository2026;
 use App\Program\Repository\VideoRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +27,7 @@ final class ElectionWriteController
         private FlashMessenger $flashMessenger,
         private PhtmlRenderer $renderer,
         private UrlGeneratorInterface $urlGenerator,
-        private LoggerInterface $logger,
+        private Logger $logger,
     ) {}
 
     public function add(Request $request): Response|RedirectResponse
@@ -76,7 +76,7 @@ final class ElectionWriteController
                 $error = $e->getMessage();
 
                 // Log
-                $this->logger->error('ELECTION - Add election', [
+                $this->logger->err('ELECTION - Add election', [
                     'description' => 'ERROR',
                     'file' => __FILE__,
                     'trace' => $e->getMessage(),
@@ -150,7 +150,7 @@ final class ElectionWriteController
                 $error = $e->getMessage();
 
                 // Log
-                $this->logger->error('ELECTION - Edit election', [
+                $this->logger->err('ELECTION - Edit election', [
                     'description' => 'ERROR',
                     'file' => __FILE__,
                     'trace' => $e->getMessage(),
@@ -197,7 +197,7 @@ final class ElectionWriteController
                 $message = 'Cannot find election';
 
                 // Log
-                $this->logger->error('ELECTION - Delete election', [
+                $this->logger->err('ELECTION - Delete election', [
                     'description' => 'ERROR',
                     'file' => __FILE__,
                     'trace' => $message,
@@ -208,7 +208,7 @@ final class ElectionWriteController
             $message = $e->getMessage();
 
             // Log
-            $this->logger->error('ELECTION - Delete election', [
+            $this->logger->err('ELECTION - Delete election', [
                 'description' => 'ERROR',
                 'file' => __FILE__,
                 'trace' => $message,

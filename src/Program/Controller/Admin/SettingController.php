@@ -3,6 +3,7 @@
 namespace App\Program\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\SettingRepository;
 use App\Authorization\Identity\AuthorizationUser;
@@ -11,7 +12,6 @@ use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +41,7 @@ final class SettingController
 		Request $request,
 		PhtmlRenderer $renderer,
 		SettingRepository $settingRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 		UrlGeneratorInterface $urlGenerator,
 	): Response
 	{
@@ -93,7 +93,7 @@ final class SettingController
 					$this->flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
 
 					// Log
-					$logger->error('PROGRAM - Edit settings', [
+					$logger->err('PROGRAM - Edit settings', [
 						'description' => 'ERROR',
 						'user' => $identity->getUserIdentifier(),
 						'file' => __FILE__,
@@ -104,7 +104,7 @@ final class SettingController
 				$this->flashMessenger->addMessage('error', 'Chyba', $e->getMessage());
 
 				// Log
-				$logger->error('PROGRAM - Edit settings', [
+				$logger->err('PROGRAM - Edit settings', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,

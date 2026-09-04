@@ -3,6 +3,7 @@
 namespace App\Program\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\SettingRepository;
@@ -13,7 +14,6 @@ use Imagine\Image\Box;
 use Imagine\Image\ManipulatorInterface;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +39,7 @@ final class ShowWriteController
 		ShowRepository $showRepository,
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
-		LoggerInterface $logger,
+		Logger $logger,
 	): Response
 	{
 		$identity = $this->security->getUser();
@@ -144,7 +144,7 @@ final class ShowWriteController
 				$errors['general'] = $e->getMessage();
 
 				// Log
-				$logger->error('PROGRAM - Add show', [
+				$logger->err('PROGRAM - Add show', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -169,7 +169,7 @@ final class ShowWriteController
 		ShowRepository $showRepository,
 		SettingRepository $settingRepository,
 		UrlGeneratorInterface $urlGenerator,
-		LoggerInterface $logger,
+		Logger $logger,
 	): Response
 	{
 		$identity = $this->security->getUser();
@@ -244,7 +244,7 @@ final class ShowWriteController
 				return new RedirectResponse($urlGenerator->generate('admin_program_show_list'));
 			} catch (Exception $e) {
 				// Log
-				$logger->error('PROGRAM - Edit show', [
+				$logger->err('PROGRAM - Edit show', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -266,7 +266,7 @@ final class ShowWriteController
 		Request $request,
 		ShowRepository $showRepository,
 		ProgramRepository $programRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -309,7 +309,7 @@ final class ShowWriteController
 				$message = 'Nelze najít pořad';
 
 				// Log
-				$logger->error('PROGRAM - Delete show', [
+				$logger->err('PROGRAM - Delete show', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -321,7 +321,7 @@ final class ShowWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Delete show', [
+			$logger->err('PROGRAM - Delete show', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
@@ -488,7 +488,7 @@ final class ShowWriteController
 	public function setDefaultImage(
 		Request $request,
 		ShowRepository $showRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -530,7 +530,7 @@ final class ShowWriteController
 				$message = 'Nelze najít pořad';
 
 				// Log
-				$logger->error('PROGRAM - Set show image', [
+				$logger->err('PROGRAM - Set show image', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -542,7 +542,7 @@ final class ShowWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Set show image', [
+			$logger->err('PROGRAM - Set show image', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,

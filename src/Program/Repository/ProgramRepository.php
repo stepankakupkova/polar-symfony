@@ -314,7 +314,7 @@ final class ProgramRepository
 			->leftJoin('program', 'program_videos', 'program_videos', 'program_videos.id = program.video_id')
 			->leftJoin('program', 'program_videos', 'v2', 'v2.id = program.video_id_for_newton')
 			->where('program_shows.newton = 1')
-			->andWhere('DATE(program.time) >= DATE_SUB(DATE(NOW()), INTERVAL 3 DAY)')
+			->andWhere('DATE(program.time) >= DATE_SUB(DATE(NOW()), INTERVAL 10 DAY)') 		// TODO INTERVAL 3 DAY !!!
 			->andWhere('program.time < NOW()')
 			->andWhere('CHAR_LENGTH(program.overwrite) > :minLength')
 			->andWhere('(program.video_id IS NOT NULL OR program.video_id_for_newton IS NOT NULL)')

@@ -9,7 +9,6 @@ use App\Program\Repository\VideoRepository;
 use App\Authorization\Identity\AuthorizationUser;
 use DateTime;
 use Exception;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -2,6 +2,7 @@
 
 namespace App\Program\Controller\Admin;
 
+use App\Application\Service\Logger;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\SettingRepository;
@@ -14,7 +15,6 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\Palette\RGB as ImaginePaletteRGB;
 use Imagine\Image\Point as ImaginePoint;
 use Imagine\Imagick\Imagine;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -65,7 +65,7 @@ final class VideoWriteController
 		Request $request,
 		VideoRepository $videoRepository,
 		ProgramRepository $programRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -107,7 +107,7 @@ final class VideoWriteController
 				$message = 'Nelze najít video';
 
 				// Log
-				$logger->error('PROGRAM - Delete video', [
+				$logger->err('PROGRAM - Delete video', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -119,7 +119,7 @@ final class VideoWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Delete video', [
+			$logger->err('PROGRAM - Delete video', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
@@ -139,7 +139,7 @@ final class VideoWriteController
 		VideoRepository $videoRepository,
 		ProgramRepository $programRepository,
 		SettingRepository $settingRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): Response
 	{
 		$identity = $this->security->getUser();
@@ -293,7 +293,7 @@ final class VideoWriteController
 					$this->pushProgress(100, 100, $e->getMessage());
 				}
 
-				$logger->error('PROGRAM - Load videos', [
+				$logger->err('PROGRAM - Load videos', [
 					'description' => 'ERROR',
 					'user' => $identity ? $identity->getUserIdentifier() : 'CRON',
 					'file' => __FILE__,
@@ -315,7 +315,7 @@ final class VideoWriteController
 	public function createPreviewAction(
 		Request $request,
 		VideoRepository $videoRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -353,7 +353,7 @@ final class VideoWriteController
 				$message = 'Nelze najít video';
 
 				// Log
-				$logger->error('PROGRAM - Edit video - Create preview', [
+				$logger->err('PROGRAM - Edit video - Create preview', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -365,7 +365,7 @@ final class VideoWriteController
 			$message = $e->getMessage();
 
 			// Log
-			$logger->error('PROGRAM - Edit video - Create preview', [
+			$logger->err('PROGRAM - Edit video - Create preview', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier(),
 				'file' => __FILE__,
@@ -385,7 +385,7 @@ final class VideoWriteController
 	public function uploadPreviewFromPc(
 		Request $request,
 		VideoRepository $videoRepository,
-		LoggerInterface $logger,
+		Logger $logger,
 	): JsonResponse
 	{
 		$identity = $this->security->getUser();
@@ -441,7 +441,7 @@ final class VideoWriteController
 				$message = $e->getMessage();
 
 				// Log
-				$logger->error('PROGRAM - Edit video - Upload preview', [
+				$logger->err('PROGRAM - Edit video - Upload preview', [
 					'description' => 'ERROR',
 					'user' => $identity->getUserIdentifier(),
 					'file' => __FILE__,
@@ -462,7 +462,7 @@ final class VideoWriteController
 	 * @param string $file
 	 * @param int $sec
 	 */
-	private function createPreview(string $file, int $sec, LoggerInterface $logger, mixed $identity): void
+	private function createPreview(string $file, int $sec, Logger $logger, mixed $identity): void
 	{
 		$previewDir = 'data/program/thumbs/';
 		$preview = $previewDir . substr($file, strrpos($file, '/') + 1, -7) . '.jpg';
@@ -488,7 +488,7 @@ final class VideoWriteController
 				'file' => __FILE__,
 			]);
 		} catch (Exception $e) {
-			$logger->error('PROGRAM - Load videos - Create preview', [
+			$logger->err('PROGRAM - Load videos - Create preview', [
 				'description' => 'ERROR',
 				'user' => $identity->getUserIdentifier() ?? 'CRON',
 				'file' => __FILE__,
