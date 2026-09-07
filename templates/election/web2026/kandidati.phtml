@@ -23,7 +23,7 @@ $view->addOgMeta('og:image:height', '1080');
 
 $view->setBreadcrumbs([
 	['label' => 'Volby 2026', 'url' => $view->path('election_2026')],
-	['label' => isset($obec['NAZEVZAST']) ? $obec['NAZEVZAST'] . ' | Kandidáti' : 'Kandidáti'],
+	['label' => isset($obec['NAZEVZAST']) ? 'Kandidáti - ' . $obec['NAZEVZAST'] : 'Kandidáti'],
 ]);
 
 $view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
@@ -187,14 +187,14 @@ function removeAccent($text, $replace = null): string
 	<div class="row">
         <div class="col-lg-7">
 
-			<div class="row mb-5">
+			<div class="row mb-5 bg-color-light-scale-1 p-3 p-md-4 ms-0 me-0 me-lg-3">
 				<div class="col-12">
-					<div class="row mb-2">
+					<div class="row mb-3 align-items-center">
 						<div class="col-md-3">
-							<label for="elections_okresy" class="">vyberte okres:&nbsp;&nbsp;</label>
+							<label for="elections_okresy" class="mb-0 text-secondary">Vyberte okres:</label>
 						</div>
 						<div class="col-md-7">
-							<select name="elections_okresy" id="elections_okresy">
+							<select name="elections_okresy" id="elections_okresy" class="form-select">
 								<option value="8101" data-url="<?= $view->path('election_2026_kandidati', ['okres' => 8101]) ?>" <?= $okres_id === 8101 ? ' selected' : '' ?>>Bruntál</option>
 								<option value="8105" data-url="<?= $view->path('election_2026_kandidati', ['okres' => 8105]) ?>" <?= $okres_id === 8105 ? ' selected' : '' ?>>Opava</option>
 								<option value="8104" data-url="<?= $view->path('election_2026_kandidati', ['okres' => 8104]) ?>" <?= $okres_id === 8104 ? ' selected' : '' ?>>Nový Jičín</option>
@@ -204,12 +204,12 @@ function removeAccent($text, $replace = null): string
 							</select>
 						</div>
 					</div>
-					<div class="row">
+					<div class="row align-items-center">
 						<div class="col-md-3">
-							<label for="elections_obce" class="">vyberte obec:&nbsp;&nbsp;</label>
+							<label for="elections_obce" class="mb-0 text-secondary">Vyberte obec:</label>
 						</div>
 						<div class="col-md-7">
-							<select name="elections_obce" id="elections_obce">
+							<select name="elections_obce" id="elections_obce" class="form-select">
 								<option value=""> --- </option>
 								<?php foreach ($obce as $value) { ?>
 									<option value="<?= (int)$value['KODZASTUP'] ?>" data-url="<?= $view->path('election_2026_kandidati_obec', ['okres' => $okres_id, 'obec' => $value['KODZASTUP']]) ?>" <?= $obec_id === (int)$value['KODZASTUP'] ? ' selected' : '' ?>><?= htmlspecialchars($value['NAZEVZAST']) ?></option>
@@ -224,7 +224,7 @@ function removeAccent($text, $replace = null): string
 				<div class="col-12">
 					<div class="row">
 						<div class="col-12 mb-5">
-							<h2 class="text-6 text-primary line-height-2 mb-0">Kandidátky pro <?= htmlspecialchars($obec['NAZEVZAST'] ?? '') ?></h2>
+							<h2 class="text-6 text-primary line-height-2 mb-0">Kandidátky pro: <?= htmlspecialchars($obec['NAZEVZAST'] ?? '') ?></h2>
 						</div>
 					</div>
 
@@ -254,10 +254,10 @@ function removeAccent($text, $replace = null): string
 								</div>
 							<?php } ?>
 
-							<div class="col-12 mb-3">
-								<div class="row mb-4">
+							<div class="col-12 mb-5 pb-3 pb-lg-5">
+								<div class="row mb-3">
 									<div class="col-md-9">
-										<h2 class="text-6 text-primary line-height-2 mb-0">
+										<h2 class="text-5 text-primary line-height-2 mb-2 mb-lg-0">
 											<?= htmlspecialchars($kandidatka['NAZEVCELK']); ?>
 										</h2>
 									</div>

@@ -176,13 +176,13 @@ foreach ($elections as $election) {
 
 	<div class="row sticky-square">
 
-		<div class="col-lg-7">
+		<div class="col-lg-7 pe-md-4">
 			<?php if ($elections) { ?>
-				<h2 class="text-primary mb-4">Volební studia</h2>
-				<div class="text-primary mb-4">Představujeme lídry politických stran a hnutí pro volby do zastupitelstev obcí</div>
+				<h2 class="text-primary font-weight-semibold text-5 mb-3">Volební studia</h2>
+				<p class="text-secondary text-3 font-weight-semibold line-height-6 mb-5">Představujeme lídry politických stran a hnutí pro volby do zastupitelstev obcí</p>
 				<?php foreach ($electionsByCity as $city => $cityElections) { ?>
-					<h3 class="text-secondary mb-3"><?= htmlspecialchars($city) ?></h3>
-					<div class="row row-cols-1 row-cols-md-3 mb-3">
+					<h3 class="text-primary text-5 font-weight-semibold border-bottom border-color-grey pb-2 mb-3"><?= htmlspecialchars($city) ?></h3>
+					<div class="row row-cols-1 row-cols-md-3 mb-5">
 						<?php foreach ($cityElections as $value) { ?>
 							<div class="col mb-4-5">
 								<a class="" href="<?= $view->path('show_video', ['show_url' => $value['url'], 'program_url' => $value['program_url']]) ?>" title="<?= htmlspecialchars($value['title']) ?>" target="_blank">
@@ -206,7 +206,7 @@ foreach ($elections as $election) {
 									</span>
 								</a>
 								<a class="" href="<?= $view->path('show_video', ['show_url' => $value['url'], 'program_url' => $value['program_url']]) ?>" title="<?= htmlspecialchars($value['title']) ?>" target="_blank">
-									<h4 class="text-4 text-secondary mb-0"><?= htmlspecialchars($value['title']) ?></h4>
+									<h4 class="text-4 text-secondary font-weight-semibold line-height-5 mb-1"><?= htmlspecialchars($value['title']) ?></h4>
 								</a>
 								<div class="line-height-6"><?= htmlspecialchars($value['description']) ?></div>
 							</div>
@@ -277,7 +277,7 @@ foreach ($elections as $election) {
 
         <div class="col-lg-5">
 			<?php if ($articles) { ?>
-				<h2 class="text-primary mb-4 d-none">Volební zpravodajství</h2>
+				<h2 class="text-primary font-weight-semibold text-5 mb-4">Volební zpravodajství</h2>
                 <?php foreach ($articles as $key => $item) { ?>
 
                     <?php

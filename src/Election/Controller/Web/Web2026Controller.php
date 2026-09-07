@@ -19,46 +19,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class Web2026Controller
 {
     private array $colors = [
-        /* všechny strany
-        1  => '#FF4500', // Rebelové
-        2  => '#cf2e2e', // Moravské zemské hnutí
-        3  => '#000000', // Jasný Signál Nezávislých
-        4  => '#0066CC', // VÝZVA 2026
-        5  => '#008000', // SMS – Stát Má Sloužit
-        6  => '#B45F06', // SPD
-        7  => '#FF4500', // ČSSD
-        8  => '#0033FF', // PŘÍSAHA
-        9  => '#8B0000', // Levice
-        10 => '#00008B', // Česká republika na 1. místě
-        11 => '#00FF40', // SPOLU
-        12 => '#C0C0C0', // ŠVÝCARSKÁ DEMOKRACIE
-        13 => '#800080', // Urza.cz
-        14 => '#2E8B57', // Hnutí občanů a podnikatelů
-        15 => '#FFA500', // Hnutí Generace
-        16 => '#707070', // Piráti
-        17 => '#DAA520', // Koruna Česká
-        18 => '#1E90FF', // Volt Česko
-        19 => '#808080', // Volte Pravý Blok
-        20 => '#00BFFF', // Motoristé sobě
-        21 => '#4B0082', // Balbínova poetická strana
-        22 => '#261060', // ANO 2011
-        23 => '#E6007E', // STAROSTOVÉ A NEZÁVISLÍ STAN
-        24 => '#00CED1', // Hnutí Kruh
-        25 => '#FF0000', // Stačilo!
-        26 => '#FF69B4', // Voluntia
-        */
-
-        22 => '#261060', // ANO 2011
-        11 => '#00FF40', // SPOLU
-        6  => '#B45F06', // SPD
-        23 => '#E6007E', // STAROSTOVÉ A NEZÁVISLÍ STAN
-        16 => '#707070', // Piráti
-        25 => '#FF0000', // Stačilo!
-        20 => '#00BFFF', // Motoristé sobě
-        8  => '#0033FF', // PŘÍSAHA
-        7  => '#FF4500', // ČSSD
-        2  => '#cf2e2e', // Moravské zemské hnutí
-
+        1    => '#FFDD00', // KDU-ČSL
+        7    => '#FF5F60', // Sociální demokracie
+        47   => '#CC0808', // Komunistická strana Čech a Moravy
+        53   => '#2B5797', // Občanská demokratická strana
+        72   => '#00FF00', // COEXISTENTIA
+        83   => '#feca0a', // Moravané
+        166  => '#ce0f68', // STAROSTOVÉ A NEZÁVISLÍ
+        720  => '#f9ce05', // Česká pirátská strana
+        768  => '#29235c', // ANO 2011
+        1114 => '#EE202C', // Svoboda a přímá demokracie (SPD)
+        1178 => '#009fe3', // Motoristé sobě
+        1291 => '#00caf9', // Hnutí Generace
+        1298 => '#7d0004', // Stačilo!
     ];
 
     /**
@@ -107,7 +80,7 @@ final class Web2026Controller
         $articles = null;
         $page = 1;
         try {
-            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2026');
+            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2025');   // TODO volby-20526 !!!
             if ($topic) {
                 $articles_ids = $this->playkitRepository->getArticlesIDsByTopicID((int)$topic['id']);
                 //var_dump($articles_ids);
@@ -184,7 +157,7 @@ final class Web2026Controller
         $articles = null;
         $page = 1;
         try {
-            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2026');
+            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2025');   // TODO volby-20526 !!!
             if ($topic) {
                 $articles_ids = $this->playkitRepository->getArticlesIDsByTopicID((int)$topic['id']);
                 //var_dump($articles_ids);
@@ -269,6 +242,10 @@ final class Web2026Controller
         }
 
         try {
+            $obce = $this->electionPlaykitRepository->getKvrosArrayByColumn('OKRES', $okres_id) ?: [];
+            if (!$obec_id && $obce) {
+                $obec_id = (int)$obce[0]['KODZASTUP'];
+            }
             $elections = $obec_id ? $this->electionPlaykitRepository->getResultsOkresyObceForWeb($obec_id) : null;
             $elections_results = $obec_id ? $this->electionPlaykitRepository->getResultsOkresyObceTotal($obec_id) : null;
             if ($elections_results) $elections_results = (array)$elections_results;
@@ -276,7 +253,6 @@ final class Web2026Controller
             for ($i=0, $iMax = count($elections ?? []); $i< $iMax; $i++) {
                 $elections[$i]['barva'] = isset($this->colors[$elections[$i]['VSTRANA']]) ? $this->colors[$i]['VSTRANA'] : "#ccc";
             }
-            $obce = $this->electionPlaykitRepository->getKvrosArrayByColumn('OKRES', $okres_id);
             if ($obec_id) {
                 $obec = $this->electionPlaykitRepository->getKvrosByColumn('KODZASTUP', $obec_id);
             }
@@ -290,7 +266,7 @@ final class Web2026Controller
         $articles = null;
         $page = 1;
         try {
-            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2026');
+            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2025');   // TODO volby-20526 !!!
             if ($topic) {
                 $articles_ids = $this->playkitRepository->getArticlesIDsByTopicID((int)$topic['id']);
                 //var_dump($articles_ids);

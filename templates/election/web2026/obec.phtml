@@ -23,7 +23,7 @@ $view->addOgMeta('og:image:height', '1080');
 
 $view->setBreadcrumbs([
 	['label' => 'Volby 2026', 'url' => $view->path('election_2026')],
-	['label' => isset($obec['NAZEVZAST']) ? $obec['NAZEVZAST'] . ' | ' . $okres_title : $okres_title],
+	['label' => isset($obec['NAZEVZAST']) ? 'Vaše obec - ' . $obec['NAZEVZAST'] : 'Vaše obec'],
 ]);
 
 $view->addInlineScript(
@@ -169,14 +169,14 @@ function removeAccent($text, $replace = null): string
 	<div class="row">
         <div class="col-lg-7">
 
-            <div class="row mb-5">
-				<div class="col-12 mb-5">
-					<div class="row mb-2">
+			<div class="row mb-5 bg-color-light-scale-1 p-3 p-md-4 ms-0 me-0 me-lg-3">
+				<div class="col-12">
+					<div class="row mb-3 align-items-center">
 						<div class="col-md-3">
-							<label for="elections_okresy" class="">vyberte okres:&nbsp;&nbsp;</label>
+							<label for="elections_okresy" class="mb-0 text-secondary">Vyberte okres:</label>
 						</div>
 						<div class="col-md-7">
-							<select name="elections_okresy" id="elections_okresy">
+							<select name="elections_okresy" id="elections_okresy" class="form-select">
 								<option value="8101" data-url="<?= $view->path('election_2026_obec', ['okres' => 8101]) ?>">Bruntál</option>
 								<option value="8105" data-url="<?= $view->path('election_2026_obec', ['okres' => 8105]) ?>">Opava</option>
 								<option value="8104" data-url="<?= $view->path('election_2026_obec', ['okres' => 8104]) ?>">Nový Jičín</option>
@@ -186,12 +186,12 @@ function removeAccent($text, $replace = null): string
 							</select>
 						</div>
 					</div>
-					<div class="row">
+					<div class="row align-items-center">
 						<div class="col-md-3">
-							<label for="elections_obce" class="">vyberte obec:&nbsp;&nbsp;</label>
+							<label for="elections_obce" class="mb-0 text-secondary">Vyberte obec:</label>
 						</div>
 						<div class="col-md-7">
-							<select name="elections_obce" id="elections_obce">
+							<select name="elections_obce" id="elections_obce" class="form-select">
 								<option value="null" data-url="<?= $view->path('election_2026_obec', ['okres' => $okres_id]) ?>"> --- </option>
 								<?php foreach ($obce as $value) { ?>
 									<option value="<?= (int)$value['KODZASTUP'] ?>" data-url="<?= $view->path('election_2026_obec_detail', ['okres' => $value['OKRES'], 'obec' => $value['KODZASTUP']]) ?>"><?= htmlspecialchars($value['NAZEVZAST']) ?></option>
@@ -200,54 +200,55 @@ function removeAccent($text, $replace = null): string
 						</div>
 					</div>
 				</div>
+			</div>
+				
+			<div class="row">
+				<div class="col-md-6">
 
-                <div class="col-12">
-                    <div class="row">
-                        <div class="col-md-6">
+					<?php if (isset($obec['NAZEVZAST'])) { ?>
+						<h2 class="text-primary text-5 font-weight-semibold"><?= htmlspecialchars($obec['NAZEVZAST']).'&nbsp&nbsp<span class="color-1e1e1e text-2">('.$okres_title.')</span>'; ?></h2>
+					<?php } else { ?>
+						<h2 class="text-primary text-5 font-weight-semibold"><?= $okres_title; ?></h2>
+					<?php } ?>
+				</div>
 
-							<?php if (isset($obec['NAZEVZAST'])) { ?>
-								<h2 class="text-primary"><?= htmlspecialchars($obec['NAZEVZAST']).'&nbsp&nbsp<span class="color-1e1e1e text-2">('.$okres_title.')</span>'; ?></h2>
-                            <?php } else { ?>
-                                <h2 class="text-primary"><?= $okres_title; ?></h2>
-                            <?php } ?>
-                        </div>
+				<?php if ($elections_results) { ?>
+					<div class="col-4 col-md-2">
+						<span class="text-4 font-weight-bold"><?= number_format($elections_results['PLATNE_HLASY'], 0, ',', ' '); ?></span><br />
+						<div class="text-2">Platné hlasy</div>
+					</div>
+					<div class="col-4 col-md-2 elections">
+						<div class="progress mb-1">
+							<div class="progress-bar" aria-valuenow="<?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%; background-color: #990000;">
+							</div>
+						</div>
+						<span class="text-4 font-weight-bold"><?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%</span><br />
+						<div class="text-2">Sečteno</div>
+					</div>
+					<div class="col-4 col-md-2 elections">
+						<div class="progress mb-1">
+							<div class="progress-bar" aria-valuenow="<?= $elections_results['UCAST_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['UCAST_PROC']; ?>%; background-color: #990000;">
+							</div>
+						</div>
+						<span class="text-4 font-weight-bold"><?= number_format($elections_results['UCAST_PROC'], 2, ',', ' '); ?>%</span><br />
+						<div class="text-2">Volební účast</div>
+					</div>
+				<?php } ?>
+			</div>
 
-                        <?php if ($elections_results) { ?>
-                            <div class="col-4 col-md-2">
-                                <span class="text-4 font-weight-bold"><?= number_format($elections_results['PLATNE_HLASY'], 0, ',', ' '); ?></span><br />
-                                <div class="text-2">Platné hlasy</div>
-                            </div>
-                            <div class="col-4 col-md-2 elections">
-                                <div class="progress mb-1">
-                                    <div class="progress-bar" aria-valuenow="<?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%; background-color: #990000;">
-                                    </div>
-                                </div>
-                                <span class="text-4 font-weight-bold"><?= $elections_results['OKRSKY_ZPRAC_PROC']; ?>%</span><br />
-                                <div class="text-2">Sečteno</div>
-                            </div>
-                            <div class="col-4 col-md-2 elections">
-                                <div class="progress mb-1">
-                                    <div class="progress-bar" aria-valuenow="<?= $elections_results['UCAST_PROC']; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $elections_results['UCAST_PROC']; ?>%; background-color: #990000;">
-                                    </div>
-                                </div>
-                                <span class="text-4 font-weight-bold"><?= number_format($elections_results['UCAST_PROC'], 2, ',', ' '); ?>%</span><br />
-                                <div class="text-2">Volební účast</div>
-                            </div>
-                        <?php } ?>
-                    </div>
-                </div>
+			<?php if ($elections) { ?>
 
-                <?php if ($elections) { ?>
-                    <?php foreach ($elections as $value) { ?>
-                        <div class="col-12 mb-3">
-                            <div class="progress-bars elections mt-4">
-                                <div class="progress-label clearfix">
-                                    <h2 class="float-start">
+				<div class="row">
+					<?php foreach ($elections as $value) { ?>
+						<div class="col-12 mb-3">
+							<div class="progress-bars elections mt-4">
+								<div class="progress-label clearfix">
+									<h2 class="float-start">
 										<?= htmlspecialchars($value['NAZEV_STRANY']); ?>
-                                    </h2>
-                                </div>
+									</h2>
+								</div>
 								<div class="clearfix mb-1">
-									<div class="progress-label float-start line-height-2" style="width: 70px;">
+									<div class="progress-label float-start line-height-2" style="width: 75px;">
 										<span class="text-4 font-weight-bold"><?= number_format((float)$value['VOLEBNI_STRANA_HLASY_PROC'], 2, ',', ' '); ?>%</span>
 									</div>
 									<div class="progress">
@@ -256,21 +257,24 @@ function removeAccent($text, $replace = null): string
 									</div>
 								</div>
 								<div class="text-2"><?= number_format($value['VOLEBNI_STRANA_HLASY'], 0, ',', ' '); ?> hlasů</div>
-                            </div>
-                        </div>
-                    <?php } ?>
-                <?php } else { ?>
-                    <div class="col-12 mb-3">
-                        Pro tuto obec zatím nejsou dostupné výsledky.<br /><br /><br /><br />
-                    </div>
-                <?php } ?>
-            </div>
+							</div>
+						</div>
+					<?php } ?>
+				</div>
+				
+			<?php } else { ?>
+				<div class="row">
+					<div class="col-12 mb-3">
+						Pro tuto obec zatím nejsou dostupné výsledky.<br /><br /><br /><br />
+					</div>
+				</div>
+			<?php } ?>
 
             <div class="row">
                 <div class="col-md-7 mb-5">
-                    <h4 class="text-4 text-primary mb-3">vyberte obec okresu <?= $okres_title;?>:</h4>
+                    <h4 class="text-4 text-primary mb-3">Vyberte obec okresu <?= $okres_title;?>:</h4>
                     <?php foreach ($obce as $value) { ?>
-						<h4 class="text-4 text-secondary mb-1"><a href="<?= $view->path('election_2026_obec_detail', ['okres' => $value['OKRES'], 'obec' => $value['KODZASTUP']]);?>"><?= htmlspecialchars($value['NAZEVZAST']);?></a></h4>
+						<div class="text-3-4 text-secondary"><a href="<?= $view->path('election_2026_obec_detail', ['okres' => $value['OKRES'], 'obec' => $value['KODZASTUP']]);?>"><?= htmlspecialchars($value['NAZEVZAST']);?></a></div>
                     <?php } ?>
                 </div>
             </div>
@@ -378,10 +382,7 @@ function removeAccent($text, $replace = null): string
 									</span>
 									<span>
 										<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
-									--></span><!--
-									--><span><!--
-										--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
-									</span>
+									--></span>
 								</div>
 								<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
 									<?php //= $item['anotation']; ?>
