@@ -13,25 +13,29 @@ $view->addInlineScript(
     }, 2000);'
 );
 
-$view->addHeadStyle(
-    '#ssp-zone-151865-branding {
-        position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0 auto;
-    }
-    #ssp-zone-151865-branding.adFull {
-        width: 2000px;
-        height: 1400px;
-    }
-    #ssp-zone-151865-branding.adFull ~ #page {
-        position: relative;
-        top: 142px;
-    }'
-);
-
 $rand = random_int(1, 1000);
 ?>
+
+<script>
+    var bannerLeaderboardStyle = document.createElement('style');
+    bannerLeaderboardStyle.textContent = `
+        #ssp-zone-151865-branding {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0 auto;
+        }
+        #ssp-zone-151865-branding.adFull {
+            width: 2000px;
+            height: 1400px;
+        }
+        #ssp-zone-151865-branding.adFull ~ #page {
+            position: relative;
+            top: 226px;
+        }
+    `;
+    document.head.appendChild(bannerLeaderboardStyle);
+</script>
 
 <div id="bannerLeaderboardPlace<?= $rand ?>"></div>
 
@@ -55,7 +59,7 @@ $rand = random_int(1, 1000);
                         {id: "ssp-zone-151865-branding", width: 2000, height: 1400}
                     ]
                 });
-            }
+            } 
             sssp.getAds(brandedZones);
         } else {
             if (window.innerWidth > 767) {
