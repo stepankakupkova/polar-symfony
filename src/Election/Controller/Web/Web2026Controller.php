@@ -80,7 +80,7 @@ final class Web2026Controller
         $articles = null;
         $page = 1;
         try {
-            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2025');   // TODO volby-20526 !!!
+            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2026');   
             if ($topic) {
                 $articles_ids = $this->playkitRepository->getArticlesIDsByTopicID((int)$topic['id']);
                 //var_dump($articles_ids);
@@ -157,7 +157,7 @@ final class Web2026Controller
         $articles = null;
         $page = 1;
         try {
-            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2025');   // TODO volby-20526 !!!
+            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2026');  
             if ($topic) {
                 $articles_ids = $this->playkitRepository->getArticlesIDsByTopicID((int)$topic['id']);
                 //var_dump($articles_ids);
@@ -266,7 +266,7 @@ final class Web2026Controller
         $articles = null;
         $page = 1;
         try {
-            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2025');   // TODO volby-20526 !!!
+            $topic = $this->playkitRepository->getTopicIDByUrl('volby-2026');  
             if ($topic) {
                 $articles_ids = $this->playkitRepository->getArticlesIDsByTopicID((int)$topic['id']);
                 //var_dump($articles_ids);

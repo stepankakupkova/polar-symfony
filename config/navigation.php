@@ -35,7 +35,7 @@ return [
             'url'   => '#',
             'class' => 'p-0',
             'dropdown' => [
-                ['label' => 'Volby 2025',           'url' => '/volby',              'order' => 3],
+                /*['label' => 'Volby 2026',           'url' => '/volby',              'order' => 3],*/
                 ['label' => 'Kam vyrazit',          'url' => '/kam-vyrazit',        'order' => 5],
                 ['label' => 'Nabídka práce',        'url' => '/nabidka-prace',      'order' => 6],
                 ['label' => 'Kamery',               'url' => '/kamery',             'order' => 7],
