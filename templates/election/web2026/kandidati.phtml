@@ -97,6 +97,16 @@ $view->addInlineScript(
 			window.location.href = $(this).find(":selected").data("url");
 		}
 	});
+
+	$("#elections_strany").change(function() {
+		var ostrana = $(this).val();
+		if (ostrana === "") {
+			$("[data-ostrana]").show();
+		} else {
+			$("[data-ostrana]").hide();
+			$("[data-ostrana=\"" + ostrana + "\"]").show();
+		}
+	});
 	'
 );
 
@@ -189,7 +199,7 @@ function removeAccent($text, $replace = null): string
 
 			<div class="row mb-5 bg-color-light-scale-1 p-3 p-md-4 ms-0 me-0 me-lg-3">
 				<div class="col-12">
-					<div class="row mb-3 align-items-center">
+					<div class="row align-items-center mb-2">
 						<div class="col-md-3">
 							<label for="elections_okresy" class="mb-0 text-secondary">Vyberte okres:</label>
 						</div>
@@ -204,7 +214,7 @@ function removeAccent($text, $replace = null): string
 							</select>
 						</div>
 					</div>
-					<div class="row align-items-center">
+					<div class="row align-items-center mb-2">
 						<div class="col-md-3">
 							<label for="elections_obce" class="mb-0 text-secondary">Vyberte obec:</label>
 						</div>
@@ -213,6 +223,19 @@ function removeAccent($text, $replace = null): string
 								<option value=""> --- </option>
 								<?php foreach ($obce as $value) { ?>
 									<option value="<?= (int)$value['KODZASTUP'] ?>" data-url="<?= $view->path('election_2026_kandidati_obec', ['okres' => $okres_id, 'obec' => $value['KODZASTUP']]) ?>" <?= $obec_id === (int)$value['KODZASTUP'] ? ' selected' : '' ?>><?= htmlspecialchars($value['NAZEVZAST']) ?></option>
+								<?php } ?>
+							</select>
+						</div>
+					</div>
+					<div class="row align-items-center">
+						<div class="col-md-3">
+							<label for="elections_strany" class="mb-0 text-secondary">Vyberte stranu:</label>
+						</div>
+						<div class="col-md-7">
+							<select name="elections_strany" id="elections_strany" class="form-select">
+								<option value=""> --- </option>
+								<?php foreach ($kandidatky as $kandidatka) { ?>
+									<option value="<?= (int)$kandidatka['OSTRANA'] ?>"><?= htmlspecialchars($kandidatka['NAZEVCELK']) ?></option>
 								<?php } ?>
 							</select>
 						</div>
@@ -230,7 +253,7 @@ function removeAccent($text, $replace = null): string
 
 					<?php foreach ($kandidatky as $kandidatka) { ?>
 
-						<div class="row">
+						<div class="row" data-ostrana="<?= (int)$kandidatka['OSTRANA'] ?>">
 
 							<?php if ($studio) { ?>
 								<!-- mobil -->

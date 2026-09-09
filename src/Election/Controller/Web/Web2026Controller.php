@@ -140,7 +140,9 @@ final class Web2026Controller
         try {
             $obce = $this->electionPlaykitRepository->getKvrosArrayByColumn('OKRES', $okres_id) ?: [];
             if (!$obec_id && $obce) {
-                $obec_id = (int)$obce[0]['KODZASTUP'];
+                // výchozí obec je Ostrava, pokud je v okrese k dispozici
+                $ostrava = array_filter($obce, fn($o) => (int)$o['KODZASTUP'] === 554821);
+                $obec_id = $ostrava ? 554821 : (int)$obce[0]['KODZASTUP'];
             }
             $obec_id = (int)$obec_id;
             $obec = $this->electionPlaykitRepository->getKvrosByColumn('KODZASTUP', $obec_id);
@@ -244,7 +246,9 @@ final class Web2026Controller
         try {
             $obce = $this->electionPlaykitRepository->getKvrosArrayByColumn('OKRES', $okres_id) ?: [];
             if (!$obec_id && $obce) {
-                $obec_id = (int)$obce[0]['KODZASTUP'];
+                // výchozí obec je Ostrava, pokud je v okrese k dispozici
+                $ostrava = array_filter($obce, fn($o) => (int)$o['KODZASTUP'] === 554821);
+                $obec_id = $ostrava ? 554821 : (int)$obce[0]['KODZASTUP'];
             }
             $elections = $obec_id ? $this->electionPlaykitRepository->getResultsOkresyObceForWeb($obec_id) : null;
             $elections_results = $obec_id ? $this->electionPlaykitRepository->getResultsOkresyObceTotal($obec_id) : null;
