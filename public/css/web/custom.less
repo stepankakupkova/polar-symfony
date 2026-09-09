@@ -2076,6 +2076,7 @@ button.sidenav-1.open .animated-icon2 span:nth-child(4) {
         max-height: 400px !important;
         display: unset !important;
         float: left;
+        width: 100%;
     }
     #header .header-nav-main-effect-1 nav > ul > li.dropdown:hover > .dropdown-menu {
         transform: translate3d(0, 1px, 0);
@@ -2090,9 +2091,26 @@ button.sidenav-1.open .animated-icon2 span:nth-child(4) {
     #header .header-nav-main nav > ul > li.dropdown.accessibility-open > a::before, #header .header-nav-main nav > ul > li.dropdown.open > a::before, #header .header-nav-main nav > ul > li.dropdown:hover > a::before {
         display: none;
     }
-    #header .header-nav-main nav > ul > li > a {
-        padding: .5rem 2rem;
-        /*padding: .5rem 1.5rem;*/ // zúžení menu kvůli volbám
+    #header .header-nav-main nav > ul#mainNav {
+        display: flex;
+        width: 100%;
+        > li {
+            flex: 1 1 auto;
+            text-align: center;
+            > a {
+                padding: .5rem 1rem;
+                justify-content: center;
+                width: 100%;
+                text-align: center;
+                white-space: nowrap;
+            }
+        }
+        > li:first-child {
+            flex: 0 0 auto;
+            > a {
+                padding: .5rem 1rem;
+            }
+        }
     }
     .mb-custom-4-5 {
         margin-bottom: 1rem !important;

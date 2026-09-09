@@ -35,7 +35,6 @@ return [
             'url'   => '#',
             'class' => 'p-0',
             'dropdown' => [
-                /*['label' => 'Volby 2026',           'url' => '/volby',              'order' => 3],*/
                 ['label' => 'Kam vyrazit',          'url' => '/kam-vyrazit',        'order' => 5],
                 ['label' => 'Nabídka práce',        'url' => '/nabidka-prace',      'order' => 6],
                 ['label' => 'Kamery',               'url' => '/kamery',             'order' => 7],
@@ -86,5 +85,15 @@ return [
             'icon'   => 'fa fa-fw fa-sitemap',
         ],
     ],
-    'regions' => require __DIR__ . '/news_navigation.php',
+    'regions' => (static function (): array {
+        $regions = require __DIR__ . '/news_navigation.php';
+        // TODO dočasné pro volby 2026 — po skončení voleb tento blok smazat
+        array_splice($regions, 1, 0, [[
+            'id'     => 'region-volby',
+            'label'  => 'Volby',
+            'url'    => '/volby',
+            'cities' => [],
+        ]]);
+        return $regions;
+    })(),
 ];

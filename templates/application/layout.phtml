@@ -40,7 +40,7 @@
     <link rel="stylesheet" href="<?= $view->asset('vendor/porto/css/theme-elements.min.css?ver=0.1') ?>">
     <link rel="stylesheet" href="<?= $view->asset('vendor/porto/css/theme-blog.min.css?ver=0.1') ?>">
     <link rel="stylesheet" href="<?= $view->asset('css/web/skin/skin.min.css?ver=0.1') ?>">
-    <link rel="stylesheet" href="<?= $view->asset('css/web/custom.min.css?ver=0.1') ?>">
+    <link rel="stylesheet" href="<?= $view->asset('css/web/custom.min.css?ver=0.3') ?>">
     <link rel="stylesheet" href="<?= $view->asset('css/web/print.css?ver=0.1') ?>" media="print">
 
     <script src="<?= $view->asset('vendor/web/jquery/js/jquery.min.js?ver=0.1') ?>"></script>
@@ -197,10 +197,10 @@
                             </nav>
                         </div>
                         <div class="header-nav-main header-nav-main-effect-1 header-nav-main-sub-effect-1 collapse">
-                            <div class="d-flex">
+                            <div class="d-flex w-100">
                                 <!-- Desktop hlavní menu regiony -->
-                                <div class="d-none d-lg-flex">
-                                    <nav aria-label="Regiony">
+                                <div class="d-none d-lg-flex w-100">
+                                    <nav class="w-100" aria-label="Regiony">
                                         <?= $view->include('application/navigation/menu', ['ulClass' => 'nav nav-pills']) ?>
                                     </nav>
                                 </div>
