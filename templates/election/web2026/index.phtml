@@ -177,105 +177,6 @@ foreach ($elections as $election) {
 	<div class="row sticky-square">
 
 		<div class="col-lg-7 pe-md-4">
-			<?php if ($elections) { ?>
-				<h2 class="text-primary font-weight-semibold text-5 mb-3">Volební studia</h2>
-				<p class="text-secondary text-3 font-weight-semibold line-height-6 mb-5">Představujeme lídry politických stran a hnutí pro volby do zastupitelstev obcí</p>
-				<?php foreach ($electionsByCity as $city => $cityElections) { ?>
-					<h3 class="text-primary text-5 font-weight-semibold border-bottom border-color-grey pb-2 mb-3"><?= htmlspecialchars($city) ?></h3>
-					<div class="row row-cols-1 row-cols-md-3 mb-5">
-						<?php foreach ($cityElections as $value) { ?>
-							<div class="col mb-4-5">
-								<a class="" href="<?= $view->path('show_video', ['show_url' => $value['url'], 'program_url' => $value['program_url']]) ?>" title="<?= htmlspecialchars($value['title']) ?>" target="_blank">
-									<span class="thumb-info thumb-info-lighten mb-2">
-										<span class="thumb-info-wrapper">
-											<?php
-												if (file_exists($PUBLIC_PATH . '/data/program/thumbs/' . $value['name'] . '.jpg')) {
-													$image = '/data/program/thumbs/' . $value['name'] . '.jpg';
-												} else {
-													$image = '/data/program/show/!default-show.png';
-												}
-											?>
-											<img src="<?= $image ?>" class="img-fluid" alt="<?= htmlspecialchars($value['title']) ?>">
-											<span class="thumb-info-action">
-												<span class="thumb-info-action-icon">
-													<i class="fas fa-play"></i>
-													<span class="player_duration"><?= $value['duration'] ? gmdate("i:s", $value['duration']) : ''; ?></span>
-												</span>
-											</span>
-										</span>
-									</span>
-								</a>
-								<a class="" href="<?= $view->path('show_video', ['show_url' => $value['url'], 'program_url' => $value['program_url']]) ?>" title="<?= htmlspecialchars($value['title']) ?>" target="_blank">
-									<h4 class="text-4 text-secondary font-weight-semibold line-height-5 mb-1"><?= htmlspecialchars($value['title']) ?></h4>
-								</a>
-								<div class="line-height-6"><?= htmlspecialchars($value['description']) ?></div>
-							</div>
-						<?php } ?>
-					</div>
-				<?php } ?>
-			<?php } ?>
-
-			<?php if (!$elections) { ?>
-				<div class="row">
-					<?php $k = 0; ?>
-					<div class="col-12 p-relative">
-						<aside class="section-best-news" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 63}}">
-							<!-- Živé vysílání + počasí -->
-							<div class="row d-none d-lg-flex mb-4">
-								<div class="col-8">
-									<div id="video-container" class="ratio ratio-16x9">
-										<video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
-											<source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
-											<p class="vjs-no-js">
-												Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.
-											</p>
-										</video>
-									</div>
-								</div>
-								<div class="col-4">
-									<?php if ($weather) { ?>
-										<div class="text-primary font-weight-semibold text-3-4 mb-4">Počasí - <?= $weather_region; ?></div>
-										<?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
-										<?php foreach ($weather as $weather_item) { ?>
-											<div class="row text-secondary text-3-4 mb-2">
-												<div class="col-5">
-													<?= isset($days[$m]) ? $days[$m] : ''; ?>
-												</div>
-												<div class="col-3 px-2">
-													<img src="<?= $view->asset('/img/web/weather/' . $weather_item['status'] . '.png') ?>" class="img-fluid" alt="" />
-												</div>
-												<div class="col-4">
-													<?= $weather_item['temperature_day']; ?>°C
-												</div>
-											</div>
-											<?php $m++; ?>
-										<?php } ?>
-									<?php } ?>
-								</div>
-							</div>
-							<!-- END Živé vysílání + počasí -->
-
-							<?php // REKLAMA ?>
-							<!-- reklama nad PR -->
-							<?= $view->include('banner/web/partial/ads/article-right-top', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
-
-							<!-- PR články -->
-							<?php $pr_block = []; ?>
-							<?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
-							<?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
-							<?php $k = $k + 2; ?>
-							<br />
-							<?php // REKLAMA ?>
-							<!-- reklama pod PR -->
-							<?= $view->include('banner/web/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
-							<br class="d-none d-lg-inline" />
-						</aside>
-					</div>
-				</div>
-			<?php } ?>
-		</div>
-
-        <div class="col-lg-5">
 			<?php if ($articles) { ?>
 				<h2 class="text-primary font-weight-semibold text-5 mb-4">Volební zpravodajství</h2>
                 <?php foreach ($articles as $key => $item) { ?>
@@ -423,12 +324,110 @@ foreach ($elections as $election) {
 					</div>
 				</div>
 			<?php } ?>
-			<!-- END Volební zprávy -->
-	
+			<!-- END Volební zprávy -->			
+		</div>
+
+        <div class="col-lg-5">
+			<?php if ($elections) { ?>
+				<h2 class="text-primary font-weight-semibold text-5 mb-3">Volební studia</h2>
+				<p class="text-secondary text-3 font-weight-semibold line-height-6 mb-5">Představujeme lídry politických stran a hnutí pro volby do zastupitelstev obcí</p>
+				<?php foreach ($electionsByCity as $city => $cityElections) { ?>
+					<h3 class="text-primary text-5 font-weight-semibold border-bottom border-color-grey pb-2 mb-3"><?= htmlspecialchars($city) ?></h3>
+					<div class="row row-cols-1 row-cols-md-3 mb-5">
+						<?php foreach ($cityElections as $value) { ?>
+							<div class="col mb-4-5">
+								<a class="" href="<?= $view->path('show_video', ['show_url' => $value['url'], 'program_url' => $value['program_url']]) ?>" title="<?= htmlspecialchars($value['title']) ?>" target="_blank">
+									<span class="thumb-info thumb-info-lighten mb-2">
+										<span class="thumb-info-wrapper">
+											<?php
+												if (file_exists($PUBLIC_PATH . '/data/program/thumbs/' . $value['name'] . '.jpg')) {
+													$image = '/data/program/thumbs/' . $value['name'] . '.jpg';
+												} else {
+													$image = '/data/program/show/!default-show.png';
+												}
+											?>
+											<img src="<?= $image ?>" class="img-fluid" alt="<?= htmlspecialchars($value['title']) ?>">
+											<span class="thumb-info-action">
+												<span class="thumb-info-action-icon">
+													<i class="fas fa-play"></i>
+													<span class="player_duration"><?= $value['duration'] ? gmdate("i:s", $value['duration']) : ''; ?></span>
+												</span>
+											</span>
+										</span>
+									</span>
+								</a>
+								<a class="" href="<?= $view->path('show_video', ['show_url' => $value['url'], 'program_url' => $value['program_url']]) ?>" title="<?= htmlspecialchars($value['title']) ?>" target="_blank">
+									<h4 class="text-4 text-secondary font-weight-semibold line-height-5 mb-1"><?= htmlspecialchars($value['title']) ?></h4>
+								</a>
+								<div class="line-height-6"><?= htmlspecialchars($value['description']) ?></div>
+							</div>
+						<?php } ?>
+					</div>
+				<?php } ?>
+			<?php } ?>
+
+			<?php if (!$elections) { ?>
+				<div class="row">
+					<?php $k = 0; ?>
+					<div class="col-12 p-relative">
+						<aside class="section-best-news" data-plugin-sticky data-plugin-options="{'minWidth': 991, 'containerSelector': '.sticky-square', 'padding': {'top': 63}}">
+							<!-- Živé vysílání + počasí -->
+							<div class="row d-none d-lg-flex mb-4">
+								<div class="col-8">
+									<div id="video-container" class="ratio ratio-16x9">
+										<video id="playerLiveSDHD" class="video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" style="position:absolute;top:0;left:0;overflow:hidden;" height="100%" width="100%" poster="/img/web/poster-hd.png">
+											<source src="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8" type="application/x-mpegURL">
+											<p class="vjs-no-js">
+												Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="https://stream.polar.cz:443/polar/polarlive-2/playlist.m3u8">stream</a>.
+											</p>
+										</video>
+									</div>
+								</div>
+								<div class="col-4">
+									<?php if ($weather) { ?>
+										<div class="text-primary font-weight-semibold text-3-4 mb-4">Počasí - <?= $weather_region; ?></div>
+										<?php $days = ['Dnes', 'Zítra', 'Pozítří']; $m = 0; ?>
+										<?php foreach ($weather as $weather_item) { ?>
+											<div class="row text-secondary text-3-4 mb-2">
+												<div class="col-5">
+													<?= isset($days[$m]) ? $days[$m] : ''; ?>
+												</div>
+												<div class="col-3 px-2">
+													<img src="<?= $view->asset('/img/web/weather/' . $weather_item['status'] . '.png') ?>" class="img-fluid" alt="" />
+												</div>
+												<div class="col-4">
+													<?= $weather_item['temperature_day']; ?>°C
+												</div>
+											</div>
+											<?php $m++; ?>
+										<?php } ?>
+									<?php } ?>
+								</div>
+							</div>
+							<!-- END Živé vysílání + počasí -->
+
+							<?php // REKLAMA ?>
+							<!-- reklama nad PR -->
+							<?= $view->include('banner/web/partial/ads/article-right-top', ['bannerRectangle' => $bannerRectangle ?? null]) ?>
+
+							<!-- PR články -->
+							<?php $pr_block = []; ?>
+							<?php if (isset($pr[$k])) {$pr_block[] = $pr[$k];} if (isset($pr[$k+1])) {$pr_block[] = $pr[$k+1];} ?>
+							<?= $view->include('news/partial/pr-block', ['pr_block' => $pr_block]) ?>
+							<?php $k = $k + 2; ?>
+							<br />
+							<?php // REKLAMA ?>
+							<!-- reklama pod PR -->
+							<?= $view->include('banner/web/partial/ads/article-right-bottom', ['bannerSquare' => $bannerSquare ?? null]) ?>
+							<br class="d-none d-lg-inline" />
+						</aside>
+					</div>
+				</div>
+			<?php } ?>	
         </div>
 	</div>
 
 	<div class="text-secondary text-2 mt-4 mb-5">
-		Pořad "Volební studio POLAR" bylo z kapacitních důvodů možné vyrábět a vysílat pouze pro 6 největších měst MS kraje a bylo možné představit pouze 5 kandidujících subjektů (v Ostravě 8). Kandidující subjekty byly pozvány na základě výsledků průzkumu volebních preferencí v těchto městech.
+		Pořad "Volební studio POLAR" bylo z kapacitních důvodů možné vyrábět a vysílat pouze pro 6 největších měst MS kraje a bylo možné představit pouze 5 kandidujících subjektů (v Ostravě 8). Kandidující subjekty byly pozvány na základě výsledků průzkumu volebních preferencí v těchto městech. Průzkum provedla agentura Datamar International k 1. 9. 2026.
 	</div>
 </div>
