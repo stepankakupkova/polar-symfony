@@ -16,6 +16,9 @@ $view->addBodyScript($view->asset('vendor/admin/file-upload/js/file-upload.js'))
 $view->addInlineScript(
     'var player = videojs("video");
     $("#createPreview").click(function(){
+        var $btn = $(this);
+        if ($btn.prop("disabled")) return;
+        $btn.prop("disabled", true);
         var currentPos = Math.round(player.currentTime());
         player.pause();
         $.post("' . $view->path('admin_program_video_json_create_preview') . '",
@@ -39,7 +42,9 @@ $view->addInlineScript(
                 }
             }, 
             "json"      
-        );
+        ).always(function() {
+            $btn.prop("disabled", false);
+        });
     });'
 );
 

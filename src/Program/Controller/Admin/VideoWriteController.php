@@ -476,10 +476,21 @@ final class VideoWriteController
 		}
 
 		try {
-			$command = 'ffmpeg -y -ss ' . $sec . ' -i "' . $file . '" -vcodec mjpeg -qscale 7 -vframes 1 -an -f rawvideo -s 460x259 "' . $this->PUBLIC_PATH . '/' . $preview . '"';
-			exec($command);
-			$command = 'ffmpeg -y -ss ' . $sec . ' -i "' . $file . '" -vcodec mjpeg -qscale 7 -vframes 1 -an -f rawvideo -s 260x146 "' . $this->PUBLIC_PATH . '/' . $preview2 . '"';
-			exec($command);
+			// Zápis do dočasného souboru + atomický rename, ať náhled nejde přečíst částečně dopsaný
+			$tmp1 = $this->PUBLIC_PATH . '/' . $preview . '.tmp';
+			$tmp2 = $this->PUBLIC_PATH . '/' . $preview2 . '.tmp';
+
+			$command = 'ffmpeg -y -ss ' . $sec . ' -i "' . $file . '" -vcodec mjpeg -qscale 7 -vframes 1 -an -f rawvideo -s 460x259 "' . $tmp1 . '"';
+			exec($command, $output1, $resultCode1);
+			$command = 'ffmpeg -y -ss ' . $sec . ' -i "' . $file . '" -vcodec mjpeg -qscale 7 -vframes 1 -an -f rawvideo -s 260x146 "' . $tmp2 . '"';
+			exec($command, $output2, $resultCode2);
+
+			if ($resultCode1 === 0 && file_exists($tmp1)) {
+				rename($tmp1, $this->PUBLIC_PATH . '/' . $preview);
+			}
+			if ($resultCode2 === 0 && file_exists($tmp2)) {
+				rename($tmp2, $this->PUBLIC_PATH . '/' . $preview2);
+			}
 
 			// Log
 			$logger->notice('PROGRAM - Load videos - Create preview', [

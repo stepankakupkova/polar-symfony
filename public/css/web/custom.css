@@ -132,6 +132,9 @@ h6 {
 .color-1e1e1e {
   color: #1e1e1e;
 }
+html .bg-color-light-scale-1 {
+  background-color: #f6f7f9 !important;
+}
 .btn-grey {
   background-color: #a7a7a7;
   border-color: #a7a7a7;
@@ -1243,6 +1246,63 @@ select#elections_obce {
   padding: 3px 5px;
   background-color: #fff;
   min-width: 235px;
+}
+@media (max-width: 991.98px) {
+  .election-party-header h2 {
+    font-weight: 700;
+  }
+  .election-party-statistics {
+    margin: 0.75rem auto 0;
+    padding: 0.8rem 1rem 0.6rem 1rem;
+    width: calc(100% - 24px);
+    justify-content: center;
+    background-color: #f6f7f9;
+  }
+  .election-party-statistics h4 {
+    font-size: 16px !important;
+    font-weight: 400;
+  }
+  .election-party-statistics h4 + h4 {
+    padding-left: 1rem;
+    border-left: 1px solid #dfe3e8;
+  }
+  .election-party-statistics h4:first-child {
+    padding-right: 1rem;
+  }
+  .election-party-statistics i {
+    margin-right: 0.65rem;
+    color: #990000;
+  }
+  .election-candidate-card {
+    padding: 0.75rem !important;
+    border-color: #e4e7eb !important;
+  }
+  .election-candidate-number {
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background-color: #990000;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .election-candidate-mandat {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    background-color: #990000;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .election-candidate-mandat i {
+    margin-right: 0.3rem;
+    color: #fff;
+  }
 }
 .elections .progress {
   overflow: hidden !important;
