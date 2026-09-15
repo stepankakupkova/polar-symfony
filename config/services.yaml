@@ -105,6 +105,10 @@ services:
         resource: '../src/Rss/Controller/Web/'
         tags: ['controller.service_arguments']
 
+    App\Application\Service\RoutingCacheInvalidator:
+        arguments:
+            $cacheDir: '%kernel.cache_dir%'
+
     App\Application\View\PhtmlRenderer:
         arguments:
             $templatesDir: '%kernel.project_dir%/templates'

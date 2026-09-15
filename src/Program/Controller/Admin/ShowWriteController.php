@@ -4,6 +4,7 @@ namespace App\Program\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
 use App\Application\Service\Logger;
+use App\Application\Service\RoutingCacheInvalidator;
 use App\Application\View\PhtmlRenderer;
 use App\Program\Repository\ProgramRepository;
 use App\Program\Repository\SettingRepository;
@@ -31,6 +32,7 @@ final class ShowWriteController
 		private string $PUBLIC_PATH,
 		private Security $security,
 		private FlashMessenger $flashMessenger,
+		private RoutingCacheInvalidator $routingCacheInvalidator,
 	) {}
 
 	public function add(
@@ -803,6 +805,7 @@ final class ShowWriteController
 		}
 
 		file_put_contents($routesDir . 'program_show_generated.yaml', $yaml);
+		$this->routingCacheInvalidator->invalidate();
 	}
 
 	private function exportArray(array $array, int $indent = 0): string

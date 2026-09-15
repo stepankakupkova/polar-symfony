@@ -4,6 +4,7 @@ namespace App\Page\Controller\Admin;
 
 use App\Application\Service\FlashMessenger;
 use App\Application\Service\Logger;
+use App\Application\Service\RoutingCacheInvalidator;
 use App\Application\View\PhtmlRenderer;
 use App\Page\Repository\PageRepository;
 use App\Page\Repository\PageSettingRepository;
@@ -38,6 +39,7 @@ final class PageWriteController
 		private Security $security,
 		private UrlGeneratorInterface $urlGenerator,
 		private string $PUBLIC_PATH,
+		private RoutingCacheInvalidator $routingCacheInvalidator,
 	) {
 		$this->imageDefault = 'data/page/!default-page.png';
 	}
@@ -981,6 +983,7 @@ final class PageWriteController
 		}
 
 		file_put_contents($configDir . 'routes/page_generated.yaml', $yaml);
+		$this->routingCacheInvalidator->invalidate();
 
 		// 2. Vygenerování navigace (PHP)
 		$buildNavigation = function (string $lang, bool $header, ?int $parent = null) use (&$buildNavigation): array {
