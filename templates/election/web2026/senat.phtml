@@ -1,0 +1,178 @@
+<?php
+
+/** @var \App\Application\View\ViewHelper $view */
+
+$view->setTitle('Senát | Volby 2026');
+$view->addMeta('description', 'Výsledky senátních voleb 2026 v Moravskoslezském kraji.');
+$view->addMeta('keywords', 'volby 2026, senát, senátní volby, Moravskoslezský kraj');
+
+$currentUrl = $currentUrl ?? '';
+$view->addOgMeta('og:title', 'Senát | Volby 2026 | Televize POLAR');
+$view->addOgMeta('og:description', 'Výsledky senátních voleb 2026 v Moravskoslezském kraji.');
+$view->addOgMeta('og:url', $currentUrl);
+$view->addOgMeta('og:type', 'website');
+$view->addOgMeta('og:site_name', 'polar.cz');
+$view->addOgMeta('og:image', '/img/web/volby/microformat_2026.png');
+$view->addOgMeta('og:image:secure_url', '/img/web/volby/microformat_2026.png');
+$view->addOgMeta('og:image:width', '1920');
+$view->addOgMeta('og:image:height', '1080');
+
+$view->setBreadcrumbs([
+    ['label' => 'Volby 2026', 'url' => $view->path('election_2026')],
+    ['label' => 'Senát'],
+]);
+
+$view->addInlineScript(
+    '// Ticker
+    getTickerData();
+    interval = startTicker();
+    // Crawl
+    getCrawlData();'
+);
+
+$view->addInlineScript(
+    '
+    $(".elections_menu nav > ul.nav-pills").on("click", "li:not(.open) > a", function(){
+        $(this).parent().addClass("open");
+    });
+    $(".elections_menu nav > ul.nav-pills").on("click", "li.open > a", function(){
+        $(this).parent().removeClass("open");
+    });
+    $(".elections_menu nav ul.nav-pills li a:not(.active)").hover(function(){
+        $(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#0f375a");
+    }, function(){
+        $(".elections_menu nav > ul.nav-pills > li > a.nav-link.active").css("background-color", "#900");
+    });
+    '
+);
+
+// Výsledky se po skončení sčítání doplní ručně do tohoto pole.
+$senatniObvody = [
+    [
+        'nazev' => 'Ostrava',
+        'kolo2' => [
+            //['jmeno' => 'Ing. Jana Nováková, Nezávislí', 'popis' => '52 let, starostka městského obvodu', 'procenta' => '58.40'],
+            //['jmeno' => 'Mgr. Petr Svoboda, Občané', 'popis' => '61 let, lékař', 'procenta' => '41.60'],
+        ],
+        'kolo1' => [
+            //['jmeno' => 'Ing. Jana Nováková, Nezávislí', 'popis' => '52 let, starostka městského obvodu', 'procenta' => '34.25'],
+            //['jmeno' => 'Mgr. Petr Svoboda, Občané', 'popis' => '61 let, lékař', 'procenta' => '27.80'],
+            //['jmeno' => 'Bc. Martin Dvořák, Hnutí pro Ostravu', 'popis' => '45 let, podnikatel', 'procenta' => '19.15'],
+        ],
+    ],
+    [
+        'nazev' => 'Karviná',
+        'kolo2' => [
+            //['jmeno' => 'Bc. Lucie Malá, Za Karvinsko', 'popis' => '48 let, místostarostka', 'procenta' => '52.10'],
+            //['jmeno' => 'Ing. Tomáš Velký, Nezávislí', 'popis' => '56 let, ředitel společnosti', 'procenta' => '47.90'],
+        ],
+        'kolo1' => [
+            //['jmeno' => 'Bc. Lucie Malá, Za Karvinsko', 'popis' => '48 let, místostarostka', 'procenta' => '31.50'],
+            //['jmeno' => 'Ing. Tomáš Velký, Nezávislí', 'popis' => '56 let, ředitel společnosti', 'procenta' => '26.40'],
+            //['jmeno' => 'JUDr. Pavel Černý, Občané', 'popis' => '63 let, advokát', 'procenta' => '22.10'],
+        ],
+    ],
+    [
+        'nazev' => 'Opava',
+        'kolo2' => [
+            //['jmeno' => 'Mgr. Eva Veselá, Společně pro Opavsko', 'popis' => '50 let, primátorka', 'procenta' => '61.75'],
+            //['jmeno' => 'Ing. Milan Horák, Nezávislí', 'popis' => '59 let, podnikatel', 'procenta' => '38.25'],
+        ],
+        'kolo1' => [
+            //['jmeno' => 'Mgr. Eva Veselá, Společně pro Opavsko', 'popis' => '50 let, primátorka', 'procenta' => '39.20'],
+            //['jmeno' => 'Ing. Milan Horák, Nezávislí', 'popis' => '59 let, podnikatel', 'procenta' => '25.80'],
+            //['jmeno' => 'Bc. Adam Procházka, Občané', 'popis' => '44 let, učitel', 'procenta' => '18.60'],
+        ],
+    ],
+];
+
+?>
+
+<section class="page-header page-header-modern bg-color-light-scale-1 page-header-sm mb-0 mb-lg-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 align-self-center order-1">
+                <?= $view->include('application/navigation/breadcrumb') ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div id="crawl" class="mb-2 hide">
+                <div id="crawlIcon">Mimořádná zpráva:</div>
+                <div class="crawl-container"><div>Načítám...</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="ticker" role="region" aria-label="Přehled zpráv" class="mb-3">
+                <h2 class="visually-hidden">Přehled zpráv</h2>
+                <div id="tickerIcon"></div>
+                <div class="ticker-container">
+                    <ul><div class="ticker-active"><li><span>Načítám...</span></li></div></ul>>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-2-3">
+                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+                    <a href="<?= $view->path('election_2026') ?>" title="Komunální volby 2026">
+                        <img src="/img/web/volby/volby_2026_logo.png" alt="Volby 2026" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-12 text-center">
+					<h2 class="text-secondary text-4-5 font-weight-normal">Volby do zastupitelstev obcí <span class="text-nowrap">9. a 10. října 2026</span> - Moravskoslezský kraj</h2>
+                </div>
+            </div>
+
+            <div class="row mb-4-5 elections_menu y2025">
+                <div class="col-12">
+                    <?= $view->include('election/web2026/partial/menu', ['active' => 'senat']) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-secondary text-4 text-md-5 line-height-6 font-weight-semibold">Kandidáti senátních voleb 2026, 1. a 2. kolo</h1>
+        </div>
+
+        <?php foreach ($senatniObvody as $obvod) { ?>
+            <div class="col-md-4 mb-5">
+                <h2 class="text-primary font-weight-semibold"><?= htmlspecialchars($obvod['nazev']) ?></h2>
+
+                <?php foreach ([2, 1] as $kolo) { ?>
+                    <?php $kandidati = $obvod['kolo' . $kolo]; ?>
+                    <?php if ($kandidati) { ?>
+                        <div class="mb-4">
+                            <h2 class="text-primary font-weight-semibold">Výsledky <?= $kolo ?>. kola</h2>
+                        </div>
+
+                        <?php foreach ($kandidati as $kandidat) { ?>
+                            <div class="progress-bars elections mb-5">
+                                <div class="progress-label clearfix">
+                                    <h2 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h2>
+                                    <h3 class="text-3 font-weight-regular mb-2"><?= htmlspecialchars($kandidat['popis']) ?></h3>
+                                </div>
+                                <div class="progress-label float-start line-height-2" style="width: 70px;">
+                                    <span class="text-3 font-weight-bold"><?= number_format((float)$kandidat['procenta'], 2, ',', ' ') ?>%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" aria-valuenow="<?= htmlspecialchars($kandidat['procenta']) ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= htmlspecialchars($kandidat['procenta']) ?>%; background-color: #990000;"></div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+
+                <?php if (!$obvod['kolo1'] && !$obvod['kolo2']) { ?>
+                    <p>Výsledky budou doplněny po skončení sčítání.</p>
+                <?php } ?>
+            </div>
+        <?php } ?>
+    </div>
+</div>

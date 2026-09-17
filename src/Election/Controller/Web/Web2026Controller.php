@@ -310,4 +310,13 @@ final class Web2026Controller
         ]));
     }
 
+    public function senat(Request $request, PhtmlRenderer $renderer): Response
+    {
+        $actual_link = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+
+        return new Response($renderer->renderWithLayout('election/web2026/senat', [
+            'currentUrl' => $actual_link,
+        ]));
+    }
+
 }

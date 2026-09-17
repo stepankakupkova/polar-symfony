@@ -14,6 +14,9 @@ $active = $active ?? null;
 		<li class="nav-item flex-fill">
 			<a class="nav-link text-center text-4 <?= $active === 'obec' ? 'active' : '' ?>" href="<?= $view->path('election_2026_obec', ['okres' => 8106]) ?>">Vaše obec</a>
 		</li>
+		<li class="nav-item flex-fill">
+			<a class="nav-link text-center text-4 <?= $active === 'senat' ? 'active' : '' ?>" href="<?= $view->path('election_2026_senat') ?>">Senát</a>
+		</li>
 		<li class="nav-item dropdown flex-fill">
 			<a class="dropdown-item dropdown-toggle d-flex align-items-center justify-content-center text-4 nav-link" href="#" data-bs-toggle="dropdown">Archiv</a>
 			<ul class="dropdown-menu">

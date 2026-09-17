@@ -33,6 +33,10 @@ election_2026_obec_detail:
     okres: '[0-9]+'
     obec: '[0-9]+'
 
+election_2026_senat:
+  path: /volby/senat
+  controller: App\Election\Controller\Web\Web2026Controller::senat
+
 # Web — Volby 2025
 election_2025:
   path: /volby-2025
