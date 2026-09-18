@@ -100,13 +100,13 @@ class Election2026PlaykitRepository
     public function getResultsOkresyObceForWeb(int $obec_id): ?array
     {
         $result = $this->connection->createQueryBuilder()
-            ->select('*')
+            ->select('VSTRANA', 'NAZEV_STRANY', 'VOLEBNI_STRANA_HLASY', 'VOLEBNI_STRANA_HLASY_PROC')
             ->from('polar_electionszo2026_results_obce')
             ->where('KODZASTUP = :obec_id')
             ->setParameter('obec_id', $obec_id)
             ->orderBy('VOLEBNI_STRANA_HLASY', 'DESC')
             ->addOrderBy('LOWER(NAZEV_STRANY) COLLATE utf8_czech_ci', 'ASC')
-            ->groupBy('NAZEV_STRANY')
+            ->groupBy('VSTRANA', 'NAZEV_STRANY', 'VOLEBNI_STRANA_HLASY', 'VOLEBNI_STRANA_HLASY_PROC')
             ->fetchAllAssociative();
 
         return $result ?: null;
@@ -137,12 +137,12 @@ class Election2026PlaykitRepository
     public function getKvrosArrayByColumn(string $column, int|string $value): ?array
     {
         $result = $this->connection->createQueryBuilder()
-            ->select('*')
+            ->select('KODZASTUP', 'OKRES', 'NAZEVZAST')
             ->from('polar_electionszo2026_kvros')
             ->where($column . ' = :value')
             ->setParameter('value', $value)
             ->orderBy('LOWER(NAZEVZAST) COLLATE utf8_czech_ci', 'ASC')
-            ->groupBy('KODZASTUP')
+            ->groupBy('KODZASTUP', 'OKRES', 'NAZEVZAST')
             ->fetchAllAssociative();
 
         return $result ?: null;

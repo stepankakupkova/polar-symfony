@@ -11,6 +11,7 @@ use App\News\Repository\PlaykitRepository;
 use App\Program\Repository\ShowRepository;
 use App\Application\View\PhtmlRenderer;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,6 +42,7 @@ final class Web2026Controller
      * @param Election2026PlaykitRepository $electionPlaykitRepository
      * @param ShowRepository $showRepository
      * @param UrlGeneratorInterface $urlGenerator
+    * @param LoggerInterface $logger
      */
     public function __construct(
         private ElectionRepository2026 $electionRepository,
@@ -49,6 +51,7 @@ final class Web2026Controller
         private Election2026PlaykitRepository $electionPlaykitRepository,
         private ShowRepository $showRepository,
         private UrlGeneratorInterface $urlGenerator,
+        private LoggerInterface $logger,
     ) {}
 
     public function index(Request $request, PhtmlRenderer $renderer): Response
@@ -254,15 +257,22 @@ final class Web2026Controller
             $elections_results = $obec_id ? $this->electionPlaykitRepository->getResultsOkresyObceTotal($obec_id) : null;
             if ($elections_results) $elections_results = (array)$elections_results;
 
-            for ($i=0, $iMax = count($elections ?? []); $i< $iMax; $i++) {
-                $elections[$i]['barva'] = isset($this->colors[$elections[$i]['VSTRANA']]) ? $this->colors[$i]['VSTRANA'] : "#ccc";
+                foreach ($elections ?? [] as $key => $election) {
+                    $elections[$key]['barva'] = isset($this->colors[$election['VSTRANA']]) ? $this->colors[$election['VSTRANA']] : "#ccc";
             }
             if ($obec_id) {
                 $obec = $this->electionPlaykitRepository->getKvrosByColumn('KODZASTUP', $obec_id);
             }
         } catch (\Exception $ex) {
-            return new RedirectResponse($this->urlGenerator->generate('election_2026_obec', ['okres' => $okres_id]));
-            //var_dump($ex->getMessage());
+            if ($_ENV['APP_ENV'] === 'dev') {
+                throw $ex;
+            }
+            $this->logger->error('Načtení stránky Vaše obec pro volby 2026 selhalo.', [
+                'okres' => $okres_id,
+                'obec' => $obec_id,
+                'exception' => $ex,
+            ]);
+            return new RedirectResponse($this->urlGenerator->generate('election_2026'));
         }
         //var_dump($elections_results);
 
