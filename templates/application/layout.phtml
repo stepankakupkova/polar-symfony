@@ -45,7 +45,7 @@
 
     <script src="<?= $view->asset('vendor/web/jquery/js/jquery.min.js?ver=0.1') ?>"></script>
     <script src="<?= $view->asset('vendor/web/modernizr/js/modernizr.min.js?ver=0.1') ?>"></script>
-    <script src="<?= $view->asset('js/web/custom.min.js?ver=0.1') ?>"></script>
+    <script src="<?= $view->asset('js/web/custom.min.js?ver=0.2') ?>"></script>
     <script type="text/javascript" 
         data-cmp-ab="1" 
         src="https://cdn.consentmanager.net/delivery/js/semiautomatic.min.js" 
@@ -433,8 +433,8 @@
             const isInViewportOffset = 0;
             $('#bannerLeaderboard, #bannerRectangle, #bannerSquare, #bannerMobilesticky, #bannerMobilesquare1, #bannerMobilesquare2').isInViewport(function(status) {
                 if (status === 'entered') {
-                    var type = $(this).attr('data-type');
-                    var id   = $(this).attr('data-id');
+                    var type = this.attr('data-type');
+                    var id   = this.attr('data-id');
                     if (
                         (type === 'leaderboard'   && !bannerLeaderboardShowed) ||
                         (type === 'rectangle'     && !bannerRectangleShowed) ||

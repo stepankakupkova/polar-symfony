@@ -255,7 +255,7 @@ $(function() {
 });
 
 function bannerCountClick(type, id) {
-    $.post("/banner/json-write/set-clicked",
+    $.post("/banner/set-clicked",
         {
             type: type,
             id: id
