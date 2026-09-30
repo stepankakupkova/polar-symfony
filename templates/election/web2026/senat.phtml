@@ -46,43 +46,49 @@ $view->addInlineScript(
     '
 );
 
-// Výsledky se po skončení sčítání doplní ručně do tohoto pole.
+// Kandidáti a výsledky jednotlivých kol.
 $senatniObvody = [
     [
-        'nazev' => 'Ostrava',
-        'kolo2' => [
-            //['jmeno' => 'Ing. Jana Nováková, Nezávislí', 'popis' => '52 let, starostka městského obvodu', 'procenta' => '58.40'],
-            //['jmeno' => 'Mgr. Petr Svoboda, Občané', 'popis' => '61 let, lékař', 'procenta' => '41.60'],
-        ],
+        'cislo' => 69,
+        'nazev' => 'Frýdek-Místek',
         'kolo1' => [
-            //['jmeno' => 'Ing. Jana Nováková, Nezávislí', 'popis' => '52 let, starostka městského obvodu', 'procenta' => '34.25'],
-            //['jmeno' => 'Mgr. Petr Svoboda, Občané', 'popis' => '61 let, lékař', 'procenta' => '27.80'],
-            //['jmeno' => 'Bc. Martin Dvořák, Hnutí pro Ostravu', 'popis' => '45 let, podnikatel', 'procenta' => '19.15'],
+            ['jmeno' => 'Petr Hrnčárek (KSČM)', 'procenta' => null],    // např. 34.25
+            ['jmeno' => 'Petr Korč (Naše Město F-M)', 'procenta' => null],
+            ['jmeno' => 'Nela Lisková (NEZLOMNÍ)', 'procenta' => null],
+            ['jmeno' => 'René Hompora (Švýcarská dem.)', 'procenta' => null],
+            ['jmeno' => 'Tomáš Krpel (SPD)', 'procenta' => null],
+            ['jmeno' => 'Helena Pešatová (STAN)', 'procenta' => null],
+            ['jmeno' => 'Zdeněk Navrátil (Evo)', 'procenta' => null],
         ],
+        'kolo2' => [],
     ],
     [
+        'cislo' => 72,
+        'nazev' => 'Ostrava-město',
+        'kolo1' => [
+            ['jmeno' => 'Milan Loprais (SPD a PRO)', 'procenta' => null],
+            ['jmeno' => 'Petr Jančík (Ostravak)', 'procenta' => null],
+            ['jmeno' => 'Ondřej Šimetka (ODS)', 'procenta' => null],
+            ['jmeno' => 'Lucie Baránková Vilamová (ANO)', 'procenta' => null],
+            ['jmeno' => 'Radoslav Štědroň (Švýcarská dem.)', 'procenta' => null],
+            ['jmeno' => 'Radek Iwoniak (ČSSD)', 'procenta' => null],
+            ['jmeno' => 'Štefan Režný (ReMeK)', 'procenta' => null],
+        ],
+        'kolo2' => [],
+    ],
+    [
+        'cislo' => 75,
         'nazev' => 'Karviná',
-        'kolo2' => [
-            //['jmeno' => 'Bc. Lucie Malá, Za Karvinsko', 'popis' => '48 let, místostarostka', 'procenta' => '52.10'],
-            //['jmeno' => 'Ing. Tomáš Velký, Nezávislí', 'popis' => '56 let, ředitel společnosti', 'procenta' => '47.90'],
-        ],
         'kolo1' => [
-            //['jmeno' => 'Bc. Lucie Malá, Za Karvinsko', 'popis' => '48 let, místostarostka', 'procenta' => '31.50'],
-            //['jmeno' => 'Ing. Tomáš Velký, Nezávislí', 'popis' => '56 let, ředitel společnosti', 'procenta' => '26.40'],
-            //['jmeno' => 'JUDr. Pavel Černý, Občané', 'popis' => '63 let, advokát', 'procenta' => '22.10'],
+            ['jmeno' => 'Aleš Polách (ODS)', 'procenta' => null],
+            ['jmeno' => 'Mariam Szyja (Piráti)', 'procenta' => null],
+            ['jmeno' => 'Pavel Staněk (SPD)', 'procenta' => null],
+            ['jmeno' => 'Karel Světnička (JaSaN)', 'procenta' => null],
+            ['jmeno' => 'Lenka Brzyszkowská (ANO)', 'procenta' => null],
+            ['jmeno' => 'Roman Galia (SOCDEM)', 'procenta' => null],
+            ['jmeno' => 'Petr Kazík (OK)', 'procenta' => null],
         ],
-    ],
-    [
-        'nazev' => 'Opava',
-        'kolo2' => [
-            //['jmeno' => 'Mgr. Eva Veselá, Společně pro Opavsko', 'popis' => '50 let, primátorka', 'procenta' => '61.75'],
-            //['jmeno' => 'Ing. Milan Horák, Nezávislí', 'popis' => '59 let, podnikatel', 'procenta' => '38.25'],
-        ],
-        'kolo1' => [
-            //['jmeno' => 'Mgr. Eva Veselá, Společně pro Opavsko', 'popis' => '50 let, primátorka', 'procenta' => '39.20'],
-            //['jmeno' => 'Ing. Milan Horák, Nezávislí', 'popis' => '59 let, podnikatel', 'procenta' => '25.80'],
-            //['jmeno' => 'Bc. Adam Procházka, Občané', 'popis' => '44 let, učitel', 'procenta' => '18.60'],
-        ],
+        'kolo2' => [],
     ],
 ];
 
@@ -143,34 +149,29 @@ $senatniObvody = [
 
         <?php foreach ($senatniObvody as $obvod) { ?>
             <div class="col-md-4 mb-5">
-                <h2 class="text-primary font-weight-semibold"><?= htmlspecialchars($obvod['nazev']) ?></h2>
-
-                <?php foreach ([2, 1] as $kolo) { ?>
+                <h2 class="text-primary font-weight-semibold mb-4"><?= htmlspecialchars($obvod['nazev']) ?></h2>
+                <?php foreach ([1, 2] as $kolo) { ?>
                     <?php $kandidati = $obvod['kolo' . $kolo]; ?>
                     <?php if ($kandidati) { ?>
-                        <div class="mb-4">
-                            <h2 class="text-primary font-weight-semibold">Výsledky <?= $kolo ?>. kola</h2>
-                        </div>
-
+                        <h3 class="text-primary font-weight-semibold mb-4">Kandidáti <?= $kolo ?>. kola</h3>
                         <?php foreach ($kandidati as $kandidat) { ?>
-                            <div class="progress-bars elections mb-5">
-                                <div class="progress-label clearfix">
-                                    <h2 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h2>
-                                    <h3 class="text-3 font-weight-regular mb-2"><?= htmlspecialchars($kandidat['popis']) ?></h3>
+                            <?php if ($kandidat['procenta'] !== null) { ?>
+                                <div class="progress-bars elections mb-4">
+                                    <div class="progress-label clearfix">
+                                        <h2 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h2>
+                                    </div>
+                                    <div class="progress-label float-start line-height-2" style="width: 70px;">
+                                        <span class="text-3 font-weight-bold"><?= number_format((float)$kandidat['procenta'], 2, ',', ' ') ?>%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" aria-valuenow="<?= htmlspecialchars((string)$kandidat['procenta']) ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= htmlspecialchars((string)$kandidat['procenta']) ?>%; background-color: #990000;"></div>
+                                    </div>
                                 </div>
-                                <div class="progress-label float-start line-height-2" style="width: 70px;">
-                                    <span class="text-3 font-weight-bold"><?= number_format((float)$kandidat['procenta'], 2, ',', ' ') ?>%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" aria-valuenow="<?= htmlspecialchars($kandidat['procenta']) ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= htmlspecialchars($kandidat['procenta']) ?>%; background-color: #990000;"></div>
-                                </div>
-                            </div>
+                            <?php } else { ?>
+                                <div class="mb-2"><?= htmlspecialchars($kandidat['jmeno']) ?></div>
+                            <?php } ?>
                         <?php } ?>
                     <?php } ?>
-                <?php } ?>
-
-                <?php if (!$obvod['kolo1'] && !$obvod['kolo2']) { ?>
-                    <p>Výsledky budou doplněny po skončení sčítání.</p>
                 <?php } ?>
             </div>
         <?php } ?>
