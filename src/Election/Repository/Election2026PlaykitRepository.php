@@ -242,14 +242,14 @@ class Election2026PlaykitRepository
             ->from('polar_electionszo2026_kvros')
             ->where('KODZASTUP IN (554821, 555088, 598917, 505927, 598003, 598810, 599069)')
             ->orderBy('LOWER(NAZEVZAST) COLLATE utf8_czech_ci', 'ASC')
-            ->addOrderBy('LOWER(NAZEVCELK) COLLATE utf8_czech_ci', 'ASC')
+            ->addOrderBy('LOWER(ZKRATKAO30) COLLATE utf8_czech_ci', 'ASC')
             ->fetchAllAssociative();
 
         $data = [['value' => null, 'label' => null]];
         foreach ($resources as $resource) {
             $data[] = [
                 'value' => $resource['OSTRANA'] . '-' . $resource['VSTRANA'] . '-' . $resource['KODZASTUP'],
-                'label' => $resource['NAZEVZAST'] . ' - ' . $resource['NAZEVCELK'],
+                'label' => $resource['NAZEVZAST'] . ' - ' . $resource['ZKRATKAO30'],
             ];
         }
         return $data;

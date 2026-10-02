@@ -33,7 +33,7 @@ final class ElectionWriteController
     public function add(Request $request): Response|RedirectResponse
     {
         $title_options = $this->electionPlaykitRepository->fetchKvrosForBootstrapSelect();
-        $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(161);
+        $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(177);
         $error = null;
 
         if ($request->isMethod('POST')) {
@@ -54,7 +54,7 @@ final class ElectionWriteController
                 }
 
                 $id = $this->electionCommand->insertPost([
-                    'title'       => $kvros['NAZEVCELK'],
+                    'title'       => $kvros['ZKRATKAO30'],
                     'description' => $post['description'] ?? '',
                     'video_id'    => !empty($post['video_id']) ? (int) $post['video_id'] : null,
                     'OSTRANA'     => $OSTRANA,
@@ -105,7 +105,7 @@ final class ElectionWriteController
         }
 
         $title_options = $this->electionPlaykitRepository->fetchKvrosForBootstrapSelect();
-        $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(161);
+        $video_options = $this->videoRepository->fetchForBootstrapSelectByShowId(177);
         $error = null;
 
         if ($request->isMethod('POST')) {
@@ -127,7 +127,7 @@ final class ElectionWriteController
 
                 $this->electionCommand->updatePost([
                     'id'          => $id,
-                    'title'       => $kvros['NAZEVCELK'],
+                    'title'       => $kvros['ZKRATKAO30'],
                     'description' => $post['description'] ?? $election['description'],
                     'video_id'    => !empty($post['video_id']) ? (int) $post['video_id'] : null,
                     'OSTRANA'     => $OSTRANA,

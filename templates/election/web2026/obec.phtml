@@ -281,7 +281,9 @@ function removeAccent($text, $replace = null): string
         </div>
 
         <div class="col-lg-5">
+			<!-- Volební zprávy -->
 			<?php if ($articles) { ?>
+				<!-- desktop -->
 				<h2 class="text-primary mb-4">Volební zpravodajství</h2>
 				<?php foreach ($articles as $key => $item) { ?>
 
@@ -412,10 +414,7 @@ function removeAccent($text, $replace = null): string
 										</span>
 										<span>
 											<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
-										--></span><!--
-										--><span><!--
-											--><?= $item['show_id'] ? '&nbsp;| <a class="" href="' . $view->path('program_show_' . $item['show_id']) . '" title="' . ($shows[$item['show_id']] ?? '') . '">' . ($shows[$item['show_id']] ?? '') . '</a>' : ''; ?>
-										</span>
+										--></span>
 									</div>
 									<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
 										<?php //= $item['anotation']; ?>
@@ -431,6 +430,7 @@ function removeAccent($text, $replace = null): string
 					</div>
 				</div>
 			<?php } ?>
+			<!-- END Volební zprávy -->
 		</div>
     </div>
 </div>
