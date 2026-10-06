@@ -612,7 +612,7 @@ $dateFormatHelper = function(DateTime $date, int $dateType, int $timeType, strin
                 <div class="container">
                     <div class="row">
                         <?php // První část článků pro regiony (3 články v šedém bloku) ?>
-                        <?php for ($i = 0; $i < 3; $i++) { ?>
+                        <?php for ($i = 0, $iMax = min(3, count($region['articles'])); $i < $iMax; $i++) { ?>
                             <?php
                                 $hide_on_mobile = '';
                                 if ($i >= 2) {
