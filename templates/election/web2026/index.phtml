@@ -177,6 +177,158 @@ foreach ($elections as $election) {
 	<div class="row sticky-square">
 
 		<div class="col-lg-7 pe-md-4">
+			<!-- Volební zprávy -->		
+			<?php if ($articles) { ?>
+				<h2 class="text-primary font-weight-semibold text-5 mb-4">Volební zpravodajství</h2>
+                <?php foreach ($articles as $key => $item) { ?>
+
+                    <?php
+					if ($item['region_url'] && $item['city_url']) {
+						$region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
+						if ($item['city_url'] === 'cely-ms-kraj') {
+							$region_city_url = $view->path('news');
+						}
+					}
+
+					try {
+						$today = new DateTime();
+						$dateUpdate = new DateTime($item['updated_date']);
+						if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+							$dayUpdate = 'Dnes';
+						} else {
+							$yesterday = new DateTime();
+							$yesterday->modify('-1 day');
+							if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
+								$dayUpdate = 'Včera';
+							} else {
+								$dayUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+							}
+						}
+						$timeUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+
+						$today = new DateTime();
+						$date = new DateTime($item['public_from']);
+						if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
+							if ($item['label']) {
+								$day = 'dnes';
+							} else {
+								$day = 'Dnes';
+							}
+						} else {
+							$yesterday = new DateTime();
+							$yesterday->modify('-1 day');
+							if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
+								if ($item['label']) {
+									$day = 'včera';
+								} else {
+									$day = 'Včera';
+								}
+							} else {
+								$day = $view->dateFormat($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
+							}
+						}
+						$time = $view->dateFormat($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
+					} catch (Exception $e) {
+						$day = 'NaN';
+						$time = 'NaN';
+						$dayUpdate = 'NaN';
+						$timeUpdate = 'NaN';
+					}
+				?>
+
+                    <div class="row mb-4-5">
+					<?php if ($item['picture']) { ?>
+						<div class="col-5 col-lg-6 pe-2 pe-md-3">
+							<div class="">
+								<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+									<span class="thumb-info thumb-info-lighten">
+										<span class="thumb-info-wrapper">
+											<img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
+											<?php if (strpos($item['picture'], '/videos/') !== false) { ?>
+												<span class="thumb-info-action">
+													<span class="thumb-info-action-icon">
+														<i class="fas fa-play"></i>
+														<span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
+													</span>
+												</span>
+											<?php } ?>
+										</span>
+									</span>
+								</a>
+							</div>
+						</div>
+						<div class="col-7 col-lg-6 ps-1 pe-3">
+							<h2 class="mb-1 mb-md-2">
+								<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+									<?= $item['title'] ?>
+								</a>
+							</h2>
+							<div class="text-1 text-tertiary line-height-7 mb-1">
+								<?php
+									$now_minus_x = new DateTime();
+									$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+									if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+										echo $item['label'];
+										echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+									} else {
+										echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+									}
+								?>
+								<span>
+									<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+								</span>
+								<span>
+									<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+								--></span>
+							</div>
+							<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+								<?= $item['anotation']; ?>
+							</p>
+						</div>
+					<?php } else { ?>
+						<div class="col-12">
+							<div class="">
+								<h2 class="mb-1 mb-md-2">
+									<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
+										<?= $item['title'] ?>
+									</a>
+								</h2>
+								<div class="text-1 text-tertiary line-height-7 mb-1">
+									<?php
+										$now_minus_x = new DateTime();
+										$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
+										if ($item['label'] && $item['updated_date'] > $now_minus_x) {
+											echo $item['label'];
+											echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+										} else {
+											echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
+										}
+									?>
+									<span>
+										<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
+									</span>
+									<span>
+										<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
+									--></span>
+								</div>
+								<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
+									<?= $item['anotation']; ?>
+								</p>
+							</div>
+						</div>
+					<?php } ?>
+					</div>
+                <?php } ?>
+				<div class="row">
+					<div class="col-12">
+						<?= $view->include('application/pagination/paginator', ['route' => 'election_2026', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
+					</div>
+				</div>
+			<?php } ?>
+			<!-- END Volební zprávy -->		
+		</div>
+
+        <div class="col-lg-5">
 			<?php if ($elections) { ?>
 				<h2 class="text-primary font-weight-semibold text-5 mb-3">Volební studia</h2>
 				<p class="text-secondary text-3 font-weight-semibold line-height-6 mb-5">Představujeme lídry politických stran a hnutí pro volby do zastupitelstev obcí</p>
@@ -272,160 +424,7 @@ foreach ($elections as $election) {
 						</aside>
 					</div>
 				</div>
-			<?php } ?>	
-		</div>
-
-        <div class="col-lg-5">
-			<!-- Volební zprávy -->
-			<?php if ($articles) { ?>
-				<!-- desktop -->
-				<h2 class="text-primary mb-4">Volební zpravodajství</h2>
-				<?php foreach ($articles as $key => $item) { ?>
-
-					<?php
-						if ($item['region_url'] && $item['city_url']) {
-							$region_city_url = $view->path('news_region_city', ['url' => $item['region_url'], 'city_url' => $item['city_url']]);
-							if ($item['city_url'] === 'cely-ms-kraj') {
-								$region_city_url = $view->path('news');
-							}
-						}
-
-						try {
-							$today = new DateTime();
-							$dateUpdate = new DateTime($item['updated_date']);
-							if ($today->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
-								$dayUpdate = 'Dnes';
-							} else {
-								$yesterday = new DateTime();
-								$yesterday->modify('-1 day');
-								if ($yesterday->format('Y-m-d') === $dateUpdate->format('Y-m-d')) {
-									$dayUpdate = 'Včera';
-								} else {
-									$dayUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
-								}
-							}
-							$timeUpdate = $view->dateFormat($dateUpdate, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
-
-							$today = new DateTime();
-							$date = new DateTime($item['public_from']);
-							if ($today->format('Y-m-d') === $date->format('Y-m-d')) {
-								if ($item['label']) {
-									$day = 'dnes';
-								} else {
-									$day = 'Dnes';
-								}
-							} else {
-								$yesterday = new DateTime();
-								$yesterday->modify('-1 day');
-								if ($yesterday->format('Y-m-d') === $date->format('Y-m-d')) {
-									if ($item['label']) {
-										$day = 'včera';
-									} else {
-										$day = 'Včera';
-									}
-								} else {
-									$day = $view->dateFormat($date, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $locale);
-								}
-							}
-							$time = $view->dateFormat($date, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $locale);
-						} catch (Exception $e) {
-							$day = 'NaN';
-							$time = 'NaN';
-							$dayUpdate = 'NaN';
-							$timeUpdate = 'NaN';
-						}
-					?>
-
-					<div class="row mb-4-5">
-						<?php if ($item['picture']) { ?>
-							<div class="col-5 pe-2 pe-md-3">
-								<div class="">
-									<a class="" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
-										<span class="thumb-info thumb-info-lighten">
-											<span class="thumb-info-wrapper">
-												<img src="<?= $item['picture'] ?>" class="img-fluid" alt="<?= $item['title'] ?>">
-												<?php if (strpos($item['picture'], '/videos/') !== false) { ?>
-													<span class="thumb-info-action">
-														<span class="thumb-info-action-icon">
-															<i class="fas fa-play"></i>
-															<span class="player_duration"><?= $item['duration'] ? gmdate("i:s", $item['duration']) : ''; ?></span>
-														</span>
-													</span>
-												<?php } ?>
-											</span>
-										</span>
-									</a>
-								</div>
-							</div>
-							<div class="col-7 ps-1 pe-3">
-								<h2 class="line-height-md-2 mb-1 mb-md-2">
-									<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
-										<?= $item['title'] ?>
-									</a>
-								</h2>
-								<div class="text-1 text-tertiary line-height-7 mb-1">
-									<?php
-										$now_minus_x = new DateTime();
-										$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
-										if ($item['label'] && $item['updated_date'] > $now_minus_x) {
-											echo $item['label'];
-											echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
-										} else {
-											echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
-										}
-									?>
-									<span>
-										<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
-									</span>
-									<span>
-										<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
-									--></span>
-								</div>
-								<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
-									<?php //= $item['anotation']; ?>
-								</p>-->
-							</div>
-						<?php } else { ?>
-							<div class="col-12">
-								<div class="">
-									<h2 class="line-height-md-2 mb-1 mb-md-22">
-										<a class="text-lg-1" href="<?= $view->path('news_region_city_article', ['url' => $item['region_url'], 'city_url' => $item['city_url'], 'article_id' => $item['article_id'], 'article_url' => $item['article_url']]) ?>" title="<?= $item['title'] ?>">
-											<?= $item['title'] ?>
-										</a>
-									</h2>
-									<div class="text-1 text-tertiary line-height-7 mb-1">
-										<?php
-											$now_minus_x = new DateTime();
-											$now_minus_x = $now_minus_x->modify('-' . $HOURS_DELETE_LABELS . ' hours')->format('Y-m-d H:i:s');
-											if ($item['label'] && $item['updated_date'] > $now_minus_x) {
-												echo $item['label'];
-												echo ' <span>' . $dayUpdate . '</span> <span>' . $timeUpdate . '</span>, <span>vydáno ' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
-											} else {
-												echo '<span>' . $day . '</span> <span>' . $time . '</span>&nbsp;|';
-											}
-										?>
-										<span>
-											<a href="<?= $region_city_url ?>" title="<?= $item['city_title'] ?>"><?= $item['city_title'] ?></a>&nbsp;|
-										</span>
-										<span>
-											<?= '<a class="" href="' . $view->path('news_redactor', ['redactor_url' => $item['author_url']]) . '" title="' . $item['author'] . '">' . $item['author'] . '</a>'; ?><!--
-										--></span>
-									</div>
-									<!--<p class="block-truncate block-truncate-3 special-hidden-xs mb-0 line-height-6">
-										<?php //= $item['anotation']; ?>
-									</p>-->
-								</div>
-							</div>
-						<?php } ?>
-					</div>
-				<?php } ?>
-				<div class="row">
-					<div class="col-12">
-						<?= $view->include('application/pagination/paginator', ['route' => 'election_2026', 'routeParams' => [], 'page' => $page, 'total' => $total, 'limit' => $limit]) ?>
-					</div>
-				</div>
-			<?php } ?>
-			<!-- END Volební zprávy -->
+			<?php } ?>		
         </div>
 	</div>
 
