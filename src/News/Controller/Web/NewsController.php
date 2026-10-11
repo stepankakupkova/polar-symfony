@@ -1223,7 +1223,7 @@ final class NewsController
 	{
 		$article_id = (int) $request->attributes->get('article_id', 0);
 		$page = (int) $request->request->get('page', 1);
-		$limit = 10;
+		$limit = 20;
 		$count = 0;
 		$html = '';
 		$refreshDate = '1970/01/01 00:00:00';

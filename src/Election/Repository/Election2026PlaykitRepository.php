@@ -100,13 +100,18 @@ class Election2026PlaykitRepository
     public function getResultsOkresyObceForWeb(int $obec_id): ?array
     {
         $result = $this->connection->createQueryBuilder()
-            ->select('VSTRANA', 'NAZEV_STRANY', 'VOLEBNI_STRANA_HLASY', 'VOLEBNI_STRANA_HLASY_PROC')
-            ->from('polar_electionszo2026_results_obce')
-            ->where('KODZASTUP = :obec_id')
+            ->select('r.VSTRANA', 'r.NAZEV_STRANY', 'r.VOLEBNI_STRANA_HLASY', 'r.VOLEBNI_STRANA_HLASY_PROC', 'r.ZASTUPITELE_POCET')
+            ->addSelect("MAX(CONCAT_WS(' ', NULLIF(k.TITULPRED, ''), k.JMENO, k.PRIJMENI, NULLIF(k.TITULZA, ''))) AS LIDR")
+            ->from('polar_electionszo2026_results_obce', 'r')
+            ->leftJoin('r', 'polar_electionszo2026_kvros', 's',
+                       's.KODZASTUP = r.KODZASTUP AND s.VSTRANA = r.VSTRANA AND s.NAZEVCELK = r.NAZEV_STRANY')
+            ->leftJoin('s', 'polar_electionszo2026_kvrk', 'k',
+                       'k.KODZASTUP = s.KODZASTUP AND k.OSTRANA = s.OSTRANA AND k.PORCISLO = 1')
+            ->where('r.KODZASTUP = :obec_id')
             ->setParameter('obec_id', $obec_id)
-            ->orderBy('VOLEBNI_STRANA_HLASY', 'DESC')
-            ->addOrderBy('LOWER(NAZEV_STRANY) COLLATE utf8_czech_ci', 'ASC')
-            ->groupBy('VSTRANA', 'NAZEV_STRANY', 'VOLEBNI_STRANA_HLASY', 'VOLEBNI_STRANA_HLASY_PROC')
+            ->orderBy('r.VOLEBNI_STRANA_HLASY', 'DESC')
+            ->addOrderBy('LOWER(r.NAZEV_STRANY) COLLATE utf8_czech_ci', 'ASC')
+            ->groupBy('r.KODZASTUP', 'r.VSTRANA', 'r.NAZEV_STRANY', 'r.VOLEBNI_STRANA_HLASY', 'r.VOLEBNI_STRANA_HLASY_PROC', 'r.ZASTUPITELE_POCET')
             ->fetchAllAssociative();
 
         return $result ?: null;

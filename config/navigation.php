@@ -91,7 +91,8 @@ return [
         array_splice($regions, 1, 0, [[
             'id'     => 'region-volby',
             'label'  => 'Volby',
-            'url'    => '/volby',
+            //'url'    => '/volby
+            'url'    => '/volby/okres/8106',
             'cities' => [],
         ]]);
         return $regions;

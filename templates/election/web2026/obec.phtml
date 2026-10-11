@@ -148,7 +148,7 @@ function removeAccent($text, $replace = null): string
             </div>
 
             <div class="row justify-content-center mb-2-3">
-                <div class="col-8 col-md-4 col-lg-3 mb-2-3 px-0">
+                <div class="col-7 col-md-4 col-lg-3 mb-2-3 px-0">
 					<a href="<?= $view->path('election_2026') ?>" title="Komunální volby 2026">
 						<img src="/img/web/volby/volby_2026_logo.png" alt="Volby 2026" class="img-fluid">
                     </a>
@@ -256,7 +256,10 @@ function removeAccent($text, $replace = null): string
 										</div>
 									</div>
 								</div>
-								<div class="text-2"><?= number_format($value['VOLEBNI_STRANA_HLASY'], 0, ',', ' '); ?> hlasů</div>
+								<div class="text-2"><?= number_format($value['VOLEBNI_STRANA_HLASY'], 0, ',', ' '); ?> hlasů, zvoleno zastupitelů: <?= (int)$value['ZASTUPITELE_POCET']; ?></div>
+								<?php if (!empty($value['LIDR'])) { ?>
+									<div class="text-2">Lídr: <?= htmlspecialchars($value['LIDR']) ?></div>
+								<?php } ?>
 							</div>
 						</div>
 					<?php } ?>
