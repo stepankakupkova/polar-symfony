@@ -22,12 +22,50 @@ $view->setBreadcrumbs([
     ['label' => 'Senát'],
 ]);
 
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/video-js.min.css'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/theme/custom/index.css?ver=11'));
+$view->addHeadLink('stylesheet', $view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/quality-selector.css?ver=9'));
+
+$view->addBodyScript($view->asset('vendor/web/video-js/video.min.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/lang/cs.js'));
+$view->addBodyScript($view->asset('vendor/web/video-js/plugin/silvermine-videojs-quality-selector/silvermine-videojs-quality-selector.min.js'));
+
 $view->addInlineScript(
     '// Ticker
     getTickerData();
     interval = startTicker();
     // Crawl
     getCrawlData();'
+);
+
+// Player VideoJS
+$view->addInlineScript(
+    '
+    $("video.player-senat").each(function () {
+        let player = videojs($(this).attr("id"), {
+            controlBar: {
+                children: {
+                    playToggle: true,
+                    progressControl: true,
+                    currentTimeDisplay: true,
+                    timeDivider: true,
+                    durationDisplay: true,
+                    volumePanel: {
+                        inline: true
+                    },
+                    fullscreenToggle: true,
+                    qualitySelector: true,
+                }
+            },
+            playsinline: true,
+        });
+
+        // Explicitní načtení pluginu qualitySelector
+        player.ready(function () {
+            this.controlBar.addChild("QualitySelector");
+        });
+    });
+    '
 );
 
 $view->addInlineScript(
@@ -61,8 +99,8 @@ $senatniObvody = [
             ['jmeno' => 'Zdeněk Navrátil (Evo)', 'hlasy' => 4140, 'procenta' => 9.53],
         ],
         'kolo2' => [
-            ['jmeno' => 'Helena Pešatová (STAN)', 'hlasy' => null, 'procenta' => null],
-            ['jmeno' => 'Petr Korč (Naše Město F-M)', 'hlasy' => null, 'procenta' => null],
+            ['jmeno' => 'Helena Pešatová (STAN)', 'hlasy' => null, 'procenta' => null, 'video' => 'pesatova_senat_261014_50p_HD', 'thumb' => 'pesatova_volby_senat'],
+            ['jmeno' => 'Petr Korč (Naše Město F-M)', 'hlasy' => null, 'procenta' => null, 'video' => 'korc_senat_261014_50p_HD', 'thumb' => 'korc_volby_senat'],
         ],
     ],
     [
@@ -95,8 +133,8 @@ $senatniObvody = [
             ['jmeno' => 'Petr Kazík (OK)', 'hlasy' => 3411, 'procenta' => 14.31],
         ],
         'kolo2' => [
-            ['jmeno' => 'Lenka Brzyszkowská (ANO)', 'hlasy' => null, 'procenta' => null],
-            ['jmeno' => 'Petr Kazík (OK)', 'hlasy' => null, 'procenta' => null],
+            ['jmeno' => 'Lenka Brzyszkowská (ANO)', 'hlasy' => null, 'procenta' => null, 'video' => 'bryszkowska_senat_261014_50p_HD', 'thumb' => 'brzyskowska_volby_senat'],
+            ['jmeno' => 'Petr Kazík (OK)', 'hlasy' => null, 'procenta' => null, 'video' => 'kazik_senat_261014_50p_HD', 'thumb' => 'kazik_volby_senat'],
         ],
     ],
 ];
@@ -153,20 +191,20 @@ $senatniObvody = [
 
     <div class="row">
         <div class="col-12">
-            <h1 class="text-secondary text-4 text-md-5 line-height-6 font-weight-semibold">Výsledky senátních voleb 2026, 1. a 2. kolo</h1>
+            <h1 class="text-primary text-4 text-md-5 line-height-6 font-weight-semibold">Výsledky senátních voleb 2026, 1. a 2. kolo</h1>
         </div>
 
         <?php foreach ($senatniObvody as $obvod) { ?>
             <div class="col-md-4 mb-5">
                 <h2 class="text-primary font-weight-semibold mb-4"><?= htmlspecialchars($obvod['nazev']) ?></h2>
-                <?php foreach ([1, 2] as $kolo) { ?>
+                <?php foreach ([2, 1] as $kolo) { ?>
                     <?php $kandidati = $obvod['kolo' . $kolo]; ?>
                     <?php if ($kolo === 1) { ?>
                         <?php usort($kandidati, static fn(array $candidateA, array $candidateB): int => $candidateB['hlasy'] <=> $candidateA['hlasy']); ?>
                         <?php $kandidati = array_slice($kandidati, 0, 3); ?>
                     <?php } ?>
                     <?php if ($kandidati) { ?>
-                        <h3 class="text-primary font-weight-semibold mb-4"><?= $kandidati[0]['procenta'] !== null ? 'Výsledky' : 'Kandidáti' ?> <?= $kolo ?>. kola</h3>
+                        <h3 class="text-primary font-weight-semibold mb-3<?= $kolo === 1 ? ' mt-5' : '' ?>"><?= $kandidati[0]['procenta'] !== null ? 'Výsledky' : 'Kandidáti' ?> <?= $kolo ?>. kola</h3>
                         <?php foreach ($kandidati as $index => $kandidat) { ?>
                             <?php if ($kolo === 1 && $index === 2) { ?>
                                 <hr class="my-3">
@@ -174,7 +212,7 @@ $senatniObvody = [
                             <?php if ($kandidat['procenta'] !== null) { ?>
                                 <div class="progress-bars elections <?= $kolo === 1 && $index === 2 ? 'mb-5' : 'mb-4' ?>">
                                     <div class="progress-label clearfix">
-                                        <h2 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h2>
+                                        <h4 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h4>
                                     </div>
                                     <div class="progress-label float-start line-height-2" style="width: 150px;">
                                         <span class="text-3 font-weight-bold"><?= number_format((int)$kandidat['hlasy'], 0, ',', ' ') ?> hlasů · <?= number_format((float)$kandidat['procenta'], 2, ',', ' ') ?>%</span>
@@ -184,7 +222,25 @@ $senatniObvody = [
                                     </div>
                                 </div>
                             <?php } else { ?>
-                                <div class="mb-2"><?= htmlspecialchars($kandidat['jmeno']) ?></div>
+                                <h4 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h4>
+                                <?php if (!empty($kandidat['video'])) { ?>
+                                    <?php
+                                        $video_lq = $LIGHT_URL . 'porady/publikovano/2026/10/13/' . $kandidat['video'] . '__lq.mp4';
+                                        $video_hq = $LIGHT_URL . 'porady/publikovano/2026/10/13/' . $kandidat['video'] . '__hq.mp4';
+                                        $poster = '/data/program/thumbs/' . $kandidat['thumb'] . '.jpg';
+                                    ?>
+                                    <div class="video-thumbnail mb-4">
+                                        <video id="player-<?= htmlspecialchars($kandidat['video']) ?>" class="player-senat video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $poster ?>"}'>
+                                            <source src="<?= $video_lq ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
+                                            <source src="<?= $video_hq ?>" type="video/mp4" label="vysoká HD 1080p" />
+                                            <p class="vjs-no-js">
+                                                Váš prohlížeč nepodporuje HTML5 video. Zde je odkaz na <a href="<?= $video_lq ?>">video</a>.
+                                            </p>
+                                        </video>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="ratio ratio-16x9 mb-4"></div>
+                                <?php } ?>
                             <?php } ?>
                         <?php } ?>
                     <?php } ?>

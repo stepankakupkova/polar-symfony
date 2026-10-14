@@ -52,6 +52,7 @@ final class Web2026Controller
         private ShowRepository $showRepository,
         private UrlGeneratorInterface $urlGenerator,
         private LoggerInterface $logger,
+        private string $LIGHT_URL,
     ) {}
 
     public function index(Request $request, PhtmlRenderer $renderer): Response
@@ -368,6 +369,7 @@ final class Web2026Controller
 
         return new Response($renderer->renderWithLayout('election/web2026/senat', [
             'currentUrl' => $actual_link,
+            'LIGHT_URL' => $this->LIGHT_URL,
         ]));
     }
 
