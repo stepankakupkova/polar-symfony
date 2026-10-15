@@ -101,6 +101,10 @@ $view->addInlineScript(
                     <?= htmlspecialchars($camera['description'] ?? '') ?>
                 </p>
 
+                <?php if ($camera['id'] === 11) { ?>
+                    <p class="text-danger">Omlouváme se, tato kamera je momentálně mimo provoz z důvodu technické závady.</p>
+                <?php } ?>
+
                 <div class="video-thumbnail" itemprop="associatedMedia image" itemscope itemtype="https://schema.org/ImageObject">
                     <?php
                     try {
