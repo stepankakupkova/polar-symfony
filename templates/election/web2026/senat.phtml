@@ -99,8 +99,8 @@ $senatniObvody = [
             ['jmeno' => 'Zdeněk Navrátil (Evo)', 'hlasy' => 4140, 'procenta' => 9.53],
         ],
         'kolo2' => [
-            ['jmeno' => 'Helena Pešatová (STAN)', 'hlasy' => null, 'procenta' => null, 'video' => 'pesatova_senat_261014_50p_HD', 'thumb' => 'pesatova_volby_senat'],
-            ['jmeno' => 'Petr Korč (Naše Město F-M)', 'hlasy' => null, 'procenta' => null, 'video' => 'korc_senat_261014_50p_HD', 'thumb' => 'korc_volby_senat'],
+            ['jmeno' => 'Helena Pešatová (STAN)', 'hlasy' => 10409, 'procenta' => 47.90, 'video' => 'pesatova_senat_261014_50p_HD', 'thumb' => 'pesatova_volby_senat'],
+            ['jmeno' => 'Petr Korč (Naše Město F-M)', 'hlasy' => 11321, 'procenta' => 52.09, 'video' => 'korc_senat_261014_50p_HD', 'thumb' => 'korc_volby_senat'],
         ],
     ],
     [
@@ -116,8 +116,8 @@ $senatniObvody = [
             ['jmeno' => 'Štefan Režný (ReMeK)', 'hlasy' => 624, 'procenta' => 1.87],
         ],
         'kolo2' => [
-            ['jmeno' => 'Ondřej Šimetka (ODS)', 'hlasy' => null, 'procenta' => null, 'video_lq' => 'simetka_senat_261014_50p_lq.mp4', 'video_hq' => 'simetka_senat_261014_50p_hq.mp4', 'thumb' => 'simetka_volby_senat'],
-            ['jmeno' => 'Lucie Baránková Vilamová (ANO)', 'hlasy' => null, 'procenta' => null, 'video_lq' => 'barankova_vilamova_senat_261014_50p_HD__lq.mp4', 'video_hq' => 'barankova_vilamova_senat_261014_50p_HD__hq.mp4', 'thumb' => 'barankova_vilamova_volby_senat'],
+            ['jmeno' => 'Ondřej Šimetka (ODS)', 'hlasy' => 12524, 'procenta' => 65.90, 'video_lq' => 'simetka_senat_261014_50p_lq.mp4', 'video_hq' => 'simetka_senat_261014_50p_hq.mp4', 'thumb' => 'simetka_volby_senat'],
+            ['jmeno' => 'Lucie Baránková Vilamová (ANO)', 'hlasy' => 6479, 'procenta' => 34.09, 'video_lq' => 'barankova_vilamova_senat_261014_50p_HD__lq.mp4', 'video_hq' => 'barankova_vilamova_senat_261014_50p_HD__hq.mp4', 'thumb' => 'barankova_vilamova_volby_senat'],
         ],
     ],
     [
@@ -133,8 +133,8 @@ $senatniObvody = [
             ['jmeno' => 'Petr Kazík (OK)', 'hlasy' => 3411, 'procenta' => 14.31],
         ],
         'kolo2' => [
-            ['jmeno' => 'Lenka Brzyszkowská (ANO)', 'hlasy' => null, 'procenta' => null, 'video' => 'bryszkowska_senat_261014_50p_HD', 'thumb' => 'brzyskowska_volby_senat'],
-            ['jmeno' => 'Petr Kazík (OK)', 'hlasy' => null, 'procenta' => null, 'video' => 'kazik_senat_261014_50p_HD', 'thumb' => 'kazik_volby_senat'],
+            ['jmeno' => 'Lenka Brzyszkowská (ANO)', 'hlasy' => 5188, 'procenta' => 47.06, 'video' => 'bryszkowska_senat_261014_50p_HD', 'thumb' => 'brzyskowska_volby_senat'],
+            ['jmeno' => 'Petr Kazík (OK)', 'hlasy' => 5836, 'procenta' => 52.93, 'video' => 'kazik_senat_261014_50p_HD', 'thumb' => 'kazik_volby_senat'],
         ],
     ],
 ];
@@ -199,12 +199,12 @@ $senatniObvody = [
                 <h2 class="text-primary font-weight-semibold mb-4"><?= htmlspecialchars($obvod['nazev']) ?></h2>
                 <?php foreach ([2, 1] as $kolo) { ?>
                     <?php $kandidati = $obvod['kolo' . $kolo]; ?>
+                    <?php usort($kandidati, static fn(array $candidateA, array $candidateB): int => $candidateB['hlasy'] <=> $candidateA['hlasy']); ?>
                     <?php if ($kolo === 1) { ?>
-                        <?php usort($kandidati, static fn(array $candidateA, array $candidateB): int => $candidateB['hlasy'] <=> $candidateA['hlasy']); ?>
                         <?php $kandidati = array_slice($kandidati, 0, 3); ?>
                     <?php } ?>
                     <?php if ($kandidati) { ?>
-                        <h3 class="text-primary font-weight-semibold mb-3<?= $kolo === 1 ? ' mt-5' : '' ?>"><?= $kandidati[0]['procenta'] !== null ? 'Výsledky' : 'Kandidáti' ?> <?= $kolo ?>. kola</h3>
+                        <h3 class="text-primary font-weight-semibold mb-3 pt-3<?= $kolo === 1 ? ' mt-5' : '' ?>"><?= $kandidati[0]['procenta'] !== null ? 'Výsledky' : 'Kandidáti' ?> <?= $kolo ?>. kola</h3>
                         <?php foreach ($kandidati as $index => $kandidat) { ?>
                             <?php if ($kolo === 1 && $index === 2) { ?>
                                 <hr class="my-3">
@@ -223,6 +223,8 @@ $senatniObvody = [
                                 </div>
                             <?php } else { ?>
                                 <h4 class="text-secondary text-4 font-weight-bold mb-1"><?= htmlspecialchars($kandidat['jmeno']) ?></h4>
+                            <?php } ?>
+                            <?php if ($kolo === 2) { ?>
                                 <?php if (!empty($kandidat['video']) || !empty($kandidat['video_lq'])) { ?>
                                     <?php
                                         if (!empty($kandidat['video_lq'])) {
@@ -236,7 +238,7 @@ $senatniObvody = [
                                         }
                                         $poster = '/data/program/thumbs/' . $kandidat['thumb'] . '.jpg';
                                     ?>
-                                    <div class="video-thumbnail mb-4">
+                                    <div class="video-thumbnail mb-5">
                                         <video id="player-<?= htmlspecialchars($playerId) ?>" class="player-senat video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $poster ?>"}'>
                                             <source src="<?= $video_lq ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
                                             <source src="<?= $video_hq ?>" type="video/mp4" label="vysoká HD 1080p" />
@@ -245,7 +247,7 @@ $senatniObvody = [
                                             </p>
                                         </video>
                                     </div>
-                                <?php } else { ?>
+                                <?php } elseif ($kandidat['procenta'] === null) { ?>
                                     <div class="ratio ratio-16x9 mb-4"></div>
                                 <?php } ?>
                             <?php } ?>
