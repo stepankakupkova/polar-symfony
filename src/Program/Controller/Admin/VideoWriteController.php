@@ -14,7 +14,7 @@ use Imagine\Image\Box as ImagineBox;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Palette\RGB as ImaginePaletteRGB;
 use Imagine\Image\Point as ImaginePoint;
-use Imagine\Imagick\Imagine;
+use Imagine\Gd\Imagine;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -553,7 +553,7 @@ final class VideoWriteController
 				->save($this->PUBLIC_PATH . '/' . $target . '-260x146.jpg', ['jpeg_quality' => 90]);
 
 		} catch (ImagineException $e) {
-			// silent
+			throw $e;
 		}
 	}
 
