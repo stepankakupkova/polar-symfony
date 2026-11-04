@@ -116,7 +116,7 @@ final class PlaykitRepository
 
 		// Všechny soubory z galerie
 		$files = $this->connection->createQueryBuilder()
-			->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.size_hq', 'gf.ext', 'gf.duration', 'gf.description', 'gf.updated_date', 'pna2gf.file_id', 'pna2gf.rank')
+			->select('gf.folder', 'gf.type', 'gf.module', 'gf.file', 'gf.folder_light', 'gf.size', 'gf.size_hq', 'gf.ext', 'gf.duration', 'gf.description', 'gf.updated_date', 'pna2gf.file_id', 'pna2gf.rank', 'pna2gf.seek_from', 'pna2gf.seek_to')
 			->from('gallery_files', 'gf')
 			->leftJoin('gf', 'polar_news_articles2gallery_files', 'pna2gf', 'pna2gf.file_id = gf.id')
 			->where('pna2gf.article_id = :articleId')
@@ -127,8 +127,14 @@ final class PlaykitRepository
 
 		if ($files) {
 			foreach ($files as &$file) {
+				if ($file['type'] !== 'video' || !is_numeric($file['seek_from']) || !is_numeric($file['seek_to']) || !is_finite((float) $file['seek_from']) || !is_finite((float) $file['seek_to']) || (float) $file['seek_from'] < 0 || (float) $file['seek_to'] <= (float) $file['seek_from']) {
+					unset($file['seek_from'], $file['seek_to']);
+				}
 				$version = str_replace(['-', ' ', ':'], '', (string) $file['updated_date']);
 				if ($file['type'] === 'video') {
+					if (!empty($resultSet['vi_preview_folder'])) {
+						$file['folder'] = $resultSet['vi_preview_folder'];
+					}
 					$file['medium'] = '/data/gallery/modules/' . $file['module'] . '/videos/' . $file['folder'] . '/715x402.jpg?ver=' . $version;
 					if ($resultSet['public_from'] >= '2015-12-10') {
 						$file['link_lq'] = 'https://light.polar.cz/videa/polar/zpravy/publikovano/' . $file['folder_light'] . '/' . $file['file'] . '_lq.mp4';

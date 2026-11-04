@@ -99,6 +99,8 @@ $view->addInlineScript(
 $view->addInlineScript(
         '
 		$("video.player-article").each(function () {
+            let seekFrom = this.getAttribute("data-seek-from");
+            let seekTo = this.getAttribute("data-seek-to");
 			let player = videojs($(this).attr("id"), {
 				controlBar: {
 					children: {
@@ -121,6 +123,59 @@ $view->addInlineScript(
 			player.ready(function () {
 				this.controlBar.addChild("QualitySelector");
 			});
+            if (seekFrom !== null && seekTo !== null) {
+                seekFrom = Number(seekFrom);
+                seekTo = Number(seekTo);
+                if (Number.isFinite(seekFrom) && Number.isFinite(seekTo) && seekFrom >= 0 && seekTo > seekFrom) {
+                    let initialized = false;
+                    function initializeSeek() {
+                        if (initialized || player.readyState() < 3) {
+                            return;
+                        }
+                        initialized = true;
+                        if (seekFrom >= player.duration()) {
+                            player.error({code: 4, message: "Začátek reportáže je mimo dostupné video."});
+                            return;
+                        }
+                        player.currentTime(seekFrom);
+                    }
+                    function waitingForQuality() {
+                        return player._qualitySelectorSafeSeek && !player._qualitySelectorSafeSeek.hasFinished();
+                    }
+                    player.on("loadedmetadata", initializeSeek);
+                    player.on("canplay", initializeSeek);
+                    player.ready(function () {
+                        if (player.readyState() > 0) {
+                            initializeSeek();
+                        }
+                    });
+                    player.on("seeking", function () {
+                        if (!initialized || waitingForQuality()) {
+                            return;
+                        }
+                        let position = player.currentTime();
+                        let end = Math.min(seekTo, player.duration());
+                        if (position < seekFrom) {
+                            player.currentTime(seekFrom);
+                        } else if (position > end) {
+                            player.currentTime(end);
+                        }
+                    });
+                    player.on("timeupdate", function () {
+                        if (initialized && !waitingForQuality() && player.currentTime() >= Math.min(seekTo, player.duration())) {
+                            player.pause();
+                            if (player.currentTime() > seekTo) {
+                                player.currentTime(seekTo);
+                            }
+                        }
+                    });
+                    player.on("play", function () {
+                        if (initialized && !waitingForQuality() && (player.currentTime() < seekFrom || player.currentTime() >= Math.min(seekTo, player.duration()))) {
+                            player.currentTime(seekFrom);
+                        }
+                    });
+                }
+            }
 		});
         '
     );
@@ -615,7 +670,12 @@ if ($hasOnlineNewsWidget) {
                                         <?php
                                             $first = false;
                                         ?>
-                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="<?= htmlspecialchars($video['description'] ?: $article['title']) ?>" data-setup='{"src": "", "controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
+                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="<?= htmlspecialchars($video['description'] ?: $article['title']) ?>"
+                                            <?php if (isset($video['seek_from'], $video['seek_to'])) { ?>
+                                                data-seek-from="<?= htmlspecialchars((string) $video['seek_from'], ENT_QUOTES, 'UTF-8') ?>"
+                                                data-seek-to="<?= htmlspecialchars((string) $video['seek_to'], ENT_QUOTES, 'UTF-8') ?>"
+                                            <?php } ?>
+                                            data-setup='{"src": "", "controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
 											<source src="<?= $video['link_lq'] ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
 											<source src="<?= $video['link_hq'] ?>" type="video/mp4" label="vysoká HD 1080p" />
                                             <p class="vjs-no-js">
@@ -753,7 +813,7 @@ if ($hasOnlineNewsWidget) {
                                         <?php
                                             $first = false;
                                         ?>
-                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="<?= htmlspecialchars($video['description'] ?: $article['title']) ?>" data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
+                                        <video id="player<?= $index ?>" class="player-article video-js vjs-fluid vjs-16-9 vjs-theme-fantasy" aria-label="<?= htmlspecialchars($video['description'] ?: $article['title']) ?>"<?php if (isset($video['seek_from'], $video['seek_to'])) { ?> data-seek-from="<?= htmlspecialchars((string) $video['seek_from'], ENT_QUOTES, 'UTF-8') ?>" data-seek-to="<?= htmlspecialchars((string) $video['seek_to'], ENT_QUOTES, 'UTF-8') ?>"<?php } ?> data-setup='{"controls": true, "autoplay": false, "preload": "auto", "poster": "<?= $video['medium'] ?>"}'>
 											<source src="<?= $video['link_lq'] ?>" type="video/mp4" label="nízká SD 576p" selected="true" />
 											<source src="<?= $video['link_hq'] ?>" type="video/mp4" label="vysoká HD 1080p" />
                                             <p class="vjs-no-js">
