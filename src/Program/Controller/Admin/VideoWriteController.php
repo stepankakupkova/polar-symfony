@@ -495,13 +495,13 @@ final class VideoWriteController
 			// Log
 			$logger->notice('PROGRAM - Load videos - Create preview', [
 				'description' => 'OK',
-				'user' => $identity->getUserIdentifier() ?? 'CRON',
+				'user' => $identity?->getUserIdentifier() ?? 'CRON',
 				'file' => __FILE__,
 			]);
 		} catch (Exception $e) {
 			$logger->err('PROGRAM - Load videos - Create preview', [
 				'description' => 'ERROR',
-				'user' => $identity->getUserIdentifier() ?? 'CRON',
+				'user' => $identity?->getUserIdentifier() ?? 'CRON',
 				'file' => __FILE__,
 				'trace' => $e->getMessage(),
 			]);
