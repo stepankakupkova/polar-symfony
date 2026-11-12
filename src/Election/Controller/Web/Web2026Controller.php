@@ -91,7 +91,7 @@ final class Web2026Controller
                 if ($articles_ids) {
                     $page = (int)$request->query->get('strana', 1);
                     // DOČASNĚ — připnutí článku 11000057262 na první místo.
-                    $featuredArticle = $this->newsRepository->getArticle(11000057262);
+                    /*$featuredArticle = $this->newsRepository->getArticle(11000057262);
                     if ($featuredArticle) {
                         $articles_ids = array_values(array_filter($articles_ids, static fn(int|string $articleId): bool => (int)$articleId !== 11000057262));
                     }
@@ -100,12 +100,10 @@ final class Web2026Controller
                         array_unshift($articles, $featuredArticle);
                         $articles = array_slice($articles, 0, 20);
                     }
-                    $articlesCount = $this->newsRepository->getCountByTopic($articles_ids) + ($featuredArticle ? 1 : 0);
+                    $articlesCount = $this->newsRepository->getCountByTopic($articles_ids) + ($featuredArticle ? 1 : 0);*/
                     // PŮVODNÍ BLOK — po volbách odkomentovat a dočasný blok odstranit.
-                    /*
                     $articles = $this->newsRepository->getPaginatorByTopic($articles_ids, $page, 20);
                     $articlesCount = $this->newsRepository->getCountByTopic($articles_ids);
-                    */
                     //var_dump($articles);
                 }
             }
@@ -184,7 +182,7 @@ final class Web2026Controller
                 if ($articles_ids) {
                     $page = (int)$request->query->get('strana', 1);
                     // DOČASNĚ — připnutí článku 11000057262 na první místo.
-                    $featuredArticle = $this->newsRepository->getArticle(11000057262);
+                    /*$featuredArticle = $this->newsRepository->getArticle(11000057262);
                     if ($featuredArticle) {
                         $articles_ids = array_values(array_filter($articles_ids, static fn(int|string $articleId): bool => (int)$articleId !== 11000057262));
                     }
@@ -193,12 +191,10 @@ final class Web2026Controller
                         array_unshift($articles, $featuredArticle);
                         $articles = array_slice($articles, 0, 20);
                     }
-                    $articlesCount = $this->newsRepository->getCountByTopic($articles_ids) + ($featuredArticle ? 1 : 0);
+                    $articlesCount = $this->newsRepository->getCountByTopic($articles_ids) + ($featuredArticle ? 1 : 0);*/
                     // PŮVODNÍ BLOK — po volbách odkomentovat a dočasný blok odstranit.
-                    /*
                     $articles = $this->newsRepository->getPaginatorByTopic($articles_ids, $page, 20);
                     $articlesCount = $this->newsRepository->getCountByTopic($articles_ids);
-                    */
                     //var_dump($articles);
                 }
             }
@@ -316,7 +312,7 @@ final class Web2026Controller
                 if ($articles_ids) {
                     $page = (int)$request->query->get('strana', 1);
                     // DOČASNĚ — připnutí článku 11000057262 na první místo.
-                    $featuredArticle = $this->newsRepository->getArticle(11000057262);
+                    /*$featuredArticle = $this->newsRepository->getArticle(11000057262);
                     if ($featuredArticle) {
                         $articles_ids = array_values(array_filter($articles_ids, static fn(int|string $articleId): bool => (int)$articleId !== 11000057262));
                     }
@@ -325,12 +321,10 @@ final class Web2026Controller
                         array_unshift($articles, $featuredArticle);
                         $articles = array_slice($articles, 0, 20);
                     }
-                    $articlesCount = $this->newsRepository->getCountByTopic($articles_ids) + ($featuredArticle ? 1 : 0);
+                    $articlesCount = $this->newsRepository->getCountByTopic($articles_ids) + ($featuredArticle ? 1 : 0);*/
                     // PŮVODNÍ BLOK — po volbách odkomentovat a dočasný blok odstranit.
-                    /*
                     $articles = $this->newsRepository->getPaginatorByTopic($articles_ids, $page, 20);
                     $articlesCount = $this->newsRepository->getCountByTopic($articles_ids);
-                    */
                     //var_dump($articles);
                 }
             }
