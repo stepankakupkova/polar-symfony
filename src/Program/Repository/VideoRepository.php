@@ -214,6 +214,7 @@ final class VideoRepository
 			->innerJoin('program', 'program2shows', 'program2shows', 'program2shows.program_id = program.id')
 			->innerJoin('program2shows', 'program_shows', 'program_shows', 'program_shows.id = program2shows.show_id')
 			->where('program.premiere = 1')
+			->andWhere('program.time < NOW()')
 			->orderBy('program.time', 'DESC')
 			->setMaxResults($limit)
 			->fetchAllAssociative();
