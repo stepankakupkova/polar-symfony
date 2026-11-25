@@ -5,13 +5,13 @@
  *          O TV POLAR dropdown (hamburger) s children z DB + statickými položkami
  * Mobile:  jen Živě Polar 1+2 (menší SVG)
  *
- * @param bool $mobile  true = mobilní verze (jen živě polar/polar2)
+ * @param bool $mobile  true = mobilní verze (jen živě polar)
  */
 /** @var \App\Application\View\ViewHelper $view */
 
 $mobile = $mobile ?? false;
 
-// Mobilní verze — pouze živě polar a polar2 s menšími ikonami
+// Mobilní verze — pouze živě polar s menšími ikonami
 if ($mobile) {
     $mobileItems = [
         [

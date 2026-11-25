@@ -53,10 +53,6 @@ app_hd:
   path: /hd
   controller: App\Application\Controller\Web\ApplicationController::hd
 
-app_polar2:
-  path: /polar2
-  controller: App\Application\Controller\Web\ApplicationController::polar2
-
 app_privacy_policy:
   path: /ochrana-osobnich-udaju
   controller: App\Application\Controller\Web\ApplicationController::privacyPolicy

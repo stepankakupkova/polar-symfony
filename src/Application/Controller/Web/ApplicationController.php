@@ -185,22 +185,6 @@ final class ApplicationController
 		]));
 	}
 
-	public function polar2(
-		Request $request,
-		PhtmlRenderer $renderer,
-		BannerRepository $bannerRepository,
-	): Response {
-		$actual_link = $request->getSchemeAndHttpHost() . $request->getRequestUri();
-
-		return new Response($renderer->renderWithLayout('application/web/polar2', [
-			'og' => [
-				'title' => 'Polar 2 | Televize POLAR',
-				'description' => 'POLAR - moravskoslezská regionální televize - nepřetržitý proud informací, zpráv a zábavných pořadů z vašeho okolí.',
-				'url' => $actual_link,
-			],
-		]));
-	}
-
 	public function privacyPolicy(
 		PhtmlRenderer $renderer,
 	): Response {

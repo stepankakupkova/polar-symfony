@@ -14,7 +14,7 @@ $pageNav = file_exists($pageNavFile) ? require $pageNavFile : [];
 $pageDropdown = $pageNav['submenu-dropdown'] ?? [];
 
 // Sestaví flat seznam položek v pořadí odpovídajícím Laminasu:
-// Přímé submenu items (bez živě polar/polar2, multimedia) + dropdown children + page items
+// Přímé submenu items (bez živě polar, multimedia) + dropdown children + page items
 // V Laminasu šlo vše z jednoho navigation containeru v daném order.
 $skipIds = ['zive-polar', 'multimedia'];
 $items = [];
