@@ -128,6 +128,37 @@ $view->addInlineScript(
                 seekTo = Number(seekTo);
                 if (Number.isFinite(seekFrom) && Number.isFinite(seekTo) && seekFrom >= 0 && seekTo > seekFrom) {
                     let initialized = false;
+                    let fullProgram = false;
+                    let endActions = $("<div>", {
+                        css: {position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none"}
+                    }).hide().appendTo(player.el());
+                    let buttons = $("<div>", {
+                        class: "d-flex flex-column flex-sm-row flex-sm-wrap align-items-center justify-content-center gap-sm-3 w-100 py-1",
+                        css: {background: "rgba(0, 0, 0, 0.78)"}
+                    }).appendTo($("<div>", {class: "d-flex align-items-center h-100"}).appendTo(endActions));
+                    let actionClass = "btn btn-sm border-0 text-white text-decoration-none bg-hover-144b7b px-3 py-2";
+                    $("<button>", {
+                        type: "button", class: actionClass, text: "Pokračovat v pořadu",
+                        css: {pointerEvents: "auto"}
+                    }).prepend("<i class=\"fa-solid fa-play me-2\" aria-hidden=\"true\"></i>").appendTo(buttons).on("click", function () {
+                        fullProgram = true;
+                        resumeFrom(seekTo);
+                    });
+                    $("<button>", {
+                        type: "button", class: actionClass, text: "Přehrát reportáž znovu",
+                        css: {pointerEvents: "auto"}
+                    }).prepend("<i class=\"fa-solid fa-rotate-right me-2\" aria-hidden=\"true\"></i>").appendTo(buttons).on("click", function () {
+                        resumeFrom(seekFrom);
+                    });
+                    buttons.children("button").on("focus blur", function () {
+                        this.style.outline = this.matches(":focus-visible") ? "2px solid #fff" : "";
+                    });
+                    function resumeFrom(position) {
+                        endActions.hide();
+                        player.controlBar.playToggle.focus();
+                        player.currentTime(position);
+                        player.play();
+                    }
                     function initializeSeek() {
                         if (initialized || player.readyState() < 3) {
                             return;
@@ -150,11 +181,14 @@ $view->addInlineScript(
                         }
                     });
                     player.on("seeking", function () {
-                        if (!initialized || waitingForQuality()) {
+                        if (!initialized || fullProgram || waitingForQuality()) {
                             return;
                         }
                         let position = player.currentTime();
                         let end = Math.min(seekTo, player.duration());
+                        if (position < end) {
+                            endActions.hide();
+                        }
                         if (position < seekFrom) {
                             player.currentTime(seekFrom);
                         } else if (position > end) {
@@ -162,15 +196,19 @@ $view->addInlineScript(
                         }
                     });
                     player.on("timeupdate", function () {
-                        if (initialized && !waitingForQuality() && player.currentTime() >= Math.min(seekTo, player.duration())) {
+                        if (initialized && !fullProgram && !waitingForQuality() && player.currentTime() >= Math.min(seekTo, player.duration())) {
                             player.pause();
                             if (player.currentTime() > seekTo) {
                                 player.currentTime(seekTo);
                             }
+                            if (seekTo < player.duration()) {
+                                endActions.show();
+                            }
                         }
                     });
                     player.on("play", function () {
-                        if (initialized && !waitingForQuality() && (player.currentTime() < seekFrom || player.currentTime() >= Math.min(seekTo, player.duration()))) {
+                        if (initialized && !fullProgram && !waitingForQuality() && (player.currentTime() < seekFrom || player.currentTime() >= Math.min(seekTo, player.duration()))) {
+                            endActions.hide();
                             player.currentTime(seekFrom);
                         }
                     });
